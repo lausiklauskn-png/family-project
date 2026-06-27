@@ -318,6 +318,11 @@ h2{font-size:1.55rem;margin:0 0 6px}
 #andockWizard #sbkim-aw-out h4{margin:14px 0 6px;font-size:.95rem}
 #andockWizard pre{background:rgba(0,0,0,.30);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-family:var(--mono);font-size:.78rem;line-height:1.5;color:#cfe0ff;max-height:300px}
 #andockWizard #sbkim-aw-pr{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:.86rem;color:var(--accent)}
+/* Newcomer-Komfort: geführter Ausgang (Kopier-Knöpfe + 'in deinem Repo anlegen') */
+.fp-aw-extra{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.fp-aw-extra h4{margin:0 0 8px;font-size:.95rem}
+.fp-aw-extra .fp-aw-steps{margin:0 0 12px;padding-left:20px;color:var(--muted);font-size:.86rem;line-height:1.6}
+.fp-aw-extra .fp-aw-row{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
 
 /* Bild-des-Tages-Wechsel-Fenster (5-fach-Klick) */
 .fp-bild-modal{position:fixed;inset:0;z-index:1000;display:none;place-items:center;padding:18px}

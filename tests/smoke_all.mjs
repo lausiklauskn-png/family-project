@@ -49,6 +49,19 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>!!document.querySelector("#andockWizard .field .mic")), "netzwerk: Mikrofon am Wizard-Feld nachgerüstet");
   ok(await page.evaluate(()=>!!document.getElementById("fpCopyAndock")), "netzwerk: 'Anleitung kopieren'-Knopf vorhanden");
   ok(await page.evaluate(async()=>{try{const r=await fetch("docs/MYCEL-ANDOCK-AUFTRAG.md");const t=await r.text();return r.ok && /Pflicht-Module/.test(t) && /generateOwnSpore/.test(t);}catch(e){return false;}}), "netzwerk: Mycel-Andock-Auftrag erreichbar + vollständig");
+  // Newcomer-Komfort: nach „Spore-Vorlage erzeugen" gibt es Kopier-Knöpfe + einen
+  // „in DEINEM Repo anlegen"-Link (aus der Repo-Eingabe gebaut). Modul 19 bleibt 1:1.
+  ok(await page.evaluate(async()=>{
+    document.getElementById("sbkim-aw-repo").value="https://github.com/maxmuster/meine-seite";
+    document.getElementById("sbkim-aw-domain").value="Kochrezepte";
+    document.getElementById("sbkim-aw-go").click();
+    await new Promise(r=>setTimeout(r,30));
+    const extra=document.getElementById("fp-aw-extra"); if(!extra) return false;
+    const link=[...extra.querySelectorAll("a")].find(a=>/\/new\/main\?filename=sbkim%2Fspore\.json/.test(a.getAttribute("href")||""));
+    const linkOk=link && /github\.com\/maxmuster\/meine-seite\/new\/main/.test(link.getAttribute("href"));
+    const copyBtns=extra.querySelectorAll("button.slim, button.btn.slim, .fp-aw-row button");
+    return !!(linkOk && copyBtns.length>=2);
+  }), "netzwerk: Wizard-Ausgang geführt (Kopier-Knöpfe + 'in deinem Repo anlegen'-Link)");
   await page.close(); }
 { const { page } = await load("/index.html");
   ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("docked")), "widget: startet angedockt");

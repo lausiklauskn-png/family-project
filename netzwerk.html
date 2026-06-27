@@ -171,9 +171,81 @@
           embeddingModel: "Xenova/multilingual-e5-small"
         });
         FP.enhanceBareInputs(document.getElementById("andockWizard"));
+        // Newcomer-Komfort (Klaus 2026-06-27: „auch Fremde sollen sich so leicht
+        // mit jedem Repo verbinden"). Nach „Spore-Vorlage erzeugen" den Wizard-
+        // Ausgang um Kopier-Knöpfe + einen „in DEINEM Repo anlegen"-Link
+        // erweitern. Modul 19 bleibt unangetastet (1:1 aus Sage) — reines
+        // Seiten-Code, das den Modul-Ausgang umschließt.
+        var goBtn = document.getElementById("sbkim-aw-go");
+        if (goBtn) goBtn.addEventListener("click", function () { setTimeout(augmentWizard, 0); });
       } else {
         var c = document.getElementById("andockWizard");
         if (c) c.innerHTML = '<p class="muted">Andock-Werkzeug konnte nicht geladen werden.</p>';
+      }
+      function ownRepoNewFileUrl(repoUrl) {
+        try {
+          var u = new URL(String(repoUrl || "").trim());
+          if (u.hostname !== "github.com") return "";
+          var parts = u.pathname.replace(/^\/|\/$/g, "").split("/");
+          if (parts.length < 2 || !parts[0] || !parts[1]) return "";
+          return "https://github.com/" + parts[0] + "/" + parts[1] +
+            "/new/main?filename=" + encodeURIComponent("sbkim/spore.json");
+        } catch (e) { return ""; }
+      }
+      function makeCopyBtn(label, getText) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "btn slim"; b.textContent = label;
+        b.addEventListener("click", function () {
+          var txt = getText();
+          function ok() { var o = b.textContent; b.textContent = "✓ kopiert"; setTimeout(function () { b.textContent = o; }, 1600); }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(ok, function () {});
+          } else { try { var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); ok(); } catch (e) {} }
+        });
+        return b;
+      }
+      function augmentWizard() {
+        var outBox = document.getElementById("sbkim-aw-out");
+        if (!outBox || outBox.hidden) return;
+        var old = document.getElementById("fp-aw-extra"); if (old) old.remove();
+        var en = FP.getLang() === "en";
+        var sporeEl = document.getElementById("sbkim-aw-spore");
+        var lineEl = document.getElementById("sbkim-aw-line");
+        var repoEl = document.getElementById("sbkim-aw-repo");
+        var sporeJson = sporeEl ? sporeEl.textContent : "";
+        var statusLine = lineEl ? lineEl.textContent : "";
+        var newUrl = ownRepoNewFileUrl(repoEl ? repoEl.value : "");
+        var box = document.createElement("div"); box.id = "fp-aw-extra"; box.className = "fp-aw-extra";
+        var h = document.createElement("h4");
+        h.textContent = en ? "So bringst du es ins Repo (kein Terminal)" : "So bringst du es ins Repo (kein Terminal)";
+        box.appendChild(h);
+        var ol = document.createElement("ol"); ol.className = "fp-aw-steps";
+        [
+          en ? "Copy the spore template below." : "Spore-Vorlage unten kopieren.",
+          (newUrl
+            ? (en ? "Tap “Create sbkim/spore.json in your repo” — GitHub opens with the path filled in; paste & Commit." : "„sbkim/spore.json in deinem Repo anlegen“ antippen — GitHub öffnet mit ausgefülltem Pfad; einfügen & Commit.")
+            : (en ? "Create a file sbkim/spore.json in your repo and paste it." : "In deinem Repo eine Datei sbkim/spore.json anlegen und einfügen.")),
+          en ? "Copy the status.json line and open the hub PR to add yourself to the node list." : "status.json-Zeile kopieren und den Hub-PR öffnen, um dich in die Knoten-Liste einzutragen."
+        ].forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ol.appendChild(li); });
+        box.appendChild(ol);
+        var row1 = document.createElement("div"); row1.className = "fp-aw-row";
+        row1.appendChild(makeCopyBtn(en ? "📋 Copy spore" : "📋 Spore kopieren", function () { return sporeJson; }));
+        if (newUrl) {
+          var a = document.createElement("a"); a.className = "btn slim"; a.href = newUrl;
+          a.target = "_blank"; a.rel = "noopener noreferrer";
+          a.textContent = en ? "→ Create sbkim/spore.json in your repo" : "→ sbkim/spore.json in deinem Repo anlegen";
+          row1.appendChild(a);
+        }
+        box.appendChild(row1);
+        var row2 = document.createElement("div"); row2.className = "fp-aw-row";
+        row2.appendChild(makeCopyBtn(en ? "📋 Copy status.json line" : "📋 status.json-Zeile kopieren", function () { return statusLine; }));
+        box.appendChild(row2);
+        var note = document.createElement("p"); note.className = "galnote";
+        note.textContent = en
+          ? "This is your unsigned starter template. Your real signed identity is created on your own published site — full guide below (“Bring a foreign site into the mycelium”)."
+          : "Das ist deine unsignierte Start-Vorlage. Deine echte, signierte Identität entsteht auf deiner eigenen veröffentlichten Seite — volle Anleitung unten („Eine fremde Seite ins Mycel holen“).";
+        box.appendChild(note);
+        outBox.appendChild(box);
       }
       // „Anleitung kopieren" — holt MYCEL-ANDOCK-AUFTRAG.md und legt sie in die Zwischenablage.
       var cb = document.getElementById("fpCopyAndock");

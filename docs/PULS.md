@@ -164,9 +164,34 @@ Reihenfolge entscheidet Klaus: PR #1 → PR #2 → diese.
   **⬇ Als Datei herunterladen** (Alternative). Kein Terminal, keine Konsole.
   Nur öffentlicher Teil (Hinweis: privater Schlüssel bleibt im Browser). Neue
   Funktion `renderSporeGuide()` in `sbkim/sbkim-init.js`.
-- **Tests:** `tests/smoke_all.mjs` **61/61 grün** (+2 Weekly: 5-fach-Klick öffnet
-  Weekly-Fenster, Fenster zielt auf den angezeigten Eintrag; +1 Dev-Briefkasten:
-  Spore-Pfad geführt — Kopier-Knopf + GitHub-Link + Download, keine Konsole).
+- **Modell-Lade-Robustheit (Klaus' Befund 2026-06-27, Screenshots):** beim
+  Spore-Erzeugen kam „Modell 'Xenova/multilingual-e5-small' konnte nicht geladen
+  werden: network error". Diagnose: der **GitHub-Lese-Pfad funktioniert**
+  (Klaus' „Verbindung testen" zeigte Sage seq 32 + SB-KIMTool-Point seq 24 ✓);
+  nur der **HuggingFace-Modell-Download** (~30 MB, anderer Host) schlug fehl —
+  transient/host-spezifisch beim Erstlauf. Fix in **family-project-eigenem Code**
+  (`sbkim/sbkim-init.js`, Modul 03 bleibt 1:1 aus Sage): `startSporeGeneration()`
+  zeigt **Download-Fortschritt** (Event `sbkim:embedding-progress`), bei Fehler
+  einen **klaren Hinweis** (Erstlauf braucht stabile Verbindung, danach offline)
+  + **↻ Erneut versuchen** (Modul 03 setzt seinen `pipePromise` bei Fehler
+  zurück, Retry funktioniert). **Offene Tafel-Frage an Sage:** falls der
+  HuggingFace-Download bei Klaus dauerhaft scheitert, ist ein Modell-Mirror/
+  -Vendoring in **Sage Modul 03** die saubere Lösung (Tafel-Evolutions-Klausel,
+  nicht stillschweigend umgehen) — Copy-Paste-Brief unten.
+- **Newcomer-Andock-Wizard geführt (Klaus' Wunsch: „auch Fremde sollen sich so
+  leicht mit jedem Repo verbinden"):** der Modul-19-Ausgang auf `netzwerk.html`
+  wird um **Kopier-Knöpfe** (Spore-Vorlage, status.json-Zeile) + einen
+  **„→ sbkim/spore.json in DEINEM Repo anlegen"**-Link erweitert, der aus der
+  eingegebenen Repo-URL gebaut wird (`https://github.com/<owner>/<repo>/new/main
+  ?filename=sbkim/spore.json`), plus nummerierte Schritte + ehrlicher Hinweis
+  (unsignierte Start-Vorlage; echte signierte Identität entsteht auf der eigenen
+  Seite). **Modul 19 bleibt byte-1:1 aus Sage** — die Erweiterung ist reines
+  Seiten-Code in `netzwerk.html` (umschließt den Modul-Ausgang). CSS `.fp-aw-*`.
+  **Wenn Klaus es überall will**, wird die Erweiterung in einer Sage-Sitzung in
+  `src/modules/19_andock_wizard.js` gehoben (sonst Drift).
+- **Tests:** `tests/smoke_all.mjs` **62/62 grün** (+2 Weekly; +1 Dev-Briefkasten
+  geführter Spore-Pfad; +1 netzwerk: Wizard-Ausgang geführt — Kopier-Knöpfe +
+  „in deinem Repo anlegen"-Link).
 
 **OFFEN — braucht Klaus' Browser (NICHT autonom machbar):** Schritte 1–3 + 5–6
 aus Brief 04 hängen an der **eigenen Spore**. Die erzeugt Klaus im Browser,

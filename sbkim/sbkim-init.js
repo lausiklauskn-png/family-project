@@ -200,6 +200,49 @@
     });
   }
 
+  // Spore-Erzeugung mit Fortschritt + Wiederholen (Klaus' Befund 2026-06-27:
+  // der HuggingFace-Modell-Download ~30 MB kann beim ersten Lauf mit „network
+  // error" scheitern, während der GitHub-Lese-Pfad einwandfrei läuft). Zeigt den
+  // Download-Fortschritt (Event aus Modul 03), bei Fehler einen klaren Hinweis +
+  // „Erneut versuchen". Modul 03 bleibt unangetastet (1:1 aus Sage); die
+  // Wiederhol-Logik nutzt, dass init() seinen pipePromise bei Fehler zurücksetzt.
+  function startSporeGeneration(out) {
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;";
+      });
+    }
+    out.textContent = "Erzeuge Identität … lade Modell (~30 MB beim ersten Mal, danach offline gecacht). Bleib online.\n";
+    var onProg = function (e) {
+      var d = (e && e.detail) || {};
+      if (d.status === "progress" && d.file) {
+        var pct = (d.progress != null) ? Math.round(d.progress) : null;
+        out.textContent = "Lade Modell: " + d.file + (pct != null ? " … " + pct + "%" : " …") +
+          "\n(Einmalig ~30 MB von HuggingFace. Bleib online — danach läuft es offline.)";
+      }
+    };
+    window.addEventListener("sbkim:embedding-progress", onProg);
+    function cleanup() { window.removeEventListener("sbkim:embedding-progress", onProg); }
+    window.__fpErzeugeSpore().then(function (sp) {
+      return (window.SbkimSpore && SbkimSpore.getOwnSpore ? SbkimSpore.getOwnSpore() : Promise.resolve(sp))
+        .then(function (full) { cleanup(); renderSporeGuide(out, full || sp); });
+    }).catch(function (e) {
+      cleanup();
+      var msg = (e && e.message) ? e.message : String(e);
+      var netz = /network|laden|nicht geladen|load|fetch|abort/i.test(msg);
+      var bs = "padding:6px 11px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
+        "background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit";
+      out.innerHTML =
+        '<div style="color:#ffb4a8;margin-bottom:6px">Fehler: ' + esc(msg) + '</div>' +
+        (netz
+          ? '<div style="color:#cfe0ff;margin-bottom:10px">Das Modell (~30 MB) wird beim <b>ersten Mal</b> von HuggingFace geladen — dafür braucht es eine <b>stabile Internet-Verbindung</b>. Der GitHub-Lese-Pfad funktioniert (siehe „Verbindung testen"); nur dieser Download ist gescheitert. Bitte WLAN prüfen und erneut versuchen — danach ist das Modell offline gecacht.</div>'
+          : '') +
+        '<button id="fp-spore-retry" style="' + bs + '">↻ Erneut versuchen</button>';
+      var rb = out.querySelector("#fp-spore-retry");
+      if (rb) rb.addEventListener("click", function () { startSporeGeneration(out); });
+    });
+  }
+
   function mountDevMailbox() {
     if (!isDev() || document.getElementById("fp-dev-mailbox")) return;
     var btn = document.createElement("button");
@@ -231,11 +274,7 @@
     panel.querySelector("#fp-dev-close").addEventListener("click", function () { panel.style.display = "none"; });
     panel.querySelector("#fp-dev-test").addEventListener("click", function () { verbindungsTest(out); });
     panel.querySelector("#fp-dev-spore").addEventListener("click", function () {
-      out.textContent = "Erzeuge Identität (Modell ~30 MB einmalig, dann gecacht) …\n";
-      window.__fpErzeugeSpore().then(function (sp) {
-        return (window.SbkimSpore && SbkimSpore.getOwnSpore ? SbkimSpore.getOwnSpore() : Promise.resolve(sp))
-          .then(function (full) { renderSporeGuide(out, full || sp); });
-      }).catch(function (e) { out.textContent = "Fehler: " + (e && e.message ? e.message : e); });
+      startSporeGeneration(out);
     });
   }
   if (document.readyState !== "loading") mountDevMailbox();
