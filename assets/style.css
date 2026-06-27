@@ -86,29 +86,37 @@ header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radi
 
 /* Glas-Cabochon-Buttons: geschliffene Kante (inset-Schatten) + maus-folgender
    holografischer Schimmer in Theme-Farben (var(--mx)/var(--my) aus app.js). */
-.btn{position:relative;display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:14px;padding:13px 20px;font-size:.96rem;cursor:pointer;border:1px solid transparent;overflow:hidden;text-decoration:none;font-family:var(--sans);line-height:1.2;
+.btn{position:relative;display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:14px;padding:13px 22px;font-size:.96rem;cursor:pointer;border:1px solid transparent;overflow:hidden;text-decoration:none;font-family:var(--sans);line-height:1.2;
+  transform:perspective(640px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transform-style:preserve-3d;transition:transform .14s ease,box-shadow .2s ease;
   box-shadow:
-    inset 0 1.5px .5px rgba(255,255,255,.55),
-    inset 0 -3px 5px rgba(0,0,0,.38),
-    inset 7px 0 12px rgba(255,255,255,.05),
-    inset -7px 0 12px rgba(0,0,0,.28),
-    0 8px 20px rgba(0,0,0,.38),0 2px 4px rgba(0,0,0,.30)}
+    inset 0 2px 1px rgba(255,255,255,.7),         /* heller Schliff oben */
+    inset 0 -5px 9px rgba(0,0,0,.52),             /* tiefe Wölbung unten */
+    inset 11px 0 17px rgba(255,255,255,.07),
+    inset -11px 0 19px rgba(0,0,0,.42),
+    inset 0 0 0 1px rgba(255,255,255,.12),        /* scharfe Schliffkante */
+    0 14px 30px rgba(0,0,0,.48),0 4px 8px rgba(0,0,0,.36)}
 .btn::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:
-    radial-gradient(140px 92px at var(--mx,50%) var(--my,28%),rgba(255,255,255,.55),transparent 60%),
-    linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,0) 44%),
-    linear-gradient(115deg,transparent 28%,color-mix(in srgb,var(--accent3) 60%,transparent) 44%,color-mix(in srgb,var(--accent) 55%,transparent) 52%,color-mix(in srgb,var(--accent2) 60%,transparent) 60%,transparent 74%);
+    radial-gradient(108px 76px at var(--mx,50%) var(--my,24%),rgba(255,255,255,.72),transparent 56%),
+    linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,0) 46%),
+    linear-gradient(115deg,transparent 26%,color-mix(in srgb,var(--accent3) 62%,transparent) 43%,color-mix(in srgb,var(--accent) 58%,transparent) 51%,color-mix(in srgb,var(--accent2) 62%,transparent) 60%,transparent 76%);
   background-size:auto,auto,240% 100%;
   background-position:0 0,0 0,var(--mx,50%) 0;
-  mix-blend-mode:screen;opacity:.5;transition:opacity .25s}
+  mix-blend-mode:screen;opacity:.45;transition:opacity .22s}
+/* zweite Schliffkanten-Brechung: heller Rand, der sich mit der Neigung verschiebt */
+.btn::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(60% 140% at var(--mx,50%) -10%,rgba(255,255,255,.5),transparent 40%);
+  mix-blend-mode:screen;opacity:0;transition:opacity .22s}
 .btn:hover::before,.btn:focus-visible::before{opacity:1}
+.btn:hover::after,.btn:focus-visible::after{opacity:.85}
 .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a}
-.btn.primary:hover{box-shadow:inset 0 1.5px .5px rgba(255,255,255,.6),inset 0 -3px 5px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.4),var(--glow)}
+.btn.primary:hover{box-shadow:inset 0 2px 1px rgba(255,255,255,.75),inset 0 -5px 9px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.16),0 16px 32px rgba(0,0,0,.5),var(--glow)}
 .btn.ghost{background:linear-gradient(180deg,rgba(140,150,170,.16),rgba(18,23,33,.24));border:1px solid var(--line);color:var(--text)}
-.btn.ghost:hover{border-color:var(--accent);box-shadow:inset 0 1.5px .5px rgba(255,255,255,.4),inset 0 -3px 5px rgba(0,0,0,.4),var(--glow)}
+.btn.ghost:hover{border-color:var(--accent);box-shadow:inset 0 2px 1px rgba(255,255,255,.5),inset 0 -5px 9px rgba(0,0,0,.5),0 16px 32px rgba(0,0,0,.5),var(--glow)}
 .btn.gold{background:linear-gradient(135deg,var(--gold),#caa33f);color:#1a1405}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
-@media (prefers-reduced-motion: reduce){ .btn::before{transition:none} }
+@media (prefers-reduced-motion: reduce){ .btn{transition:none;transform:none} .btn::before,.btn::after{transition:none} }
 
 /* Eingabe + Mikrofon (überall, wo Text geschrieben wird) */
 .field{position:relative;display:flex;align-items:center}
