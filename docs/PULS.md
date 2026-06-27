@@ -75,6 +75,13 @@ und der **Verbindungs-Test** (`?dev` → Dev-Briefkasten → „Verbindung teste
 - **Offen vor Launch:** Footer-App-Leiste ausblenden/dev-only; Bild ggf. als
   WebP/JPG optimieren (PNG ~2,4 MB).
 
+## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
+
+Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-
+contained „Verbinde mich mit dem Mycel"-Anleitung für fremde Seiten/KI),
+Marktplatz-Einreich-Dienst, PayPal vorbereiten, Weekly-Discovery-Bild,
+Footer-Bauleiste dev-only, Deploy. Design ist abgeschlossen (Klaus abgenommen).
+
 ## Offen / nächste Schritte (priorisiert)
 
 1. **Klaus' Browser-Sichttest** der Startseite + Räume (lokal via
