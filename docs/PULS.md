@@ -303,6 +303,32 @@ family-project verteilt:
   ✓ Echo = der family-Knoten spricht das Relais. Voller Cross-Knoten-Handshake
   (zwei laufende Knoten) = Generalprobe.
 
+## Nachtrag 2026-06-27 — PWA installierbar + offline (Deploy-Schritt 1)
+
+Vor dem Hetzner-Deploy: family-project zur installierbaren, offline-fähigen PWA
+gemacht (war vorher normale Website ohne Manifest/SW).
+
+- **`manifest.json`** (name „Family Projekt", `display:standalone`, `start_url:"."`,
+  `scope:"."`, theme/bg `#0b0d14`, Icons 192+512 „any maskable").
+- **`icon-192.png` / `icon-512.png`** — per Node erzeugt (Marken-Motiv: Gradient-
+  Rundquadrat + weißes Λ-Knoten-Zeichen wie das Favicon).
+- **`sw.js`** — App-Schale cache-first + Hintergrund-Update, **Fremd-Origins
+  durchgereicht** (Relais/raw/Modell nicht gecacht), `CACHE_VERSION` für Cache-Bust.
+- **4 Hauptseiten**: `<link rel=manifest>` + apple-/mobile-Meta + apple-touch-icon
+  + fail-soft SW-Registrierung (`navigator.serviceWorker.register("sw.js")`).
+- **Tests:** `smoke_all.mjs` **72/72 grün** (+3 PWA: Manifest gültig, sw.js+Icons
+  erreichbar, index verlinkt Manifest/SW). SW stört den Headless-Lauf nicht.
+
+**Wichtig (Identität ist pro Origin):** der deployte Knoten `family-projekt.de`
+ist eine **andere Adresse** als `localhost` — die Identität (privater Schlüssel)
+muss dort **einmalig über den Safe importiert** werden (Andock-Tool → Safe
+entsperren), NICHT neu erzeugt. Die committete `spore.json` ist nur der
+öffentliche Teil.
+
+**Deploy-Schritt 2 (Hetzner):** einmaliges Setup `docs/DEPLOY.md` (Verzeichnis
+klonen + Caddy-Block + reload), dann „veröffentlichen" = Server `git pull origin main`.
+Browser-Sichttest der Installierbarkeit (Chrome „Installieren"-Angebot) wartet auf Klaus.
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-

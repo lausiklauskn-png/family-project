@@ -87,6 +87,10 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>{const shot=document.getElementById("discShot");for(let i=0;i<5;i++)shot.dispatchEvent(new MouseEvent("click",{bubbles:true}));const ms=document.querySelectorAll(".fp-bild-modal");const w=[...ms].find(m=>m.querySelector("#fpwDrop"));return !!(w&&w.classList.contains("open")&&w.querySelector("#fpwName"));}), "Weekly: 5-fach-Klick öffnet Bild-Wechsel-Fenster (eigener Eintrag)");
   // Das Wechsel-Fenster zielt auf den GERADE angezeigten Weekly-Eintrag
   ok(await page.evaluate(()=>{const ms=document.querySelectorAll(".fp-bild-modal");const w=[...ms].find(m=>m.querySelector("#fpwDrop"));const shown=(document.getElementById("discName").textContent||"").trim();return !!w && (w.querySelector("#fpwName").textContent||"").trim()===shown;}), "Weekly: Wechsel-Fenster zielt auf den angezeigten Eintrag");
+  // PWA: Manifest + Service-Worker + Icons (installierbar + offline, Schritt 1)
+  ok(await page.evaluate(async()=>{try{const r=await fetch("manifest.json");const j=await r.json();return r.ok&&j.name==="Family Projekt"&&j.display==="standalone"&&Array.isArray(j.icons)&&j.icons.length>=2;}catch(e){return false;}}), "PWA: manifest.json erreichbar + gültig (standalone, ≥2 Icons)");
+  ok(await page.evaluate(async()=>{try{const a=await fetch("sw.js");const b=await fetch("icon-192.png");const c=await fetch("icon-512.png");return a.ok&&b.ok&&c.ok;}catch(e){return false;}}), "PWA: sw.js + Icons (192/512) erreichbar");
+  ok(await page.evaluate(()=>!!document.querySelector('link[rel="manifest"]')&&!!document.querySelector('link[rel="apple-touch-icon"]')&&!!document.querySelector('script')&&/serviceWorker/.test(document.documentElement.innerHTML)), "PWA: index verlinkt manifest + apple-touch-icon + SW-Registrierung");
   await page.close(); }
 { const { page } = await load("/markt.html");
   ok(await page.evaluate(()=>!document.getElementById("mkEmpty").hidden), "markt: Leer-Hinweis (noch keine Einträge)");
