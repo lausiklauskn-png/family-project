@@ -67,12 +67,18 @@
         await SbkimMembrane.init({ allowedOrigins: FP.allowedOrigins });
       }
       if (window.SbkimSiegel) {
-        SbkimSiegel.init({ badgeSelector: "#sbkim-siegel-badge", repoUrl: FP.repoUrl });
+        SbkimSiegel.init({ badgeSelector: "#sbkim-siegel-badge", repoUrl: FP.repoUrl, ribbonText: "FAMILY PROJEKT" });
+      }
+      // Modul 07 Apoptose: Pflicht-Modul fürs Siegel (01/02/03/04/05/07/15) und
+      // stellt die aktive Knoten-Identität sicher. init() ist fail-soft gekapselt
+      // (legt Ed25519-Identität lokal in IndexedDB an — nichts verlässt das Gerät).
+      if (window.SbkimApoptose) {
+        try { await SbkimApoptose.init(); } catch (e) { console.warn("[FP-SBKIM] Apoptose-Init übersprungen:", e); }
       }
       if (window.SbkimAnastomose) {
         await SbkimAnastomose.init();
       }
-      console.info("[FP-SBKIM] Andock bereit (Storage/Widget/Membran/Siegel/Anastomose). " +
+      console.info("[FP-SBKIM] Andock bereit (Storage/Widget/Membran/Siegel/Apoptose/Anastomose). " +
         "Spore erzeugen: __fpErzeugeSpore() in der DevTools-Konsole.");
     } catch (e) {
       console.error("[FP-SBKIM] Init-Fehler:", e);

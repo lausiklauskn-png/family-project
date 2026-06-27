@@ -83,6 +83,34 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>/Freigabe|markt-/.test(document.getElementById("sbOut").textContent)), "markt: gültiger Eintrag -> Freigabe-Block (keine Auto-Veröffentlichung)");
   await page.close(); }
 
+// SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.
+// reducedMotion: der three.js-Hintergrund läuft headless auf Software-GL
+// (swiftshader) und kann den Main-Thread + IndexedDB-Callbacks ausbremsen;
+// mit reduzierter Bewegung läuft die Andock-Kette deterministisch durch.
+// Auf echter GPU (Klaus' Tablet) ist das kein Thema.
+console.log("\nSBKIM-Siegel (Modul 16)");
+{ const page = await browser.newPage();
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto(base+"/index.html",{waitUntil:"load"});
+  let ready=false;
+  for (let i=0;i<40;i++){ await page.waitForTimeout(200); ready=await page.evaluate(()=>window.SbkimSiegel&&SbkimSiegel._meta&&SbkimSiegel._meta.ready===true); if(ready)break; }
+  ok(ready, "siegel: Andock-Kette läuft durch (Siegel.init ready)");
+  ok(await page.evaluate(()=>!!window.SbkimApoptose && typeof SbkimApoptose.prepareSelfApoptose==="function"), "siegel: Modul 07 Apoptose geladen (Pflicht-Modul)");
+  ok(await page.evaluate(()=>window.SbkimSiegel.isCertified()===true), "siegel: zertifiziert (alle Pflicht-Module 01/02/03/04/05/07/15)");
+  ok(await page.evaluate(()=>SbkimSiegel.getCertifiedModules().includes("07")), "siegel: 07 in zertifizierten Modulen");
+  ok(await page.evaluate(()=>!!document.getElementById("sbkim-siegel-badge")), "siegel: Badge gemountet (#sbkim-siegel-badge)");
+  // SIEGEL-Slot im Status-Widget öffnet das Siegel-Modal (Proxy-Klick).
+  await page.evaluate(()=>{const s=document.querySelector('.fp-sw [data-slot="siegel"]'); if(s) s.click();});
+  await page.waitForTimeout(250);
+  ok(await page.evaluate(()=>SbkimSiegel._meta.modalOpen===true), "siegel: SIEGEL-Slot öffnet das Erklärungs-Modal");
+  // Bronze → Gold bei erfolgreichem Handshake (sbkim:handshake established).
+  ok(await page.evaluate(()=>SbkimSiegel._meta.siegelStufe==="bronze"), "siegel: startet in Bronze");
+  await page.evaluate(()=>window.dispatchEvent(new CustomEvent("sbkim:handshake",{detail:{outcome:"established"}})));
+  await page.waitForTimeout(250);
+  ok(await page.evaluate(()=>SbkimSiegel._meta.siegelStufe==="gold"), "siegel: Handshake → Gold");
+  ok(await page.evaluate(()=>{const b=document.getElementById("sbkim-siegel-badge");return b && b.getAttribute("data-stufe")==="gold";}), "siegel: Badge-Stufe data-stufe=gold");
+  await page.close(); }
+
 await browser.close(); server.close();
 console.log(`\nErgebnis: ${pass}/${pass+fail} grün`+(fail?`, ${fail} rot`:""));
 process.exit(fail?1:0);
