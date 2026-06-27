@@ -134,6 +134,39 @@ per fast-forward übernommen, darauf weitergebaut).
 3. **Deploy** (Hetzner, Caddy + git pull) — erst nach Phase 1/2 fertig
    (Klaus-Entscheid 2026-06-27).
 
+## Bau-Sitzung 4 (Brief 04 — Spore/Netz/Weekly/Deploy) — 2026-06-27
+
+Branch `claude/spore-generation-network-receipt-eyzz27` (Session-vorgegeben).
+Bau-Stand `…-implementation-yeeogy` (PR #2, Brief 04 enthalten) per Reset
+übernommen, darauf weitergebaut. Stacked Draft-PR mit Base
+`claude/family-projekt-implementation-yeeogy` (saubere Inkrement-Diff). Merge-
+Reihenfolge entscheidet Klaus: PR #1 → PR #2 → diese.
+
+**Getan (autonom, Freibrief — logisch, abgegrenzt, headless getestet):**
+
+- **Brief-04-Schritt 4 — Weekly-Discovery-Bild per Drag&Drop** gebaut (analog
+  „Bild des Tages"). **5-fach-Klick** aufs Weekly-Bild (`#discShot`) öffnet ein
+  Wechsel-Fenster (gleiche `.fp-bild-*`-Optik), das **pro Weekly-Eintrag** ein
+  Bild setzt: Drag&Drop ODER Tippen (JPG/PNG/WebP), Vorschau, Übernehmen
+  (lädt das bisherige herunter), „Auf Standard zurücksetzen" (zurück auf
+  Config-`img`/Emoji). Gespeichert in `localStorage` Schlüssel
+  `fp_weekly_img:<url|name>`; `renderDiscover` zieht den Override vor, fällt
+  fail-soft auf Config-Bild bzw. Emoji zurück. SVG gesperrt (`isSvg`). Nur
+  `index.html` (Startseiten-IIFE) berührt; `assets/config/weekly.js`-Kopf um
+  Hinweis ergänzt.
+- **Tests:** `tests/smoke_all.mjs` **60/60 grün** (+2: 5-fach-Klick öffnet
+  Weekly-Fenster; Fenster zielt auf den angezeigten Eintrag).
+
+**OFFEN — braucht Klaus' Browser (NICHT autonom machbar):** Schritte 1–3 + 5–6
+aus Brief 04 hängen an der **eigenen Spore**. Die erzeugt Klaus im Browser,
+damit der **private Schlüssel dauerhaft bei ihm** bleibt (Klaus-Entscheid
+2026-06-27) — eine headless erzeugte Spore hätte einen weggeworfenen privaten
+Schlüssel und wäre wertlos. Reihenfolge sobald die Spore da ist:
+`sbkim/spore.json` committen → `nodeId`/`sporeUrl` in `SIGNAL.json` (seq +1,
+`_pending` raus) → reziproke Netz-Quittung Sage + SB-KIMTool-Point → Deploy
+(Hetzner) → unabhängiger End-to-End-Mycel-Test. Schritt-für-Schritt für Klaus
+in `docs/sessions/BRIEF_05_SPORE_NETZ_DEPLOY.md` + in der Chat-Antwort.
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-
