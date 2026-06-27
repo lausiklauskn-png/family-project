@@ -152,7 +152,8 @@ header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radi
   .pill,nav.top a{transform:none}
   .mic{transform:translateY(-50%)}
   .area,.listing{transform:translateY(var(--lift,0px))}
-  .disc-shot,.doodle{transform:none}
+  .disc-shot{transform:none}
+  .doodle .title{transform:none}
 }
 
 /* Eingabe + Mikrofon (überall, wo Text geschrieben wird) */
@@ -189,14 +190,17 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* Startseite — Bild des Tages */
 .hero{padding:46px 0 8px}
-.doodle{position:relative;border-radius:22px;padding:2px;background:var(--holo-border);animation:holo-rot 14s linear infinite;box-shadow:var(--shadow),var(--glow);
-  transform:perspective(1400px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .2s ease}
+.doodle{position:relative;border-radius:22px;padding:2px;background:var(--holo-border);animation:holo-rot 14s linear infinite;box-shadow:var(--shadow),var(--glow)}
 .doodle .inner{border-radius:20px;background:linear-gradient(180deg,rgba(17,21,31,.92),rgba(11,13,20,.96));overflow:hidden}
-.doodle .pad{aspect-ratio:16/5;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
+/* Pad: Bild liegt vollflächig; Verhältnis passt sich per JS dem Bild an. */
+.doodle .pad{position:relative;aspect-ratio:16/5;
   background:radial-gradient(700px 240px at 80% -30%,rgba(124,156,255,.18),transparent 60%),radial-gradient(520px 200px at 4% 130%,rgba(110,231,211,.14),transparent 60%)}
-.doodle .pad img{width:100%;height:100%;object-fit:cover;display:block}
-.doodle .title{font-size:clamp(1.7rem,4.6vw,2.7rem)}
-.doodle .ph{font-family:var(--mono);font-size:.78rem;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:6px 12px}
+.doodle .pad img.tagesimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
+/* Schriftzug oben mittig ÜBER dem Bild, wackelt wie die Buttons (eigene Neigung). */
+.doodle .title{position:absolute;top:0;left:0;right:0;text-align:center;padding-top:clamp(10px,2.4vw,22px);z-index:2;
+  font-size:clamp(1.7rem,4.6vw,2.7rem);text-shadow:0 2px 14px rgba(0,0,0,.6);
+  transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transform-origin:top center;transition:transform .14s ease}
+.doodle .ph{position:absolute;left:50%;top:56%;transform:translateX(-50%);z-index:2;font-family:var(--mono);font-size:.78rem;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:6px 12px;background:rgba(0,0,0,.25)}
 .lead.hero-lead{margin:20px auto 0;text-align:center}
 
 .searchrow{margin:22px auto 0;max-width:680px;display:flex;gap:10px}

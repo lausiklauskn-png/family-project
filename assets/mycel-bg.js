@@ -82,10 +82,11 @@ if (canvas) {
       uColorCool: { value: new THREE.Color(0x7c9cff) },
       uColorMid:  { value: new THREE.Color(0xa78bfa) },
       uAlpha:     { value: 0.42 },
+      uMouse:     { value: new THREE.Vector2(2, 2) }, // weit weg → kein Boost
       uPxRatio:   { value: renderer.getPixelRatio() }
     },
     vertexShader: /* glsl */`
-      uniform float uTime; uniform float uPxRatio;
+      uniform float uTime; uniform float uPxRatio; uniform vec2 uMouse;
       attribute float aSeed; attribute float aSize;
       varying float vMix; varying float vAlpha;
       void main() {
@@ -96,11 +97,14 @@ if (canvas) {
         p.z += sin(t * 0.5 + p.x * 0.5) * 0.28;
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         float breath = 0.85 + 0.25 * sin(t * 1.4);
-        gl_PointSize = aSize * breath * (220.0 / -mv.z) * uPxRatio;
         gl_Position = projectionMatrix * mv;
+        // Sterne nahe der Maus werden heller + etwas größer (Klaus 2026-06-27)
+        vec2 ndc = gl_Position.xy / gl_Position.w;
+        float nearC = smoothstep(0.5, 0.0, distance(ndc, uMouse));
+        gl_PointSize = aSize * breath * (220.0 / -mv.z) * uPxRatio * (1.0 + nearC * 0.9);
         vMix = aSeed;
         float pulse = sin(t * 2.4 + aSeed * 31.4159);
-        vAlpha = 0.10 + 0.55 * pow(max(pulse, 0.0), 4.0);
+        vAlpha = 0.10 + 0.55 * pow(max(pulse, 0.0), 4.0) + nearC * 0.75;
       }
     `,
     fragmentShader: /* glsl */`
@@ -185,6 +189,19 @@ if (canvas) {
   let scrollY = window.scrollY || 0;
   window.addEventListener('scroll', () => {
     scrollY = window.scrollY || 0;
+    if (reduce) requestAnimationFrame(renderOnce);
+  }, { passive: true });
+
+  // Maus-Position (NDC) an den Shader → Sterne unter der Maus leuchten heller.
+  window.addEventListener('pointermove', (e) => {
+    mat.uniforms.uMouse.value.set(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -((e.clientY / window.innerHeight) * 2 - 1)
+    );
+    if (reduce) requestAnimationFrame(renderOnce);
+  }, { passive: true });
+  window.addEventListener('pointerleave', () => {
+    mat.uniforms.uMouse.value.set(2, 2);
     if (reduce) requestAnimationFrame(renderOnce);
   }, { passive: true });
 

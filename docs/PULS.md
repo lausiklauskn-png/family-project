@@ -55,6 +55,26 @@ und der **Verbindungs-Test** (`?dev` → Dev-Briefkasten → „Verbindung teste
 - **Weiter offen für Klaus' Tablet-Sichttest:** Andocken/Lösen per Touch fühlen,
   Mikrofon-Position, Gesamteindruck.
 
+## Nachtrag 2026-06-27 (Design-Politur mit Klaus, live)
+
+- **Glas-Cabochon-Buttons** überall (Buttons, Pillen, Mikro, Navi-Links auf
+  Hover, große Karten, Bild des Tages, Markt-Karten): geschliffene Kante +
+  maus-folgender Holo-Schimmer (Theme-Farben via color-mix) + 3D-Neigung zum
+  Cursor (`--rx/--ry`, app.js `wireHoloButtons`, SEL breit). Reduced-motion
+  ohne Tilt. Mikrofon vertikal mittig.
+- **Status-Widget** behält beim Lösen die waagerechte Lampen-Form (kein
+  „Status"-Text, kein Hochkant); nur kleines ✕; Ziehen von überall.
+- **Footer-Schnell-Links** (Bauphase) zu Klaus' PWAs: `assets/config/meineapps.js`
+  + `.btn.slim`. **Vor Launch raus/dev-only** (offen). WorkFloh bewusst draußen.
+- **Bild des Tages:** füllt den Rahmen vollflächig (Pad-Verhältnis = Bild-
+  Verhältnis via JS), Titel „Family Projekt" oben mittig drüber, Titel wackelt
+  wie die Buttons (`.fp-doodle-title`). Erstes Bild gesetzt:
+  `assets/tagesbilder/kosmos-mycel.png` (Klaus-Generat). three.js-Sterne werden
+  **heller unter der Maus** (`uMouse`-Uniform in `assets/mycel-bg.js`).
+- Smoke `smoke_all.mjs` **41/41 grün** durchgängig.
+- **Offen vor Launch:** Footer-App-Leiste ausblenden/dev-only; Bild ggf. als
+  WebP/JPG optimieren (PNG ~2,4 MB).
+
 ## Offen / nächste Schritte (priorisiert)
 
 1. **Klaus' Browser-Sichttest** der Startseite + Räume (lokal via

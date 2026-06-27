@@ -3,7 +3,7 @@
  * eintragen (eigenes Bild auf dem Server, z.B. "assets/tagesbilder/2026-06-27.jpg",
  * oder eine externe https-URL). Nur JPG/PNG/WebP. */
 window.FP_TAGESBILD = {
-  img: "",
+  img: "assets/tagesbilder/kosmos-mycel.png",
   titleDe: "Family Projekt",
   titleEn: "Family Projekt",
   phDe: "[ Bild des Tages — wechselt täglich, von dir eingesetzt ]",

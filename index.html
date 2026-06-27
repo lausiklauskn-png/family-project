@@ -43,7 +43,7 @@
         <div class="doodle">
           <div class="inner">
             <div class="pad" id="tagesbildPad">
-              <div class="title holo" id="tagesTitle">Family Projekt</div>
+              <div class="title holo fp-doodle-title" id="tagesTitle">Family Projekt</div>
               <div class="ph" id="tagesPh" data-i18n="doodle_ph">[ Bild des Tages — wechselt täglich, von dir eingesetzt ]</div>
             </div>
           </div>
@@ -162,18 +162,31 @@
         var ph = document.getElementById("tagesPh");
         var pad = document.getElementById("tagesbildPad");
         if (title) title.textContent = (l === "en" ? tb.titleEn : tb.titleDe) || "Family Projekt";
-        if (tb.img && pad) {
-          // Nur Bild zeigen (JPG/PNG/WebP); SVG nicht zulassen.
-          if (!/\.svg(\?|$)/i.test(tb.img)) {
-            pad.innerHTML = "";
+        if (!pad) return;
+        var hasImg = tb.img && !/\.svg(\?|$)/i.test(tb.img);
+        var existing = pad.querySelector("img.tagesimg");
+        if (hasImg) {
+          // Bild vollflächig — Rahmen passt sein Verhältnis dem Bild an,
+          // damit nichts beschnitten wird. Titel bleibt oben mittig drüber.
+          if (!existing || existing.getAttribute("src") !== tb.img) {
+            if (existing) existing.remove();
             var img = new Image();
+            img.className = "tagesimg";
             img.alt = "Bild des Tages";
+            img.onload = function () {
+              if (img.naturalWidth && img.naturalHeight) {
+                pad.style.aspectRatio = (img.naturalWidth / img.naturalHeight).toFixed(4);
+              }
+            };
             img.src = tb.img;
-            pad.appendChild(img);
-            return;
+            pad.insertBefore(img, pad.firstChild);
           }
+          if (ph) ph.style.display = "none";
+        } else {
+          if (existing) existing.remove();
+          pad.style.aspectRatio = "";
+          if (ph) { ph.style.display = ""; ph.textContent = (l === "en" ? tb.phEn : tb.phDe) || ""; }
         }
-        if (ph) ph.textContent = (l === "en" ? tb.phEn : tb.phDe) || "";
       }
 
       // Weekly Discovery — fair, zufällig; Bild bevorzugt, sonst Emoji.
