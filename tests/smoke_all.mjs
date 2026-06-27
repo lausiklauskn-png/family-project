@@ -87,6 +87,16 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>document.querySelectorAll("#spDonate a").length===0), "markt: kein scharfer Spenden-Link solange enabled:false");
   await page.close(); }
 
+// Footer-Bauleiste (Meine Apps) ist dev-only — öffentlich verborgen.
+console.log("\nFooter-Bauleiste (dev-only)");
+{ const { page } = await load("/index.html");
+  ok(await page.evaluate(()=>!document.querySelector("footer .applinks")), "footer: Bauleiste öffentlich verborgen (kein ?dev)");
+  await page.close();
+  const dev = await browser.newPage();
+  await dev.goto(base+"/index.html?dev",{waitUntil:"load"}); await dev.waitForTimeout(600);
+  ok(await dev.evaluate(()=>!!document.querySelector("footer .applinks a")), "footer: Bauleiste mit ?dev sichtbar");
+  await dev.close(); }
+
 // SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.
 // reducedMotion: der three.js-Hintergrund läuft headless auf Software-GL
 // (swiftshader) und kann den Main-Thread + IndexedDB-Callbacks ausbremsen;

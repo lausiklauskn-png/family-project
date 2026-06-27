@@ -178,8 +178,21 @@
     }, { passive: true });
   }
 
+  // Dev-Modus (gleiche Konvention wie sbkim-init.js): ?dev in der URL oder
+  // localStorage fp_dev=1. Bauphasen-Elemente bleiben öffentlich verborgen.
+  function isDev() {
+    try {
+      if (/[?&]dev\b/.test(location.search)) { localStorage.setItem("fp_dev", "1"); return true; }
+      if (/[?&]nodev\b/.test(location.search)) { localStorage.removeItem("fp_dev"); return false; }
+      return localStorage.getItem("fp_dev") === "1";
+    } catch (_e) { return false; }
+  }
+
   // Footer-Schnell-Links zu Klaus' PWAs (Bauphase), aus window.FP_MYAPPS.
+  // NUR im Dev-Modus sichtbar (enthält u.a. WorkFloh/ISD⁺ — soll nicht
+  // dauerhaft öffentlich verlinkt sein, Brief Phase 3 + meineapps.js-Hinweis).
   function renderAppLinks() {
+    if (!isDev()) return;
     var cfg = global.FP_MYAPPS;
     var footer = document.querySelector("footer");
     if (!cfg || !cfg.apps || !cfg.apps.length || !footer) return;
