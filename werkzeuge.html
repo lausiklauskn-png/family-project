@@ -84,6 +84,7 @@
     };
   </script>
   <script src="assets/config/meineapps.js"></script>
+  <script src="assets/config/publicapps.js"></script>
   <script src="assets/app.js"></script>
   <script src="assets/status-widget.js"></script>
   <script>
@@ -93,11 +94,15 @@
         var l = FP.getLang(), grid = document.getElementById("toolGrid");
         var tools = window.FP_WERKZEUGE || [];
         grid.innerHTML = tools.map(function (w) {
-          return '<a class="glass area" href="' + esc(w.page) + '">' +
+          var ext = !!w.external;
+          var href = ext ? (w.open || w.page) : w.page;
+          var attrs = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
+          var label = ext ? (l === "en" ? "→ Open app" : "→ App öffnen") : FP.t("wt_open");
+          return '<a class="glass area" href="' + esc(href) + '"' + attrs + '>' +
             '<div class="ico">' + esc(w.icon || "🧰") + '</div>' +
             '<h3>' + esc(w.name) + '</h3>' +
             '<p>' + esc(l === "en" ? w.en : w.de) + '</p>' +
-            '<span class="go">' + esc(FP.t("wt_open")) + '</span></a>';
+            '<span class="go">' + esc(label) + '</span></a>';
         }).join("");
       }
       window.addEventListener("fp:lang", render);

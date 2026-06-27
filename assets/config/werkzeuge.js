@@ -21,5 +21,34 @@ window.FP_WERKZEUGE = [
     en: "Turns your own PWA into a node in the network (identity, handshake, status).",
     page: "werkzeuge/knoten-werkzeug.html",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/docs/observatorium/tools/mycelknoten.html",
-    install: "" }
+    install: "" },
+
+  /* Klaus' EIGENE, öffentliche Apps (2026-06-27 freigeschaltet). external:true →
+   * die Karte öffnet die LIVE-App direkt in einem neuen Tab (keine eigene
+   * Zwischen-Landingpage nötig). Nur Apps mit eigenem Impressum sind hier gelistet
+   * (Mein Tresor / Jasons Tresor / BookLedgerPro / WorkFloh bewusst NICHT). */
+  { id: "rezeptbuch", name: "Mein Rezeptbuch", icon: "📖", external: true,
+    de: "Rezepte sammeln, ordnen, kochen und teilen — mit Wochenplan, mehrsprachig, offline. Als App installierbar.",
+    en: "Collect, organise, cook and share recipes — weekly plan, multilingual, offline. Installable as an app.",
+    open: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/" },
+  { id: "mixarium", name: "Mein Mixarium", icon: "🍹", external: true,
+    de: "Dein Getränke-Labor: Cocktails, Mocktails, Smoothies, Limonaden, Tees & Sirupe — mehrsprachig, offline.",
+    en: "Your drinks lab: cocktails, mocktails, smoothies, lemonades, teas & syrups — multilingual, offline.",
+    open: "https://lausiklauskn-png.github.io/Mein-Mixarium/" },
+  { id: "sage", name: "Sage-Protokoll", icon: "🍄", external: true,
+    de: "Die Mycel-Bibliothek und der Bau-Hub des Netzwerks — Glossar, Protokoll-Doku und Werkzeuge.",
+    en: "The mycelium library and the build hub of the network — glossary, protocol docs and tools.",
+    open: "https://lausiklauskn-png.github.io/Sage-Protokol/" },
+  { id: "einladung", name: "Sage-Einladung", icon: "✉️", external: true,
+    de: "Die bebilderte Einladung ins Mycel: was das Netzwerk ist, wie es gedacht ist und wie man mitmacht.",
+    en: "The illustrated invitation into the mycelium: what the network is and how to join.",
+    open: "https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" },
+  { id: "kimtoolpoint", name: "SB-KIMTool-Point", icon: "🛰️", external: true,
+    de: "Der öffentliche Knoten-Punkt: Werkzeugkiste und Andock-Stelle, um eine eigene Seite ans Netzwerk zu bringen.",
+    en: "The public node point: toolbox and docking station to bring your own site onto the network.",
+    open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/" },
+  { id: "pinnwand", name: "Pinnwand", icon: "📌", external: true,
+    de: "Eine gemeinsame Pinnwand: Notizen, Links und Fundstücke sammeln, ordnen und teilen — im Browser, ohne Konto.",
+    en: "A shared pinboard: collect, organise and share notes, links and finds — in the browser, no account.",
+    open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" }
 ];
