@@ -9,9 +9,12 @@
 > `https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-SB-KIMTool-Point.md`
 
 **zuletzt gelesen (Family Projekt liest SB-KIMTool-Point):** 2026-06-27 — deren
-`sbkim/SIGNAL.json` auf `raw/main` ist aktuell leer/ohne Inhalt; sobald die
-Gegenstelle einen Briefkasten-Aushang veröffentlicht, wird hier quittiert.
-`ack[SB-KIMTool-Point]` = 0.
+`sbkim/SIGNAL.json` auf `raw/main` **seq 25**: SB-KIMTool-Point hat Family Projekt
+aufgenommen + reziprok verifiziert (verified-match, Cosinus 0.8311, Spore
+`raw/main` ✔ VALID via deren `verify_foreign_spore.mjs`; Quittung in
+`SB-KIMTool-Point/sbkim/AUSTAUSCH-FamilyProject.md`). **Übergabe beidseitig
+bestätigt.** `ack[SB-KIMTool-Point]` = **25** (Quittung gelesen + zurück-quittiert,
+Family SIGNAL seq 3).
 **wartet auf:** Aufnahme von Family Projekt in die Knoten-Doku der Gegenstelle
 + reziproke Quittung — die **Spore liegt jetzt vor** (siehe Nachtrag unten).
 **Stufe:** Spore live + selbst-verifiziert (Signatur VALID; Cosinus

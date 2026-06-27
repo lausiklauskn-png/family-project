@@ -223,12 +223,23 @@ waren transient). Spore in den Chat gegeben → Sitzung hat sie committet.
 - **Neuer Test `tests/smoke_spore.mjs`** (pure Node, kein Browser): 6/6 lokal,
   **10/10 mit `--net`** (reziproke Cosinus-/Signatur-Prüfung gegen die Nachbarn).
 
-**OFFEN für die echte Netz-Quittung:** die `sporeUrl` zeigt auf **`main`** —
-damit Sage + SB-KIMTool-Point die Family-Spore von `raw/main` holen können, muss
-die Family-Spore **auf `main`** liegen (Merge der Family-PRs #1→#2→#3). Danach:
-reziproke **Eintragung + Quittung in Sage + SB-KIMTool-Point** (status.json /
-NETZ-STAND + deren Postfach) — eigener Schritt, Klaus entscheidet Merge + ob die
-Sitzung in die beiden Nachbar-Repos committet.
+**Netz-Quittung ERLEDIGT (beidseitig bestätigt, 2026-06-27):**
+
+- Family-PRs #1→#2→#3 nach `main` gemerged → `spore.json` auf `main` erreichbar.
+- **Sage** (PR #460, gemerged): Family als 7. Knoten in `status.json` +
+  `familyproject_inbox.verify.md` + `AUSTAUSCH-FamilyProjekt.md` + NETZ-STAND +
+  SIGNAL seq 33, `ack[Family Projekt]=2`. Reziprok nachgerechnet: verified-match
+  **0.8287**, Signatur VALID, Manipulationsprobe fällt durch.
+- **SB-KIMTool-Point** (PR #88, gemerged): Family in `status.json` +
+  `familyproject_inbox.json/.verify.md` + `AUSTAUSCH-FamilyProject.md` +
+  `web/data/marktplatz.json` + SIGNAL seq 25, `ack[Family Projekt]=2`. Repo-eigenes
+  `verify_foreign_spore.mjs` → ✔ VALID, verified-match **0.8311**.
+- **Family-Seite zurück-quittiert:** `SIGNAL.json` seq 3, `ack[Sage-Protokol]=33`,
+  `ack[SB-KIMTool-Point]=25`; beide Postfächer „Übergabe beidseitig bestätigt".
+
+**Family Projekt ist damit ein verifizierter Mycel-Knoten.** OFFEN bleibt nur der
+**Deploy** (Hetzner, `family-projekt.de` — Endpoint noch nicht live; Verifikation
+lief über `raw/main`).
 
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
