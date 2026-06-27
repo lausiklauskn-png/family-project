@@ -84,15 +84,31 @@ nav.top a:hover,nav.top a.active{color:var(--text);background:rgba(127,127,127,.
 .fp-sw-restore:hover{color:var(--text);border-color:var(--accent);box-shadow:var(--glow)}
 header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radius:9px}
 
-.btn{position:relative;display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:12px;padding:13px 20px;font-size:.96rem;cursor:pointer;border:1px solid transparent;overflow:hidden;text-decoration:none;font-family:var(--sans);line-height:1.2}
-.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a;box-shadow:var(--shadow)}
-.btn.primary::after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-160%) skewX(-18deg)}
-.btn.primary:hover::after{animation:shimmer .9s ease}
-.btn.primary:hover{box-shadow:var(--shadow),var(--glow)}
-.btn.ghost{background:rgba(127,127,127,.10);border:1px solid var(--line);color:var(--text)}
-.btn.ghost:hover{border-color:var(--accent);box-shadow:var(--glow)}
+/* Glas-Cabochon-Buttons: geschliffene Kante (inset-Schatten) + maus-folgender
+   holografischer Schimmer in Theme-Farben (var(--mx)/var(--my) aus app.js). */
+.btn{position:relative;display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:14px;padding:13px 20px;font-size:.96rem;cursor:pointer;border:1px solid transparent;overflow:hidden;text-decoration:none;font-family:var(--sans);line-height:1.2;
+  box-shadow:
+    inset 0 1.5px .5px rgba(255,255,255,.55),
+    inset 0 -3px 5px rgba(0,0,0,.38),
+    inset 7px 0 12px rgba(255,255,255,.05),
+    inset -7px 0 12px rgba(0,0,0,.28),
+    0 8px 20px rgba(0,0,0,.38),0 2px 4px rgba(0,0,0,.30)}
+.btn::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    radial-gradient(140px 92px at var(--mx,50%) var(--my,28%),rgba(255,255,255,.55),transparent 60%),
+    linear-gradient(180deg,rgba(255,255,255,.32),rgba(255,255,255,0) 44%),
+    linear-gradient(115deg,transparent 28%,color-mix(in srgb,var(--accent3) 60%,transparent) 44%,color-mix(in srgb,var(--accent) 55%,transparent) 52%,color-mix(in srgb,var(--accent2) 60%,transparent) 60%,transparent 74%);
+  background-size:auto,auto,240% 100%;
+  background-position:0 0,0 0,var(--mx,50%) 0;
+  mix-blend-mode:screen;opacity:.5;transition:opacity .25s}
+.btn:hover::before,.btn:focus-visible::before{opacity:1}
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a}
+.btn.primary:hover{box-shadow:inset 0 1.5px .5px rgba(255,255,255,.6),inset 0 -3px 5px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.4),var(--glow)}
+.btn.ghost{background:linear-gradient(180deg,rgba(140,150,170,.16),rgba(18,23,33,.24));border:1px solid var(--line);color:var(--text)}
+.btn.ghost:hover{border-color:var(--accent);box-shadow:inset 0 1.5px .5px rgba(255,255,255,.4),inset 0 -3px 5px rgba(0,0,0,.4),var(--glow)}
 .btn.gold{background:linear-gradient(135deg,var(--gold),#caa33f);color:#1a1405}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
+@media (prefers-reduced-motion: reduce){ .btn::before{transition:none} }
 
 /* Eingabe + Mikrofon (überall, wo Text geschrieben wird) */
 .field{position:relative;display:flex;align-items:center}

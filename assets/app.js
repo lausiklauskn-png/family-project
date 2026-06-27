@@ -152,6 +152,24 @@
     });
   }
 
+  // Holografischer Schimmer folgt der Maus IM Button (Theme-Farben via CSS).
+  // Delegation am Dokument → gilt auch für dynamisch eingehängte Buttons.
+  function wireHoloButtons() {
+    if (wireHoloButtons._done) return; wireHoloButtons._done = true;
+    document.addEventListener("pointermove", function (e) {
+      var b = e.target && e.target.closest && e.target.closest(".btn");
+      if (!b) return;
+      var r = b.getBoundingClientRect();
+      b.style.setProperty("--mx", (((e.clientX - r.left) / r.width) * 100).toFixed(1) + "%");
+      b.style.setProperty("--my", (((e.clientY - r.top) / r.height) * 100).toFixed(1) + "%");
+    }, { passive: true });
+    document.addEventListener("pointerout", function (e) {
+      var b = e.target && e.target.closest && e.target.closest(".btn");
+      if (!b) return;
+      b.style.removeProperty("--mx"); b.style.removeProperty("--my");
+    }, { passive: true });
+  }
+
   // ---- Init ----------------------------------------------------------------
   function init() {
     var lb = document.getElementById("langBtn");
@@ -161,6 +179,7 @@
     applyTheme(ti);
     applyLang(lang);
     wireAllMics();
+    wireHoloButtons();
   }
 
   global.FP = {
