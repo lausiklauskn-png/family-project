@@ -218,6 +218,35 @@
     if (lblEl) lblEl.textContent = (lang === "en" ? cfg.labelEn : cfg.labelDe) || "";
   }
 
+  // Öffentliche Footer-Schnell-Links zu Klaus' FREIGEGEBENEN Apps, aus
+  // window.FP_PUBLICAPPS. IMMER sichtbar (nicht dev-gated, Klaus 2026-06-27:
+  // „Platzierung auf jeder Seite unten"). Nur Apps mit eigenem Impressum sind
+  // hier gelistet (Mein Tresor / Jasons Tresor / BookLedgerPro / WorkFloh nicht).
+  function renderPublicAppLinks() {
+    var cfg = global.FP_PUBLICAPPS;
+    var footer = document.querySelector("footer");
+    if (!cfg || !cfg.apps || !cfg.apps.length || !footer) return;
+    var bar = footer.querySelector(".pubapplinks");
+    if (!bar) {
+      var row = document.createElement("div"); row.className = "wrap";
+      bar = document.createElement("div"); bar.className = "applinks pubapplinks";
+      var lbl = document.createElement("span"); lbl.className = "lbl"; bar.appendChild(lbl);
+      cfg.apps.forEach(function (a) {
+        if (!a || !/^https?:\/\//i.test(a.url || "")) return;
+        var link = document.createElement("a");
+        link.className = "btn ghost slim"; link.href = a.url;
+        link.target = "_blank"; link.rel = "noopener noreferrer";
+        link.textContent = a.name || a.url;
+        bar.appendChild(link);
+      });
+      row.appendChild(bar);
+      // Ganz unten in den Footer (unter die Standard-Zeile/frow).
+      footer.appendChild(row);
+    }
+    var lblEl = bar.querySelector(".lbl");
+    if (lblEl) lblEl.textContent = (lang === "en" ? cfg.labelEn : cfg.labelDe) || "";
+  }
+
   // ---- Init ----------------------------------------------------------------
   function init() {
     var lb = document.getElementById("langBtn");
@@ -229,6 +258,7 @@
     wireAllMics();
     wireHoloButtons();
     renderAppLinks();
+    renderPublicAppLinks();
   }
 
   global.FP = {

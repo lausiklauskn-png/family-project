@@ -36,7 +36,8 @@ for (const rel of ["/index.html","/netzwerk.html","/werkzeuge.html","/markt.html
 // Vertiefte Checks
 console.log("\nDetail-Checks");
 { const { page } = await load("/werkzeuge.html");
-  ok(await page.evaluate(()=>document.querySelectorAll("#toolGrid .area").length===3), "werkzeuge: 3 Tool-Karten");
+  ok(await page.evaluate(()=>document.querySelectorAll("#toolGrid .area").length===(window.FP_WERKZEUGE||[]).length && (window.FP_WERKZEUGE||[]).length>=8), "werkzeuge: alle Tool-/App-Karten gerendert");
+  ok(await page.evaluate(()=>!!document.querySelector('#toolGrid a[href*="Mein-Rezeptbuch"][target="_blank"]')), "werkzeuge: öffentliche App-Karte (Rezeptbuch) extern verlinkt");
   await page.close(); }
 { const { page } = await load("/werkzeuge/such-werkzeug.html");
   ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .feat .f").length===4), "such-werkzeug: 4 Vorteils-Kacheln");
@@ -111,13 +112,15 @@ console.log("\nDetail-Checks");
   await page.close(); }
 
 // Footer-Bauleiste (Meine Apps) ist dev-only — öffentlich verborgen.
-console.log("\nFooter-Bauleiste (dev-only)");
+// Die ÖFFENTLICHE App-Leiste (.pubapplinks) ist dagegen IMMER sichtbar.
+console.log("\nFooter-Bauleiste (dev-only) + öffentliche App-Leiste");
 { const { page } = await load("/index.html");
-  ok(await page.evaluate(()=>!document.querySelector("footer .applinks")), "footer: Bauleiste öffentlich verborgen (kein ?dev)");
+  ok(await page.evaluate(()=>!document.querySelector("footer .applinks:not(.pubapplinks)")), "footer: Bauleiste öffentlich verborgen (kein ?dev)");
+  ok(await page.evaluate(()=>!!document.querySelector("footer .pubapplinks a[href*='Mein-Rezeptbuch']")), "footer: öffentliche App-Leiste sichtbar (Rezeptbuch verlinkt)");
   await page.close();
   const dev = await browser.newPage();
   await dev.goto(base+"/index.html?dev",{waitUntil:"load"}); await dev.waitForTimeout(600);
-  ok(await dev.evaluate(()=>!!document.querySelector("footer .applinks a")), "footer: Bauleiste mit ?dev sichtbar");
+  ok(await dev.evaluate(()=>!!document.querySelector("footer .applinks:not(.pubapplinks) a")), "footer: Bauleiste mit ?dev sichtbar");
   // Dev-Briefkasten: geführter, KONSOLEN-FREIER Spore-Pfad (Klaus 2026-06-27).
   // Embedding-Modell (~30 MB) stubben, damit der Test ohne Netz/Modell läuft.
   ok(await dev.evaluate(async()=>{

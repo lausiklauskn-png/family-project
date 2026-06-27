@@ -83,7 +83,23 @@
       if (window.SbkimSafe) {
         try { await SbkimSafe.init({ autoPrompt: false }); } catch (e) { console.warn("[FP-SBKIM] Safe-Init übersprungen:", e); }
       }
+      // Auto-Lauschen am Relais beim Öffnen (Klaus 2026-06-27): der Knoten ist
+      // Empfangsmodus MIT Antwortrecht — er lauscht selbsttätig auf eingehende
+      // Handshakes und ANTWORTET nur; er initiiert NIE von sich aus (kein Crawler,
+      // keine Pulsation, keine Eigenanfrage ins offene Netz). Das offene Ohr ist
+      // der Empfangskanal; die Schutz-Module (10 Reputation / 11 Rate-Limit /
+      // 12 Blocklist / 15 Membran) sind sein Wächter, sobald sie aus der Schablone
+      // ins echte Leben gehoben sind. Nicht-blockierend + fail-soft: ohne
+      // Relais-Client (Modul 05b) oder bei Netz-Fehler passiert schlicht nichts.
+      if (window.SbkimAnastomose && typeof SbkimAnastomose.listenNostr === "function" && window.SbkimNostrRelay) {
+        try {
+          SbkimAnastomose.listenNostr()
+            .then(function () { console.info("[FP-SBKIM] Auto-Lauschen aktiv (Empfangsmodus mit Antwortrecht)."); })
+            .catch(function (e) { console.warn("[FP-SBKIM] Auto-Lauschen übersprungen:", e); });
+        } catch (e) { console.warn("[FP-SBKIM] Auto-Lauschen übersprungen:", e); }
+      }
       console.info("[FP-SBKIM] Andock bereit (Storage/Widget/Membran/Siegel/Apoptose/Anastomose/Safe). " +
+        "Knoten lauscht selbsttätig am Relais (Empfangsmodus). " +
         "Andock-Tool im Dev-Modus (?dev): Spore erzeugen / sichern / verbinden.");
     } catch (e) {
       console.error("[FP-SBKIM] Init-Fehler:", e);
