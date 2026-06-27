@@ -130,6 +130,13 @@ console.log("\nFooter-Bauleiste (dev-only)");
     const jsonOk=ta && /node-test-123/.test(ta.value) && !/privat|privateKey|secret/i.test(ta.value);
     return !!(ta&&copy&&link&&dl&&noConsole&&linkOk&&jsonOk);
   }), "Dev-Briefkasten: Spore-Pfad geführt (Kopier-Knopf + GitHub-Link + Download, keine Konsole)");
+  // Andock-Tool (vereinheitlicht): Panel heißt „Andock-Tool", vier Schritte,
+  // Modul 20 Safe geladen + „Identität sichern"-Knopf + KI-Anleitung-Link.
+  ok(await dev.evaluate(()=>!!window.SbkimSafe && typeof SbkimSafe.open==="function"), "Andock-Tool: Modul 20 Schlüssel-Safe geladen");
+  ok(await dev.evaluate(()=>{const p=document.getElementById("fp-dev-mailbox");return !!p && /Andock-Tool/.test(p.textContent) && !!document.getElementById("fp-dev-safe") && !!document.getElementById("fp-dev-spore") && !!document.getElementById("fp-dev-test");}), "Andock-Tool: Panel mit Spore/Safe/Verbinden-Schritten");
+  ok(await dev.evaluate(()=>{const a=[...document.querySelectorAll("#fp-dev-mailbox a")];return a.some(x=>/MYCEL-ANDOCK-AUFTRAG\.md/.test(x.getAttribute("href"))) && a.some(x=>/netzwerk\.html#andock/.test(x.getAttribute("href")));}), "Andock-Tool: KI-Anleitung + Andock-Wizard verlinkt");
+  // Safe-Knopf öffnet das Modul-20-Modal (hasVault false -> Create-Modal)
+  ok(await dev.evaluate(async()=>{document.getElementById("fp-dev-safe").click();for(let i=0;i<40;i++){if(document.querySelector("[data-sbkim-vault-modal]"))return true;await new Promise(r=>setTimeout(r,75));}return false;}), "Andock-Tool: Safe-Knopf öffnet Modul-20-Modal");
   await dev.close(); }
 
 // SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.

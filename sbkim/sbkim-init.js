@@ -78,8 +78,13 @@
       if (window.SbkimAnastomose) {
         await SbkimAnastomose.init();
       }
-      console.info("[FP-SBKIM] Andock bereit (Storage/Widget/Membran/Siegel/Apoptose/Anastomose). " +
-        "Spore erzeugen: __fpErzeugeSpore() in der DevTools-Konsole.");
+      // Modul 20 Schlüssel-Safe: fail-soft, KEIN Auto-Prompt (Safe öffnet nur auf
+      // Abruf über das Andock-Tool). Sichert die Identität lokal verschlüsselt.
+      if (window.SbkimSafe) {
+        try { await SbkimSafe.init({ autoPrompt: false }); } catch (e) { console.warn("[FP-SBKIM] Safe-Init übersprungen:", e); }
+      }
+      console.info("[FP-SBKIM] Andock bereit (Storage/Widget/Membran/Siegel/Apoptose/Anastomose/Safe). " +
+        "Andock-Tool im Dev-Modus (?dev): Spore erzeugen / sichern / verbinden.");
     } catch (e) {
       console.error("[FP-SBKIM] Init-Fehler:", e);
     }
@@ -251,8 +256,8 @@
     var btn = document.createElement("button");
     btn.id = "fp-dev-mailbox-btn";
     btn.type = "button";
-    btn.textContent = "🛠 Dev-Briefkasten";
-    btn.title = "Nur im Entwicklungs-Modus sichtbar (Brief §6b). Vor Launch aus.";
+    btn.textContent = "🔌 Andock-Tool";
+    btn.title = "Werkzeug des Knoten-Betreibers. Nur im Entwicklungs-Modus sichtbar (Brief §6b). Vor Launch aus.";
     btn.style.cssText = "position:fixed;left:14px;bottom:14px;z-index:90;font:600 .8rem var(--mono,monospace);" +
       "padding:8px 12px;border-radius:10px;border:1px solid var(--gold,#e6b450);background:rgba(0,0,0,.55);" +
       "color:var(--gold,#e6b450);cursor:pointer;backdrop-filter:blur(6px)";
@@ -261,23 +266,49 @@
     panel.style.cssText = "position:fixed;left:14px;bottom:58px;z-index:90;width:min(420px,92vw);display:none;" +
       "background:rgba(10,12,20,.92);border:1px solid var(--gold,#e6b450);border-radius:12px;padding:14px;" +
       "color:#eef2f8;font:.82rem/1.5 var(--sans,system-ui);backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.5)";
+    var bs = "padding:7px 12px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
+      "background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit;text-decoration:none;display:inline-block";
+    var bsGhost = "padding:7px 12px;border-radius:8px;border:1px solid var(--line,#2a3340);" +
+      "background:transparent;color:#eef2f8;cursor:pointer;font:inherit;text-decoration:none;display:inline-block";
+    var stepStyle = "margin:12px 0 4px;color:var(--gold,#e6b450);font-weight:600;font-size:.78rem";
+    var rowStyle = "display:flex;gap:8px;flex-wrap:wrap";
     panel.innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">' +
-      '<strong style="color:var(--gold,#e6b450)">Dev-Briefkasten · Verbindungs-Test</strong>' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
+      '<strong style="color:var(--gold,#e6b450)">🔌 Andock-Tool</strong>' +
       '<button id="fp-dev-close" style="background:none;border:none;color:#9aa7b6;font-size:1.1rem;cursor:pointer">✕</button></div>' +
-      '<p style="margin:0 0 10px;color:#9aa7b6">Versteckt auf der öffentlichen Seite. Testet die Lese-Erreichbarkeit der Gegenstellen (Sage, SB-KIMTool-Point). Der vollautomatische Rück-Handshake übers Relay ist <strong>in Vorbereitung</strong>.</p>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">' +
-      '<button id="fp-dev-test" style="padding:7px 12px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit">Verbindung testen</button>' +
-      '<button id="fp-dev-spore" style="padding:7px 12px;border-radius:8px;border:1px solid var(--line,#2a3340);background:transparent;color:#eef2f8;cursor:pointer;font:inherit">Eigene Spore erzeugen</button></div>' +
-      '<pre id="fp-dev-out" style="margin:0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:46vh;overflow:auto"></pre>';
+      '<p style="margin:0;color:#9aa7b6">Werkzeug des Knoten-Betreibers (öffentlich versteckt). Vier Schritte, um diesen Knoten ans Mycel zu bringen — klick-geführt, ohne Konsole.</p>' +
+      '<div style="' + stepStyle + '">① Identität erzeugen</div>' +
+      '<div style="' + rowStyle + '"><button id="fp-dev-spore" style="' + bs + '">Eigene Spore erzeugen</button></div>' +
+      '<div style="' + stepStyle + '">② Ins Repo bringen / an deine KI geben</div>' +
+      '<div style="' + rowStyle + '">' +
+      '<a href="docs/MYCEL-ANDOCK-AUFTRAG.md" target="_blank" rel="noopener" style="' + bsGhost + '">↗ KI-Anleitung</a>' +
+      '<a href="netzwerk.html#andock" style="' + bsGhost + '">↗ Andock-Wizard</a></div>' +
+      '<div style="' + stepStyle + '">③ Identität sichern (Safe)</div>' +
+      '<div style="' + rowStyle + '"><button id="fp-dev-safe" style="' + bs + '">🔐 Identität im Safe sichern</button></div>' +
+      '<div style="' + stepStyle + '">④ Verbinden</div>' +
+      '<div style="' + rowStyle + '"><button id="fp-dev-test" style="' + bsGhost + '">Verbindung testen</button></div>' +
+      '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Vollautomatischer Handshake übers Relais (<code>relay.family-projekt.de</code>): in Vorbereitung (Modul 05 Nostr-Transport).</p>' +
+      '<pre id="fp-dev-out" style="margin:10px 0 0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:42vh;overflow:auto"></pre>';
     document.body.appendChild(btn);
     document.body.appendChild(panel);
     var out = panel.querySelector("#fp-dev-out");
     btn.addEventListener("click", function () { panel.style.display = panel.style.display === "none" ? "block" : "none"; });
     panel.querySelector("#fp-dev-close").addEventListener("click", function () { panel.style.display = "none"; });
     panel.querySelector("#fp-dev-test").addEventListener("click", function () { verbindungsTest(out); });
-    panel.querySelector("#fp-dev-spore").addEventListener("click", function () {
-      startSporeGeneration(out);
+    panel.querySelector("#fp-dev-spore").addEventListener("click", function () { startSporeGeneration(out); });
+    panel.querySelector("#fp-dev-safe").addEventListener("click", function () {
+      if (window.SbkimSafe && typeof SbkimSafe.open === "function") {
+        out.textContent = "Safe wird geöffnet … (Passwort setzen oder entsperren im Fenster)\n";
+        SbkimSafe.open().then(function () {
+          return SbkimSafe.hasVault ? SbkimSafe.hasVault() : false;
+        }).then(function (has) {
+          out.textContent = has
+            ? "✔ Safe bereit. Deine Identität ist lokal verschlüsselt gesichert (Shamir 2/3 — Anteile sicher verwahren)."
+            : "Safe-Fenster geschlossen (noch nichts gesichert).";
+        }).catch(function (e) { out.textContent = "Safe-Fehler: " + (e && e.message ? e.message : e); });
+      } else {
+        out.textContent = "Safe (Modul 20) nicht geladen.";
+      }
     });
   }
   if (document.readyState !== "loading") mountDevMailbox();
