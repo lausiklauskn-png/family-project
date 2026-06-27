@@ -279,14 +279,22 @@
       // Weekly Discovery — fair, zufällig; Bild bevorzugt, sonst Emoji.
       var APPS = (window.FP_WEEKLY || []).filter(function (a) { return a && (a.img || a.emoji); });
       var current = -1;
+      // Pro Eintrag kann Klaus (Bauphase) ein Bild per 5-fach-Klick + Drag&Drop
+      // setzen — gespeichert in diesem Browser, fällt sonst auf das Config-Bild/Emoji zurück.
+      function weeklyKey(a) { return "fp_weekly_img:" + (a.url || a.name || ""); }
+      function weeklyImg(a) {
+        try { var o = localStorage.getItem(weeklyKey(a)); if (o && !isSvg(o)) return o; } catch (e) {}
+        return (a.img && !isSvg(a.img)) ? a.img : "";
+      }
       function renderDiscover(i) {
         if (!APPS.length) return;
         current = i;
         var a = APPS[i], l = FP.getLang();
         var shot = document.getElementById("discShot");
         shot.innerHTML = "";
-        if (a.img && !/\.svg(\?|$)/i.test(a.img)) {
-          var img = new Image(); img.alt = a.name; img.src = a.img; shot.appendChild(img);
+        var src = weeklyImg(a);
+        if (src) {
+          var img = new Image(); img.alt = a.name; img.src = src; shot.appendChild(img);
         } else {
           shot.textContent = a.emoji || "🔍";
         }
@@ -304,6 +312,74 @@
       }
       var dbtn = document.getElementById("discBtn");
       if (dbtn) dbtn.addEventListener("click", randomDiscover);
+
+      // --- 5-fach-Klick auf das Weekly-Bild öffnet das Wechsel-Fenster (Bauphase) ---
+      // Gleiche Optik wie „Bild des Tages" (.fp-bild-* CSS), aber pro Weekly-Eintrag.
+      var wkModal = null, wkPending = null;
+      function buildWeeklyModal() {
+        if (wkModal) return wkModal;
+        var m = document.createElement("div"); m.className = "fp-bild-modal";
+        m.innerHTML =
+          '<div class="backdrop"></div>' +
+          '<div class="fp-bild-card">' +
+            '<button class="fp-bild-close" title="Schließen" aria-label="Schließen">✕</button>' +
+            '<h3>Weekly-Bild wechseln</h3>' +
+            '<p class="sub muted">Für: <b id="fpwName">—</b>. Zieh ein Bild hierher oder tippe, um eins zu wählen (JPG/PNG/WebP).</p>' +
+            '<div class="fp-bild-drop" id="fpwDrop">📥 Bild hierher ziehen oder tippen<input type="file" accept="image/png,image/jpeg,image/webp" hidden></div>' +
+            '<div class="fp-bild-prev" id="fpwPrev"><img alt="Vorschau"></div>' +
+            '<div class="fp-bild-actions">' +
+              '<button class="btn primary" id="fpwApply" disabled>Übernehmen</button>' +
+              '<button class="btn ghost" id="fpwDlold">Bisheriges herunterladen</button>' +
+              '<button class="btn ghost" id="fpwReset">Auf Standard zurücksetzen</button>' +
+            '</div>' +
+            '<p class="fp-bild-note">Das Bild gilt nur für <b>diesen Weekly-Eintrag</b> und wird in <b>diesem Browser</b> gespeichert (Bauphase). Fürs öffentliche Veröffentlichen das Bild ins Repo legen und in <code>assets/config/weekly.js</code> beim Eintrag als <code>img</code> eintragen.</p>' +
+          '</div>';
+        document.body.appendChild(m);
+        var drop = m.querySelector("#fpwDrop"), input = drop.querySelector("input");
+        var prev = m.querySelector("#fpwPrev"), prevImg = prev.querySelector("img"), apply = m.querySelector("#fpwApply");
+        function setPending(file) {
+          if (!file || !/^image\/(png|jpeg|webp)$/.test(file.type)) return;
+          var r = new FileReader();
+          r.onload = function () { wkPending = r.result; prevImg.src = wkPending; prev.style.display = "block"; apply.disabled = false; };
+          r.readAsDataURL(file);
+        }
+        drop.addEventListener("click", function () { input.click(); });
+        input.addEventListener("change", function () { if (input.files && input.files[0]) setPending(input.files[0]); });
+        drop.addEventListener("dragover", function (e) { e.preventDefault(); drop.classList.add("hot"); });
+        drop.addEventListener("dragleave", function () { drop.classList.remove("hot"); });
+        drop.addEventListener("drop", function (e) { e.preventDefault(); drop.classList.remove("hot"); if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) setPending(e.dataTransfer.files[0]); });
+        apply.addEventListener("click", function () {
+          if (!wkPending || current < 0) return;
+          var a = APPS[current];
+          var old = weeklyImg(a); if (old) downloadImg(old, baseName(old)); // „zurück in den Ordner"
+          try { localStorage.setItem(weeklyKey(a), wkPending); }
+          catch (e) { var n = m.querySelector(".fp-bild-note"); if (n) n.textContent = "Bild zu groß für den Browser-Speicher. Tipp: als WebP/JPG kleiner speichern oder ins Repo legen."; return; }
+          renderDiscover(current); closeWeekly();
+        });
+        m.querySelector("#fpwDlold").addEventListener("click", function () { if (current < 0) return; var c = weeklyImg(APPS[current]); if (c) downloadImg(c, baseName(c)); });
+        m.querySelector("#fpwReset").addEventListener("click", function () { if (current < 0) return; try { localStorage.removeItem(weeklyKey(APPS[current])); } catch (e) {} renderDiscover(current); closeWeekly(); });
+        m.querySelector(".fp-bild-close").addEventListener("click", closeWeekly);
+        m.querySelector(".backdrop").addEventListener("click", closeWeekly);
+        wkModal = m; return m;
+      }
+      function openWeeklyModal() {
+        if (current < 0) return;
+        buildWeeklyModal(); wkPending = null;
+        var nm = wkModal.querySelector("#fpwName"); if (nm) nm.textContent = APPS[current].name || "—";
+        var ap = wkModal.querySelector("#fpwApply"); if (ap) ap.disabled = true;
+        var pv = wkModal.querySelector("#fpwPrev"); if (pv) pv.style.display = "none";
+        wkModal.classList.add("open");
+      }
+      function closeWeekly() { if (wkModal) wkModal.classList.remove("open"); }
+      (function () {
+        var shot = document.getElementById("discShot"); if (!shot) return;
+        var clicks = 0, ct;
+        shot.addEventListener("click", function () {
+          clicks++; clearTimeout(ct); ct = setTimeout(function () { clicks = 0; }, 1500);
+          if (clicks >= 5) { clicks = 0; openWeeklyModal(); }
+        });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeWeekly(); });
+      })();
 
       // Suche -> Marktplatz mit Query (volle semantische Suche: Schritt 6).
       var form = document.getElementById("searchForm");

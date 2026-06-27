@@ -8,6 +8,11 @@
  * Discovery-Rotation hat hier aber jeder Eintrag entweder img ODER emoji;
  * Einträge ohne img UND ohne emoji werden übersprungen.
  *
+ * Bauphase-Komfort: 5-fach-Klick auf das Weekly-Bild der Startseite öffnet ein
+ * Drag&Drop-Fenster (wie „Bild des Tages") — pro Eintrag ein Bild im Browser
+ * setzen/zurücksetzen. Fürs öffentliche Veröffentlichen das Bild ins Repo legen
+ * und hier beim Eintrag als img eintragen.
+ *
  * Schema: { name, emoji?, img?, de, en, url } */
 window.FP_WEEKLY = [
   { name: "Such-Werkzeug", emoji: "🔍", img: "",
