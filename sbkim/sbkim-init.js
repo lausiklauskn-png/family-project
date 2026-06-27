@@ -149,6 +149,57 @@
     line("Fertig. Auto-Handshake übers Relay: in Vorbereitung (eigene Folge-Sitzung).");
   }
 
+  // Repo, in das die eigene Spore committet wird (sporeUrl zeigt auf main).
+  var FP_REPO = "https://github.com/lausiklauskn-png/family-project";
+
+  // Geführter, KONSOLEN-FREIER Spore-Pfad (Klaus' Wunsch 2026-06-27): nach dem
+  // Erzeugen zeigt das Panel die JSON + Kopier-Knopf + einen GitHub-Link, der die
+  // Datei-anlegen-Seite für sbkim/spore.json mit vorbelegtem Pfad öffnet, plus
+  // einen Download als Alternative. Kein DevTools-Befehl mehr nötig.
+  function renderSporeGuide(out, spore) {
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;";
+      });
+    }
+    var json = JSON.stringify(spore, null, 2);
+    var newFileUrl = FP_REPO + "/new/main?filename=" + encodeURIComponent("sbkim/spore.json");
+    var bs = "padding:6px 11px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
+      "background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit;text-decoration:none;display:inline-block";
+    out.innerHTML =
+      '<div style="color:#9ff7df;margin-bottom:6px">✔ Spore erzeugt — nodeId <b>' + esc(spore.id || "?") + '</b></div>' +
+      '<div style="color:#cfe0ff;margin-bottom:8px">So bringst du sie ins Repo — <b>ohne Terminal, ohne Konsole</b>:</div>' +
+      '<ol style="margin:0 0 10px;padding-left:20px;color:#cfe0ff">' +
+        '<li>Unten <b>📋 JSON kopieren</b> antippen.</li>' +
+        '<li><b>→ Datei im Repo anlegen</b> antippen — GitHub öffnet die Seite für <code>sbkim/spore.json</code> (Pfad ist schon ausgefüllt).</li>' +
+        '<li>Ins große Textfeld tippen → <b>einfügen</b> (lange drücken → Einfügen, oder Strg+V) → unten <b>Commit changes</b>.</li>' +
+      '</ol>' +
+      '<textarea id="fp-spore-json" readonly rows="7" style="width:100%;box-sizing:border-box;resize:vertical;' +
+        'background:rgba(0,0,0,.4);color:#cfe0ff;border:1px solid var(--line,#2a3340);border-radius:8px;padding:8px;' +
+        'font:.72rem/1.45 var(--mono,monospace)">' + esc(json) + '</textarea>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">' +
+        '<button id="fp-spore-copy" style="' + bs + '">📋 JSON kopieren</button>' +
+        '<a id="fp-spore-newfile" href="' + newFileUrl + '" target="_blank" rel="noopener noreferrer" style="' + bs + '">→ Datei im Repo anlegen</a>' +
+        '<button id="fp-spore-dl" style="' + bs + ';border-color:var(--line,#2a3340);background:transparent">⬇ Als Datei herunterladen</button>' +
+      '</div>' +
+      '<div style="color:#9aa7b6;margin-top:8px;font-size:.72rem">Es wird nur der <b>öffentliche</b> Teil committet — dein privater Schlüssel bleibt in diesem Browser.</div>';
+    var ta = out.querySelector("#fp-spore-json");
+    var copyBtn = out.querySelector("#fp-spore-copy");
+    copyBtn.addEventListener("click", function () {
+      function done() { copyBtn.textContent = "✓ kopiert"; setTimeout(function () { copyBtn.textContent = "📋 JSON kopieren"; }, 1800); }
+      if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(json).then(done, function () { ta.focus(); ta.select(); });
+      } else { ta.focus(); ta.select(); try { document.execCommand("copy"); done(); } catch (e) {} }
+    });
+    out.querySelector("#fp-spore-dl").addEventListener("click", function () {
+      var blob = new Blob([json], { type: "application/json" });
+      var u = URL.createObjectURL(blob);
+      var a = document.createElement("a"); a.href = u; a.download = "spore.json";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(u); }, 0);
+    });
+  }
+
   function mountDevMailbox() {
     if (!isDev() || document.getElementById("fp-dev-mailbox")) return;
     var btn = document.createElement("button");
@@ -180,10 +231,11 @@
     panel.querySelector("#fp-dev-close").addEventListener("click", function () { panel.style.display = "none"; });
     panel.querySelector("#fp-dev-test").addEventListener("click", function () { verbindungsTest(out); });
     panel.querySelector("#fp-dev-spore").addEventListener("click", function () {
-      out.textContent = "Erzeuge Identität (Modell ~30 MB einmalig) … siehe DevTools-Konsole für Details.\n";
+      out.textContent = "Erzeuge Identität (Modell ~30 MB einmalig, dann gecacht) …\n";
       window.__fpErzeugeSpore().then(function (sp) {
-        out.textContent += "✔ Spore erzeugt — nodeId " + sp.id + "\nKopiere mit: copy(JSON.stringify(await SbkimSpore.getOwnSpore(),null,2))\nund committe nach sbkim/spore.json.";
-      }).catch(function (e) { out.textContent += "Fehler: " + (e && e.message ? e.message : e); });
+        return (window.SbkimSpore && SbkimSpore.getOwnSpore ? SbkimSpore.getOwnSpore() : Promise.resolve(sp))
+          .then(function (full) { renderSporeGuide(out, full || sp); });
+      }).catch(function (e) { out.textContent = "Fehler: " + (e && e.message ? e.message : e); });
     });
   }
   if (document.readyState !== "loading") mountDevMailbox();

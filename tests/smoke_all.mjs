@@ -99,6 +99,24 @@ console.log("\nFooter-Bauleiste (dev-only)");
   const dev = await browser.newPage();
   await dev.goto(base+"/index.html?dev",{waitUntil:"load"}); await dev.waitForTimeout(600);
   ok(await dev.evaluate(()=>!!document.querySelector("footer .applinks a")), "footer: Bauleiste mit ?dev sichtbar");
+  // Dev-Briefkasten: geführter, KONSOLEN-FREIER Spore-Pfad (Klaus 2026-06-27).
+  // Embedding-Modell (~30 MB) stubben, damit der Test ohne Netz/Modell läuft.
+  ok(await dev.evaluate(async()=>{
+    window.__fpErzeugeSpore = async()=>({ id:"node-test-123" });
+    window.SbkimSpore = window.SbkimSpore || {};
+    SbkimSpore.getOwnSpore = async()=>({ id:"node-test-123", domain:"family-projekt.de", nodeType:"hybrid", signature:"sig", domainVector:[0.1,0.2,0.3] });
+    const btn=document.getElementById("fp-dev-spore"); if(!btn) return false;
+    btn.click(); await new Promise(r=>setTimeout(r,150));
+    const out=document.getElementById("fp-dev-out");
+    const ta=out.querySelector("#fp-spore-json");
+    const copy=out.querySelector("#fp-spore-copy");
+    const link=out.querySelector("#fp-spore-newfile");
+    const dl=out.querySelector("#fp-spore-dl");
+    const noConsole=!/copy\(JSON|DevTools-Konsole|console/i.test(out.textContent);
+    const linkOk=link && /\/new\/main\?filename=sbkim%2Fspore\.json/.test(link.getAttribute("href"));
+    const jsonOk=ta && /node-test-123/.test(ta.value) && !/privat|privateKey|secret/i.test(ta.value);
+    return !!(ta&&copy&&link&&dl&&noConsole&&linkOk&&jsonOk);
+  }), "Dev-Briefkasten: Spore-Pfad geführt (Kopier-Knopf + GitHub-Link + Download, keine Konsole)");
   await dev.close(); }
 
 // SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.
