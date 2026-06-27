@@ -169,11 +169,14 @@
     out.innerHTML =
       '<div style="color:#9ff7df;margin-bottom:6px">✔ Spore erzeugt — nodeId <b>' + esc(spore.id || "?") + '</b></div>' +
       '<div style="color:#cfe0ff;margin-bottom:8px">So bringst du sie ins Repo — <b>ohne Terminal, ohne Konsole</b>:</div>' +
-      '<ol style="margin:0 0 10px;padding-left:20px;color:#cfe0ff">' +
+      '<div style="color:#9ff7df;margin-bottom:4px"><b>Die Spore muss in dein Repo</b> — als Datei <code>sbkim/spore.json</code>. Zwei Wege:</div>' +
+      '<div style="color:#cfe0ff;margin-bottom:6px"><b>Weg A — selbst über GitHub:</b></div>' +
+      '<ol style="margin:0 0 8px;padding-left:20px;color:#cfe0ff">' +
         '<li>Unten <b>📋 JSON kopieren</b> antippen.</li>' +
         '<li><b>→ Datei im Repo anlegen</b> antippen — GitHub öffnet die Seite für <code>sbkim/spore.json</code> (Pfad ist schon ausgefüllt).</li>' +
         '<li>Ins große Textfeld tippen → <b>einfügen</b> (lange drücken → Einfügen, oder Strg+V) → unten <b>Commit changes</b>.</li>' +
       '</ol>' +
+      '<div style="color:#cfe0ff;margin-bottom:10px"><b>Weg B — mit KI-Sitzung (wie hier):</b> <b>📋 JSON kopieren</b> und die Spore einfach <b>in den Chat deiner KI-Sitzung einfügen</b> — sie legt <code>sbkim/spore.json</code> für dich an. (Die Spore ist öffentlich, sie darf in den Chat — kein privater Schlüssel dabei.)</div>' +
       '<textarea id="fp-spore-json" readonly rows="7" style="width:100%;box-sizing:border-box;resize:vertical;' +
         'background:rgba(0,0,0,.4);color:#cfe0ff;border:1px solid var(--line,#2a3340);border-radius:8px;padding:8px;' +
         'font:.72rem/1.45 var(--mono,monospace)">' + esc(json) + '</textarea>' +
