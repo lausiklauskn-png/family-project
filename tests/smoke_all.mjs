@@ -81,6 +81,8 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>{const r=document.querySelector(".fp-sw-restore");return r && r.style.display!=="none";}), "widget: X schließt → Restore-Chip erscheint");
   // Bild des Tages: 5-fach-Klick (schnell) öffnet das Wechsel-Fenster
   ok(await page.evaluate(()=>{const pad=document.getElementById("tagesbildPad");for(let i=0;i<5;i++)pad.dispatchEvent(new MouseEvent("click",{bubbles:true}));const m=document.querySelector(".fp-bild-modal");return !!(m&&m.classList.contains("open")&&m.querySelector("#fpDrop"));}), "Bild des Tages: 5-fach-Klick öffnet Drag&Drop-Fenster");
+  // Bild des Tages: Feenstaub-Canvas (Funkel im Maus-Umfeld) ist gemountet + klick-durchlässig
+  ok(await page.evaluate(()=>{const c=document.querySelector("#tagesbildPad canvas.fp-dust");return !!c && getComputedStyle(c).pointerEvents==="none";}), "Bild des Tages: Feenstaub-Canvas gemountet (pointer-events:none, 5-Klick unberührt)");
   // Weekly Discovery: 5-fach-Klick aufs Weekly-Bild öffnet das eigene Wechsel-Fenster (für den aktuellen Eintrag)
   ok(await page.evaluate(()=>{const shot=document.getElementById("discShot");for(let i=0;i<5;i++)shot.dispatchEvent(new MouseEvent("click",{bubbles:true}));const ms=document.querySelectorAll(".fp-bild-modal");const w=[...ms].find(m=>m.querySelector("#fpwDrop"));return !!(w&&w.classList.contains("open")&&w.querySelector("#fpwName"));}), "Weekly: 5-fach-Klick öffnet Bild-Wechsel-Fenster (eigener Eintrag)");
   // Das Wechsel-Fenster zielt auf den GERADE angezeigten Weekly-Eintrag

@@ -196,6 +196,7 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .doodle .pad{position:relative;aspect-ratio:16/5;
   background:radial-gradient(700px 240px at 80% -30%,rgba(124,156,255,.18),transparent 60%),radial-gradient(520px 200px at 4% 130%,rgba(110,231,211,.14),transparent 60%)}
 .doodle .pad img.tagesimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
+.doodle .pad .fp-dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 /* Schriftzug oben mittig ÜBER dem Bild, wackelt wie die Buttons (eigene Neigung). */
 .doodle .title{position:absolute;top:0;left:0;right:0;text-align:center;padding-top:clamp(10px,2.4vw,22px);z-index:2;
   font-size:clamp(1.7rem,4.6vw,2.7rem);text-shadow:0 2px 14px rgba(0,0,0,.55);
