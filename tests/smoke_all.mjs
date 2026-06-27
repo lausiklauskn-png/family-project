@@ -81,6 +81,10 @@ console.log("\nDetail-Checks");
   await page.fill("#sbImg","https://example.com/shot.jpg");
   await page.click("#mkSubmit button[type=submit]"); await page.waitForTimeout(100);
   ok(await page.evaluate(()=>/Freigabe|markt-/.test(document.getElementById("sbOut").textContent)), "markt: gültiger Eintrag -> Freigabe-Block (keine Auto-Veröffentlichung)");
+  ok(await page.evaluate(()=>{const a=document.getElementById("sbPr");return a && a.style.display!=="none" && /\/edit\/main\/assets\/config\/listings\.js\?quick_pull=1/.test(a.href) && /description=/.test(a.href);}), "markt: PR-Link (GitHub propose-changes) wird erzeugt");
+  // Spenden/Jahresbeitrag: Platzhalter (enabled:false) -> deaktivierte Knöpfe, kein echter Link
+  ok(await page.evaluate(()=>{const b=document.querySelectorAll("#spDonate button");return b.length===2 && [...b].every(x=>x.disabled);}), "markt: Spenden-Knöpfe als Platzhalter deaktiviert (kein Einzug)");
+  ok(await page.evaluate(()=>document.querySelectorAll("#spDonate a").length===0), "markt: kein scharfer Spenden-Link solange enabled:false");
   await page.close(); }
 
 // SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.
