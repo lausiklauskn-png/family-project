@@ -92,22 +92,18 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
 .fp-sw-lamp.on .dot{background:var(--ok);box-shadow:0 0 8px rgba(70,210,127,.7)}
 .fp-sw-lamp.warn .dot{background:#ff5a8a;box-shadow:0 0 8px rgba(255,90,138,.7);animation:pulse 1.1s ease-in-out infinite}
 .fp-sw-lamp[data-slot="siegel"]{cursor:pointer}
-.fp-sw-head{display:flex;align-items:center;gap:6px}
-.fp-sw-head .grip{flex:1;font-family:var(--mono);font-size:.64rem;color:var(--muted);letter-spacing:.04em;white-space:nowrap}
-.fp-sw-head button{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:rgba(127,127,127,.12);color:var(--text);cursor:pointer;font-size:.8rem;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
-.fp-sw-head button:hover{border-color:var(--accent)}
-/* Docked: kompakt, greifbar */
+/* Docked: kompakt, greifbar — waagerechte Lampen-Leiste */
 .fp-sw.docked{display:inline-flex;align-items:center;cursor:grab;padding:4px 8px;border:1px dashed transparent;border-radius:9px;touch-action:none}
 .fp-sw.docked:hover{border-color:var(--line)}
-.fp-sw.docked .fp-sw-head{display:none}
-/* Floating: schwebende Pille mit Kopf (Minimieren + X) */
-.fp-sw.floating{position:fixed;z-index:60;display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:152px;
-  background:var(--card);border:1px solid var(--line);border-radius:12px;
-  backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);box-shadow:var(--shadow);padding:8px 10px}
-.fp-sw.floating .fp-sw-head{cursor:grab;touch-action:none}
-.fp-sw.floating .fp-sw-slots{flex-direction:column;align-items:flex-start;gap:7px}
-.fp-sw.floating.min .fp-sw-slots{display:none}
-.fp-sw.dragging{opacity:.9;cursor:grabbing}
+/* Floating: GLEICHE waagerechte Form, nur frei schwebend + kleines ✕.
+   KEINE Hochkant-/Quadrat-Form, kein „Status"-Text (Klaus 2026-06-27). */
+.fp-sw.floating{position:fixed;z-index:60;display:inline-flex;flex-direction:row;align-items:center;gap:9px;cursor:grab;touch-action:none;
+  background:var(--card);border:1px solid var(--line);border-radius:999px;
+  backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);box-shadow:var(--shadow);padding:7px 13px}
+.fp-sw-x{display:none;width:20px;height:20px;flex-shrink:0;border-radius:50%;border:1px solid var(--line);background:rgba(127,127,127,.14);color:var(--text);cursor:pointer;font-size:.7rem;line-height:1;align-items:center;justify-content:center;padding:0}
+.fp-sw-x:hover{border-color:#ff5a8a;color:#ff8585}
+.fp-sw.floating .fp-sw-x{display:flex}
+.fp-sw.dragging{opacity:.92;cursor:grabbing}
 .fp-sw-restore{font-family:var(--mono);font-size:.7rem;color:var(--muted);background:rgba(127,127,127,.10);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer}
 .fp-sw-restore:hover{color:var(--text);border-color:var(--accent);box-shadow:var(--glow)}
 header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radius:9px}
@@ -143,6 +139,12 @@ header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radi
 .btn.ghost{background:linear-gradient(180deg,rgba(140,150,170,.16),rgba(18,23,33,.24));border:1px solid var(--line);color:var(--text)}
 .btn.ghost:hover{border-color:var(--accent);box-shadow:inset 0 2px 1px rgba(255,255,255,.5),inset 0 -5px 9px rgba(0,0,0,.5),0 16px 32px rgba(0,0,0,.5),var(--glow)}
 .btn.gold{background:linear-gradient(135deg,var(--gold),#caa33f);color:#1a1405}
+/* schmale, flache Glas-Buttons (Footer-Schnell-Links) — gleiche Effekte, kleiner */
+.btn.slim{padding:6px 13px;font-size:.78rem;font-weight:600;border-radius:10px;gap:5px;
+  box-shadow:inset 0 1.5px .5px rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.08),0 5px 14px rgba(0,0,0,.34)}
+.btn.slim:hover{box-shadow:inset 0 1.5px .5px rgba(255,255,255,.5),inset 0 -2px 4px rgba(0,0,0,.42),inset 0 0 0 1px color-mix(in srgb,var(--accent) 50%,transparent),0 6px 16px rgba(0,0,0,.4),var(--glow)}
+.applinks{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+.applinks .lbl{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-right:2px}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
 @media (prefers-reduced-motion: reduce){
   .btn,.pill,.mic,.area,.disc-shot,.doodle,.listing,nav.top a{transition:none}

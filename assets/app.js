@@ -58,6 +58,7 @@
       var k = el.getAttribute("data-i18n-ph");
       if (dict[k] != null) el.setAttribute("placeholder", dict[k]);
     });
+    try { renderAppLinks(); } catch (_e) {}
     try { global.dispatchEvent(new CustomEvent("fp:lang", { detail: { lang: lang } })); } catch (_e) {}
   }
   function getLang() { return lang; }
@@ -177,6 +178,33 @@
     }, { passive: true });
   }
 
+  // Footer-Schnell-Links zu Klaus' PWAs (Bauphase), aus window.FP_MYAPPS.
+  function renderAppLinks() {
+    var cfg = global.FP_MYAPPS;
+    var footer = document.querySelector("footer");
+    if (!cfg || !cfg.apps || !cfg.apps.length || !footer) return;
+    var bar = footer.querySelector(".applinks");
+    if (!bar) {
+      var row = document.createElement("div"); row.className = "wrap";
+      bar = document.createElement("div"); bar.className = "applinks";
+      var lbl = document.createElement("span"); lbl.className = "lbl"; bar.appendChild(lbl);
+      cfg.apps.forEach(function (a) {
+        if (!a || !/^https?:\/\//i.test(a.url || "")) return;
+        var link = document.createElement("a");
+        link.className = "btn ghost slim"; link.href = a.url;
+        link.target = "_blank"; link.rel = "noopener noreferrer";
+        link.textContent = a.name || a.url;
+        bar.appendChild(link);
+      });
+      row.appendChild(bar);
+      var frow = footer.querySelector(".frow");
+      if (frow && frow.parentNode) frow.parentNode.insertBefore(row, frow.nextSibling);
+      else footer.insertBefore(row, footer.firstChild);
+    }
+    var lblEl = bar.querySelector(".lbl");
+    if (lblEl) lblEl.textContent = (lang === "en" ? cfg.labelEn : cfg.labelDe) || "";
+  }
+
   // ---- Init ----------------------------------------------------------------
   function init() {
     var lb = document.getElementById("langBtn");
@@ -187,6 +215,7 @@
     applyLang(lang);
     wireAllMics();
     wireHoloButtons();
+    renderAppLinks();
   }
 
   global.FP = {

@@ -37,16 +37,16 @@
   // ---- Widget-DOM ----------------------------------------------------------
   var w = document.createElement("span");
   w.className = "fp-sw";
+  // Immer dieselbe waagerechte Lampen-Leiste (docked wie floating), kein
+  // „Status"-Text. Floating zeigt zusätzlich ein kleines ✕.
   w.innerHTML =
-    '<span class="fp-sw-head"><span class="grip">⋮⋮ Status</span>' +
-      '<button type="button" data-act="min" title="Minimieren">–</button>' +
-      '<button type="button" data-act="close" title="Schließen">✕</button></span>' +
     '<span class="fp-sw-slots">' +
       '<span class="fp-sw-lamp" data-slot="lebt"><i class="dot"></i>LEBT</span>' +
       '<span class="fp-sw-lamp" data-slot="verkehr"><i class="dot"></i>VERKEHR</span>' +
       '<span class="fp-sw-lamp" data-slot="fremd"><i class="dot"></i>FREMD</span>' +
       '<span class="fp-sw-lamp" data-slot="siegel" title="SBKIM-Siegel"><i class="dot"></i>SIEGEL</span>' +
-    '</span>';
+    '</span>' +
+    '<button type="button" class="fp-sw-x" data-act="close" title="Schließen" aria-label="Schließen">✕</button>';
 
   var restore = document.createElement("span");
   restore.className = "fp-sw-restore";
@@ -78,7 +78,6 @@
     } else { // floating
       document.body.appendChild(w);
       w.classList.add("floating");
-      if (state.min) w.classList.add("min");
       var x = state.x == null ? (global.innerWidth - 200) : state.x;
       var y = state.y == null ? 70 : state.y;
       w.style.left = clampX(x) + "px";
@@ -87,12 +86,7 @@
     saveState();
   }
 
-  // ---- Kopf-Knöpfe (Minimieren / Schließen) --------------------------------
-  w.querySelector('[data-act="min"]').addEventListener("click", function (e) {
-    e.stopPropagation();
-    state.min = !w.classList.contains("min");
-    w.classList.toggle("min", state.min); saveState();
-  });
+  // ---- Schließen (nur floating sichtbar) -----------------------------------
   w.querySelector('[data-act="close"]').addEventListener("click", function (e) {
     e.stopPropagation(); setMode("closed");
   });
@@ -109,8 +103,7 @@
   var drag = null;
   function onDown(e) {
     if (e.button != null && e.button !== 0) return;
-    if (e.target.closest("[data-act]")) return;           // Knöpfe nicht greifen
-    if (state.mode === "floating" && !e.target.closest(".fp-sw-head")) return; // floating nur am Kopf
+    if (e.target.closest("[data-act]")) return;           // ✕ nicht greifen
     drag = { sx: e.clientX, sy: e.clientY, moved: false,
              ox: w.getBoundingClientRect().left, oy: w.getBoundingClientRect().top,
              gx: e.clientX - w.getBoundingClientRect().left, gy: e.clientY - w.getBoundingClientRect().top };
@@ -125,7 +118,8 @@
     if (state.mode === "docked") {
       if (drag.moved && dy > 10) {            // nach unten ziehen → lösen
         setMode("floating"); w.classList.add("dragging");
-        drag.gx = 90; drag.gy = 14;            // Greifpunkt im neuen Pillen-Kopf
+        var nr = w.getBoundingClientRect();   // Pille mittig unter den Cursor
+        drag.gx = nr.width / 2; drag.gy = nr.height / 2;
       } else return;
     }
     if (state.mode === "floating") {

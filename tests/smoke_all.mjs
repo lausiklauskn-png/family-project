@@ -50,11 +50,11 @@ console.log("\nDetail-Checks");
   await page.close(); }
 { const { page } = await load("/index.html");
   ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("docked")), "widget: startet angedockt");
-  ok(await page.evaluate(()=>getComputedStyle(document.querySelector(".fp-sw .fp-sw-head")).display==="none"), "widget: angedockt ohne Minimieren/X");
+  ok(await page.evaluate(()=>getComputedStyle(document.querySelector(".fp-sw .fp-sw-x")).display==="none"), "widget: angedockt ohne ✕");
   // Andocken/Lösen über die öffentliche API
   await page.evaluate(()=>window.FPStatusWidget.setMode("floating"));
   ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("floating")), "widget: gelöst → floating");
-  ok(await page.evaluate(()=>document.querySelector('.fp-sw [data-act="min"]') && document.querySelector('.fp-sw [data-act="close"]')), "widget: floating hat Minimieren + X");
+  ok(await page.evaluate(()=>{const s=getComputedStyle(document.querySelector(".fp-sw"));return s.flexDirection==="row" && getComputedStyle(document.querySelector(".fp-sw .fp-sw-x")).display!=="none";}), "widget: floating bleibt waagerecht (gleiche Form) + ✕ sichtbar");
   // Echtes Ziehen nach unten zum Lösen (aus angedockt)
   await page.evaluate(()=>window.FPStatusWidget.setMode("docked"));
   const box = await page.evaluate(()=>{const r=document.querySelector(".fp-sw").getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};});
