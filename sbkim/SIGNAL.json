@@ -1,10 +1,10 @@
 {
   "node": "family-project",
   "lastBuild": "2026-06-27",
-  "seq": 1,
-  "headline": "Family Projekt tritt dem SBKIM-Mycel bei. Module 01/02/03/04/05/07/15 (+16/17/19) 1:1 aus Sage, Andock-Kette laeuft durch, SBKIM-Siegel zertifiziert (Bronze; Gold nach erstem Handshake). Marktplatz PR-basiert, Spenden/Jahresbeitrag als Platzhalter. OFFEN: eigene Spore (sbkim/spore.json) erzeugt Klaus im Browser (privater Schluessel bleibt bei ihm); danach nodeId hier nachtragen + reziproke Quittung mit Sage + SB-KIMTool-Point.",
+  "seq": 2,
+  "headline": "Eigene Spore erzeugt + committet (nodeId HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE, privater Schluessel bleibt in Klaus' Browser). Reziprok verifiziert: eigene Signatur VALID, nodeId = base64url(sha256(pubkey)), domainVector L2-normalisiert; Cosinus Family<->Sage 0.83, Family<->SB-KIMTool-Point 0.83. Bitte um Aufnahme in eure Knoten-Liste (status.json / NETZ-STAND) + reziproke Quittung.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json",
-  "nodeId": "",
+  "nodeId": "HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE",
   "mailboxes": {
     "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-Sage.md",
     "SB-KIMTool-Point": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-SB-KIMTool-Point.md"
@@ -18,12 +18,16 @@
     "SB-KIMTool-Point": 0
   },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal.",
-  "_pending": "nodeId ist leer, bis Klaus die eigene Spore im Browser erzeugt hat (Dev-Briefkasten ?dev -> 'Eigene Spore erzeugen' -> sbkim/spore.json committen). Erst dann ist sporeUrl auflösbar und die Gegenstellen koennen verified-spore/verified-match rechnen. Bis dahin ist dieser Eintrag eine Beitritts-Ankuendigung, keine verifizierbare Identitaet.",
   "history": [
     {
       "seq": 1,
       "date": "2026-06-27",
       "headline": "Beitritts-Ankuendigung. Module verdrahtet, Siegel zertifiziert, Marktplatz/Spenden vorbereitet. Spore + nodeId folgen nach Klaus' Browser-Lauf."
+    },
+    {
+      "seq": 2,
+      "date": "2026-06-27",
+      "headline": "Spore erzeugt + committet (nodeId HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE). Reziprok verifiziert (Signaturen VALID, Cosinus ~0.83 zu Sage und SB-KIMTool-Point). Bitte um Aufnahme + Quittung."
     }
   ]
 }

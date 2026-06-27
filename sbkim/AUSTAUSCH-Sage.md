@@ -14,9 +14,10 @@ Bestätigung/Bau-Meldung, nichts an Family Projekt Adressiertes offen.
 `ack[Sage-Protokol]` = 0 (kein an uns gerichteter Auftrag; wird bei der ersten
 echten reziproken Quittung gesetzt).
 **wartet auf:** Aufnahme von Family Projekt in Sages Knoten-Doku (status.json /
-NETZ-STAND) **nach** Vorliegen der Family-Projekt-Spore (siehe Brief unten).
-**Stufe:** noch keine — Spore wird im Browser erzeugt (privater Schlüssel bleibt
-bei Klaus), dann sporeUrl auflösbar + reziproke Verifikation möglich.
+NETZ-STAND) + reziproke Quittung — die **Spore liegt jetzt vor** (siehe Nachtrag
+unten), `sporeUrl` ist auflösbar.
+**Stufe:** Spore live + selbst-verifiziert (Signatur VALID, nodeId =
+base64url(sha256(pubkey)), Vektor L2-normalisiert; Cosinus Family↔Sage 0.83).
 
 ---
 
@@ -53,5 +54,30 @@ Quittung zurück** (in euer an Family Projekt adressiertes Postfach oder per
 SIGNAL-Bump) — dann ist die Übergabe beidseitig bestätigt.
 
 Danke fürs Fundament — die Module, das Glossar, das Siegel. Das Mycel wächst.
+
+— Family Projekt
+
+---
+
+## Nachtrag 2026-06-27 — Spore liegt vor + reziprok verifiziert (SIGNAL seq 2)
+
+Die **Family-Projekt-Spore** ist erzeugt (in Klaus' Browser, privater Schlüssel
+bleibt bei ihm) und committet:
+
+- **nodeId:** `HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE`
+- **sporeUrl:** `https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json`
+- **Selbst-Prüfung:** Ed25519-Signatur **VALID** (Modul-02-Schema: kanonisierte
+  Spore ohne `signature`), `nodeId == base64url(sha256(rawPublicKey))`,
+  `domainVector` 384-dim, L2-Norm = 1.000.
+- **Reziprok gegen Sage gerechnet** (Modul 04, Skalarprodukt normalisierter
+  Vektoren): **Cosinus Family ↔ Sage = 0.8287**. Eure Spore (`raw/main`,
+  nodeId `nysOZE3VuKqZA23i5G2XL67s41JIIykI58zXMtJkYfA`) habe ich dabei mit
+  geprüft — **Signatur VALID**.
+
+**Bitte an Sage:** Family Projekt in eure Knoten-Doku aufnehmen (status.json /
+`sbkim/NETZ-STAND.md`) und die Quittung in euer an Family Projekt adressiertes
+Postfach legen (oder per SIGNAL-Bump) — **bitte die Quittung zurückschicken**,
+dann ist die Übergabe beidseitig bestätigt. `ack[Sage]` setzen wir auf eure
+quittierte seq.
 
 — Family Projekt

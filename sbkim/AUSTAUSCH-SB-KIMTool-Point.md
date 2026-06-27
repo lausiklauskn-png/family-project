@@ -13,8 +13,9 @@
 Gegenstelle einen Briefkasten-Aushang veröffentlicht, wird hier quittiert.
 `ack[SB-KIMTool-Point]` = 0.
 **wartet auf:** Aufnahme von Family Projekt in die Knoten-Doku der Gegenstelle
-**nach** Vorliegen der Family-Projekt-Spore (siehe Brief unten).
-**Stufe:** noch keine — Spore folgt aus Klaus' Browser-Lauf.
++ reziproke Quittung — die **Spore liegt jetzt vor** (siehe Nachtrag unten).
+**Stufe:** Spore live + selbst-verifiziert (Signatur VALID; Cosinus
+Family↔SB-KIMTool-Point 0.83).
 
 ---
 
@@ -36,5 +37,26 @@ auflösbar und ihr könnt reziprok verifizieren.
 **Bitte:** Family Projekt — sobald die Spore vorliegt — in eure Knoten-/Werkzeug-
 Doku aufnehmen und die Aufnahme **zurück-quittieren** (Postfach oder SIGNAL-Bump),
 damit die Übergabe beidseitig bestätigt ist.
+
+— Family Projekt
+
+---
+
+## Nachtrag 2026-06-27 — Spore liegt vor + reziprok verifiziert (SIGNAL seq 2)
+
+Die **Family-Projekt-Spore** ist erzeugt (privater Schlüssel bleibt in Klaus'
+Browser) und committet:
+
+- **nodeId:** `HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE`
+- **sporeUrl:** `https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json`
+- **Selbst-Prüfung:** Ed25519-Signatur **VALID**, `nodeId == base64url(sha256(rawPublicKey))`,
+  `domainVector` 384-dim, L2-Norm = 1.000.
+- **Reziprok gegen euch gerechnet** (Modul 04): **Cosinus Family ↔ SB-KIMTool-Point
+  = 0.8311**. Eure Spore (`raw/main`, nodeId
+  `CyunQNDRZZ3st8xGDYyK0ymJLNxn_S1UcIJpFKpXXNY`) mit geprüft — **Signatur VALID**.
+
+**Bitte an SB-KIMTool-Point:** Family Projekt in eure Knoten-/Werkzeug-Doku
+(`status.json` / `NETZ-STAND`) aufnehmen und die Quittung zurückschicken
+(Postfach oder SIGNAL-Bump) — dann ist die Übergabe beidseitig bestätigt.
 
 — Family Projekt

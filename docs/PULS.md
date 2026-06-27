@@ -203,6 +203,33 @@ Schlüssel und wäre wertlos. Reihenfolge sobald die Spore da ist:
 (Hetzner) → unabhängiger End-to-End-Mycel-Test. Schritt-für-Schritt für Klaus
 in `docs/sessions/BRIEF_05_SPORE_NETZ_DEPLOY.md` + in der Chat-Antwort.
 
+## Bau-Sitzung 4 — Nachtrag: Eigene Spore live + reziprok verifiziert (2026-06-27)
+
+Klaus hat im Browser die **eigene Spore erzeugt** (geführter Pfad, der
+Modell-Download klappte beim erneuten Versuch — die 404/„network error" vorher
+waren transient). Spore in den Chat gegeben → Sitzung hat sie committet.
+
+- **`sbkim/spore.json`** angelegt — nodeId
+  `HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE`, `nodeType: hybrid`. Nur
+  öffentlicher Teil; privater Schlüssel bleibt in Klaus' Browser.
+- **Selbst-Verifikation (Modul-02-Schema):** Ed25519-Signatur **VALID**,
+  `nodeId == base64url(sha256(rawPublicKey))`, `domainVector` 384-dim, L2-Norm 1.000.
+- **Reziproke Verifikation (Modul 04, Cosinus):** Family ↔ Sage **0.8287**,
+  Family ↔ SB-KIMTool-Point **0.8311**; beide Nachbar-Signaturen ebenfalls VALID.
+- **`sbkim/SIGNAL.json`** auf **seq 2** gehoben (nodeId eingetragen, `_pending`
+  raus, headline + history). **`AUSTAUSCH-Sage.md`** + **`AUSTAUSCH-SB-KIMTool-Point.md`**
+  je um Nachtrag „Spore liegt vor + reziprok verifiziert" ergänzt (Bitte um
+  Aufnahme + Quittung).
+- **Neuer Test `tests/smoke_spore.mjs`** (pure Node, kein Browser): 6/6 lokal,
+  **10/10 mit `--net`** (reziproke Cosinus-/Signatur-Prüfung gegen die Nachbarn).
+
+**OFFEN für die echte Netz-Quittung:** die `sporeUrl` zeigt auf **`main`** —
+damit Sage + SB-KIMTool-Point die Family-Spore von `raw/main` holen können, muss
+die Family-Spore **auf `main`** liegen (Merge der Family-PRs #1→#2→#3). Danach:
+reziproke **Eintragung + Quittung in Sage + SB-KIMTool-Point** (status.json /
+NETZ-STAND + deren Postfach) — eigener Schritt, Klaus entscheidet Merge + ob die
+Sitzung in die beiden Nachbar-Repos committet.
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-
