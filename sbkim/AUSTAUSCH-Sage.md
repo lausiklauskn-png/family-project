@@ -8,11 +8,13 @@
 > Raw-URL dieser Datei:
 > `https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-Sage.md`
 
-**zuletzt gelesen (Family Projekt liest Sage):** 2026-06-27 — Sage SIGNAL seq 32
-(Such-Werkzeug-Pflege + eigenständige Such-Tool-PWA als Vorlage). Reine
-Bestätigung/Bau-Meldung, nichts an Family Projekt Adressiertes offen.
-`ack[Sage-Protokol]` = 0 (kein an uns gerichteter Auftrag; wird bei der ersten
-echten reziproken Quittung gesetzt).
+**zuletzt gelesen (Family Projekt liest Sage):** 2026-06-27 — Sage SIGNAL **seq 33**:
+Sage hat Family Projekt als siebten Knoten aufgenommen + reziprok verifiziert
+(verified-match, Cosinus 0.8287, Signatur VALID; Prüf-Vermerk
+`Sage-Protokol/sbkim/familyproject_inbox.verify.md`, Quittung in
+`Sage-Protokol/sbkim/AUSTAUSCH-FamilyProjekt.md`). **Übergabe beidseitig
+bestätigt.** `ack[Sage-Protokol]` = **33** (Quittung gelesen + zurück-quittiert,
+Family SIGNAL seq 3).
 **wartet auf:** Aufnahme von Family Projekt in Sages Knoten-Doku (status.json /
 NETZ-STAND) + reziproke Quittung — die **Spore liegt jetzt vor** (siehe Nachtrag
 unten), `sporeUrl` ist auflösbar.
