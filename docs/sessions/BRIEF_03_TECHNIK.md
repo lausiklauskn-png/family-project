@@ -122,6 +122,22 @@ Bild-Einfügen, fremde Seiten ins Mycel holen.
   vorgetäuscht; Platzhalter klar benannt.
 - Klaus' Browser-Sichttest steht über jedem „grün".
 
+## Befunde aus dieser Sitzung (für die Umsetzung)
+
+- **Modul 07 (Apoptose) fehlt** — Modul 16 verlangt für das Siegel die Pflicht-
+  Module **01/02/03/04/05/07/15**. In der nächsten Sitzung `07_apoptose.js`
+  1:1 aus Sage nach `sbkim/` kopieren + in die Init-Kette aufnehmen, sonst
+  zertifiziert das Siegel nicht voll. (Die `MYCEL-ANDOCK-AUFTRAG.md` listet 07
+  bereits korrekt.)
+- **„Verbinde mich"-Anleitung ist gebaut:** `docs/MYCEL-ANDOCK-AUFTRAG.md`
+  (self-contained), im Netzwerk-Raum per „Anleitung kopieren"-Knopf. Smoke prüft
+  Erreichbarkeit + Vollständigkeit.
+- **Unabhängiger End-to-End-Test (Klaus' Idee):** eine **komplett separate
+  Mini-Test-Seite** bauen (nicht Family Projekt), deren KI die Anleitung 1:1
+  ausführt → Identität + Eintrag + Handshake mit Family Projekt/Sage + Siegel.
+  Das ist der ehrliche Beweis. Voraussetzung: Family Projekt hat seine Spore
+  und ist erreichbar (Schritt 1+9). Vor dem echten Lauf am Tablet testet Klaus.
+
 ## Offene Fragen an Klaus
 
 - PayPal: echter Spenden-Empfänger/Link schon hinterlegen, oder reiner

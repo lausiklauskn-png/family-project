@@ -67,6 +67,18 @@
 
     <section>
       <div class="wrap">
+        <h2 data-i18n="nw_fremd_h">Eine fremde Seite ins Mycel holen</h2>
+        <p class="sub" data-i18n="nw_fremd_sub">Du hast eine ganz normale Webseite, die noch nicht im Mycel ist? Gib ihrer KI / ihrem Agenten diese self-contained Anleitung — sie führt die Verbindung 1:1 aus, ohne offene Fragen. Endzustand: Identität + Bausteine + Eintrag + Siegel. (Der vollautomatische Rück-Handshake übers Relay bleibt „in Vorbereitung“.)</p>
+        <div class="cta">
+          <button class="btn primary" id="fpCopyAndock" type="button" data-i18n="nw_fremd_copy">⧉ Anleitung kopieren</button>
+          <a class="btn ghost" href="docs/MYCEL-ANDOCK-AUFTRAG.md" target="_blank" rel="noopener" data-i18n="nw_fremd_open">→ Anleitung ansehen</a>
+        </div>
+        <p class="galnote" id="fpCopyNote"></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
         <h2 data-i18n="nw_vision_h">Verbindung herstellen <span class="prep" data-i18n="nw_prep">in Vorbereitung</span></h2>
         <p class="sub" data-i18n="nw_vision_sub">Die Vision: „sag <em>Verbindung herstellen</em> → Spore-Handshake → die Gegenseite quittiert automatisch übers Relay zurück."</p>
         <div class="glass note-box">
@@ -114,6 +126,9 @@
         nw_serverlos: "„Server-los“ ehrlich eingeordnet: für deine App-Daten stimmt es — sie brauchen keinen Server. Für Netz-Botschaften trifft „herren-los“: es gibt einen dummen Treffpunkt (Relay), aber keinen Vermittler. Wir behalten das Wort „server-los“ immer mit dieser Erklärung daneben.",
         nw_andock_h: "Deine Seite andocken", nw_andock_sub: "Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.",
         nw_andock_note: "Das echte Signieren passiert in deiner eigenen App (Knoten-Werkzeug). Hier entsteht nur die Vorlage zum Kopieren.",
+        nw_fremd_h: "Eine fremde Seite ins Mycel holen",
+        nw_fremd_sub: "Du hast eine ganz normale Webseite, die noch nicht im Mycel ist? Gib ihrer KI / ihrem Agenten diese self-contained Anleitung — sie führt die Verbindung 1:1 aus, ohne offene Fragen. Endzustand: Identität + Bausteine + Eintrag + Siegel. (Der vollautomatische Rück-Handshake übers Relay bleibt „in Vorbereitung“.)",
+        nw_fremd_copy: "⧉ Anleitung kopieren", nw_fremd_open: "→ Anleitung ansehen",
         nw_vision_h: "Verbindung herstellen", nw_prep: "in Vorbereitung",
         nw_vision_sub: "Die Vision: „sag Verbindung herstellen → Spore-Handshake → die Gegenseite quittiert automatisch übers Relay zurück.",
         nw_vision_honest: "Ehrlicher Stand: Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren. Der vollautomatische Rück-Handshake über das Relay ist noch nicht end-to-end bewiesen — heute braucht es einen manuellen Bestätigungs-Schritt. Das ist der nächste echte Bau-Schritt. Wir täuschen hier nichts vor.",
@@ -130,6 +145,9 @@
         nw_serverlos: "“Server-less” honestly placed: for your app data it's true — it needs no server. For network messages “masterless” fits: there is a dumb meeting point (relay), but no middleman. We keep the word “server-less” always with this explanation next to it.",
         nw_andock_h: "Dock your site", nw_andock_sub: "Three inputs — repo, domain, node type — and you get a spore template, the status.json line and a PR link. Pure input to text: no crypto, no network.",
         nw_andock_note: "The real signing happens in your own app (node tool). Here only the template to copy is created.",
+        nw_fremd_h: "Bring a foreign site into the mycelium",
+        nw_fremd_sub: "Got an ordinary website that isn't in the mycelium yet? Give its AI / agent this self-contained guide — it performs the connection 1:1, no open questions. End state: identity + building blocks + entry + seal. (The fully automatic return handshake over the relay stays “in preparation”.)",
+        nw_fremd_copy: "⧉ Copy the guide", nw_fremd_open: "→ View the guide",
         nw_vision_h: "Establish connection", nw_prep: "in preparation",
         nw_vision_sub: "The vision: “say Establish connection → spore handshake → the other side acknowledges automatically back over the relay.”",
         nw_vision_honest: "Honest status: spore generation, local crypto and the relay transport work. The fully automatic return handshake over the relay is not yet proven end-to-end — today it needs a manual confirmation step. That is the next real build step. We pretend nothing here.",
@@ -156,6 +174,19 @@
         var c = document.getElementById("andockWizard");
         if (c) c.innerHTML = '<p class="muted">Andock-Werkzeug konnte nicht geladen werden.</p>';
       }
+      // „Anleitung kopieren" — holt MYCEL-ANDOCK-AUFTRAG.md und legt sie in die Zwischenablage.
+      var cb = document.getElementById("fpCopyAndock");
+      if (cb) cb.addEventListener("click", function () {
+        var note = document.getElementById("fpCopyNote");
+        var en = FP.getLang() === "en";
+        fetch("docs/MYCEL-ANDOCK-AUFTRAG.md").then(function (r) { return r.text(); }).then(function (t) {
+          return navigator.clipboard.writeText(t);
+        }).then(function () {
+          if (note) note.textContent = en ? "Copied — paste it to the foreign site's AI." : "Kopiert — füg es der KI der fremden Seite ein.";
+        }).catch(function () {
+          if (note) note.textContent = en ? "Copy failed — open the guide and copy manually." : "Kopieren fehlgeschlagen — Anleitung öffnen und manuell kopieren.";
+        });
+      });
     })();
   </script>
 </body>

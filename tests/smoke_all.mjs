@@ -47,6 +47,8 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>document.querySelectorAll(".stages .stage").length===3), "netzwerk: 3 Versprechen-Stufen");
   ok(await page.evaluate(()=>!!document.getElementById("sbkim-aw-go")), "netzwerk: Andock-Wizard gemountet");
   ok(await page.evaluate(()=>!!document.querySelector("#andockWizard .field .mic")), "netzwerk: Mikrofon am Wizard-Feld nachgerüstet");
+  ok(await page.evaluate(()=>!!document.getElementById("fpCopyAndock")), "netzwerk: 'Anleitung kopieren'-Knopf vorhanden");
+  ok(await page.evaluate(async()=>{try{const r=await fetch("docs/MYCEL-ANDOCK-AUFTRAG.md");const t=await r.text();return r.ok && /Pflicht-Module/.test(t) && /generateOwnSpore/.test(t);}catch(e){return false;}}), "netzwerk: Mycel-Andock-Auftrag erreichbar + vollständig");
   await page.close(); }
 { const { page } = await load("/index.html");
   ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("docked")), "widget: startet angedockt");
