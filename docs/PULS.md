@@ -283,6 +283,26 @@ Alpha (0.55·life), reduced-motion-sicher (kein Canvas). `index.html`
 Smoke `smoke_all.mjs` **67/67 grün** (+1 Feenstaub-Canvas gemountet/klick-durchlässig).
 **Browser-Sichttest des Effekt-Gefühls wartet auf Klaus.**
 
+## Nachtrag 2026-06-27 — Stufe 2 verteilt: Nostr-Relais-Handshake in family-project
+
+Modul 05 Nostr-Transport (in Sage gebaut + live bestätigt, PR #461 gemerged) nach
+family-project verteilt:
+
+- **`sbkim/05_anastomose.js`** (mit `transport:"nostr"`), **`sbkim/05b_nostr_relay.js`**
+  (browser-only WebSocket+schnorr-Client), **`sbkim/noble-secp256k1.js`** — alle
+  **byte-identisch aus Sage** kopiert. 05b als `<script type="module">` in
+  index/markt/netzwerk/werkzeuge geladen (self-mountet `global.SbkimNostrRelay`,
+  Default `wss://relay.family-projekt.de`).
+- **Andock-Tool Schritt ④** umgestellt: „in Vorbereitung" → **live**. Neue Knöpfe
+  **🛰 Relais-Selbsttest** (publish→subscribe Round-Trip gegen das echte Relais)
+  + **👂 Empfänger lauschen** (`SbkimAnastomose.listenNostr()`, macht den Knoten
+  erreichbar). `relaisSelbsttest()` in `sbkim-init.js`.
+- **Tests:** `smoke_all.mjs` **69/69 grün** (+2: 05b geladen; Relais-Knöpfe +
+  listenNostr verfügbar), `smoke_spore.mjs` 6/6. 05b lädt headless ohne Fehler.
+- **Browser-Sichttest:** Klaus drückt im Andock-Tool ④ „🛰 Relais-Selbsttest" →
+  ✓ Echo = der family-Knoten spricht das Relais. Voller Cross-Knoten-Handshake
+  (zwei laufende Knoten) = Generalprobe.
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-

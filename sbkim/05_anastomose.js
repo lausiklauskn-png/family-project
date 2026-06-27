@@ -19,13 +19,19 @@
  * Public surface (registered on window.SbkimAnastomose):
  *   init() -> Promise<void>
  *   handshake(targetSpore, ownDomainVector, options?) -> Promise<HandshakeResult>
- *     options.transport ∈ {"auto","http","channel"}, Default "auto"
+ *     options.transport ∈ {"auto","http","channel","nostr"}, Default "auto"
  *     (Spec-Sitzung BroadcastChannel-Bridge 2026-05-17 — additiv, der
  *      bestehende HTTP-Pfad bleibt unverändert; same-origin-Fallback auf
  *      BroadcastChannel('sbkim') bei klaren HTTP-Defekt-Signalen.)
+ *     "nostr" (Stufe 2, 2026-06-27 — additiv): server-loser Cross-Knoten-
+ *      Handshake über ein Nostr-Relais. "auto" wählt NIEMALS nostr (nur
+ *      explizit). Echter WebSocket+schnorr-Client = Modul 05b (browser-only).
  *   receiveHandshake(request) -> Promise<HandshakeResponse>
  *   listSiblings() -> Promise<Array<{nodeId, domain, since, pubKey}>>
  *   forgetSibling(nodeId) -> Promise<void>
+ *   listenNostr() -> Promise<void>     (additiv; explizit, kein init()-Auto-Start —
+ *                                       Empfangsmodus: nur lauschen + antworten)
+ *   stopListenNostr() -> void
  *
  * Inoffiziell (Unterstrich-Präfix, nur für tests/manual_check.html):
  *   _invokeDirect(request)            -> alias auf receiveHandshake
@@ -33,9 +39,12 @@
  *                                        (umgeht das domainVector-Feld
  *                                        in der eigenen Spore)
  *   _setTransport(t)                  -> forciert Default-Transport
- *                                        ("auto"|"http"|"channel"|null)
+ *                                        ("auto"|"http"|"channel"|"nostr"|null)
  *   _clearChannelState()              -> setzt Default-Transport zurück
  *                                        auf "auto"
+ *   _setNostrRelayClient(client|null) -> spielt den Relay-Client ein
+ *                                        (Test-Mock oder Modul 05b)
+ *   _clearNostrSeen()                 -> leert den Replay-nonce-Cache
  *   _postChannelEnvelope(request)     -> roher Channel-Sender für Panel
  *                                        (kein consume, kein sibling-put)
  *   _buildSignedRequest(...)          -> Test-Brücke für In-Memory-Peer
@@ -94,9 +103,36 @@
     "toNodeId",
   ];
 
-  var ALLOWED_TRANSPORTS = ["auto", "http", "channel"];
+  var ALLOWED_TRANSPORTS = ["auto", "http", "channel", "nostr"];
   var BROADCAST_CHANNEL_NAME = "sbkim";
   var REPLY_CHANNEL_PREFIX = "sbkim:reply:";
+
+  // ---- Nostr-Relais-Transport (Stufe 2, additiv, 2026-06-27) ----
+  //
+  // Cross-Knoten-Handshake über ein öffentliches Nostr-Relais, server-los
+  // aus dem Browser (kein eigener Backend-Server). Vollständig additiv —
+  // http/channel/auto bleiben unverändert; "auto" wählt NIEMALS nostr
+  // (kein überraschender Netz-Egress, Empfangsmodus gewahrt).
+  //
+  // WICHTIG zur Krypto-Trennung: das Nostr-Event ist nur ein TRANSPORT-
+  // Umschlag, signiert mit einem ephemeren secp256k1/schnorr-Schlüssel.
+  // Die echte SBKIM-Identität ist ausschließlich die Ed25519-Signatur im
+  // `content` (das bestehende, von Modul 02 signierte HandshakeRequest/
+  // HandshakeResponse). Der Nostr-pubkey beweist NICHTS über die SBKIM-
+  // Identität — verifiziert wird wie immer verifyEnvelope gegen die Spore.
+  //
+  // Event-Format (NIP-01, kind:1):
+  //   Anfrage: tags [["t","sbkim-anastomosis"],["d",<ZielNodeId>],["x",<requestNonce>]]
+  //            content = JSON.stringify(signedRequest)
+  //   Antwort: tags [["t","sbkim-anastomosis-reply"],["d",<AnfragerNodeId>],["x",<requestNonce>]]
+  //            content = JSON.stringify(signedResponse)  (nonceEcho = request.nonce)
+  var NOSTR_TAG_REQUEST = "sbkim-anastomosis";
+  var NOSTR_TAG_REPLY = "sbkim-anastomosis-reply";
+  var NOSTR_KIND = 1;
+  var NOSTR_REPLY_TIMEOUT_MS = 8000;   // Relais-tauglich, großzügiger als HTTP/Channel
+  var NOSTR_REPLAY_TTL_MS = 600000;    // 10 min — gesehene nonces ablehnen
+  var NOSTR_REPLAY_MAX = 2000;         // Deckel gegen unbegrenztes Wachstum
+  var NOSTR_CLOCK_SKEW_MS = 900000;    // 15 min Toleranz für created_at-Fenster
 
   // ---- Fehler-Erzeugung ----
 
@@ -280,6 +316,18 @@
   // einen neuen Slot anlegt, muss Modul 05 re-initialisieren (Tab-
   // Reload — Karte 05 § Receiver-Map-Schlank-Konvention).
   var receiverMap = new Map();
+
+  // ---- Nostr-Transport-Zustand (additiv, 2026-06-27) ----
+  // Einspielbarer Relay-Client (Test-Brücke _setNostrRelayClient). Default
+  // null → bei Nostr-Transport wird global.SbkimNostrRelay genommen, sonst
+  // sauberer Fehler „kein Relay-Client". Interface:
+  //   { publish(event) -> Promise, subscribe(filter, onEvent) -> unsubscribeFn }
+  var nostrRelayClient = null;
+  // Receiver-Subscription-Handle (listenNostr) — null wenn nicht aktiv.
+  // Empfangsmodus: NICHT automatisch in init() gestartet, nur explizit.
+  var nostrListenUnsub = null;
+  // Replay-Schutz: gesehene Anfrage-nonces mit Zeitstempel. Map<nonce, ms>.
+  var nostrSeenNonces = new Map();
 
   // Re-entry-friendly log key: ein Counter pro Millisekunde, damit
   // zwei schnell nacheinander geschriebene Log-Zeilen einander nicht
@@ -585,6 +633,262 @@
     return await consumeResponse(targetSpore, responseJson, preScore, opSlot);
   }
 
+  // ---- Nostr-Relais-Transport (additiv, 2026-06-27) ----
+  //
+  // Resolves the injected relay client. Returns null (no throw) when none is
+  // available — callers turn that into a sauberes Result, Empfangsmodus
+  // bleibt gewahrt (kein impliziter Netz-Aufbau).
+  function resolveNostrRelayClient() {
+    if (nostrRelayClient &&
+        typeof nostrRelayClient.publish === "function" &&
+        typeof nostrRelayClient.subscribe === "function") {
+      return nostrRelayClient;
+    }
+    var g = global.SbkimNostrRelay;
+    if (g && typeof g.publish === "function" && typeof g.subscribe === "function") {
+      return g;
+    }
+    return null;
+  }
+
+  // Replay-Schutz-Helfer: prunt abgelaufene nonces + deckelt die Map-Größe.
+  function pruneNostrSeen(nowMs) {
+    var cutoff = nowMs - NOSTR_REPLAY_TTL_MS;
+    nostrSeenNonces.forEach(function (ts, nonce) {
+      if (ts < cutoff) nostrSeenNonces.delete(nonce);
+    });
+    // Harter Deckel: bei Überlauf älteste (Insertion-Order) entfernen.
+    while (nostrSeenNonces.size > NOSTR_REPLAY_MAX) {
+      var firstKey = nostrSeenNonces.keys().next().value;
+      if (firstKey === undefined) break;
+      nostrSeenNonces.delete(firstKey);
+    }
+  }
+
+  function nostrNonceSeen(nonce, nowMs) {
+    pruneNostrSeen(nowMs);
+    return nostrSeenNonces.has(nonce);
+  }
+
+  function nostrRememberNonce(nonce, nowMs) {
+    nostrSeenNonces.set(nonce, nowMs);
+    pruneNostrSeen(nowMs);
+  }
+
+  function tagValue(event, name) {
+    if (!event || !Array.isArray(event.tags)) return null;
+    for (var i = 0; i < event.tags.length; i++) {
+      var t = event.tags[i];
+      if (Array.isArray(t) && t[0] === name && typeof t[1] === "string") return t[1];
+    }
+    return null;
+  }
+
+  // Baut ein Nostr-Transport-Event (ohne id/pubkey/sig — das ist Sache des
+  // Relay-Clients, der den ephemeren schnorr-Schlüssel hält). Modul 05
+  // liefert nur kind/created_at/tags/content; der Client vervollständigt
+  // und signiert. So bleibt der ephemere Nostr-Key vollständig im
+  // (browser-only) Relay-Modul, nicht in Modul 05.
+  function buildNostrEventBody(tagName, targetId, requestNonce, contentObj) {
+    return {
+      kind: NOSTR_KIND,
+      created_at: Math.floor(Date.now() / 1000),
+      tags: [
+        ["t", tagName],
+        ["d", typeof targetId === "string" ? targetId : ""],
+        ["x", typeof requestNonce === "string" ? requestNonce : ""],
+      ],
+      content: JSON.stringify(contentObj),
+    };
+  }
+
+  // Sender-Pfad für transport:"nostr". Publiziert den signierten Request als
+  // Event an die Ziel-nodeId, abonniert reply-Events (t=reply, #d=eigene
+  // nodeId, #x=request.nonce) mit Timeout, parst content, übergibt an
+  // consumeResponse (bestehender Verify-/sibling-/Log-Pfad). Wirft nicht
+  // über das normale Result-Schema hinaus: fehlt der Client, kommt ein
+  // sauberer Result-„rejected" statt eines Throws.
+  async function sendViaNostr(targetSpore, request, preScore, opSlot, timeoutMs) {
+    var client = resolveNostrRelayClient();
+    if (!client) {
+      await logEntry(targetSpore.id, "abgelehnt: kein-relay", opSlot);
+      return {
+        outcome: "rejected",
+        reason: "Kein Nostr-Relay-Client verfügbar — SbkimNostrRelay laden oder " +
+          "_setNostrRelayClient(client) setzen (Modul 05b).",
+      };
+    }
+    var ownNodeId = request.fromNodeId;
+    var requestNonce = request.nonce;
+    var replyTimeout = (typeof timeoutMs === "number" && isFinite(timeoutMs) && timeoutMs > 0)
+      ? timeoutMs
+      : NOSTR_REPLY_TIMEOUT_MS;
+
+    var settled = false;
+    var unsub = null;
+    var resultPromise = new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        if (unsub) { try { unsub(); } catch (e) {} }
+        reject(makeError(
+          "HandshakeTimeoutError",
+          "Nostr-Reply > " + replyTimeout + " ms ausgeblieben.",
+        ));
+      }, replyTimeout);
+
+      try {
+        unsub = client.subscribe(
+          { kinds: [NOSTR_KIND], "#t": [NOSTR_TAG_REPLY], "#d": [ownNodeId] },
+          function onReplyEvent(event) {
+            if (settled) return;
+            if (!event || typeof event.content !== "string") return;
+            // Nur das Reply zu GENAU diesem Request (nonce-Bindung).
+            if (tagValue(event, "x") !== requestNonce) return;
+            var parsed;
+            try { parsed = JSON.parse(event.content); } catch (e) { return; }
+            if (!parsed || typeof parsed !== "object") return;
+            // nonceEcho-Bindung (Doppelt-Bindung, wie Channel-Pfad).
+            if (parsed.nonceEcho !== requestNonce) return;
+            settled = true;
+            clearTimeout(timer);
+            if (unsub) { try { unsub(); } catch (e2) {} }
+            resolve(parsed);
+          },
+        );
+      } catch (subErr) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(makeError(
+          "HandshakeNetworkError",
+          "Nostr-Subscribe fehlgeschlagen: " + (subErr && subErr.message ? subErr.message : subErr),
+          subErr,
+        ));
+      }
+    });
+
+    // Request-Event publizieren (nach Subscribe, gegen Race).
+    var eventBody = buildNostrEventBody(NOSTR_TAG_REQUEST, targetSpore.id, requestNonce, request);
+    try {
+      await client.publish(eventBody);
+    } catch (pubErr) {
+      if (!settled) {
+        settled = true;
+        if (unsub) { try { unsub(); } catch (e) {} }
+      }
+      throw makeError(
+        "HandshakeNetworkError",
+        "Nostr-Publish fehlgeschlagen: " + (pubErr && pubErr.message ? pubErr.message : pubErr),
+        pubErr,
+      );
+    }
+
+    var responseJson;
+    try {
+      responseJson = await resultPromise;
+    } catch (err) {
+      if (err.name === "HandshakeTimeoutError") {
+        try { await logEntry(targetSpore.id, "timeout-nostr", opSlot); } catch (e) {}
+      }
+      throw err;
+    }
+    return await consumeResponse(targetSpore, responseJson, preScore, opSlot);
+  }
+
+  // Empfänger-Pfad: listenNostr() abonniert eingehende Request-Events an
+  // die eigene(n) nodeId(s) und antwortet server-los über das Relais.
+  // ADDITIV, NICHT automatisch in init() — Empfangsmodus: der Knoten lauscht
+  // nur, wenn der Betreiber es explizit auslöst (kein Crawl, keine Pulsation).
+  //
+  // SICHERHEIT (untrusted external data): jeder content wird wie eine
+  // Fremd-Eingabe behandelt. receiveHandshake() verifiziert Spore + Ed25519-
+  // Signatur + Hauptversion + toNodeId-Map BEVOR irgendetwas gespeichert
+  // oder beantwortet wird. Zusätzlich hier: Self-Hit ignorieren, Replay
+  // (doppelte nonce) ablehnen, created_at-Zeitfenster prüfen.
+  async function listenNostr() {
+    await ensureReady();
+    if (nostrListenUnsub) return;   // idempotent — schon aktiv
+    var client = resolveNostrRelayClient();
+    if (!client) {
+      throw makeError(
+        "AnastomoseDependenciesError",
+        "Kein Nostr-Relay-Client verfügbar — SbkimNostrRelay laden oder " +
+          "_setNostrRelayClient(client) setzen (Modul 05b).",
+      );
+    }
+    // Filter: nur an MICH gerichtete Requests. #d-Filter über alle eigenen
+    // Personas (receiverMap-Keys = eigene nodeIds).
+    var ownIds = Array.from(receiverMap.keys());
+    var filter = { kinds: [NOSTR_KIND], "#t": [NOSTR_TAG_REQUEST] };
+    if (ownIds.length > 0) filter["#d"] = ownIds;
+
+    nostrListenUnsub = client.subscribe(filter, function onRequestEvent(event) {
+      // fire-and-forget; Fehler werden geschluckt (Empfangsmodus: schweigen).
+      handleIncomingNostrRequest(client, event).catch(function () {});
+    });
+  }
+
+  function stopListenNostr() {
+    if (nostrListenUnsub) {
+      try { nostrListenUnsub(); } catch (e) {}
+      nostrListenUnsub = null;
+    }
+  }
+
+  async function handleIncomingNostrRequest(client, event) {
+    if (!event || typeof event.content !== "string") return;
+    var nowMs = Date.now();
+
+    // created_at-Zeitfenster (NIP-01 ist in Sekunden). Zu alt/zukunft → still
+    // verwerfen (Replay-/Clock-Skew-Schutz).
+    if (typeof event.created_at === "number") {
+      var evMs = event.created_at * 1000;
+      if (Math.abs(nowMs - evMs) > NOSTR_CLOCK_SKEW_MS) return;
+    }
+
+    var request;
+    try { request = JSON.parse(event.content); } catch (e) { return; }
+    if (!request || typeof request !== "object") return;
+
+    // Self-Hit-Schutz: eigener Request (eine eigene Persona als Absender) →
+    // ignorieren. receiverMap-Keys sind alle eigenen nodeIds.
+    if (typeof request.fromNodeId === "string" && receiverMap.has(request.fromNodeId)) return;
+
+    // Replay-Schutz: doppelte nonce → ablehnen (still). Die nonce wird ERST
+    // nach erfolgreicher Form-Vorprüfung gemerkt, damit Müll-Events den Cache
+    // nicht fluten.
+    var nonce = request.nonce;
+    if (typeof nonce !== "string" || nonce.length === 0) return;
+    if (nostrNonceSeen(nonce, nowMs)) return;
+
+    // receiveHandshake verifiziert ALLES (Spore, Ed25519-Signatur,
+    // Hauptversion, toNodeId-Map, Score) und wirft per Spec niemals.
+    var response;
+    try {
+      response = await receiveHandshake(request);
+    } catch (err) {
+      return;  // defensiv — receiveHandshake wirft eigentlich nie
+    }
+    if (!response || typeof response !== "object") return;
+
+    // nonce erst jetzt merken (gültig geformter, beantworteter Request).
+    nostrRememberNonce(nonce, nowMs);
+
+    // Antwort-Event an den Anfrager (request.fromNodeId) publizieren.
+    var replyBody = buildNostrEventBody(
+      NOSTR_TAG_REPLY,
+      typeof request.fromNodeId === "string" ? request.fromNodeId : "",
+      nonce,
+      response,
+    );
+    try {
+      await client.publish(replyBody);
+    } catch (e) {
+      // wer-nicht-publishen-kann-schweigt — kein Log-Spam.
+    }
+  }
+
   function parseTransport(options) {
     if (options === undefined || options === null) return transportDefault;
     if (typeof options !== "object" || Array.isArray(options)) {
@@ -600,7 +904,7 @@
       throw makeError(
         "InvalidTransportError",
         "handshake options.transport unbekannt: '" + options.transport +
-          "'. Erlaubt: 'auto' | 'http' | 'channel'.",
+          "'. Erlaubt: 'auto' | 'http' | 'channel' | 'nostr'.",
       );
     }
     return options.transport;
@@ -782,6 +1086,26 @@
     // 5b. transport === "channel": HTTP-Pfad überspringen, direkt zum Channel.
     if (transport === "channel") {
       return await sendViaChannel(targetSpore, request, preScore, null, opSlot, effTimeoutMs);
+    }
+
+    // 5c. transport === "nostr": HTTP-Pfad überspringen, über das Relais.
+    //     toNodeId ist hier Pflicht (das ["d"]-Routing-Tag). Der Request
+    //     trägt sie immer (toNodeId: targetSpore.id oben), daher kein
+    //     gesonderter Pflichtfeld-Throw nötig — aber defensiv prüfen.
+    if (transport === "nostr") {
+      if (typeof request.toNodeId !== "string" || request.toNodeId.length === 0) {
+        throw makeError(
+          "MissingToNodeIdError",
+          "Nostr-Pfad erfordert request.toNodeId (Routing-Tag 'd').",
+        );
+      }
+      // Nostr nutzt den großzügigeren Relais-Timeout, außer der Aufrufer hat
+      // explizit options.timeoutMs gesetzt.
+      var nostrTimeout = (options && typeof options.timeoutMs === "number" &&
+                          isFinite(options.timeoutMs) && options.timeoutMs > 0)
+        ? options.timeoutMs
+        : NOSTR_REPLY_TIMEOUT_MS;
+      return await sendViaNostr(targetSpore, request, preScore, opSlot, nostrTimeout);
     }
 
     // 6. POST mit Abort-Timeout (transport ∈ {"http", "auto"})
@@ -1210,7 +1534,7 @@
       throw makeError(
         "InvalidTransportError",
         "_setTransport: '" + t + "' ist kein erlaubter Transport. " +
-          "Erlaubt: 'auto' | 'http' | 'channel'.",
+          "Erlaubt: 'auto' | 'http' | 'channel' | 'nostr'.",
       );
     }
     transportDefault = t;
@@ -1224,6 +1548,34 @@
     transportDefault = "auto";
   }
 
+  // Spielt einen Relay-Client für den Nostr-Transport ein (Test-Brücke +
+  // Produktiv-Setter). Interface: { publish(event)->Promise,
+  // subscribe(filter, onEvent)->unsubscribeFn }. null setzt zurück (dann
+  // greift global.SbkimNostrRelay, falls vorhanden). Beim Zurücksetzen wird
+  // ein evtl. laufendes listenNostr beendet, damit kein verwaister Listener
+  // auf einem alten Client hängt.
+  function _setNostrRelayClient(client) {
+    if (client === null || client === undefined) {
+      stopListenNostr();
+      nostrRelayClient = null;
+      return;
+    }
+    if (typeof client.publish !== "function" || typeof client.subscribe !== "function") {
+      throw makeError(
+        "AnastomoseDependenciesError",
+        "_setNostrRelayClient: Client braucht publish(event)->Promise und " +
+          "subscribe(filter,onEvent)->unsubscribeFn.",
+      );
+    }
+    stopListenNostr();
+    nostrRelayClient = client;
+  }
+
+  // Test-Brücke: Replay-Cache leeren (z.B. zwischen Test-Proben).
+  function _clearNostrSeen() {
+    nostrSeenNonces.clear();
+  }
+
   // ---- public surface ----
 
   var SbkimAnastomose = {
@@ -1233,6 +1585,11 @@
     listSiblings: listSiblings,
     forgetSibling: forgetSibling,
 
+    // Nostr-Relais-Transport (additiv, 2026-06-27). listenNostr ist
+    // explizit aufrufbar (Empfangsmodus — kein Auto-Start in init()).
+    listenNostr: listenNostr,
+    stopListenNostr: stopListenNostr,
+
     // Test-Brücken
     _invokeDirect: receiveHandshake,
     _buildSignedRequest: _buildSignedRequest,
@@ -1241,6 +1598,8 @@
     _setTransport: _setTransport,
     _clearChannelState: _clearChannelState,
     _postChannelEnvelope: postChannelEnvelope,
+    _setNostrRelayClient: _setNostrRelayClient,
+    _clearNostrSeen: _clearNostrSeen,
     _canonicalize: canonicalize,
     _base64urlEncode: base64urlEncode,
     _base64urlDecode: base64urlDecode,
@@ -1264,6 +1623,14 @@
       allowedTransports: ALLOWED_TRANSPORTS.slice(),
       broadcastChannelName: BROADCAST_CHANNEL_NAME,
       replyChannelPrefix: REPLY_CHANNEL_PREFIX,
+      // Nostr-Transport (additiv, 2026-06-27).
+      nostrTagRequest: NOSTR_TAG_REQUEST,
+      nostrTagReply: NOSTR_TAG_REPLY,
+      nostrKind: NOSTR_KIND,
+      nostrReplyTimeoutMs: NOSTR_REPLY_TIMEOUT_MS,
+      get nostrRelayClientSet() { return resolveNostrRelayClient() !== null; },
+      get nostrListening() { return nostrListenUnsub !== null; },
+      get nostrSeenCount() { return nostrSeenNonces.size; },
     },
   };
 
