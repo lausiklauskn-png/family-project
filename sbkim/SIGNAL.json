@@ -1,0 +1,29 @@
+{
+  "node": "family-project",
+  "lastBuild": "2026-06-27",
+  "seq": 1,
+  "headline": "Family Projekt tritt dem SBKIM-Mycel bei. Module 01/02/03/04/05/07/15 (+16/17/19) 1:1 aus Sage, Andock-Kette laeuft durch, SBKIM-Siegel zertifiziert (Bronze; Gold nach erstem Handshake). Marktplatz PR-basiert, Spenden/Jahresbeitrag als Platzhalter. OFFEN: eigene Spore (sbkim/spore.json) erzeugt Klaus im Browser (privater Schluessel bleibt bei ihm); danach nodeId hier nachtragen + reziproke Quittung mit Sage + SB-KIMTool-Point.",
+  "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json",
+  "nodeId": "",
+  "mailboxes": {
+    "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-Sage.md",
+    "SB-KIMTool-Point": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-SB-KIMTool-Point.md"
+  },
+  "forNodes": [
+    "Sage-Protokol",
+    "SB-KIMTool-Point"
+  ],
+  "ack": {
+    "Sage-Protokol": 0,
+    "SB-KIMTool-Point": 0
+  },
+  "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal.",
+  "_pending": "nodeId ist leer, bis Klaus die eigene Spore im Browser erzeugt hat (Dev-Briefkasten ?dev -> 'Eigene Spore erzeugen' -> sbkim/spore.json committen). Erst dann ist sporeUrl auflösbar und die Gegenstellen koennen verified-spore/verified-match rechnen. Bis dahin ist dieser Eintrag eine Beitritts-Ankuendigung, keine verifizierbare Identitaet.",
+  "history": [
+    {
+      "seq": 1,
+      "date": "2026-06-27",
+      "headline": "Beitritts-Ankuendigung. Module verdrahtet, Siegel zertifiziert, Marktplatz/Spenden vorbereitet. Spore + nodeId folgen nach Klaus' Browser-Lauf."
+    }
+  ]
+}
