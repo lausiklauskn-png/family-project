@@ -241,6 +241,37 @@ waren transient). Spore in den Chat gegeben → Sitzung hat sie committet.
 **Deploy** (Hetzner, `family-projekt.de` — Endpoint noch nicht live; Verifikation
 lief über `raw/main`).
 
+## Bau-Sitzung 5 — Andock-Tool vereinheitlicht + Safe (Stufe 1) — 2026-06-27
+
+Klaus' Wunsch: **ein** Tool, das alles kann (statt Dev-Briefkasten ≠ Wizard ≠
+Anleitung), klick-geführt + KI-Anleitung, ohne Rätsel. Zuvor Repo-übergreifend
+kartiert (2 Lese-Agenten): **das Relais existiert wirklich** —
+`wss://relay.family-projekt.de` (nostr-rs-relay, Hetzner, log-frei, live seit
+2026-06-25, Cross-Knoten-Transport über die Pinnwand bewiesen). **Lücke:** Modul 05
+(Anastomose) spricht das Relais noch nicht → automatischer Handshake = Stufe 2.
+
+**Stufe 1 gebaut (family-project, abgegrenzt, headless getestet):**
+
+- **Dev-Briefkasten → „🔌 Andock-Tool"** umbenannt + als **vier geführte Schritte**
+  neu aufgebaut (`sbkim/sbkim-init.js`): ① Spore erzeugen (konsolen-frei, Fortschritt
+  + Retry) · ② ins Repo / an die KI (Links: `MYCEL-ANDOCK-AUFTRAG.md` +
+  Andock-Wizard `netzwerk.html#andock`) · ③ **🔐 Identität im Safe sichern** ·
+  ④ Verbinden (Verbindungs-Test; Auto-Handshake übers Relais = in Vorbereitung).
+  Bleibt dev-gated (Betreiber-Werkzeug, `?dev`).
+- **Modul 20 Schlüssel-Safe** 1:1 aus Sage kopiert (`sbkim/20_schluessel_safe.js`,
+  byte-identisch), in index/markt/netzwerk/werkzeuge geladen, `SbkimSafe.init({autoPrompt:false})`
+  fail-soft in die Kette. Safe-Knopf ruft `SbkimSafe.open()` (Modul-20-Modal:
+  Passwort + Shamir 2/3, Krypto = Modul 02 `exportBackup`). Kein Klartext at rest.
+- **Tests:** `tests/smoke_all.mjs` **66/66 grün** (+4: Safe geladen, Andock-Tool-Panel
+  mit Schritten, KI-Anleitung+Wizard verlinkt, Safe-Knopf öffnet Modul-20-Modal).
+- **Browser-Sichttest (Klaus) steht aus:** Safe-Modal anlegen/entsperren am Tablet.
+
+**Stufe 2 (eigene Sitzung, sicherheits-sensibel):** Modul 05 Nostr-Relais-Transport
+für den vollautomatischen Handshake → Brief `docs/sessions/BRIEF_06_RELAIS_HANDSHAKE.md`.
+Modul 05 ist 1:1 aus Sage → Spec + Bau gehören nach **Sage**, dann runterkopieren.
+**Stufe 3 (Phase B):** Andock-Tool als kopierbares Modul für fremde Repos (Modul 19
+ausbauen).
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-
