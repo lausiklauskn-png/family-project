@@ -130,6 +130,28 @@
     document.querySelectorAll(".mic").forEach(wireMic);
   }
 
+  // Rüstet blanke Text-Eingaben (außerhalb eines .field, ohne data-nomic) mit
+  // einem Mikrofon nach — für Klaus' Regel „Mikrofon in JEDEM Textfeld" auch
+  // bei dynamisch eingehängten Feldern (z.B. Andock-Wizard). Idempotent.
+  function enhanceBareInputs(root) {
+    var scope = root || document;
+    var sel = 'textarea, input[type="text"], input[type="search"], input[type="url"]';
+    scope.querySelectorAll(sel).forEach(function (input) {
+      if (input.closest(".field") || input.getAttribute("data-nomic") != null) return;
+      var field = document.createElement("span");
+      field.className = "field";
+      field.style.flex = "1 1 auto";
+      input.parentNode.insertBefore(field, input);
+      field.appendChild(input);
+      var mic = document.createElement("button");
+      mic.type = "button"; mic.className = "mic";
+      mic.title = "Sprechen statt tippen"; mic.setAttribute("aria-label", "Spracheingabe");
+      mic.textContent = "🎤";
+      field.appendChild(mic);
+      wireMic(mic);
+    });
+  }
+
   // ---- Init ----------------------------------------------------------------
   function init() {
     var lb = document.getElementById("langBtn");
@@ -143,6 +165,7 @@
 
   global.FP = {
     init: init, applyLang: applyLang, applyTheme: applyTheme,
-    getLang: getLang, t: t, wireAllMics: wireAllMics, THEMES: THEMES
+    getLang: getLang, t: t, wireAllMics: wireAllMics,
+    enhanceBareInputs: enhanceBareInputs, THEMES: THEMES
   };
 })(typeof window !== "undefined" ? window : this);

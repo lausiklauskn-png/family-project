@@ -188,6 +188,19 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .form-grid label{font-size:.86rem;color:var(--muted);display:block;margin-bottom:6px}
 .haftung{padding:16px;margin-top:18px;font-size:.86rem;color:var(--muted);border-left:3px solid var(--gold)}
 
+/* Andock-Wizard (Modul 19) — eingebettet im Netzwerk-Raum */
+#andockWizard{padding:20px}
+.sbkim-aw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
+.sbkim-aw-grid label{display:block;font-size:.86rem;color:var(--muted)}
+.sbkim-aw-grid input,.sbkim-aw-grid select{width:100%;margin-top:6px;background:rgba(127,127,127,.10);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 13px;font-size:.95rem;font-family:var(--sans)}
+.sbkim-aw-grid input:focus,.sbkim-aw-grid select:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
+#andockWizard button#sbkim-aw-go{display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:12px;padding:11px 18px;font-size:.94rem;cursor:pointer;border:1px solid transparent;background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a;box-shadow:var(--shadow)}
+#andockWizard #sbkim-aw-status{margin-left:12px;font-size:.88rem;color:var(--muted)}
+#andockWizard #sbkim-aw-out{margin-top:16px}
+#andockWizard #sbkim-aw-out h4{margin:14px 0 6px;font-size:.95rem}
+#andockWizard pre{background:rgba(0,0,0,.30);border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto;font-family:var(--mono);font-size:.78rem;line-height:1.5;color:#cfe0ff;max-height:300px}
+#andockWizard #sbkim-aw-pr{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:.86rem;color:var(--accent)}
+
 footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
 footer .frow{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 footer a{color:var(--muted)} footer a:hover{color:var(--accent)}
