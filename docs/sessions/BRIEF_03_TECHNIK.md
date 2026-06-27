@@ -5,6 +5,26 @@
 > Klaus fragen). Antworten auf Deutsch, Einzelschritte-Stil, Klaus testet live
 > am Galaxy Tab S6 (Termux `python3 -m http.server` + Chrome).
 
+## ⚡ Sofort-Start (Klaus 2026-06-27)
+
+**Diese Sitzung legt sofort mit der technischen Umsetzung los** — kein erneutes
+Orientieren. **Alle SBKIM-Repos sind in dieser Sitzung zugänglich** (Sage-Protokol,
+SB-KIMTool-Point, Mein-Rezeptbuch, Mein-Mixarium, Mein-Tresor, Jasons-Tresor,
+BookLedgerPro, Mein-WorkFloh, family-project) — nutze das für **Cross-Repo-
+Abgleich** und vor allem für den **Briefkasten (§11.6)**:
+
+- **Bei Start:** eigenes `sbkim/SIGNAL.json` (sobald angelegt) + das `SIGNAL.json`
+  von Sage + SB-KIMTool-Point aus deren `raw/main` lesen; `seq` vs. `ack`
+  vergleichen; Ungelesenes lesen, handeln, **quittieren** (Datum + `ack` hoch).
+- **Bei Ende (wenn etwas gemeldet):** Family-Projekt-`SIGNAL.json` pflegen
+  (`seq`+1, `headline`, `forNodes`), Bau-Protokoll-Zeile ins Postfach
+  (`AUSTAUSCH-*.md`), pushen — **das Pushen IST das Signal** (server-los).
+- **Übergabe-Bestätigung:** Family Projekt tritt dem Netz bei — die Aufnahme +
+  gegenseitige Quittung läuft über diese Briefkästen. Erst wenn Sage /
+  SB-KIMTool-Point Family Projekts Spore registriert + quittiert haben, ist die
+  Übergabe bestätigt. Klaus relayt offene Briefe, wenn noch kein Briefkasten-Paar
+  existiert (Copy-Paste-Brief im Chat).
+
 ## Stand (was steht — Design ist fertig)
 
 Die Website **Family Projekt** ist gebaut und durchgehend **headless grün**
