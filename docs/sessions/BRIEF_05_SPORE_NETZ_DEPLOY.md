@@ -43,15 +43,16 @@ Reihenfolge entscheidet Klaus:** #1 → #2 → Weekly-PR → `main`. Erst danach
 ## Was zu tun ist (Reihenfolge — Schritte 1–3, 5–6 brauchen Klaus' Browser)
 
 1. **Eigene Spore mit Klaus erzeugen** (NICHT headless — privater Schlüssel bleibt
-   dauerhaft in Klaus' Browser, Klaus-Entscheid 2026-06-27). Klaus' Schritte:
+   dauerhaft in Klaus' Browser, Klaus-Entscheid 2026-06-27). **Jetzt konsolen-frei**
+   (Bau-Sitzung 4): Klaus' Schritte sind reine Knopf-Klicks:
    - Seite lokal (`python3 -m http.server`) oder deployed mit **`?dev`** öffnen
-     → unten der **Dev-Briefkasten** → Knopf **„Eigene Spore erzeugen"** (lädt das
+     → unten **🛠 Dev-Briefkasten** → Knopf **„Eigene Spore erzeugen"** (lädt das
      Embedding-Modell ~30 MB einmalig, dauert kurz).
-   - In der **DevTools-Konsole** (Eruda/Chrome) kopieren:
-     `copy(JSON.stringify(await SbkimSpore.getOwnSpore(), null, 2))`
-   - Inhalt nach `sbkim/spore.json` einfügen + committen. **Kein privater Schlüssel
-     ins Repo** — `getOwnSpore()` liefert nur den öffentlichen Teil (id, domainVector,
-     signature, …).
+   - Im Ergebnis-Block: **📋 JSON kopieren** → **→ Datei im Repo anlegen** (GitHub
+     öffnet `sbkim/spore.json` mit vorbelegtem Pfad) → ins Textfeld einfügen →
+     unten **Commit changes**. Alternativ **⬇ Als Datei herunterladen**.
+   - **Kein privater Schlüssel ins Repo** — nur der öffentliche Teil
+     (`getOwnSpore()`: id, domainVector, signature, …).
 2. **nodeId nachtragen:** echte `nodeId` (= `spore.id`) + (falls anders) `sporeUrl`
    in `sbkim/SIGNAL.json` setzen, `_pending`-Feld entfernen, `seq` +1, `history`-Zeile,
    `headline` aktualisieren (Spore da, Identität verifizierbar).

@@ -154,8 +154,19 @@ Reihenfolge entscheidet Klaus: PR #1 → PR #2 → diese.
   fail-soft auf Config-Bild bzw. Emoji zurück. SVG gesperrt (`isSvg`). Nur
   `index.html` (Startseiten-IIFE) berührt; `assets/config/weekly.js`-Kopf um
   Hinweis ergänzt.
-- **Tests:** `tests/smoke_all.mjs` **60/60 grün** (+2: 5-fach-Klick öffnet
-  Weekly-Fenster; Fenster zielt auf den angezeigten Eintrag).
+- **Brief-04-Schritt 1 entschärft — Spore-Erzeugung KONSOLEN-FREI** (Klaus'
+  Befund 2026-06-27: der Spore-Knopf endete mit einem DevTools-`copy(...)`-Befehl,
+  den ein Neueinsteiger nicht ausführen kann). Der Dev-Briefkasten-Knopf „Eigene
+  Spore erzeugen" zeigt jetzt nach dem Erzeugen einen **geführten Pfad**:
+  nummerierte Schritte + JSON in readonly-`<textarea>` + **📋 JSON kopieren**
+  (Clipboard, Fallback select+execCommand) + **→ Datei im Repo anlegen**
+  (GitHub-Link `…/new/main?filename=sbkim/spore.json`, Pfad vorbelegt) +
+  **⬇ Als Datei herunterladen** (Alternative). Kein Terminal, keine Konsole.
+  Nur öffentlicher Teil (Hinweis: privater Schlüssel bleibt im Browser). Neue
+  Funktion `renderSporeGuide()` in `sbkim/sbkim-init.js`.
+- **Tests:** `tests/smoke_all.mjs` **61/61 grün** (+2 Weekly: 5-fach-Klick öffnet
+  Weekly-Fenster, Fenster zielt auf den angezeigten Eintrag; +1 Dev-Briefkasten:
+  Spore-Pfad geführt — Kopier-Knopf + GitHub-Link + Download, keine Konsole).
 
 **OFFEN — braucht Klaus' Browser (NICHT autonom machbar):** Schritte 1–3 + 5–6
 aus Brief 04 hängen an der **eigenen Spore**. Die erzeugt Klaus im Browser,
