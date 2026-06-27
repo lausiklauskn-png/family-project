@@ -86,6 +86,9 @@
   var EVENT_POSTMESSAGE = "sbkim:postmessage";
   var EVENT_FREMD_ALERT = "sbkim:fremd-alert";
   var EVENT_SIEGEL_CERTIFIED = "sbkim:siegel-certified";
+  // Stufe 2 (2026-06-27): Auto-Lauschen am Nostr-Relais. `sbkim:nostr-listening`
+  // {active:true} → VERKEHR leuchtet ruhig grün ("am Relais verbunden, lauscht").
+  var EVENT_NOSTR_LISTENING = "sbkim:nostr-listening";
 
   // Slot-IDs (Karte 17 § Vier-Slot-Layout).
   var ALL_SLOTS = ["lebt", "verkehr", "fremd", "siegel"];
@@ -95,7 +98,7 @@
   // nutzen sie). Klick-Modals geben den Kontext am Touch-Tablet.
   var SLOT_TOOLTIPS = {
     lebt:    "LEBT — Page lebt seit init() (Modul 02 Spore). Klick öffnet Status-Modal.",
-    verkehr: "VERKEHR — letzte Handshakes (Modul 05) + postMessages (Modul 15). Klick öffnet Mini-Log.",
+    verkehr: "VERKEHR — grün = am Relais verbunden, lauscht (Empfangsmodus, antwortet nur). Pulst bei Handschlag (Modul 05) / postMessage (Modul 15). Klick öffnet Mini-Log.",
     fremd:   "FREMD — Fremdzugriff-Buffer (Modul 15 Sub e). Rot wenn Buffer nicht leer. Klick öffnet Modul-15-Modal.",
     siegel:  "SBKIM-Siegel — Modul 16 Self-Inscribing-Bezeugung. Klick öffnet Aspekte-Modal.",
   };
@@ -173,6 +176,9 @@
     fremdAlert: 0,
     siegelCertified: 0,
   };
+
+  // Stufe 2: lauscht der Knoten gerade am Nostr-Relais? Hält VERKEHR ruhig grün.
+  var nostrListening = false;
 
   // Listener-Referenzen (für sauberes Re-Init).
   var listeners = {};
@@ -1154,7 +1160,7 @@
     // Wenn Widget nach init() neu gemountet wird (z.B. via show() nach
     // hide()), zeigt die aktuelle counts-Map welche Slots aktiv sind.
     if (eventCounts.alive > 0) setSlotActive("lebt", true);
-    if (eventCounts.handshake + eventCounts.postmessage > 0) setSlotActive("verkehr", true);
+    if (eventCounts.handshake + eventCounts.postmessage > 0 || nostrListening) setSlotActive("verkehr", true);
     if (fremdBufferSize > 0) setSlotActive("fremd", true);
   }
 
@@ -1228,12 +1234,14 @@
     listeners.postmessage = function (ev) { onPostmessage(ev); };
     listeners.fremdAlert = function (ev) { onFremdAlert(ev); };
     listeners.siegelCertified = function (ev) { onSiegelCertified(ev); };
+    listeners.nostrListening = function (ev) { onNostrListening(ev); };
     try {
       global.addEventListener(EVENT_ALIVE, listeners.alive);
       global.addEventListener(EVENT_HANDSHAKE, listeners.handshake);
       global.addEventListener(EVENT_POSTMESSAGE, listeners.postmessage);
       global.addEventListener(EVENT_FREMD_ALERT, listeners.fremdAlert);
       global.addEventListener(EVENT_SIEGEL_CERTIFIED, listeners.siegelCertified);
+      global.addEventListener(EVENT_NOSTR_LISTENING, listeners.nostrListening);
     } catch (err) {
       warn("Event-Listener-Registrierung fehlgeschlagen — Widget bleibt passiv.", err);
     }
@@ -1245,6 +1253,16 @@
     if (typeof detail.since === "string") lebtSince = detail.since;
     if (typeof detail.nodeId === "string") lebtNodeIdPrefix = detail.nodeId.slice(0, 12);
     setSlotActive("lebt", true);
+  }
+
+  // Stufe 2: Auto-Lauschen-Status. VERKEHR ruhig grün, solange der Knoten am
+  // Relais lauscht — sichtbar auch ohne aktuellen Verkehr. Echter Handschlag
+  // pulst weiterhin über onHandshake.
+  function onNostrListening(ev) {
+    var detail = (ev && ev.detail) || {};
+    nostrListening = (detail.active !== false);
+    var hasTraffic = (eventCounts.handshake + eventCounts.postmessage) > 0;
+    setSlotActive("verkehr", hasTraffic || nostrListening);
   }
 
   function onHandshake(ev) {
@@ -1831,8 +1849,10 @@
         postmessage:     EVENT_POSTMESSAGE,
         fremdAlert:      EVENT_FREMD_ALERT,
         siegelCertified: EVENT_SIEGEL_CERTIFIED,
+        nostrListening:  EVENT_NOSTR_LISTENING,
       },
       get ready()          { return ready; },
+      get nostrListening() { return nostrListening; },
       get widgetMounted()  { return !!(widgetRoot && widgetRoot.parentNode); },
       get firstBootShown() { return firstBootShown; },
       get siegelMounted()  { return siegelMounted; },
