@@ -75,6 +75,65 @@ und der **Verbindungs-Test** (`?dev` → Dev-Briefkasten → „Verbindung teste
 - **Offen vor Launch:** Footer-App-Leiste ausblenden/dev-only; Bild ggf. als
   WebP/JPG optimieren (PNG ~2,4 MB).
 
+## Bau-Sitzung 3 (Brief 03 — Technik) — 2026-06-27
+
+Branch `claude/family-projekt-implementation-yeeogy` (Bau-Stand `…-bau-2ji792`
+per fast-forward übernommen, darauf weitergebaut).
+
+**Phase 1 — Fundament:**
+
+- **Modul 07 Apoptose** 1:1 aus Sage nach `sbkim/07_apoptose.js` kopiert +
+  Script-Tag in index/markt/netzwerk/werkzeuge (nach 05) + `SbkimApoptose.init()`
+  fail-soft in die Andock-Kette. Damit sind die **Siegel-Pflicht-Module
+  vollständig** (01/02/03/04/05/07/15).
+- **Siegel lebendig:** `SbkimSiegel.isCertified() === true`; Badge mountet in
+  `#sbkim-siegel-badge`; **SIEGEL-Slot** im Status-Widget öffnet das Erklärungs-
+  Modal; **Bronze → Gold** bei `sbkim:handshake established`. Band graviert
+  „FAMILY PROJEKT" (Modul-16-Konvention: Host graviert eigenen Namen).
+- **Befund (wichtig):** Die Andock-Kette „hängt" headless intermittierend —
+  der three.js-Hintergrund läuft headless auf **Software-GL (swiftshader)** und
+  bremst den Main-Thread + IndexedDB-Callbacks aus. Mit `reducedMotion: reduce`
+  läuft die Kette deterministisch durch (Storage→Widget→Membran→Siegel). **Kein
+  echter Bug** — auf Klaus' GPU (Galaxy Tab S6) kein Thema; die Geschwister-Apps
+  nutzen dasselbe Modul 01. Der Siegel-Smoke nutzt darum `reducedMotion`.
+- **Briefkasten-Gerüst (§11.6):** `sbkim/SIGNAL.json` (seq 1, Beitritts-Aushang,
+  mailboxes/ack/forNodes für Sage + SB-KIMTool-Point) + `sbkim/AUSTAUSCH-Sage.md`
+  + `sbkim/AUSTAUSCH-SB-KIMTool-Point.md` (Beitritts-Briefe, Bitte um reziproke
+  Quittung). **nodeId/sporeUrl bewusst PENDING** — siehe Spore-Schritt unten.
+
+**Phase 2 — Marktplatz + Geld (Klaus' Richtungsentscheide 2026-06-27):**
+
+- **Marktplatz PR-basiert:** Einreichen erzeugt zusätzlich einen vorgelinkten
+  GitHub-PR (propose-changes auf `assets/config/listings.js`, `quick_pull=1`,
+  Commit-Titel + PR-Beschreibung mit fertigem Eintrag) — wie Andock-Wizard
+  Modul 19. Copy-Paste-Block bleibt als Fallback. Keine Auto-Veröffentlichung.
+- **PayPal Platzhalter:** `assets/config/spenden.js` (`enabled:false`, leere URLs,
+  kein PII). Spenden-/Jahresbeitrag-Knöpfe rendern deaktiviert „(in Vorbereitung)";
+  scharf via `enabled:true` + echte PayPal-Links auf Klaus' Steuer-Wort.
+  „Family Projekt unterstützen"-Sektion auf `markt.html`.
+
+**Phase 3 vorgezogen:**
+
+- **Footer-Bauleiste dev-only:** `renderAppLinks()` hinter `isDev()` (`?dev` /
+  `fp_dev=1`). WorkFloh/ISD⁺ nicht mehr dauerhaft öffentlich verlinkt.
+
+**Tests:** `tests/smoke_all.mjs` **58/58 grün** (neu: 9 Siegel-Punkte,
+3 Marktplatz/Spenden, 2 Footer). Headless-Lauf:
+`PW_CORE=/opt/node22/lib/node_modules/playwright/node_modules/playwright-core/index.js`
+`PW_CHROMIUM=$(ls -d /opt/pw-browsers/chromium-*/chrome-linux/chrome|head -1)`.
+
+**OFFEN (braucht Klaus' Browser / Folge-Sitzung):**
+
+1. **Eigene Spore** (`sbkim/spore.json`) — Klaus erzeugt im Browser
+   (Dev-Briefkasten `?dev` → „Eigene Spore erzeugen"), damit der **private
+   Schlüssel dauerhaft bei ihm** bleibt (Klaus-Entscheid 2026-06-27, empfohlen).
+   Danach: `nodeId` in `SIGNAL.json` nachtragen + Eintrag/Quittung bei Sage +
+   SB-KIMTool-Point (reziproke Übergabe-Bestätigung).
+2. **Weekly-Discovery-Bild per Drag&Drop** (analog Bild-des-Tages) — noch offen;
+   Weekly unterstützt heute Bilder via `weekly.js`-`img`-Feld.
+3. **Deploy** (Hetzner, Caddy + git pull) — erst nach Phase 1/2 fertig
+   (Klaus-Entscheid 2026-06-27).
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-
