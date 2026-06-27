@@ -1,0 +1,228 @@
+<!doctype html>
+<!--
+  Family Projekt — Startseite.
+  Optik aus dem abgenommenen Mockup mockup-startseite-v3.html, mit ECHTEM
+  three.js-Mycel-Hintergrund (assets/mycel-bg.js) und SBKIM-Knoten-Anbindung
+  im Kopf (Floating-Widget + Lampen + Siegel, Brief §6b). Gehostet auf Hetzner.
+-->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Family Projekt</title>
+  <meta name="description" content="Family Projekt — brauchbare Werkzeuge und Apps an einem Ort. Finden, entdecken, anbieten." />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset=".5" stop-color="#7c9cff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#hg)"/><g fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M20 42 L32 22 L44 42"/><path d="M20 42 L44 42"/></g><circle cx="32" cy="22" r="5" fill="white"/><circle cx="20" cy="42" r="5" fill="white"/><circle cx="44" cy="42" r="5" fill="white"/></svg>
+        <span class="holo">Family Projekt</span>
+      </span>
+      <nav class="top">
+        <a href="index.html" class="active" data-i18n="nav_start">Start</a>
+        <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+        <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span class="status" id="fp-head-status" title="Knoten-Status">
+          <span class="lamp" data-slot="lebt"><span class="dot"></span>LEBT</span>
+          <span class="lamp" data-slot="verkehr"><span class="dot"></span>VERKEHR</span>
+          <span class="lamp" data-slot="fremd"><span class="dot"></span>FREMD</span>
+          <span class="lamp pill" data-slot="siegel" title="SBKIM-Siegel"><span class="dot"></span>SIEGEL</span>
+        </span>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="doodle">
+          <div class="inner">
+            <div class="pad" id="tagesbildPad">
+              <div class="title holo" id="tagesTitle">Family Projekt</div>
+              <div class="ph" id="tagesPh" data-i18n="doodle_ph">[ Bild des Tages — wechselt täglich, von dir eingesetzt ]</div>
+            </div>
+          </div>
+        </div>
+        <p class="lead hero-lead" data-i18n="lead">Brauchbare Werkzeuge und Apps an einem Ort. Such, was du brauchst — oder lass dich entdecken.</p>
+
+        <form class="searchrow" id="searchForm">
+          <div class="field">
+            <input id="searchInput" type="search" data-i18n-ph="search_ph" placeholder="Beschreib in eigenen Worten, was du suchst …" />
+            <button class="mic" type="button" title="Sprechen statt tippen" aria-label="Spracheingabe">🎤</button>
+          </div>
+          <button class="btn primary" type="submit" data-i18n="search_btn">Suchen</button>
+        </form>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="glass discover">
+          <div class="disc-head">
+            <span class="ey">★ <span data-i18n="wd_title">Weekly Discovery</span></span>
+            <button class="btn ghost" id="discBtn" type="button" data-i18n="wd_btn">↻ Noch eine entdecken</button>
+          </div>
+          <div class="disc-card">
+            <div class="disc-shot" id="discShot">🔍</div>
+            <div class="disc-info">
+              <h3 id="discName">Such-Werkzeug</h3>
+              <p id="discDesc">Findet nach Bedeutung statt nach Stichwörtern.</p>
+              <a class="btn ghost" href="#" id="discOpen" data-i18n="wd_open">→ Ansehen</a>
+            </div>
+          </div>
+          <p class="disc-fair" data-i18n="wd_fair">Wechselt automatisch und zufällig — so kommen auch kleine, neue Apps ins Rampenlicht. Kein Such-Bonus, nur Sichtbarkeit. Nur Einträge mit Bild erscheinen hier.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2 data-i18n="areas_title">Drei Bereiche</h2>
+        <p class="sub" data-i18n="areas_sub">Klar getrennt — wähle einen.</p>
+        <div class="areas">
+          <a class="glass area" href="netzwerk.html"><div class="ico">🔗</div><h3 data-i18n="a1_h">Netzwerk</h3><p data-i18n="a1_p">Geräte verbinden sich direkt — gratis und neutral. Hier dockst du eine eigene Seite an.</p><span class="go" data-i18n="a1_go">→ verbinden</span></a>
+          <a class="glass area" href="werkzeuge.html"><div class="ico">🧰</div><h3 data-i18n="a2_h">Werkzeuge</h3><p data-i18n="a2_p">Fertige Werkzeuge zum Ansehen und Herunterladen — jedes mit eigener Seite.</p><span class="go" data-i18n="a2_go">→ öffnen</span></a>
+          <a class="glass area" href="markt.html"><div class="ico">🛒</div><h3 data-i18n="a3_h">Marktplatz</h3><p data-i18n="a3_p">Apps finden und anbieten. Such, was du brauchst — oder liste deine eigene Seite.</p><span class="go" data-i18n="a3_go">→ stöbern</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="holo">Family Projekt</span></span>
+      <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+      <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+      <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+  </footer>
+
+  <!-- three.js-Mycel-Hintergrund -->
+  <script type="module" src="assets/mycel-bg.js"></script>
+
+  <!-- SBKIM-Knoten-Module (1:1 aus Sage) + Andock -->
+  <script src="sbkim/01_storage.js"></script>
+  <script src="sbkim/02_spore.js"></script>
+  <script src="sbkim/03_embedding.js"></script>
+  <script src="sbkim/04_match.js"></script>
+  <script src="sbkim/05_anastomose.js"></script>
+  <script src="sbkim/15_membran.js"></script>
+  <script src="sbkim/16_siegel.js"></script>
+  <script src="sbkim/17_floating_widget.js"></script>
+  <script src="sbkim/sbkim-init.js"></script>
+
+  <!-- Wechselbare Konfig (von Klaus ohne Code änderbar) -->
+  <script src="assets/config/tagesbild.js"></script>
+  <script src="assets/config/weekly.js"></script>
+
+  <!-- Seiten-Texte (DE/EN) -->
+  <script>
+    window.FP_PAGE_I18N = {
+      de: {
+        doodle_ph: "[ Bild des Tages — wechselt täglich, von dir eingesetzt ]",
+        lead: "Brauchbare Werkzeuge und Apps an einem Ort. Such, was du brauchst — oder lass dich entdecken.",
+        wd_title: "Weekly Discovery", wd_btn: "↻ Noch eine entdecken", wd_open: "→ Ansehen",
+        wd_fair: "Wechselt automatisch und zufällig — so kommen auch kleine, neue Apps ins Rampenlicht. Kein Such-Bonus, nur Sichtbarkeit. Nur Einträge mit Bild erscheinen hier.",
+        areas_title: "Drei Bereiche", areas_sub: "Klar getrennt — wähle einen.",
+        a1_h: "Netzwerk", a1_p: "Geräte verbinden sich direkt — gratis und neutral. Hier dockst du eine eigene Seite an.", a1_go: "→ verbinden",
+        a2_h: "Werkzeuge", a2_p: "Fertige Werkzeuge zum Ansehen und Herunterladen — jedes mit eigener Seite.", a2_go: "→ öffnen",
+        a3_h: "Marktplatz", a3_p: "Apps finden und anbieten. Such, was du brauchst — oder liste deine eigene Seite.", a3_go: "→ stöbern"
+      },
+      en: {
+        doodle_ph: "[ Image of the day — changes daily, set by you ]",
+        lead: "Useful tools and apps in one place. Search for what you need — or let yourself be discovered.",
+        wd_title: "Weekly Discovery", wd_btn: "↻ Discover another", wd_open: "→ View",
+        wd_fair: "Rotates automatically and at random — so small, new apps get the spotlight too. No search bonus, just visibility. Only entries with an image appear here.",
+        areas_title: "Three areas", areas_sub: "Clearly separated — pick one.",
+        a1_h: "Network", a1_p: "Devices connect directly — free and neutral. Dock your own site here.", a1_go: "→ connect",
+        a2_h: "Tools", a2_p: "Ready-made tools to view and download — each with its own page.", a2_go: "→ open",
+        a3_h: "Marketplace", a3_p: "Find and offer apps. Search for what you need — or list your own site.", a3_go: "→ browse"
+      }
+    };
+  </script>
+  <script src="assets/app.js"></script>
+
+  <!-- Startseiten-Logik: Bild des Tages, Weekly Discovery, Suche -->
+  <script>
+    (function () {
+      // Bild des Tages
+      var tb = window.FP_TAGESBILD || {};
+      function renderTages() {
+        var l = FP.getLang();
+        var title = document.getElementById("tagesTitle");
+        var ph = document.getElementById("tagesPh");
+        var pad = document.getElementById("tagesbildPad");
+        if (title) title.textContent = (l === "en" ? tb.titleEn : tb.titleDe) || "Family Projekt";
+        if (tb.img && pad) {
+          // Nur Bild zeigen (JPG/PNG/WebP); SVG nicht zulassen.
+          if (!/\.svg(\?|$)/i.test(tb.img)) {
+            pad.innerHTML = "";
+            var img = new Image();
+            img.alt = "Bild des Tages";
+            img.src = tb.img;
+            pad.appendChild(img);
+            return;
+          }
+        }
+        if (ph) ph.textContent = (l === "en" ? tb.phEn : tb.phDe) || "";
+      }
+
+      // Weekly Discovery — fair, zufällig; Bild bevorzugt, sonst Emoji.
+      var APPS = (window.FP_WEEKLY || []).filter(function (a) { return a && (a.img || a.emoji); });
+      var current = -1;
+      function renderDiscover(i) {
+        if (!APPS.length) return;
+        current = i;
+        var a = APPS[i], l = FP.getLang();
+        var shot = document.getElementById("discShot");
+        shot.innerHTML = "";
+        if (a.img && !/\.svg(\?|$)/i.test(a.img)) {
+          var img = new Image(); img.alt = a.name; img.src = a.img; shot.appendChild(img);
+        } else {
+          shot.textContent = a.emoji || "🔍";
+        }
+        document.getElementById("discName").textContent = a.name;
+        document.getElementById("discDesc").textContent = (l === "en" ? a.en : a.de) || "";
+        var open = document.getElementById("discOpen");
+        if (open) open.setAttribute("href", a.url || "#");
+        shot.classList.add("flash");
+        setTimeout(function () { shot.classList.remove("flash"); }, 260);
+      }
+      function randomDiscover() {
+        if (APPS.length < 1) return;
+        var n; do { n = Math.floor(Math.random() * APPS.length); } while (n === current && APPS.length > 1);
+        renderDiscover(n);
+      }
+      var dbtn = document.getElementById("discBtn");
+      if (dbtn) dbtn.addEventListener("click", randomDiscover);
+
+      // Suche -> Marktplatz mit Query (volle semantische Suche: Schritt 6).
+      var form = document.getElementById("searchForm");
+      if (form) form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var q = (document.getElementById("searchInput").value || "").trim();
+        location.href = "markt.html" + (q ? ("?q=" + encodeURIComponent(q)) : "");
+      });
+
+      // Sprache wechselt Discovery-/Tagesbild-Text mit.
+      window.addEventListener("fp:lang", function () { renderTages(); if (current >= 0) renderDiscover(current); });
+
+      FP.init();
+      renderTages();
+      if (APPS.length) renderDiscover(Math.floor(Math.random() * APPS.length));
+    })();
+  </script>
+</body>
+</html>

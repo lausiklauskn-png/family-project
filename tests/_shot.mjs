@@ -1,0 +1,13 @@
+import http from "node:http"; import fs from "node:fs"; import path from "node:path"; import { fileURLToPath } from "node:url";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const pw = await import(process.env.PW_CORE); const chromium = pw.chromium || pw.default.chromium;
+const MIME = { ".html":"text/html",".js":"text/javascript",".mjs":"text/javascript",".css":"text/css",".json":"application/json",".svg":"image/svg+xml",".png":"image/png" };
+const server = http.createServer((req,res)=>{let p=decodeURIComponent(req.url.split("?")[0]); if(p==="/")p="/index.html"; const fp=path.join(ROOT,p); if(!fp.startsWith(ROOT)||!fs.existsSync(fp)||fs.statSync(fp).isDirectory()){res.writeHead(404);res.end();return;} res.writeHead(200,{"content-type":MIME[path.extname(fp)]||"application/octet-stream"}); fs.createReadStream(fp).pipe(res);});
+await new Promise(r=>server.listen(0,r)); const port=server.address().port;
+const browser = await chromium.launch({ executablePath:"/opt/pw-browsers/chromium-1194/chrome-linux/chrome", args:["--no-sandbox","--use-gl=swiftshader","--enable-unsafe-swrast"] });
+const page = await browser.newPage({ viewport:{width:1280,height:900} });
+const url = `http://127.0.0.1:${port}/` + (process.argv[2]||"index.html");
+await page.goto(url, { waitUntil:"load" }); await page.waitForTimeout(2200);
+await page.screenshot({ path: process.argv[3]||"tests/shot.png", fullPage:false });
+await browser.close(); server.close();
+console.log("shot:", process.argv[3]||"tests/shot.png");
