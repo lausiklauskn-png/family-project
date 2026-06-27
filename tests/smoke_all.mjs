@@ -139,6 +139,9 @@ console.log("\nFooter-Bauleiste (dev-only)");
   ok(await dev.evaluate(()=>{const a=[...document.querySelectorAll("#fp-dev-mailbox a")];return a.some(x=>/MYCEL-ANDOCK-AUFTRAG\.md/.test(x.getAttribute("href"))) && a.some(x=>/netzwerk\.html#andock/.test(x.getAttribute("href")));}), "Andock-Tool: KI-Anleitung + Andock-Wizard verlinkt");
   // Safe-Knopf öffnet das Modul-20-Modal (hasVault false -> Create-Modal)
   ok(await dev.evaluate(async()=>{document.getElementById("fp-dev-safe").click();for(let i=0;i<40;i++){if(document.querySelector("[data-sbkim-vault-modal]"))return true;await new Promise(r=>setTimeout(r,75));}return false;}), "Andock-Tool: Safe-Knopf öffnet Modul-20-Modal");
+  // Stufe 2 verteilt: Modul 05b (Nostr-Relais-Client) geladen + Relais-Knöpfe im Andock-Tool ④
+  ok(await dev.evaluate(async()=>{for(let i=0;i<40;i++){if(window.SbkimNostrRelay&&typeof SbkimNostrRelay.publish==="function")break;await new Promise(r=>setTimeout(r,75));}return !!(window.SbkimNostrRelay&&typeof SbkimNostrRelay.publish==="function"&&typeof SbkimNostrRelay.subscribe==="function");}), "Stufe 2: Modul 05b Nostr-Relais-Client geladen (SbkimNostrRelay)");
+  ok(await dev.evaluate(()=>!!document.getElementById("fp-dev-relayselftest")&&!!document.getElementById("fp-dev-listen")&&typeof SbkimAnastomose.listenNostr==="function"), "Andock-Tool ④: Relais-Selbsttest + Lauschen-Knopf + listenNostr verfügbar");
   await dev.close(); }
 
 // SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.

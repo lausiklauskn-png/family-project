@@ -251,6 +251,34 @@
     });
   }
 
+  // Relais-Selbsttest: publish→subscribe Round-Trip über den echten 05b-Client
+  // gegen wss://relay.family-projekt.de (Stufe 2, live). Beweist im Browser, dass
+  // der Knoten das Relais spricht. Geht NICHT aus einer Sandbox (wss gesperrt).
+  function relaisSelbsttest(out) {
+    var R = window.SbkimNostrRelay;
+    if (!R || typeof R.publish !== "function" || typeof R.subscribe !== "function") {
+      out.textContent = "Modul 05b (SbkimNostrRelay) nicht geladen (type=module?)."; return;
+    }
+    var tag = "sbkim-selftest-" + Math.random().toString(36).slice(2, 10);
+    out.textContent = "→ Verbinde mit wss://relay.family-projekt.de, publiziere Test-Event (tag " + tag + "), warte auf Echo (max 10 s) …\n";
+    function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+    (async function () {
+      var got = false, gotId = null, unsub = null;
+      try {
+        unsub = R.subscribe({ kinds: [1], "#t": [tag] }, function (ev) { got = true; gotId = ev && ev.id; });
+        await R.publish({ kind: 1, created_at: Math.floor(Date.now() / 1000), tags: [["t", tag]], content: "sbkim relay selftest" });
+      } catch (e) {
+        if (unsub) { try { unsub(); } catch (_e) {} }
+        out.textContent += "✗ Relais-Fehler: " + (e && e.message ? e.message : e); return;
+      }
+      for (var i = 0; i < 50 && !got; i++) { await sleep(200); }
+      if (unsub) { try { unsub(); } catch (_e) {} }
+      out.textContent += got
+        ? "✓ Echo vom Live-Relais empfangen (event " + gotId + "). Relais-Transport live bestätigt — dieser Knoten spricht relay.family-projekt.de."
+        : "✗ Kein Echo in 10 s. Internet/Relais prüfen (nur echter Browser, nicht aus einer Sandbox).";
+    })();
+  }
+
   function mountDevMailbox() {
     if (!isDev() || document.getElementById("fp-dev-mailbox")) return;
     var btn = document.createElement("button");
@@ -285,9 +313,12 @@
       '<a href="netzwerk.html#andock" style="' + bsGhost + '">↗ Andock-Wizard</a></div>' +
       '<div style="' + stepStyle + '">③ Identität sichern (Safe)</div>' +
       '<div style="' + rowStyle + '"><button id="fp-dev-safe" style="' + bs + '">🔐 Identität im Safe sichern</button></div>' +
-      '<div style="' + stepStyle + '">④ Verbinden</div>' +
-      '<div style="' + rowStyle + '"><button id="fp-dev-test" style="' + bsGhost + '">Verbindung testen</button></div>' +
-      '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Vollautomatischer Handshake übers Relais (<code>relay.family-projekt.de</code>): in Vorbereitung (Modul 05 Nostr-Transport).</p>' +
+      '<div style="' + stepStyle + '">④ Verbinden (Relais)</div>' +
+      '<div style="' + rowStyle + '">' +
+      '<button id="fp-dev-test" style="' + bsGhost + '">Verbindung testen</button>' +
+      '<button id="fp-dev-relayselftest" style="' + bs + '">🛰 Relais-Selbsttest</button>' +
+      '<button id="fp-dev-listen" style="' + bsGhost + '">👂 Empfänger lauschen</button></div>' +
+      '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Relais-Transport (Modul 05 Nostr / <code>relay.family-projekt.de</code>) ist <b>live</b>. Der volle Cross-Knoten-Handshake (zwei laufende Knoten) ist die Generalprobe.</p>' +
       '<pre id="fp-dev-out" style="margin:10px 0 0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:42vh;overflow:auto"></pre>';
     document.body.appendChild(btn);
     document.body.appendChild(panel);
@@ -295,6 +326,15 @@
     btn.addEventListener("click", function () { panel.style.display = panel.style.display === "none" ? "block" : "none"; });
     panel.querySelector("#fp-dev-close").addEventListener("click", function () { panel.style.display = "none"; });
     panel.querySelector("#fp-dev-test").addEventListener("click", function () { verbindungsTest(out); });
+    panel.querySelector("#fp-dev-relayselftest").addEventListener("click", function () { relaisSelbsttest(out); });
+    panel.querySelector("#fp-dev-listen").addEventListener("click", function () {
+      if (!window.SbkimAnastomose || typeof SbkimAnastomose.listenNostr !== "function") { out.textContent = "Modul 05 listenNostr nicht verfügbar."; return; }
+      if (!window.SbkimNostrRelay) { out.textContent = "Modul 05b (Relais-Client) nicht geladen (type=module?)."; return; }
+      out.textContent = "Empfänger lauscht am Relais (relay.family-projekt.de) auf eingehende Handshakes …\n";
+      SbkimAnastomose.listenNostr().then(function () {
+        out.textContent += "✔ Lauscht. Dieser Knoten ist jetzt über das Relais erreichbar (Empfangsmodus mit Antwortrecht).";
+      }).catch(function (e) { out.textContent += "Fehler: " + (e && e.message ? e.message : e); });
+    });
     panel.querySelector("#fp-dev-spore").addEventListener("click", function () { startSporeGeneration(out); });
     panel.querySelector("#fp-dev-safe").addEventListener("click", function () {
       if (window.SbkimSafe && typeof SbkimSafe.open === "function") {
