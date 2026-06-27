@@ -56,6 +56,34 @@ nav.top a:hover,nav.top a.active{color:var(--text);background:rgba(127,127,127,.
 .lamp.warn .dot{background:#ff5a8a;box-shadow:0 0 8px rgba(255,90,138,.7);animation:pulse 1.1s ease-in-out infinite}
 #sbkim-siegel-badge{cursor:pointer}
 
+/* Dock-Zone in der Navleiste + andockbares Status-Widget (Modul 17 ersetzt) */
+.fp-dock{display:inline-flex;align-items:center;min-height:34px}
+.fp-sw .fp-sw-slots{display:inline-flex;align-items:center;gap:9px}
+.fp-sw-lamp{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.68rem;color:var(--muted);white-space:nowrap;user-select:none}
+.fp-sw-lamp .dot{width:9px;height:9px;border-radius:50%;background:#444;transition:.3s}
+.fp-sw-lamp.on .dot{background:var(--ok);box-shadow:0 0 8px rgba(70,210,127,.7)}
+.fp-sw-lamp.warn .dot{background:#ff5a8a;box-shadow:0 0 8px rgba(255,90,138,.7);animation:pulse 1.1s ease-in-out infinite}
+.fp-sw-lamp[data-slot="siegel"]{cursor:pointer}
+.fp-sw-head{display:flex;align-items:center;gap:6px}
+.fp-sw-head .grip{flex:1;font-family:var(--mono);font-size:.64rem;color:var(--muted);letter-spacing:.04em;white-space:nowrap}
+.fp-sw-head button{width:22px;height:22px;border-radius:6px;border:1px solid var(--line);background:rgba(127,127,127,.12);color:var(--text);cursor:pointer;font-size:.8rem;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+.fp-sw-head button:hover{border-color:var(--accent)}
+/* Docked: kompakt, greifbar */
+.fp-sw.docked{display:inline-flex;align-items:center;cursor:grab;padding:4px 8px;border:1px dashed transparent;border-radius:9px;touch-action:none}
+.fp-sw.docked:hover{border-color:var(--line)}
+.fp-sw.docked .fp-sw-head{display:none}
+/* Floating: schwebende Pille mit Kopf (Minimieren + X) */
+.fp-sw.floating{position:fixed;z-index:60;display:flex;flex-direction:column;align-items:stretch;gap:8px;min-width:152px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);box-shadow:var(--shadow);padding:8px 10px}
+.fp-sw.floating .fp-sw-head{cursor:grab;touch-action:none}
+.fp-sw.floating .fp-sw-slots{flex-direction:column;align-items:flex-start;gap:7px}
+.fp-sw.floating.min .fp-sw-slots{display:none}
+.fp-sw.dragging{opacity:.9;cursor:grabbing}
+.fp-sw-restore{font-family:var(--mono);font-size:.7rem;color:var(--muted);background:rgba(127,127,127,.10);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer}
+.fp-sw-restore:hover{color:var(--text);border-color:var(--accent);box-shadow:var(--glow)}
+header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radius:9px}
+
 .btn{position:relative;display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:12px;padding:13px 20px;font-size:.96rem;cursor:pointer;border:1px solid transparent;overflow:hidden;text-decoration:none;font-family:var(--sans);line-height:1.2}
 .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a;box-shadow:var(--shadow)}
 .btn.primary::after{content:"";position:absolute;top:0;left:0;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-160%) skewX(-18deg)}
@@ -71,7 +99,7 @@ nav.top a:hover,nav.top a.active{color:var(--text);background:rgba(127,127,127,.
 .field input,.field textarea{width:100%;background:rgba(127,127,127,.10);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:13px 50px 13px 15px;font-size:1rem;font-family:var(--sans)}
 .field textarea{resize:vertical;min-height:96px;line-height:1.5}
 .field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
-.mic{position:absolute;right:7px;top:7px;width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:rgba(127,127,127,.10);color:var(--accent);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.mic{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:rgba(127,127,127,.10);color:var(--accent);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,box-shadow .15s}
 .mic:hover{border-color:var(--accent);box-shadow:var(--glow)}
 .mic.live{color:#fff;background:linear-gradient(135deg,#ff5a8a,#a06bff);border-color:transparent;animation:pulse 1.1s ease-in-out infinite}
 

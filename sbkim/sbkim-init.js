@@ -47,38 +47,9 @@
     } catch (_e) { return false; }
   }
 
-  // ---- Kopf-Status-Leiste (vier Slots, Event-getrieben) --------------------
-  function lamp(slot, state) {
-    var el = document.querySelector('#fp-head-status [data-slot="' + slot + '"]');
-    if (!el) return;
-    el.classList.remove("on", "warn");
-    if (state) el.classList.add(state);
-  }
-  function flashVerkehr() {
-    lamp("verkehr", "on");
-    clearTimeout(flashVerkehr._t);
-    flashVerkehr._t = setTimeout(function () { lamp("verkehr", ""); }, 1400);
-  }
-  function wireHeadStatus() {
-    var bar = document.getElementById("fp-head-status");
-    if (!bar) return;
-    window.addEventListener("sbkim:alive", function () { lamp("lebt", "on"); });
-    window.addEventListener("sbkim:postmessage", flashVerkehr);
-    window.addEventListener("sbkim:handshake", flashVerkehr);
-    window.addEventListener("sbkim:fremd-alert", function () { lamp("fremd", "warn"); });
-    window.addEventListener("sbkim:siegel-certified", function () {
-      var s = bar.querySelector('[data-slot="siegel"]');
-      if (s) { s.classList.add("on"); s.title = "SBKIM-Siegel ausgestellt"; }
-    });
-    // Siegel-Chip im Kopf öffnet das Siegel-Modal des Floating-Widgets.
-    var chip = bar.querySelector('[data-slot="siegel"]');
-    if (chip) chip.addEventListener("click", function () {
-      var badge = document.getElementById("sbkim-siegel-badge");
-      if (badge) badge.click();
-    });
-    // LEBT steht nach erfolgreichem Init ohnehin (Spore lebt); Fallback-Anstoß.
-    setTimeout(function () { lamp("lebt", "on"); }, 1200);
-  }
+  // Kopf-Status zeigt das andockbare Widget (assets/status-widget.js), getrieben
+  // von denselben Fenster-Events. Modul 17 bleibt geladen (Brief §6b) als
+  // Plumbing + Siegel-Proxy, seine eigene Pille wird versteckt (keine Doppelung).
 
   // ---- Init-Kette ----------------------------------------------------------
   (async function () {
@@ -88,6 +59,9 @@
 
       if (window.SbkimWidget) {
         await SbkimWidget.init({ allowedOrigins: FP.allowedOrigins, repoUrl: FP.repoUrl });
+        // Modul-17-Pille verstecken: die sichtbare Anzeige übernimmt das
+        // andockbare Status-Widget (Klaus 2026-06-27, keine Doppelung).
+        try { if (SbkimWidget.hide) SbkimWidget.hide(); } catch (_e) {}
       }
       if (window.SbkimMembrane) {
         await SbkimMembrane.init({ allowedOrigins: FP.allowedOrigins });
@@ -104,9 +78,6 @@
       console.error("[FP-SBKIM] Init-Fehler:", e);
     }
   })();
-
-  if (document.readyState !== "loading") wireHeadStatus();
-  else document.addEventListener("DOMContentLoaded", wireHeadStatus);
 
   // ---- Spore-Erzeugung (Identität) — Klaus' Browser-Lauf -------------------
   // Erzeugt einmalig die Family-Projekt-Identität (Ed25519 via Modul 02) +

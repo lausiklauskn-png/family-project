@@ -38,6 +38,23 @@ und der **Verbindungs-Test** (`?dev` → Dev-Briefkasten → „Verbindung teste
 
 ---
 
+## Nachtrag 2026-06-27 (Klaus' Sichttest-Feedback, umgesetzt)
+
+- **Doppelung behoben + andockbares Status-Widget** (`assets/status-widget.js`):
+  die feste Kopf-Leiste war eine zweite Anzeige neben dem Modul-17-Widget. Jetzt
+  EIN Element (LEBT/VERKEHR/FREMD/SIEGEL), das per Maus **angedockt** (Navleiste,
+  ohne Minimieren/X) und durch **Runterziehen gelöst** (schwebende Pille mit
+  –/✕) wird; ✕ → „⊕ Status"-Restore-Chip. Zustand+Position persistiert.
+  Modul 17 bleibt geladen (Brief §6b, Plumbing + Siegel-Proxy), seine eigene
+  Pille wird in `sbkim-init.js` per `SbkimWidget.hide()` versteckt. Klaus' live-
+  Anweisung überschreibt hier die Brief-Default-Optik (dokumentiert).
+- **Mikrofon-Knöpfe** jetzt vertikal **mittig** in jedem Feld (`.mic` top:50% +
+  translateY).
+- Smoke: `smoke_all.mjs` **41/41 grün** (inkl. echtem Maus-Ziehen Dock/Lösen,
+  Minimieren/X, Restore-Chip).
+- **Weiter offen für Klaus' Tablet-Sichttest:** Andocken/Lösen per Touch fühlen,
+  Mikrofon-Position, Gesamteindruck.
+
 ## Offen / nächste Schritte (priorisiert)
 
 1. **Klaus' Browser-Sichttest** der Startseite + Räume (lokal via

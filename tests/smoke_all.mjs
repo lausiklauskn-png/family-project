@@ -48,6 +48,23 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>!!document.getElementById("sbkim-aw-go")), "netzwerk: Andock-Wizard gemountet");
   ok(await page.evaluate(()=>!!document.querySelector("#andockWizard .field .mic")), "netzwerk: Mikrofon am Wizard-Feld nachgerüstet");
   await page.close(); }
+{ const { page } = await load("/index.html");
+  ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("docked")), "widget: startet angedockt");
+  ok(await page.evaluate(()=>getComputedStyle(document.querySelector(".fp-sw .fp-sw-head")).display==="none"), "widget: angedockt ohne Minimieren/X");
+  // Andocken/Lösen über die öffentliche API
+  await page.evaluate(()=>window.FPStatusWidget.setMode("floating"));
+  ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("floating")), "widget: gelöst → floating");
+  ok(await page.evaluate(()=>document.querySelector('.fp-sw [data-act="min"]') && document.querySelector('.fp-sw [data-act="close"]')), "widget: floating hat Minimieren + X");
+  // Echtes Ziehen nach unten zum Lösen (aus angedockt)
+  await page.evaluate(()=>window.FPStatusWidget.setMode("docked"));
+  const box = await page.evaluate(()=>{const r=document.querySelector(".fp-sw").getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};});
+  await page.mouse.move(box.x, box.y); await page.mouse.down();
+  await page.mouse.move(box.x, box.y+120, {steps:6}); await page.mouse.move(box.x, box.y+260, {steps:6}); await page.mouse.up();
+  ok(await page.evaluate(()=>document.querySelector(".fp-sw").classList.contains("floating")), "widget: Ziehen nach unten löst es (Maus)");
+  // Schließen → Restore-Chip
+  await page.evaluate(()=>document.querySelector('.fp-sw [data-act="close"]').click());
+  ok(await page.evaluate(()=>{const r=document.querySelector(".fp-sw-restore");return r && r.style.display!=="none";}), "widget: X schließt → Restore-Chip erscheint");
+  await page.close(); }
 { const { page } = await load("/markt.html");
   ok(await page.evaluate(()=>!document.getElementById("mkEmpty").hidden), "markt: Leer-Hinweis (noch keine Einträge)");
   ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .mic").length>=1), "markt: Mikrofon im Einreich-Formular");

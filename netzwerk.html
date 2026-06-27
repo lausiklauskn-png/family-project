@@ -25,12 +25,7 @@
         <a href="netzwerk.html" class="active" data-i18n="nav_network">Netzwerk</a>
         <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
         <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
-        <span class="status" id="fp-head-status" title="Knoten-Status">
-          <span class="lamp" data-slot="lebt"><span class="dot"></span>LEBT</span>
-          <span class="lamp" data-slot="verkehr"><span class="dot"></span>VERKEHR</span>
-          <span class="lamp" data-slot="fremd"><span class="dot"></span>FREMD</span>
-          <span class="lamp pill" data-slot="siegel" title="SBKIM-Siegel"><span class="dot"></span>SIEGEL</span>
-        </span>
+        <span id="fp-dock" class="fp-dock" title="Knoten-Status"></span>
         <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
         <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
       </nav>
@@ -143,6 +138,7 @@
     };
   </script>
   <script src="assets/app.js"></script>
+  <script src="assets/status-widget.js"></script>
   <script>
     (function () {
       FP.init();

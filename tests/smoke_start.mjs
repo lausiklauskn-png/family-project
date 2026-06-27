@@ -53,9 +53,10 @@ ok(await page.evaluate(() => !!document.querySelector("#bg")), "three.js-Canvas 
 ok(await page.evaluate(() => !!(window.MycelBg && typeof window.MycelBg.setTheme === "function")), "MycelBg.setTheme bereit (three.js initialisiert)");
 ok(await page.evaluate(() => typeof window.FP === "object" && typeof window.FP.init === "function"), "FP (app.js) geladen");
 ok(await page.evaluate(() => !!window.SbkimStorage && !!window.SbkimWidget && !!window.SbkimMembrane && !!window.SbkimSiegel), "SBKIM-Module geladen (01/15/16/17)");
-ok(await page.evaluate(() => !!document.getElementById("fp-head-status")), "Kopf-Status-Leiste vorhanden");
-ok(await page.evaluate(() => document.querySelectorAll("#fp-head-status .lamp").length === 4), "vier Status-Slots (LEBT/VERKEHR/FREMD/SIEGEL)");
-ok(await page.evaluate(() => document.querySelector('#fp-head-status [data-slot="lebt"]').classList.contains("on")), "LEBT-Lampe leuchtet nach Init");
+ok(await page.evaluate(() => !!document.getElementById("fp-dock") && !!document.querySelector(".fp-sw")), "andockbares Status-Widget in der Dock-Zone");
+ok(await page.evaluate(() => document.querySelectorAll(".fp-sw .fp-sw-lamp").length === 4), "vier Status-Slots (LEBT/VERKEHR/FREMD/SIEGEL)");
+ok(await page.evaluate(() => document.querySelector('.fp-sw [data-slot="lebt"]').classList.contains("on")), "LEBT-Lampe leuchtet nach Init");
+ok(await page.evaluate(() => document.querySelector(".fp-sw").classList.contains("docked")), "Widget startet angedockt (keine Doppelung)");
 ok(await page.evaluate(() => !!document.getElementById("discName") && document.getElementById("discName").textContent.length > 0), "Weekly Discovery rendert einen Eintrag");
 ok(await page.evaluate(() => !!document.querySelector(".mic")), "Mikrofon-Knopf am Suchfeld");
 
