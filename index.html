@@ -393,8 +393,72 @@
       // Sprache wechselt Discovery-/Tagesbild-Text mit.
       window.addEventListener("fp:lang", function () { renderTages(); if (current >= 0) renderDiscover(current); });
 
+      // --- Feenstaub: dezente Funken im Maus-Umfeld über dem Bild des Tages ---
+      // (analog Sage-Truhe, aber leiser). Canvas pointer-events:none -> der
+      // 5-fach-Klick aufs Bild bleibt unberührt. Nur über einem echten Bild,
+      // reduced-motion-sicher. Teal-Gold-Palette wie das Mycel.
+      function setupTagesDust() {
+        var pad = document.getElementById("tagesbildPad"); if (!pad) return;
+        if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        var canvas = document.createElement("canvas"); canvas.className = "fp-dust";
+        canvas.setAttribute("aria-hidden", "true");
+        pad.appendChild(canvas);
+        var ctx = canvas.getContext("2d"); if (!ctx) { canvas.remove(); return; }
+        var dpr = Math.min(window.devicePixelRatio || 1, 2);
+        var particles = [];
+        function resize() {
+          var r = pad.getBoundingClientRect(); if (!r.width) return;
+          canvas.width = Math.round(r.width * dpr); canvas.height = Math.round(r.height * dpr);
+          ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
+        }
+        resize();
+        if (window.ResizeObserver) { try { new ResizeObserver(resize).observe(pad); } catch (e) {} }
+        function hasImage() { return !!pad.querySelector("img.tagesimg"); }
+        function spawn(x, y, n) {
+          for (var i = 0; i < n; i++) {
+            if (particles.length > 120) particles.shift();
+            particles.push({
+              x: x + (Math.random() - 0.5) * 10, y: y + (Math.random() - 0.5) * 10,
+              vx: (Math.random() - 0.5) * 0.5, vy: -0.2 - Math.random() * 0.5,
+              life: 0, maxLife: 0.7 + Math.random() * 1.1,
+              size: 0.8 + Math.random() * 1.8, tint: Math.random()
+            });
+          }
+        }
+        pad.addEventListener("pointermove", function (e) {
+          if (!hasImage()) return; // nur über einem echten Bild funkeln
+          var r = canvas.getBoundingClientRect();
+          spawn(e.clientX - r.left, e.clientY - r.top, 1 + (Math.random() < 0.5 ? 1 : 0));
+        });
+        var lastT = performance.now();
+        (function loop() {
+          if (!canvas.isConnected) return;
+          var now = performance.now(); var dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+          var w = canvas.width / dpr, h = canvas.height / dpr;
+          ctx.clearRect(0, 0, w, h);
+          if (particles.length) {
+            particles = particles.filter(function (p) {
+              p.life += dt; if (p.life >= p.maxLife) return false;
+              p.x += p.vx; p.y += p.vy; p.vy -= 0.012;
+              var lr = 1 - (p.life / p.maxLife);
+              var a = lr * 0.55; // dezent, nicht dominant
+              var s = p.size * (0.6 + lr * 0.5);
+              var g = p.tint < 0.5 ? 200 : 231, b = p.tint < 0.5 ? 90 : 211; // gold / teal
+              ctx.fillStyle = "rgba(255," + g + "," + b + "," + a + ")";
+              ctx.beginPath(); ctx.arc(p.x, p.y, s, 0, Math.PI * 2); ctx.fill();
+              ctx.fillStyle = "rgba(255," + g + "," + b + "," + (a * 0.5) + ")";
+              ctx.fillRect(p.x - s * 2.5, p.y - 0.4, s * 5, 0.8);
+              ctx.fillRect(p.x - 0.4, p.y - s * 2.5, 0.8, s * 5);
+              return true;
+            });
+          }
+          requestAnimationFrame(loop);
+        })();
+      }
+
       FP.init();
       renderTages();
+      setupTagesDust();
       if (APPS.length) renderDiscover(Math.floor(Math.random() * APPS.length));
     })();
   </script>

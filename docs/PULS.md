@@ -272,6 +272,17 @@ Modul 05 ist 1:1 aus Sage → Spec + Bau gehören nach **Sage**, dann runterkopi
 **Stufe 3 (Phase B):** Andock-Tool als kopierbares Modul für fremde Repos (Modul 19
 ausbauen).
 
+## Nachtrag 2026-06-27 — Feenstaub über „Bild des Tages" (Klaus' Wunsch)
+
+Dezenter Funkel-/Feenstaub-Effekt im Maus-Umfeld über dem Bild des Tages
+(analog Sage-Truhe, aber leiser): Canvas `.fp-dust` über `#tagesbildPad`
+(`z-index:1`, `pointer-events:none` → 5-fach-Klick unberührt), Partikel-System
+spawnt bei `pointermove` nur über einem echten Bild, teal-gold-Palette, niedrige
+Alpha (0.55·life), reduced-motion-sicher (kein Canvas). `index.html`
+(Startseiten-IIFE `setupTagesDust()`) + CSS `.doodle .pad .fp-dust`.
+Smoke `smoke_all.mjs` **67/67 grün** (+1 Feenstaub-Canvas gemountet/klick-durchlässig).
+**Browser-Sichttest des Effekt-Gefühls wartet auf Klaus.**
+
 ## Nächster Brief: `docs/sessions/BRIEF_03_TECHNIK.md` (2026-06-27)
 
 Technische Umsetzung: Spore + Siegel + **Einbindung ins Mycel** (inkl. self-
