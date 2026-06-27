@@ -1,0 +1,33 @@
+{
+  "node": "family-project",
+  "lastBuild": "2026-06-27",
+  "seq": 2,
+  "headline": "Eigene Spore erzeugt + committet (nodeId HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE, privater Schluessel bleibt in Klaus' Browser). Reziprok verifiziert: eigene Signatur VALID, nodeId = base64url(sha256(pubkey)), domainVector L2-normalisiert; Cosinus Family<->Sage 0.83, Family<->SB-KIMTool-Point 0.83. Bitte um Aufnahme in eure Knoten-Liste (status.json / NETZ-STAND) + reziproke Quittung.",
+  "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json",
+  "nodeId": "HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE",
+  "mailboxes": {
+    "Sage-Protokol": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-Sage.md",
+    "SB-KIMTool-Point": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/AUSTAUSCH-SB-KIMTool-Point.md"
+  },
+  "forNodes": [
+    "Sage-Protokol",
+    "SB-KIMTool-Point"
+  ],
+  "ack": {
+    "Sage-Protokol": 0,
+    "SB-KIMTool-Point": 0
+  },
+  "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal.",
+  "history": [
+    {
+      "seq": 1,
+      "date": "2026-06-27",
+      "headline": "Beitritts-Ankuendigung. Module verdrahtet, Siegel zertifiziert, Marktplatz/Spenden vorbereitet. Spore + nodeId folgen nach Klaus' Browser-Lauf."
+    },
+    {
+      "seq": 2,
+      "date": "2026-06-27",
+      "headline": "Spore erzeugt + committet (nodeId HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE). Reziprok verifiziert (Signaturen VALID, Cosinus ~0.83 zu Sage und SB-KIMTool-Point). Bitte um Aufnahme + Quittung."
+    }
+  ]
+}

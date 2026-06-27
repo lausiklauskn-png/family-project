@@ -1,0 +1,324 @@
+<!doctype html>
+<!-- Family Projekt — Raum 3: Marktplatz (FREMDE Einträge: Link + Bild-Pflicht).
+     Sicherheit: nichts auto-veröffentlicht, alles escaped, SVG gesperrt,
+     kein fremder Code, keine Garantie für fremde Apps (Brief §5). -->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Marktplatz — Family Projekt</title>
+  <meta name="description" content="Apps finden und anbieten. Andere tragen ihre eigene Seite ein — Link plus mindestens ein Bild. Such, was du brauchst." />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset=".5" stop-color="#7c9cff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#hg)"/><g fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M20 42 L32 22 L44 42"/><path d="M20 42 L44 42"/></g><circle cx="32" cy="22" r="5" fill="white"/><circle cx="20" cy="42" r="5" fill="white"/><circle cx="44" cy="42" r="5" fill="white"/></svg>
+        <a href="index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="index.html" data-i18n="nav_start">Start</a>
+        <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+        <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="markt.html" class="active" data-i18n="nav_market">Marktplatz</a>
+        <span id="fp-dock" class="fp-dock" title="Knoten-Status"></span>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <span class="eyebrow">🛒 <span data-i18n="mk_eyebrow">Marktplatz</span></span>
+        <h1 data-i18n="mk_title">Apps finden — und anbieten.</h1>
+        <p class="lead" data-i18n="mk_lead">Such, was du brauchst. Oder liste deine eigene Seite: ein Link plus mindestens ein Bild.</p>
+
+        <form class="searchrow" id="mkSearchForm" style="margin-top:22px">
+          <div class="field">
+            <input id="mkSearch" type="search" data-i18n-ph="mk_search_ph" placeholder="Beschreib in eigenen Worten, was du suchst …" />
+            <button class="mic" type="button" title="Sprechen statt tippen" aria-label="Spracheingabe">🎤</button>
+          </div>
+          <button class="btn primary" type="submit" data-i18n="search_btn">Suchen</button>
+        </form>
+        <label style="display:inline-flex;align-items:center;gap:8px;margin-top:10px;font-size:.85rem;color:var(--muted)">
+          <input type="checkbox" id="mkSemantic" /> <span data-i18n="mk_semantic">Nach Bedeutung suchen (lädt einmalig ein Sprachmodell, ~30 MB)</span>
+        </label>
+        <p id="mkSearchNote" class="galnote"></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2 data-i18n="mk_listings_h">Einträge</h2>
+        <p class="sub" id="mkCount"></p>
+        <div class="listings" id="mkListings"></div>
+        <div class="glass note-box" id="mkEmpty" hidden>
+          <p style="margin:0" data-i18n="mk_empty">Noch keine Einträge. Trag unten die erste Seite ein — sie erscheint nach Freigabe und (mit Bild) auch in der Weekly Discovery.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2 data-i18n="mk_submit_h">Tool anbieten</h2>
+        <p class="sub" data-i18n="mk_submit_sub">Trag deine eigene PWA oder Seite ein. Pflicht: ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild liegt bei dir; wir speichern nur den Link.</p>
+        <form class="glass form-grid" id="mkSubmit" style="padding:22px">
+          <div><label data-i18n="mk_f_title">Titel *</label><div class="field"><input id="sbTitle" type="text" required maxlength="80" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_handle">Handle / Anbieter (kein Klarname) *</label><div class="field"><input id="sbBy" type="text" required maxlength="40" placeholder="@handle" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_url">Link zur Seite (https) *</label><div class="field"><input id="sbUrl" type="url" required placeholder="https://…" data-nomic /></div></div>
+          <div><label data-i18n="mk_f_img">Bild-Link (https, JPG/PNG/WebP) *</label><div class="field"><input id="sbImg" type="url" required placeholder="https://…/screenshot.jpg" data-nomic /></div></div>
+          <div><label data-i18n="mk_f_cat">Kategorie</label><div class="field"><input id="sbCat" type="text" maxlength="40" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_desc">Beschreibung (in eigenen Worten, mit Synonymen) *</label><div class="field"><textarea id="sbText" required maxlength="600"></textarea><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div class="haftung">
+            <p style="margin:0 0 8px" data-i18n="mk_jahr"><b>Kleiner Jahresbeitrag (in Vorbereitung):</b> ein paar Euro pro Jahr (Höhe offen), als Anreiz und Spam-Bremse. Bezahlung wird vorbereitet — heute noch kein echter Einzug.</p>
+            <p style="margin:0" data-i18n="mk_haft"><b>Hinweis:</b> Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.</p>
+          </div>
+          <button class="btn primary" type="submit" data-i18n="mk_f_btn">Eintrag vorbereiten</button>
+          <pre id="sbOut" style="display:none"></pre>
+          <a id="sbPr" class="btn primary" style="display:none" target="_blank" rel="noopener" data-i18n="mk_pr_btn">Als Pull-Request einreichen →</a>
+        </form>
+      </div>
+    </section>
+
+    <section id="support">
+      <div class="wrap">
+        <h2 data-i18n="sp_h">Family Projekt unterstützen</h2>
+        <p class="sub" data-i18n="sp_sub">Family Projekt ist frei und werbefrei. Wer mag, kann freiwillig etwas dazugeben — das hält die Lichter an.</p>
+        <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
+          <div id="spDonate" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+          <p style="margin:0;opacity:.8;font-size:.92rem" data-i18n="sp_note">Hinweis: Bezahlung wird gerade vorbereitet — heute noch kein echter Einzug. Die Knöpfe werden scharf geschaltet, sobald alles geklärt ist.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="holo">Family Projekt</span></span>
+      <a href="index.html" data-i18n="footer_back">← zur Startseite</a>
+      <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+  </footer>
+
+  <script type="module" src="assets/mycel-bg.js"></script>
+  <script src="sbkim/01_storage.js"></script>
+  <script src="sbkim/02_spore.js"></script>
+  <script src="sbkim/03_embedding.js"></script>
+  <script src="sbkim/04_match.js"></script>
+  <script src="sbkim/05_anastomose.js"></script>
+  <script src="sbkim/07_apoptose.js"></script>
+  <script src="sbkim/15_membran.js"></script>
+  <script src="sbkim/16_siegel.js"></script>
+  <script src="sbkim/17_floating_widget.js"></script>
+  <script src="sbkim/sbkim-init.js"></script>
+  <script src="assets/config/listings.js"></script>
+  <script src="assets/config/spenden.js"></script>
+  <script>
+    window.FP_PAGE_I18N = {
+      de: {
+        mk_eyebrow: "Marktplatz", mk_title: "Apps finden — und anbieten.",
+        mk_lead: "Such, was du brauchst. Oder liste deine eigene Seite: ein Link plus mindestens ein Bild.",
+        mk_search_ph: "Beschreib in eigenen Worten, was du suchst …",
+        mk_semantic: "Nach Bedeutung suchen (lädt einmalig ein Sprachmodell, ~30 MB)",
+        mk_listings_h: "Einträge",
+        mk_empty: "Noch keine Einträge. Trag unten die erste Seite ein — sie erscheint nach Freigabe und (mit Bild) auch in der Weekly Discovery.",
+        mk_submit_h: "Tool anbieten",
+        mk_submit_sub: "Trag deine eigene PWA oder Seite ein. Pflicht: ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild liegt bei dir; wir speichern nur den Link.",
+        mk_f_title: "Titel *", mk_f_handle: "Handle / Anbieter (kein Klarname) *", mk_f_url: "Link zur Seite (https) *",
+        mk_f_img: "Bild-Link (https, JPG/PNG/WebP) *", mk_f_cat: "Kategorie", mk_f_desc: "Beschreibung (in eigenen Worten, mit Synonymen) *",
+        mk_f_btn: "Eintrag vorbereiten",
+        mk_jahr: "Kleiner Jahresbeitrag (in Vorbereitung): ein paar Euro pro Jahr (Höhe offen), als Anreiz und Spam-Bremse. Bezahlung wird vorbereitet — heute noch kein echter Einzug.",
+        mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
+        mk_open: "→ zur Seite des Anbieters", search_btn: "Suchen",
+        mk_pr_btn: "Als Pull-Request einreichen →",
+        sp_h: "Family Projekt unterstützen",
+        sp_sub: "Family Projekt ist frei und werbefrei. Wer mag, kann freiwillig etwas dazugeben — das hält die Lichter an.",
+        sp_note: "Hinweis: Bezahlung wird gerade vorbereitet — heute noch kein echter Einzug. Die Knöpfe werden scharf geschaltet, sobald alles geklärt ist.",
+        sp_donate: "Einmalig spenden", sp_yearly: "Jahresbeitrag", sp_soon: "(in Vorbereitung)"
+      },
+      en: {
+        mk_eyebrow: "Marketplace", mk_title: "Find apps — and offer them.",
+        mk_lead: "Search for what you need. Or list your own site: a link plus at least one image.",
+        mk_search_ph: "Describe in your own words what you're looking for …",
+        mk_semantic: "Search by meaning (loads a language model once, ~30 MB)",
+        mk_listings_h: "Entries",
+        mk_empty: "No entries yet. Add the first site below — it appears after approval and (with an image) in Weekly Discovery.",
+        mk_submit_h: "Offer a tool",
+        mk_submit_sub: "List your own PWA or site. Required: a link and at least one image (JPG/PNG/WebP — no SVG). The image stays with you; we only store the link.",
+        mk_f_title: "Title *", mk_f_handle: "Handle / provider (no real name) *", mk_f_url: "Link to the site (https) *",
+        mk_f_img: "Image link (https, JPG/PNG/WebP) *", mk_f_cat: "Category", mk_f_desc: "Description (in your own words, with synonyms) *",
+        mk_f_btn: "Prepare entry",
+        mk_jahr: "Small yearly fee (in preparation): a few euros per year (amount open), as an incentive and spam brake. Payment is being prepared — no real charge yet.",
+        mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
+        mk_open: "→ to the provider's site", search_btn: "Search",
+        mk_pr_btn: "Submit as pull request →",
+        sp_h: "Support Family Projekt",
+        sp_sub: "Family Projekt is free and ad-free. If you like, you can chip in voluntarily — it keeps the lights on.",
+        sp_note: "Note: payment is being prepared — no real charge yet. The buttons go live once everything is settled.",
+        sp_donate: "Donate once", sp_yearly: "Yearly fee", sp_soon: "(in preparation)"
+      }
+    };
+  </script>
+  <script src="assets/config/meineapps.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/status-widget.js"></script>
+  <script>
+    (function () {
+      function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+      function safeImg(u){ u=String(u||""); return /^https?:\/\//i.test(u) && !/\.svg(\?|$)/i.test(u) ? u : ""; }
+      function safeUrl(u){ u=String(u||""); return /^https?:\/\//i.test(u) ? u : ""; }
+
+      var ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img); }); // Bild-Pflicht
+      var view = ALL.slice();
+
+      function card(x) {
+        var img = safeImg(x.img), url = safeUrl(x.url);
+        return '<div class="glass listing">' +
+          '<div class="img">' + (img ? '<img src="' + esc(img) + '" alt="' + esc(x.label) + '" loading="lazy" referrerpolicy="no-referrer">' : '') + '</div>' +
+          '<div class="body"><h3>' + esc(x.label) + '</h3>' +
+          (x.by ? '<p class="by">' + esc(x.by) + '</p>' : '') +
+          '<p>' + esc((x.text || "").slice(0, 160)) + '</p>' +
+          (url ? '<a class="btn ghost ext" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(FP.t("mk_open")) + '</a>' : '') +
+          '</div></div>';
+      }
+      function render() {
+        var box = document.getElementById("mkListings"), empty = document.getElementById("mkEmpty"), count = document.getElementById("mkCount");
+        box.innerHTML = view.map(card).join("");
+        // Leer-Hinweis nur, wenn es ÜBERHAUPT keine (freigegebenen) Einträge gibt.
+        empty.hidden = ALL.length !== 0;
+        count.textContent = ALL.length === 0 ? "" : (view.length + " / " + ALL.length);
+      }
+
+      // Wortsuche (sofort)
+      function wordSearch(q) {
+        q = (q || "").trim().toLowerCase();
+        if (!q) { view = ALL.slice(); render(); return; }
+        var terms = q.split(/\s+/);
+        view = ALL.filter(function (x) {
+          var hay = (x.label + " " + (x.text || "") + " " + (x.by || "") + " " + (x.category || "")).toLowerCase();
+          return terms.every(function (t) { return hay.indexOf(t) >= 0; });
+        });
+        render();
+      }
+
+      // Semantische Suche (lazy Modul 03 + 04) — greift, sobald Einträge da sind.
+      async function semanticSearch(q) {
+        var note = document.getElementById("mkSearchNote");
+        if (!ALL.length) { wordSearch(q); return; }
+        if (!window.SbkimEmbedding || !window.SbkimMatch) { note.textContent = "Semantik-Module nicht geladen — nutze Wortsuche."; wordSearch(q); return; }
+        note.textContent = "Lade Sprachmodell (~30 MB einmalig) …";
+        try {
+          await SbkimEmbedding.init();
+          // Vektoren der Einträge einmal bauen + cachen.
+          if (!ALL._vecs) {
+            ALL._vecs = await SbkimEmbedding.embedPassageBatch(ALL.map(function (x) { return x.text || x.label; }));
+          }
+          var qv = await SbkimEmbedding.embedQuery(q);
+          var scored = ALL.map(function (x, i) { return { x: x, s: SbkimMatch.match(qv, ALL._vecs[i]) }; })
+            .sort(function (a, b) { return b.s - a.s; });
+          view = scored.map(function (r) { return r.x; });
+          note.textContent = "Nach Bedeutung sortiert.";
+          render();
+        } catch (e) {
+          note.textContent = "Semantik fehlgeschlagen — Wortsuche aktiv.";
+          wordSearch(q);
+        }
+      }
+
+      var form = document.getElementById("mkSearchForm");
+      var input = document.getElementById("mkSearch");
+      var sem = document.getElementById("mkSemantic");
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var q = input.value;
+        if (sem.checked) semanticSearch(q); else wordSearch(q);
+      });
+      input.addEventListener("input", function () { if (!sem.checked) wordSearch(input.value); });
+
+      // Einreich-Formular (Platzhalter — keine echte Abwicklung, Brief §5)
+      var submit = document.getElementById("mkSubmit");
+      submit.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var out = document.getElementById("sbOut");
+        var img = document.getElementById("sbImg").value.trim();
+        var url = document.getElementById("sbUrl").value.trim();
+        if (!safeUrl(url)) { out.style.display = "block"; out.textContent = "Bitte einen gültigen https-Link zur Seite angeben."; return; }
+        if (!safeImg(img)) { out.style.display = "block"; out.textContent = "Bild-Link fehlt oder ungültig: nur https und JPG/PNG/WebP (kein SVG)."; return; }
+        var listing = {
+          label: document.getElementById("sbTitle").value.trim(),
+          anchorId: "markt-" + Date.now().toString(36),
+          text: document.getElementById("sbText").value.trim(),
+          by: document.getElementById("sbBy").value.trim(),
+          url: url, img: img,
+          category: document.getElementById("sbCat").value.trim()
+        };
+        var json = JSON.stringify(listing, null, 2);
+        out.style.display = "block";
+        out.textContent =
+          "✓ Vorbereitet. Dieser Eintrag wird NICHT automatisch veröffentlicht —\n" +
+          "er wartet auf Freigabe per Pull-Request. Klick unten »Als Pull-Request\n" +
+          "einreichen« — GitHub öffnet die Datei listings.js, du fügst diesen Block\n" +
+          "ins Array ein und schlägst die Änderung vor. (Fallback: Block kopieren\n" +
+          "und an Klaus geben.)\n\n" + json;
+        // PR-Pfad (server-los, GitHub propose-changes wie Andock-Wizard Modul 19):
+        // öffnet den Editor von assets/config/listings.js mit vorbefülltem
+        // Commit-Titel + PR-Beschreibung (enthält den fertigen Eintrag).
+        var REPO = "https://github.com/lausiklauskn-png/family-project";
+        var body = "Neuer Marktplatz-Eintrag (bitte das Objekt unten ins `window.FP_LISTINGS`-Array " +
+          "in assets/config/listings.js einfügen):\n\n```js\n" + json + ",\n```\n\n" +
+          "Bild-Pflicht erfüllt, kein SVG. Wird nach Sichtung gemerged (keine Auto-Veröffentlichung).";
+        var prUrl = REPO + "/edit/main/assets/config/listings.js?quick_pull=1" +
+          "&message=" + encodeURIComponent("Marktplatz: Eintrag " + (listing.label || listing.anchorId)) +
+          "&description=" + encodeURIComponent(body);
+        var prLink = document.getElementById("sbPr");
+        prLink.href = prUrl;
+        prLink.style.display = "inline-block";
+      });
+
+      // Spenden/Jahresbeitrag — opt-in-Platzhalter (assets/config/spenden.js).
+      // enabled:false → deaktivierte „(in Vorbereitung)"-Knöpfe, kein echter Einzug.
+      function renderDonate() {
+        var box = document.getElementById("spDonate");
+        if (!box) return;
+        var cfg = window.FP_SPENDEN || { enabled: false, donateUrl: "", yearlyUrl: "" };
+        var T = (FP && FP.t) ? FP.t : function (k) { return k; };
+        function btn(labelKey, url) {
+          var live = cfg.enabled === true && safeUrl(url);
+          if (live) {
+            var a = document.createElement("a");
+            a.className = "btn primary"; a.href = url; a.target = "_blank"; a.rel = "noopener";
+            a.textContent = T(labelKey);
+            return a;
+          }
+          var b = document.createElement("button");
+          b.className = "btn"; b.type = "button"; b.disabled = true;
+          b.style.opacity = ".6"; b.style.cursor = "not-allowed";
+          b.textContent = T(labelKey) + " " + T("sp_soon");
+          return b;
+        }
+        box.textContent = "";
+        box.appendChild(btn("sp_donate", cfg.donateUrl));
+        box.appendChild(btn("sp_yearly", cfg.yearlyUrl));
+      }
+      window.addEventListener("fp:lang", renderDonate);
+
+      // ?q= von der Startseite übernehmen
+      var pq = new URLSearchParams(location.search).get("q");
+      window.addEventListener("fp:lang", render);
+      FP.init();
+      render();
+      renderDonate();
+      if (pq) { input.value = pq; wordSearch(pq); }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!doctype html>
+<!-- Family Projekt — Raum 1: Netzwerk (gratis, Mycel-Schicht 1).
+     Hier ist die Mycel-Analogie ausdrücklich erlaubt (Brief §4). -->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Netzwerk — Family Projekt</title>
+  <meta name="description" content="Das freie, neutrale Netzwerk: deine Daten bleiben bei dir, Netz-Inhalte Ende-zu-Ende verschlüsselt, das Relay ist nachprüfbar. Dock deine Seite an." />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset=".5" stop-color="#7c9cff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#hg)"/><g fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M20 42 L32 22 L44 42"/><path d="M20 42 L44 42"/></g><circle cx="32" cy="22" r="5" fill="white"/><circle cx="20" cy="42" r="5" fill="white"/><circle cx="44" cy="42" r="5" fill="white"/></svg>
+        <a href="index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="index.html" data-i18n="nav_start">Start</a>
+        <a href="netzwerk.html" class="active" data-i18n="nav_network">Netzwerk</a>
+        <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span id="fp-dock" class="fp-dock" title="Knoten-Status"></span>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <span class="eyebrow">🔗 <span data-i18n="nw_eyebrow">Netzwerk · gratis & neutral</span></span>
+        <h1 data-i18n="nw_title">Ein freies Mycel — herren-los, nicht herrschaftlich.</h1>
+        <p class="lead" data-i18n="nw_lead">Geräte verbinden sich direkt. Kein Vermittler rankt, verkauft oder besitzt. Aus „vertrau mir“ wird „prüf mich“.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2 data-i18n="nw_promise_h">Das dreistufige, prüfbare Versprechen</h2>
+        <p class="sub" data-i18n="nw_promise_sub">Drei Stufen, jede einzeln nachprüfbar.</p>
+        <div class="stages">
+          <div class="glass stage"><span class="n">1</span><h3 data-i18n="nw_s1_h">App-Daten bleiben am Gerät</h3><p data-i18n="nw_s1_p">Was du in Rezeptbuch, Mixarium oder dem Tresor speicherst, liegt in deinem Browser. Es erreicht uns nie. (local-first)</p></div>
+          <div class="glass stage"><span class="n">2</span><h3 data-i18n="nw_s2_h">Netz-Inhalte kann selbst der Betreiber nicht lesen</h3><p data-i18n="nw_s2_p">Was du bewusst ins Netz schickst, ist Ende-zu-Ende verschlüsselt. Das Relay sieht nur Geheimtext. (E2E)</p></div>
+          <div class="glass stage"><span class="n">3</span><h3 data-i18n="nw_s3_h">Das Relay ist protokoll-frei und nachprüfbar</h3><p data-i18n="nw_s3_p">Offene Konfiguration statt Versprechen. Für IP-Anonymität nutzt du Tor. Volle Metadaten-Garantie später per Mixnet.</p></div>
+        </div>
+        <div class="glass note-box">
+          <p style="margin:0" data-i18n="nw_serverlos"><b>„Server-los“ ehrlich eingeordnet:</b> für deine App-Daten stimmt es — sie brauchen keinen Server. Für Netz-Botschaften trifft „herren-los“: es gibt einen dummen Treffpunkt (Relay), aber keinen Vermittler. Wir behalten das Wort „server-los“ immer mit dieser Erklärung daneben.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="andock">
+      <div class="wrap">
+        <h2 data-i18n="nw_andock_h">Deine Seite andocken</h2>
+        <p class="sub" data-i18n="nw_andock_sub">Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.</p>
+        <div class="glass" id="andockWizard"></div>
+        <p class="galnote" data-i18n="nw_andock_note">Das echte Signieren passiert in deiner eigenen App (Knoten-Werkzeug). Hier entsteht nur die Vorlage zum Kopieren.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2 data-i18n="nw_fremd_h">Eine fremde Seite ins Mycel holen</h2>
+        <p class="sub" data-i18n="nw_fremd_sub">Du hast eine ganz normale Webseite, die noch nicht im Mycel ist? Gib ihrer KI / ihrem Agenten diese self-contained Anleitung — sie führt die Verbindung 1:1 aus, ohne offene Fragen. Endzustand: Identität + Bausteine + Eintrag + Siegel. (Der vollautomatische Rück-Handshake übers Relay bleibt „in Vorbereitung“.)</p>
+        <div class="cta">
+          <button class="btn primary" id="fpCopyAndock" type="button" data-i18n="nw_fremd_copy">⧉ Anleitung kopieren</button>
+          <a class="btn ghost" href="docs/MYCEL-ANDOCK-AUFTRAG.md" target="_blank" rel="noopener" data-i18n="nw_fremd_open">→ Anleitung ansehen</a>
+        </div>
+        <p class="galnote" id="fpCopyNote"></p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2 data-i18n="nw_vision_h">Verbindung herstellen <span class="prep" data-i18n="nw_prep">in Vorbereitung</span></h2>
+        <p class="sub" data-i18n="nw_vision_sub">Die Vision: „sag <em>Verbindung herstellen</em> → Spore-Handshake → die Gegenseite quittiert automatisch übers Relay zurück."</p>
+        <div class="glass note-box">
+          <p data-i18n="nw_vision_honest"><b>Ehrlicher Stand:</b> Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren. Der vollautomatische Rück-Handshake über das Relay ist noch nicht end-to-end bewiesen — heute braucht es einen manuellen Bestätigungs-Schritt. Das ist der nächste echte Bau-Schritt. Wir täuschen hier nichts vor.</p>
+        </div>
+        <div class="cta" style="margin-top:18px">
+          <a class="btn primary" href="https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" target="_blank" rel="noopener" data-i18n="nw_profi">→ Profi-Ebene: das Mycel-Protokoll (Sage)</a>
+          <a class="btn ghost" href="werkzeuge/knoten-werkzeug.html" data-i18n="nw_knoten">→ Knoten-Werkzeug</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="holo">Family Projekt</span></span>
+      <a href="index.html" data-i18n="footer_back">← zur Startseite</a>
+      <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+  </footer>
+
+  <script type="module" src="assets/mycel-bg.js"></script>
+  <script src="sbkim/01_storage.js"></script>
+  <script src="sbkim/02_spore.js"></script>
+  <script src="sbkim/03_embedding.js"></script>
+  <script src="sbkim/04_match.js"></script>
+  <script src="sbkim/05_anastomose.js"></script>
+  <script src="sbkim/07_apoptose.js"></script>
+  <script src="sbkim/15_membran.js"></script>
+  <script src="sbkim/16_siegel.js"></script>
+  <script src="sbkim/17_floating_widget.js"></script>
+  <script src="sbkim/19_andock_wizard.js"></script>
+  <script src="sbkim/sbkim-init.js"></script>
+  <script>
+    window.FP_PAGE_I18N = {
+      de: {
+        nw_eyebrow: "Netzwerk · gratis & neutral",
+        nw_title: "Ein freies Mycel — herren-los, nicht herrschaftlich.",
+        nw_lead: "Geräte verbinden sich direkt. Kein Vermittler rankt, verkauft oder besitzt. Aus „vertrau mir“ wird „prüf mich“.",
+        nw_promise_h: "Das dreistufige, prüfbare Versprechen", nw_promise_sub: "Drei Stufen, jede einzeln nachprüfbar.",
+        nw_s1_h: "App-Daten bleiben am Gerät", nw_s1_p: "Was du in Rezeptbuch, Mixarium oder dem Tresor speicherst, liegt in deinem Browser. Es erreicht uns nie. (local-first)",
+        nw_s2_h: "Netz-Inhalte kann selbst der Betreiber nicht lesen", nw_s2_p: "Was du bewusst ins Netz schickst, ist Ende-zu-Ende verschlüsselt. Das Relay sieht nur Geheimtext. (E2E)",
+        nw_s3_h: "Das Relay ist protokoll-frei und nachprüfbar", nw_s3_p: "Offene Konfiguration statt Versprechen. Für IP-Anonymität nutzt du Tor. Volle Metadaten-Garantie später per Mixnet.",
+        nw_serverlos: "„Server-los“ ehrlich eingeordnet: für deine App-Daten stimmt es — sie brauchen keinen Server. Für Netz-Botschaften trifft „herren-los“: es gibt einen dummen Treffpunkt (Relay), aber keinen Vermittler. Wir behalten das Wort „server-los“ immer mit dieser Erklärung daneben.",
+        nw_andock_h: "Deine Seite andocken", nw_andock_sub: "Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.",
+        nw_andock_note: "Das echte Signieren passiert in deiner eigenen App (Knoten-Werkzeug). Hier entsteht nur die Vorlage zum Kopieren.",
+        nw_fremd_h: "Eine fremde Seite ins Mycel holen",
+        nw_fremd_sub: "Du hast eine ganz normale Webseite, die noch nicht im Mycel ist? Gib ihrer KI / ihrem Agenten diese self-contained Anleitung — sie führt die Verbindung 1:1 aus, ohne offene Fragen. Endzustand: Identität + Bausteine + Eintrag + Siegel. (Der vollautomatische Rück-Handshake übers Relay bleibt „in Vorbereitung“.)",
+        nw_fremd_copy: "⧉ Anleitung kopieren", nw_fremd_open: "→ Anleitung ansehen",
+        nw_vision_h: "Verbindung herstellen", nw_prep: "in Vorbereitung",
+        nw_vision_sub: "Die Vision: „sag Verbindung herstellen → Spore-Handshake → die Gegenseite quittiert automatisch übers Relay zurück.",
+        nw_vision_honest: "Ehrlicher Stand: Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren. Der vollautomatische Rück-Handshake über das Relay ist noch nicht end-to-end bewiesen — heute braucht es einen manuellen Bestätigungs-Schritt. Das ist der nächste echte Bau-Schritt. Wir täuschen hier nichts vor.",
+        nw_profi: "→ Profi-Ebene: das Mycel-Protokoll (Sage)", nw_knoten: "→ Knoten-Werkzeug"
+      },
+      en: {
+        nw_eyebrow: "Network · free & neutral",
+        nw_title: "A free mycelium — masterless, not ruled.",
+        nw_lead: "Devices connect directly. No middleman ranks, sells or owns. “Trust me” becomes “check me”.",
+        nw_promise_h: "The three-stage, verifiable promise", nw_promise_sub: "Three stages, each verifiable on its own.",
+        nw_s1_h: "App data stays on the device", nw_s1_p: "What you store in Rezeptbuch, Mixarium or the vault lives in your browser. It never reaches us. (local-first)",
+        nw_s2_h: "Not even the operator can read network content", nw_s2_p: "What you deliberately send to the net is end-to-end encrypted. The relay only sees ciphertext. (E2E)",
+        nw_s3_h: "The relay is log-free and verifiable", nw_s3_p: "Open configuration instead of promises. For IP anonymity you use Tor. Full metadata guarantee later via a mixnet.",
+        nw_serverlos: "“Server-less” honestly placed: for your app data it's true — it needs no server. For network messages “masterless” fits: there is a dumb meeting point (relay), but no middleman. We keep the word “server-less” always with this explanation next to it.",
+        nw_andock_h: "Dock your site", nw_andock_sub: "Three inputs — repo, domain, node type — and you get a spore template, the status.json line and a PR link. Pure input to text: no crypto, no network.",
+        nw_andock_note: "The real signing happens in your own app (node tool). Here only the template to copy is created.",
+        nw_fremd_h: "Bring a foreign site into the mycelium",
+        nw_fremd_sub: "Got an ordinary website that isn't in the mycelium yet? Give its AI / agent this self-contained guide — it performs the connection 1:1, no open questions. End state: identity + building blocks + entry + seal. (The fully automatic return handshake over the relay stays “in preparation”.)",
+        nw_fremd_copy: "⧉ Copy the guide", nw_fremd_open: "→ View the guide",
+        nw_vision_h: "Establish connection", nw_prep: "in preparation",
+        nw_vision_sub: "The vision: “say Establish connection → spore handshake → the other side acknowledges automatically back over the relay.”",
+        nw_vision_honest: "Honest status: spore generation, local crypto and the relay transport work. The fully automatic return handshake over the relay is not yet proven end-to-end — today it needs a manual confirmation step. That is the next real build step. We pretend nothing here.",
+        nw_profi: "→ Pro level: the mycelium protocol (Sage)", nw_knoten: "→ Node tool"
+      }
+    };
+  </script>
+  <script src="assets/config/meineapps.js"></script>
+  <script src="assets/app.js"></script>
+  <script src="assets/status-widget.js"></script>
+  <script>
+    (function () {
+      FP.init();
+      // Andock-Wizard (Modul 19) einhängen + Mikrofon an seinen Feldern.
+      if (window.SbkimAndockWizard && SbkimAndockWizard.mount) {
+        SbkimAndockWizard.mount({
+          container: "#andockWizard",
+          statusRepoUrl: "https://github.com/lausiklauskn-png/family-project",
+          protocolVersion: "0.1",
+          embeddingModel: "Xenova/multilingual-e5-small"
+        });
+        FP.enhanceBareInputs(document.getElementById("andockWizard"));
+        // Newcomer-Komfort (Klaus 2026-06-27: „auch Fremde sollen sich so leicht
+        // mit jedem Repo verbinden"). Nach „Spore-Vorlage erzeugen" den Wizard-
+        // Ausgang um Kopier-Knöpfe + einen „in DEINEM Repo anlegen"-Link
+        // erweitern. Modul 19 bleibt unangetastet (1:1 aus Sage) — reines
+        // Seiten-Code, das den Modul-Ausgang umschließt.
+        var goBtn = document.getElementById("sbkim-aw-go");
+        if (goBtn) goBtn.addEventListener("click", function () { setTimeout(augmentWizard, 0); });
+      } else {
+        var c = document.getElementById("andockWizard");
+        if (c) c.innerHTML = '<p class="muted">Andock-Werkzeug konnte nicht geladen werden.</p>';
+      }
+      function ownRepoNewFileUrl(repoUrl) {
+        try {
+          var u = new URL(String(repoUrl || "").trim());
+          if (u.hostname !== "github.com") return "";
+          var parts = u.pathname.replace(/^\/|\/$/g, "").split("/");
+          if (parts.length < 2 || !parts[0] || !parts[1]) return "";
+          return "https://github.com/" + parts[0] + "/" + parts[1] +
+            "/new/main?filename=" + encodeURIComponent("sbkim/spore.json");
+        } catch (e) { return ""; }
+      }
+      function makeCopyBtn(label, getText) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "btn slim"; b.textContent = label;
+        b.addEventListener("click", function () {
+          var txt = getText();
+          function ok() { var o = b.textContent; b.textContent = "✓ kopiert"; setTimeout(function () { b.textContent = o; }, 1600); }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(txt).then(ok, function () {});
+          } else { try { var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); ta.remove(); ok(); } catch (e) {} }
+        });
+        return b;
+      }
+      function augmentWizard() {
+        var outBox = document.getElementById("sbkim-aw-out");
+        if (!outBox || outBox.hidden) return;
+        var old = document.getElementById("fp-aw-extra"); if (old) old.remove();
+        var en = FP.getLang() === "en";
+        var sporeEl = document.getElementById("sbkim-aw-spore");
+        var lineEl = document.getElementById("sbkim-aw-line");
+        var repoEl = document.getElementById("sbkim-aw-repo");
+        var sporeJson = sporeEl ? sporeEl.textContent : "";
+        var statusLine = lineEl ? lineEl.textContent : "";
+        var newUrl = ownRepoNewFileUrl(repoEl ? repoEl.value : "");
+        var box = document.createElement("div"); box.id = "fp-aw-extra"; box.className = "fp-aw-extra";
+        var h = document.createElement("h4");
+        h.textContent = en ? "So bringst du es ins Repo (kein Terminal)" : "So bringst du es ins Repo (kein Terminal)";
+        box.appendChild(h);
+        var ol = document.createElement("ol"); ol.className = "fp-aw-steps";
+        [
+          en ? "Copy the spore template below." : "Spore-Vorlage unten kopieren.",
+          (newUrl
+            ? (en ? "Tap “Create sbkim/spore.json in your repo” — GitHub opens with the path filled in; paste & Commit." : "„sbkim/spore.json in deinem Repo anlegen“ antippen — GitHub öffnet mit ausgefülltem Pfad; einfügen & Commit.")
+            : (en ? "Create a file sbkim/spore.json in your repo and paste it." : "In deinem Repo eine Datei sbkim/spore.json anlegen und einfügen.")),
+          en ? "Copy the status.json line and open the hub PR to add yourself to the node list." : "status.json-Zeile kopieren und den Hub-PR öffnen, um dich in die Knoten-Liste einzutragen."
+        ].forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ol.appendChild(li); });
+        box.appendChild(ol);
+        var row1 = document.createElement("div"); row1.className = "fp-aw-row";
+        row1.appendChild(makeCopyBtn(en ? "📋 Copy spore" : "📋 Spore kopieren", function () { return sporeJson; }));
+        if (newUrl) {
+          var a = document.createElement("a"); a.className = "btn slim"; a.href = newUrl;
+          a.target = "_blank"; a.rel = "noopener noreferrer";
+          a.textContent = en ? "→ Create sbkim/spore.json in your repo" : "→ sbkim/spore.json in deinem Repo anlegen";
+          row1.appendChild(a);
+        }
+        box.appendChild(row1);
+        var row2 = document.createElement("div"); row2.className = "fp-aw-row";
+        row2.appendChild(makeCopyBtn(en ? "📋 Copy status.json line" : "📋 status.json-Zeile kopieren", function () { return statusLine; }));
+        box.appendChild(row2);
+        var note = document.createElement("p"); note.className = "galnote";
+        note.textContent = en
+          ? "This is your unsigned starter template. The copied template can go straight into your site’s AI session — it will create sbkim/spore.json for you. Your real signed identity is created on your own published site — full guide below (“Bring a foreign site into the mycelium”)."
+          : "Das ist deine unsignierte Start-Vorlage. Die kopierte Vorlage kannst du auch direkt der KI-Sitzung deiner Seite geben — sie legt sbkim/spore.json für dich an. Deine echte, signierte Identität entsteht auf deiner eigenen veröffentlichten Seite — volle Anleitung unten („Eine fremde Seite ins Mycel holen“).";
+        box.appendChild(note);
+        outBox.appendChild(box);
+      }
+      // „Anleitung kopieren" — holt MYCEL-ANDOCK-AUFTRAG.md und legt sie in die Zwischenablage.
+      var cb = document.getElementById("fpCopyAndock");
+      if (cb) cb.addEventListener("click", function () {
+        var note = document.getElementById("fpCopyNote");
+        var en = FP.getLang() === "en";
+        fetch("docs/MYCEL-ANDOCK-AUFTRAG.md").then(function (r) { return r.text(); }).then(function (t) {
+          return navigator.clipboard.writeText(t);
+        }).then(function () {
+          if (note) note.textContent = en ? "Copied — paste it to the foreign site's AI." : "Kopiert — füg es der KI der fremden Seite ein.";
+        }).catch(function () {
+          if (note) note.textContent = en ? "Copy failed — open the guide and copy manually." : "Kopieren fehlgeschlagen — Anleitung öffnen und manuell kopieren.";
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

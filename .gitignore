@@ -1,0 +1,5 @@
+node_modules/
+tests/*.png
+tests/shot.png
+*.log
+tests/glass-demo.html
