@@ -154,8 +154,15 @@
   <!-- Startseiten-Logik: Bild des Tages, Weekly Discovery, Suche -->
   <script>
     (function () {
-      // Bild des Tages
+      // Bild des Tages (mit 5-fach-Klick-Wechsel, Bauphase)
       var tb = window.FP_TAGESBILD || {};
+      var sessionImg = null; // Fallback, wenn localStorage zu klein
+      function isSvg(s) { return /\.svg(\?|$)/i.test(s) || /^data:image\/svg/i.test(s); }
+      function currentImg() {
+        if (sessionImg) return sessionImg;
+        try { var o = localStorage.getItem("fp_tagesbild_img"); if (o) return o; } catch (e) {}
+        return tb.img || "";
+      }
       function renderTages() {
         var l = FP.getLang();
         var title = document.getElementById("tagesTitle");
@@ -163,22 +170,22 @@
         var pad = document.getElementById("tagesbildPad");
         if (title) title.textContent = (l === "en" ? tb.titleEn : tb.titleDe) || "Family Projekt";
         if (!pad) return;
-        var hasImg = tb.img && !/\.svg(\?|$)/i.test(tb.img);
+        var src = currentImg();
+        var hasImg = src && !isSvg(src);
         var existing = pad.querySelector("img.tagesimg");
         if (hasImg) {
-          // Bild vollflächig — Rahmen passt sein Verhältnis dem Bild an,
-          // damit nichts beschnitten wird. Titel bleibt oben mittig drüber.
-          if (!existing || existing.getAttribute("src") !== tb.img) {
+          if (!existing || existing.getAttribute("data-src") !== src) {
             if (existing) existing.remove();
             var img = new Image();
             img.className = "tagesimg";
             img.alt = "Bild des Tages";
+            img.setAttribute("data-src", src);
             img.onload = function () {
               if (img.naturalWidth && img.naturalHeight) {
                 pad.style.aspectRatio = (img.naturalWidth / img.naturalHeight).toFixed(4);
               }
             };
-            img.src = tb.img;
+            img.src = src;
             pad.insertBefore(img, pad.firstChild);
           }
           if (ph) ph.style.display = "none";
@@ -188,6 +195,85 @@
           if (ph) { ph.style.display = ""; ph.textContent = (l === "en" ? tb.phEn : tb.phDe) || ""; }
         }
       }
+
+      // --- 5-fach-Klick aufs Bild öffnet das Wechsel-Fenster ---
+      function downloadImg(src, name) {
+        if (!src) return;
+        if (/^data:/.test(src)) {
+          var a = document.createElement("a"); a.href = src; a.download = name;
+          document.body.appendChild(a); a.click(); a.remove(); return;
+        }
+        fetch(src).then(function (r) { return r.blob(); }).then(function (b) {
+          var u = URL.createObjectURL(b); var a = document.createElement("a"); a.href = u; a.download = name;
+          document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 0);
+        }).catch(function () {});
+      }
+      function baseName(src) {
+        if (/^data:/.test(src)) return "bild-des-tages.png";
+        try { var p = src.split("?")[0].split("/").pop(); return p || "bild-des-tages.png"; } catch (e) { return "bild-des-tages.png"; }
+      }
+      var bildModal = null, pendingData = null;
+      function buildBildModal() {
+        if (bildModal) return bildModal;
+        var m = document.createElement("div"); m.className = "fp-bild-modal";
+        m.innerHTML =
+          '<div class="backdrop"></div>' +
+          '<div class="fp-bild-card">' +
+            '<button class="fp-bild-close" title="Schließen" aria-label="Schließen">✕</button>' +
+            '<h3>Bild des Tages wechseln</h3>' +
+            '<p class="sub muted">Zieh ein Bild hierher oder tippe, um eins zu wählen (JPG/PNG/WebP).</p>' +
+            '<div class="fp-bild-drop" id="fpDrop">📥 Bild hierher ziehen oder tippen<input type="file" accept="image/png,image/jpeg,image/webp" hidden></div>' +
+            '<div class="fp-bild-prev" id="fpPrev"><img alt="Vorschau"></div>' +
+            '<div class="fp-bild-actions">' +
+              '<button class="btn primary" id="fpApply" disabled>Übernehmen</button>' +
+              '<button class="btn ghost" id="fpDlold">Bisheriges herunterladen</button>' +
+              '<button class="btn ghost" id="fpReset">Auf Standard zurücksetzen</button>' +
+            '</div>' +
+            '<p class="fp-bild-note">Das neue Bild wird in <b>diesem Browser</b> gespeichert (Bauphase). Beim Übernehmen wird das <b>bisherige Bild heruntergeladen</b> (Download-Ordner). Fürs öffentliche Veröffentlichen die Datei ins Repo committen (oder später per Admin-Panel).</p>' +
+          '</div>';
+        document.body.appendChild(m);
+        var drop = m.querySelector("#fpDrop"), input = drop.querySelector("input");
+        var prev = m.querySelector("#fpPrev"), prevImg = prev.querySelector("img"), apply = m.querySelector("#fpApply");
+        function setPending(file) {
+          if (!file || !/^image\/(png|jpeg|webp)$/.test(file.type)) return;
+          var r = new FileReader();
+          r.onload = function () { pendingData = r.result; prevImg.src = pendingData; prev.style.display = "block"; apply.disabled = false; };
+          r.readAsDataURL(file);
+        }
+        drop.addEventListener("click", function () { input.click(); });
+        input.addEventListener("change", function () { if (input.files && input.files[0]) setPending(input.files[0]); });
+        drop.addEventListener("dragover", function (e) { e.preventDefault(); drop.classList.add("hot"); });
+        drop.addEventListener("dragleave", function () { drop.classList.remove("hot"); });
+        drop.addEventListener("drop", function (e) { e.preventDefault(); drop.classList.remove("hot"); if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) setPending(e.dataTransfer.files[0]); });
+        apply.addEventListener("click", function () {
+          if (!pendingData) return;
+          var old = currentImg(); if (old) downloadImg(old, baseName(old)); // „zurück in den Ordner"
+          try { localStorage.setItem("fp_tagesbild_img", pendingData); sessionImg = null; }
+          catch (e) { sessionImg = pendingData; var n = m.querySelector(".fp-bild-note"); if (n) n.textContent = "Bild zu groß für den Browser-Speicher — es gilt nur für diese Sitzung. Tipp: als WebP/JPG kleiner speichern."; }
+          renderTages(); closeBild();
+        });
+        m.querySelector("#fpDlold").addEventListener("click", function () { var c = currentImg(); if (c) downloadImg(c, baseName(c)); });
+        m.querySelector("#fpReset").addEventListener("click", function () { try { localStorage.removeItem("fp_tagesbild_img"); } catch (e) {} sessionImg = null; renderTages(); closeBild(); });
+        m.querySelector(".fp-bild-close").addEventListener("click", closeBild);
+        m.querySelector(".backdrop").addEventListener("click", closeBild);
+        bildModal = m; return m;
+      }
+      function openBildModal() {
+        buildBildModal(); pendingData = null;
+        var ap = bildModal.querySelector("#fpApply"); if (ap) ap.disabled = true;
+        var pv = bildModal.querySelector("#fpPrev"); if (pv) pv.style.display = "none";
+        bildModal.classList.add("open");
+      }
+      function closeBild() { if (bildModal) bildModal.classList.remove("open"); }
+      (function () {
+        var pad = document.getElementById("tagesbildPad"); if (!pad) return;
+        var clicks = 0, ct;
+        pad.addEventListener("click", function () {
+          clicks++; clearTimeout(ct); ct = setTimeout(function () { clicks = 0; }, 1500);
+          if (clicks >= 5) { clicks = 0; openBildModal(); }
+        });
+        document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeBild(); });
+      })();
 
       // Weekly Discovery — fair, zufällig; Bild bevorzugt, sonst Emoji.
       var APPS = (window.FP_WEEKLY || []).filter(function (a) { return a && (a.img || a.emoji); });

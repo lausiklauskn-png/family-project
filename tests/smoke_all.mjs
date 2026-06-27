@@ -64,6 +64,8 @@ console.log("\nDetail-Checks");
   // Schließen → Restore-Chip
   await page.evaluate(()=>document.querySelector('.fp-sw [data-act="close"]').click());
   ok(await page.evaluate(()=>{const r=document.querySelector(".fp-sw-restore");return r && r.style.display!=="none";}), "widget: X schließt → Restore-Chip erscheint");
+  // Bild des Tages: 5-fach-Klick (schnell) öffnet das Wechsel-Fenster
+  ok(await page.evaluate(()=>{const pad=document.getElementById("tagesbildPad");for(let i=0;i<5;i++)pad.dispatchEvent(new MouseEvent("click",{bubbles:true}));const m=document.querySelector(".fp-bild-modal");return !!(m&&m.classList.contains("open")&&m.querySelector("#fpDrop"));}), "Bild des Tages: 5-fach-Klick öffnet Drag&Drop-Fenster");
   await page.close(); }
 { const { page } = await load("/markt.html");
   ok(await page.evaluate(()=>!document.getElementById("mkEmpty").hidden), "markt: Leer-Hinweis (noch keine Einträge)");
