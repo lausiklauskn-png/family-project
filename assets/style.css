@@ -45,8 +45,16 @@ header{position:sticky;top:0;z-index:30;background:var(--header-bg);backdrop-fil
 nav.top{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 nav.top a{color:var(--muted);font-size:.9rem;padding:7px 12px;border-radius:9px;transition:.15s}
 nav.top a:hover,nav.top a.active{color:var(--text);background:rgba(127,127,127,.12)}
-.pill{font-family:var(--mono);font-size:.74rem;color:var(--muted);background:rgba(127,127,127,.10);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;transition:.15s;user-select:none}
-.pill:hover{color:var(--text);border-color:var(--accent);box-shadow:var(--glow)}
+.pill{position:relative;overflow:hidden;font-family:var(--mono);font-size:.74rem;color:var(--muted);background:rgba(127,127,127,.10);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;user-select:none;
+  transform:perspective(420px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .14s ease,color .15s,border-color .15s,box-shadow .2s;
+  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.35),inset 0 -2px 4px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.06)}
+.pill::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(70px 48px at var(--mx,50%) var(--my,18%),rgba(255,255,255,.5),transparent 60%),linear-gradient(180deg,rgba(255,255,255,.25),transparent 52%);
+  mix-blend-mode:screen;opacity:.4;transition:opacity .2s}
+.pill>*{position:relative}
+.pill:hover{color:var(--text);border-color:var(--accent);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.45),var(--glow)}
+.pill:hover::before{opacity:.9}
 
 /* Kopf-Status (SBKIM-Lampen + Siegel-Badge) */
 .status{display:inline-flex;align-items:center;gap:9px;margin-left:4px}
@@ -116,14 +124,28 @@ header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radi
 .btn.ghost:hover{border-color:var(--accent);box-shadow:inset 0 2px 1px rgba(255,255,255,.5),inset 0 -5px 9px rgba(0,0,0,.5),0 16px 32px rgba(0,0,0,.5),var(--glow)}
 .btn.gold{background:linear-gradient(135deg,var(--gold),#caa33f);color:#1a1405}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
-@media (prefers-reduced-motion: reduce){ .btn{transition:none;transform:none} .btn::before,.btn::after{transition:none} }
+@media (prefers-reduced-motion: reduce){
+  .btn,.pill,.mic,.area,.disc-shot,.doodle,.listing{transition:none}
+  .btn{transform:none}
+  .pill{transform:none}
+  .mic{transform:translateY(-50%)}
+  .area,.listing{transform:translateY(var(--lift,0px))}
+  .disc-shot,.doodle{transform:none}
+}
 
 /* Eingabe + Mikrofon (überall, wo Text geschrieben wird) */
 .field{position:relative;display:flex;align-items:center}
 .field input,.field textarea{width:100%;background:rgba(127,127,127,.10);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:13px 50px 13px 15px;font-size:1rem;font-family:var(--sans)}
 .field textarea{resize:vertical;min-height:96px;line-height:1.5}
 .field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
-.mic{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:rgba(127,127,127,.10);color:var(--accent);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .15s,box-shadow .15s}
+.mic{position:absolute;right:7px;top:50%;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:rgba(127,127,127,.10);color:var(--accent);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  transform:translateY(-50%) perspective(280px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .14s ease,border-color .15s,box-shadow .15s;
+  box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,255,255,.07)}
+.mic::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(40px 30px at var(--mx,50%) var(--my,20%),rgba(255,255,255,.55),transparent 62%),linear-gradient(180deg,rgba(255,255,255,.3),transparent 55%);
+  mix-blend-mode:screen;opacity:.5;transition:opacity .2s}
+.mic:hover::before{opacity:1}
 .mic:hover{border-color:var(--accent);box-shadow:var(--glow)}
 .mic.live{color:#fff;background:linear-gradient(135deg,#ff5a8a,#a06bff);border-color:transparent;animation:pulse 1.1s ease-in-out infinite}
 
@@ -145,7 +167,8 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* Startseite — Bild des Tages */
 .hero{padding:46px 0 8px}
-.doodle{position:relative;border-radius:22px;padding:2px;background:var(--holo-border);animation:holo-rot 14s linear infinite;box-shadow:var(--shadow),var(--glow)}
+.doodle{position:relative;border-radius:22px;padding:2px;background:var(--holo-border);animation:holo-rot 14s linear infinite;box-shadow:var(--shadow),var(--glow);
+  transform:perspective(1400px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));transition:transform .2s ease}
 .doodle .inner{border-radius:20px;background:linear-gradient(180deg,rgba(17,21,31,.92),rgba(11,13,20,.96));overflow:hidden}
 .doodle .pad{aspect-ratio:16/5;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;
   background:radial-gradient(700px 240px at 80% -30%,rgba(124,156,255,.18),transparent 60%),radial-gradient(520px 200px at 4% 130%,rgba(110,231,211,.14),transparent 60%)}
@@ -165,7 +188,8 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .disc-shot{width:188px;height:118px;flex-shrink:0;border-radius:12px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:2.1rem;overflow:hidden;
   background:radial-gradient(120px 80px at 30% 20%,rgba(124,156,255,.22),transparent),linear-gradient(180deg,rgba(127,127,127,.10),rgba(0,0,0,.12));transition:.25s}
 .disc-shot img{width:100%;height:100%;object-fit:cover}
-.disc-shot.flash{box-shadow:var(--glow);transform:scale(1.02)}
+.disc-shot{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
+.disc-shot.flash{box-shadow:var(--glow);transform:perspective(800px) scale(1.02)}
 .disc-info{flex:1;min-width:200px}
 .disc-info h3{margin:0 0 4px;font-size:1.25rem}
 .disc-info p{margin:0 0 12px;color:var(--muted)}
@@ -173,8 +197,14 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* Drei Bereiche / Karten-Raster */
 .areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
-.area{padding:18px;transition:transform .18s,box-shadow .18s;display:block;color:inherit}
-.area:hover{transform:translateY(-3px);box-shadow:var(--shadow),var(--glow)}
+.area{padding:18px;display:block;color:inherit;
+  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
+  transition:transform .18s ease,box-shadow .18s}
+.area:hover{--lift:-3px;box-shadow:var(--shadow),var(--glow)}
+.area::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(240px 180px at var(--mx,50%) var(--my,50%),rgba(255,255,255,.15),transparent 60%);
+  opacity:0;transition:opacity .25s;mix-blend-mode:screen}
+.area:hover::after{opacity:1}
 .area .ico{font-size:1.7rem}
 .area h3{margin:10px 0 4px;font-size:1.15rem}
 .area p{margin:0;color:var(--muted);font-size:.93rem}
@@ -228,7 +258,14 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* Marktplatz — Listing-Karten + Formular */
 .listings{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:8px}
-.listing{padding:0;overflow:hidden;display:flex;flex-direction:column}
+.listing{padding:0;overflow:hidden;display:flex;flex-direction:column;
+  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
+  transition:transform .18s ease,box-shadow .18s}
+.listing:hover{--lift:-3px;box-shadow:var(--shadow),var(--glow)}
+.listing::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(260px 200px at var(--mx,50%) var(--my,50%),rgba(255,255,255,.13),transparent 60%);
+  opacity:0;transition:opacity .25s;mix-blend-mode:screen;z-index:1}
+.listing:hover::after{opacity:1}
 .listing .img{aspect-ratio:16/9;background:linear-gradient(180deg,var(--bg2),var(--bg));display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--line)}
 .listing .img img{width:100%;height:100%;object-fit:cover}
 .listing .body{padding:14px 16px 16px}

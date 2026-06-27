@@ -156,20 +156,22 @@
   // Delegation am Dokument → gilt auch für dynamisch eingehängte Buttons.
   function wireHoloButtons() {
     if (wireHoloButtons._done) return; wireHoloButtons._done = true;
-    var MAX_TILT = 9; // Grad — leichtes „Wackeln"/Neigen zum Cursor (3D-Brechung)
+    // Gilt für alle Buttons UND große Flächen (Karten, Bild des Tages …).
+    var SEL = ".btn,.pill,.mic,.area,.disc-shot,.doodle,.listing";
+    var CARD = ".area,.disc-shot,.doodle,.listing";   // große Flächen → sanfter
     document.addEventListener("pointermove", function (e) {
-      var b = e.target && e.target.closest && e.target.closest(".btn");
+      var b = e.target && e.target.closest && e.target.closest(SEL);
       if (!b) return;
+      var max = b.matches(CARD) ? 5.5 : 9; // Grad — Neigung zum Cursor (3D-Brechung)
       var r = b.getBoundingClientRect();
       var px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
       b.style.setProperty("--mx", (px * 100).toFixed(1) + "%");
       b.style.setProperty("--my", (py * 100).toFixed(1) + "%");
-      // Glas neigt sich zum Cursor → Licht bricht an den Schliffkanten mit.
-      b.style.setProperty("--ry", ((px - 0.5) * 2 * MAX_TILT).toFixed(2) + "deg");
-      b.style.setProperty("--rx", (-(py - 0.5) * 2 * MAX_TILT).toFixed(2) + "deg");
+      b.style.setProperty("--ry", ((px - 0.5) * 2 * max).toFixed(2) + "deg");
+      b.style.setProperty("--rx", (-(py - 0.5) * 2 * max).toFixed(2) + "deg");
     }, { passive: true });
     document.addEventListener("pointerout", function (e) {
-      var b = e.target && e.target.closest && e.target.closest(".btn");
+      var b = e.target && e.target.closest && e.target.closest(SEL);
       if (!b) return;
       ["--mx", "--my", "--rx", "--ry"].forEach(function (v) { b.style.removeProperty(v); });
     }, { passive: true });
