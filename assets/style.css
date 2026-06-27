@@ -43,8 +43,28 @@ header{position:sticky;top:0;z-index:30;background:var(--header-bg);backdrop-fil
 .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:1.14rem;color:var(--text)}
 .brand .mark{width:30px;height:30px;border-radius:9px;flex-shrink:0;box-shadow:var(--glow)}
 nav.top{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-nav.top a{color:var(--muted);font-size:.9rem;padding:7px 12px;border-radius:9px;transition:.15s}
-nav.top a:hover,nav.top a.active{color:var(--text);background:rgba(127,127,127,.12)}
+/* Ruhezustand wie bisher; beim Hover wird der Link zum Glas-Button
+   (gleiche Optik/Neigung/Holo wie „Ansehen"/„Noch eine entdecken"), theme-adaptiv. */
+nav.top a{position:relative;overflow:hidden;color:var(--muted);font-size:.9rem;padding:7px 12px;border-radius:10px;
+  transform:perspective(420px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .14s ease,color .15s,background .2s,box-shadow .2s}
+nav.top a::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:
+    radial-gradient(86px 52px at var(--mx,50%) var(--my,20%),rgba(255,255,255,.5),transparent 60%),
+    linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 50%),
+    linear-gradient(115deg,transparent 26%,color-mix(in srgb,var(--accent3) 60%,transparent) 44%,color-mix(in srgb,var(--accent) 56%,transparent) 52%,color-mix(in srgb,var(--accent2) 60%,transparent) 60%,transparent 76%);
+  background-size:auto,auto,240% 100%;background-position:0 0,0 0,var(--mx,50%) 0;
+  mix-blend-mode:screen;opacity:0;transition:opacity .2s}
+nav.top a>*{position:relative}
+nav.top a.active{color:var(--text);background:linear-gradient(180deg,rgba(140,150,170,.14),rgba(18,23,33,.20))}
+nav.top a:hover,nav.top a:focus-visible{color:var(--text);
+  background:linear-gradient(180deg,rgba(140,150,170,.18),rgba(18,23,33,.26));
+  box-shadow:
+    inset 0 1.5px 1px rgba(255,255,255,.45),
+    inset 0 -3px 5px rgba(0,0,0,.42),
+    inset 0 0 0 1px color-mix(in srgb,var(--accent) 60%,transparent),
+    0 8px 18px rgba(0,0,0,.4),var(--glow)}
+nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
 .pill{position:relative;overflow:hidden;font-family:var(--mono);font-size:.74rem;color:var(--muted);background:rgba(127,127,127,.10);border:1px solid var(--line);border-radius:999px;padding:6px 11px;cursor:pointer;user-select:none;
   transform:perspective(420px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
   transition:transform .14s ease,color .15s,border-color .15s,box-shadow .2s;
@@ -125,9 +145,9 @@ header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radi
 .btn.gold{background:linear-gradient(135deg,var(--gold),#caa33f);color:#1a1405}
 .btn[disabled]{opacity:.55;cursor:not-allowed}
 @media (prefers-reduced-motion: reduce){
-  .btn,.pill,.mic,.area,.disc-shot,.doodle,.listing{transition:none}
+  .btn,.pill,.mic,.area,.disc-shot,.doodle,.listing,nav.top a{transition:none}
   .btn{transform:none}
-  .pill{transform:none}
+  .pill,nav.top a{transform:none}
   .mic{transform:translateY(-50%)}
   .area,.listing{transform:translateY(var(--lift,0px))}
   .disc-shot,.doodle{transform:none}

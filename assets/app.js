@@ -157,7 +157,7 @@
   function wireHoloButtons() {
     if (wireHoloButtons._done) return; wireHoloButtons._done = true;
     // Gilt für alle Buttons UND große Flächen (Karten, Bild des Tages …).
-    var SEL = ".btn,.pill,.mic,.area,.disc-shot,.doodle,.listing";
+    var SEL = ".btn,.pill,.mic,.area,.disc-shot,.doodle,.listing,nav.top a";
     var CARD = ".area,.disc-shot,.doodle,.listing";   // große Flächen → sanfter
     document.addEventListener("pointermove", function (e) {
       var b = e.target && e.target.closest && e.target.closest(SEL);
