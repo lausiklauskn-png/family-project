@@ -48,7 +48,7 @@ window.FP_WERKZEUGE = [
     en: "The public node point: toolbox and docking station to bring your own site onto the network.",
     open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/" },
   { id: "pinnwand", name: "Pinnwand", icon: "📌", external: true,
-    de: "Eine gemeinsame Pinnwand: Notizen, Links und Fundstücke sammeln, ordnen und teilen — im Browser, ohne Konto.",
-    en: "A shared pinboard: collect, organise and share notes, links and finds — in the browser, no account.",
+    de: "Ein offenes Frage-Antwort-Brett: Antworten lassen sich nach Bedeutung sortieren (gratis, als Rangfolge) — optional versteht ein KI-Richter die Absicht, z. B. alkoholfrei = wirklich kein Alkohol. Im Browser, ohne Konto.",
+    en: "An open question-and-answer board: answers can be sorted by meaning (free, as a ranking) — optionally an AI judge grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account.",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" }
 ];

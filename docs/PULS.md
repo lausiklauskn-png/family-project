@@ -28,6 +28,27 @@ Spore) → nach ① auf dem zweiten Gerät → **ETABLIERT**.
 (Briefkasten zeigt verified-match 0.80–0.85 zu allen Nachbarn), async-Briefkasten
 (GitHub §11.6) ✅, **und jetzt: Live-Rendezvous + Cross-Knoten-Handshake server-los ✅.**
 
+## Pflege — 2026-06-29 (Seiten auf den aktuellen Netz-Stand gezogen, Pinnwand-Text korrigiert)
+
+Reiner Web-Text-Nachzug (Klaus' Zuruf „family wieder aktuell live bringen · an die live
+laufenden Module denken"). Kein Modul-/Protokoll-Code berührt → kein SIGNAL-Bump.
+
+- **`netzwerk.html` § „Verbindung herstellen" — ehrlicher Stand aktualisiert (DE inline +
+  DE/EN i18n):** Der alte Text sagte „der vollautomatische Rück-Handshake ist noch nicht
+  end-to-end bewiesen". Das ist seit dem Meilenstein 2026-06-28 überholt — der **server-lose
+  Live-Cross-Knoten-Handshake IST bewiesen** (zwei Geräte, gemeinsamer Raum „Rendezvous",
+  ✓ Andock etabliert). Neu formuliert: bewusst **nutzer-ausgelöst** (Empfangsmodus, keine
+  Pulsation — Absicht, kein Mangel); offen bleibt nur der reine Komfort der ganz automatischen
+  Rück-Quittung. Badge „in Vorbereitung" bleibt — er gilt jetzt für genau diesen Komfort.
+- **`assets/config/werkzeuge.js` — Pinnwand-Beschreibung korrigiert (DE+EN):** beschrieb die
+  Pinnwand generisch als „Notizen/Links sammeln". Tatsächlich ist sie ein **Frage-Antwort-Brett**
+  mit Bedeutungs-Sortierung (gratis, als **Rangfolge**) + optionalem **KI-Richter** (Absicht/
+  Verneinung). Such-Werkzeug + Pinnwand sind in `werkzeuge.js`/`publicapps.js`/`meineapps.js`
+  bereits verlinkt — nur der Text war veraltet.
+- **Verifikation:** Inline-JS (`netzwerk.html`) + `werkzeuge.js` `node --check` grün. Playwright-
+  Smokes hier nicht lauffähig (kein `playwright-core`). **Browser-Sichttest wartet auf Klaus;**
+  Hetzner zieht `main` automatisch (`deploy/auto-pull.sh`) → nach Push live.
+
 ## Stand — 2026-06-28 (Rendezvous als geteiltes Modul 23 ausgegliedert — family wird Konsument)
 
 **Getan (Branch `claude/module-23-rendezvous-rollout-zqaa8u`):**
