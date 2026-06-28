@@ -1,8 +1,8 @@
 {
   "node": "family-project",
   "lastBuild": "2026-06-28",
-  "seq": 4,
-  "headline": "Andock-Tool (Dev-Briefkasten, ?dev) um echten Handshake-Knopf erweitert: Schritt 5 'Andocken' waehlt einen Ziel-Knoten und sendet einen ECHTEN ausgehenden Handshake ueber das Live-Relais (Modul 05 transport nostr) - konsolen-frei, keine __fpErzeugeSpore()-Konsole mehr noetig. Berichtet ehrlich: established / rejected / rejected-local / timeout. Bedeutungs-Schwelle 0.80 (Modul 04) wird erklaert statt versteckt. Ehrlicher Befund: Family<->Mixarium Cosinus 0.7753 < 0.80 -> rejected-local (gewollt, kein Bug); fuer die Live-VERKEHR-Demo Knoten ueber 0.80 waehlen (Rezeptbuch 0.807 / BookLedgerPro 0.803 / Sage 0.829 / SB-KIMTool 0.831). Modul 05 unangetastet (1:1 aus Sage). Smoke 75/75 gruen. Browser-Sichttest wartet auf Klaus (Clean-Slate-Test).",
+  "seq": 5,
+  "headline": "MEILENSTEIN: Live-Cross-Knoten-Handshake server-los BEWIESEN (Klaus' Browser-Lauf, Tablet<->Handy, getrennte Instanzen + lebende nodeIds): 'ANDOCK ETABLIERT mit Family Projekt (lebende ID)'. Durchbruch = Rendezvous Schritt 6 'Gemeinsamer Raum' (Klaus' Entwurf): geteiltes Relais-Tag sbkim-rdv, aktive Knoten hinterlegen ihre LEBENDE Visitenkarte (echte Spore+lebende nodeId), der Suchende handshaket die LEBENDE ID - loest die committete-ungleich-lebende-ID-Wand, die bisher alle Handshakes timeoutete (unabhaengig von 0.80). Verfassungstreu (nutzer-ausgeloest, keine Pulsation). Plus 'Mit dem Netz verbinden' (ein Klick: Spore-falls-fehlt + anmelden + lauschen) + Kopf-VERKEHR-Lampe ehrlich (bleibt an waehrend Lauschen) + Panel scrollbar. Nur Tool-Code ueber 05b publish/subscribe; Kern 05/05b unangetastet. Damit ist der in Sages Meilenstein-Doku als 'noch nicht end-to-end gezeigt' markierte Relais-Handshake jetzt gezeigt. Smoke 77/77.",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json",
   "nodeId": "HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE",
   "mailboxes": {
@@ -38,6 +38,11 @@
       "seq": 4,
       "date": "2026-06-28",
       "headline": "Andock-Tool ?dev Schritt 5 'Andocken': echter ausgehender Handshake-Knopf an waehlbaren Knoten ueber das Live-Relais (Modul 05 nostr), konsolen-frei. Ehrlich berichtet (established/rejected/rejected-local/timeout) + Bedeutungs-Schwelle 0.80 erklaert. Befund Family<->Mixarium 0.7753 < 0.80 (rejected-local, gewollt). Smoke 75/75. Wartet auf Klaus' Clean-Slate-Browser-Lauf."
+    },
+    {
+      "seq": 5,
+      "date": "2026-06-28",
+      "headline": "MEILENSTEIN Live-Cross-Knoten-Handshake server-los BEWIESEN (Klaus Tablet<->Handy). Schritt 6 'Gemeinsamer Raum' (Rendezvous, Klaus' Entwurf): geteiltes Relais-Tag sbkim-rdv, lebende Visitenkarten, Handshake an die LEBENDE ID -> loest committete-ungleich-lebende-ID-Wand. + 'Mit dem Netz verbinden' (ein Klick) + VERKEHR-Lampe ehrlich + Panel scrollbar. Kern 05/05b unangetastet. Smoke 77/77."
     }
   ]
 }

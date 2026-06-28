@@ -4,7 +4,57 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
-## Letzter Stand — 2026-06-28 (Andock-Tool ⑤: echter Handshake-Knopf)
+## ⭐ MEILENSTEIN — 2026-06-28: Live-Cross-Knoten-Handshake BEWIESEN (cross-device, server-los)
+
+**Der vollautomatische Relais-Handshake, der in Sages Meilenstein-Doku ehrlich als
+„noch nicht end-to-end gezeigt" stand, ist heute LIVE gelungen** — bezeugt durch Klaus'
+Browser-Lauf auf zwei getrennten Geräten (Tablet ↔ Handy, beide family-projekt.de,
+getrennte Browser-Instanzen, getrennte lebende nodeIds):
+
+> 🤝 Handshake an LEBENDE ID `7_tvfP1z…` (Relais) → **✓ ANDOCK ETABLIERT mit Family
+> Projekt (lebende ID)!** Server-loser Live-Cross-Knoten-Handshake.
+
+**Der Durchbruch war das Rendezvous (Schritt ⑥, „Gemeinsamer Raum"):** Klaus' eigener
+Entwurf. Bisher adressierte der Handshake die **committete** GitHub-nodeId — laufende
+Knoten lauschen aber auf einer **frisch erzeugten lebenden** nodeId → Brief kam nie an
+(Timeout, unabhängig von der 0.80-Schwelle). Der gemeinsame Raum (geteiltes Relais-Tag
+`sbkim-rdv`) lässt aktive Knoten ihre **lebende** Visitenkarte (echte Spore + lebende
+nodeId) hinterlegen; der Suchende liest die Karte und handshaket die **lebende** ID →
+trifft. **Verfassungstreu** (nutzer-ausgelöst, keine Pulsation). Der Beweis-Ablauf:
+👥 fand die lebende Karte → 🤝 schlug erst fehl (Empfänger-Gerät hatte noch keine eigene
+Spore) → nach ① auf dem zweiten Gerät → **ETABLIERT**.
+
+**Honest eingeordnet — was BEWIESEN ist:** Identität/Spore ✅, Match/Verifikation ✅
+(Briefkasten zeigt verified-match 0.80–0.85 zu allen Nachbarn), async-Briefkasten
+(GitHub §11.6) ✅, **und jetzt: Live-Rendezvous + Cross-Knoten-Handshake server-los ✅.**
+
+## Stand — 2026-06-28 (Andock-Tool ⑥ Rendezvous + 🌐-Verbinden + Lampe-Fix)
+
+**Getan (Branch `claude/spore-generation-network-receipt-eyzz27-f9lpew`):**
+
+- **Schritt ⑥ „Gemeinsamer Raum"** in `sbkim/sbkim-init.js`: `📌 Auffindbar machen`
+  (lebende Visitenkarte ins Relais-Tag `sbkim-rdv` + `listenNostr`) · `👥 Wer ist im
+  Raum?` (liest Karten 4 s, dedupe/Frische, 🤝 Andocken an die **lebende** ID) ·
+  **`🌐 Mit dem Netz verbinden`** (EIN Klick: Identität erzeugen falls fehlt + anmelden
+  + lauschen — entfernt den „erst ①, dann 📌"-Zwischenschritt; Klaus' Wunsch). Nur
+  Tool-Code über die öffentliche 05b-`publish/subscribe`-Fläche; Kern-Module 05/05b
+  **unangetastet**.
+- **Kopf-Lampe VERKEHR ehrlich** (`assets/status-widget.js`): reagiert jetzt auch auf
+  `sbkim:nostr-listening` → bleibt **an, solange der Knoten lauscht** (Klaus' Befund:
+  der reine 1,4-s-Blitz beim Handshake war leicht zu verpassen). Handschlag blitzt,
+  kehrt dann in den Lausch-Zustand zurück.
+- **Panel scrollbar** (`max-height:84vh; overflow-y:auto`) — behebt den Überlauf, der
+  langen Ausgabe-Text über die Knöpfe schob.
+- Smoke `tests/smoke_all.mjs` **77/77 grün** (Proben ⑥ + Panel-Scroll).
+
+**Vision (Klaus 2026-06-28, für Folge-Sitzungen):** der „Raum" als **öffentliche, lebende
+Teilnehmer-Liste** → das Andock-Tool aus `?dev` zu einem **öffentlichen „Mit dem Netz
+verbinden"** machen; jeder Plattform-Besucher kann einen **Knoten erzeugen + beitreten**
+(suchen ja, verkaufen nein — Marktplatz bleibt eigener Eintrag). Dann **Such-Werkzeug
+(Modul 22) über den Raum** legen → so findet man im Marktplatz semantisch die lebenden
+Teilnehmer. Kleine UX-Lehre schon eingebaut: 🌐 nimmt den manuellen Spore-Schritt ab.
+
+## Stand — 2026-06-28 (Andock-Tool ⑤: echter Handshake-Knopf)
 
 **Getan (Branch `claude/spore-generation-network-receipt-eyzz27-f9lpew`):**
 
