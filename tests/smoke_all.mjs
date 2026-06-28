@@ -149,6 +149,8 @@ console.log("\nFooter-Bauleiste (dev-only) + öffentliche App-Leiste");
   // Stufe 2 verteilt: Modul 05b (Nostr-Relais-Client) geladen + Relais-Knöpfe im Andock-Tool ④
   ok(await dev.evaluate(async()=>{for(let i=0;i<40;i++){if(window.SbkimNostrRelay&&typeof SbkimNostrRelay.publish==="function")break;await new Promise(r=>setTimeout(r,75));}return !!(window.SbkimNostrRelay&&typeof SbkimNostrRelay.publish==="function"&&typeof SbkimNostrRelay.subscribe==="function");}), "Stufe 2: Modul 05b Nostr-Relais-Client geladen (SbkimNostrRelay)");
   ok(await dev.evaluate(()=>!!document.getElementById("fp-dev-relayselftest")&&!!document.getElementById("fp-dev-listen")&&typeof SbkimAnastomose.listenNostr==="function"), "Andock-Tool ④: Relais-Selbsttest + Lauschen-Knopf + listenNostr verfügbar");
+  // Andock-Tool ⑤: echter Handshake-Knopf + Ziel-Auswahl (Mein-Mixarium als Schwellen-Beispiel) + handshake() verfügbar
+  ok(await dev.evaluate(()=>{const b=document.getElementById("fp-dev-handshake");const s=document.getElementById("fp-dev-target");return !!b&&!!s&&typeof SbkimAnastomose.handshake==="function"&&[...s.options].some(o=>o.value==="Mein-Mixarium")&&[...s.options].some(o=>o.value==="Sage-Protokol");}), "Andock-Tool ⑤: Andock-/Handshake-Knopf + Ziel-Auswahl + handshake() verfügbar");
   await dev.close(); }
 
 // SBKIM-Siegel (Modul 16) — lebendige Selbst-Bezeugung.
