@@ -107,6 +107,20 @@
     if (pipePromise) return pipePromise.then(function () { /* void */ });
     pipePromise = (async function () {
       var transformers = await loadTransformers();
+      // Fix 2026-06-28 (Klaus' Live-Befund auf family-projekt.de): hinter einem
+      // SPA-Fallback-Host (Caddy `try_files {path} /index.html`) liefert die
+      // lokale Modell-Suche von transformers.js NICHT 404, sondern die
+      // `index.html` (`<!doctype html>`) mit Status 200 zurück — der Loader
+      // versucht das als JSON zu parsen und stirbt mit „Unexpected token '<'".
+      // Darum Remote-only erzwingen: das Modell kommt ausschließlich vom
+      // HuggingFace-Hub, die lokale Probe entfällt. Unschädlich für Hosts mit
+      // echtem 404 (GitHub Pages); dort lief der Pfad ohnehin remote.
+      try {
+        if (transformers.env) {
+          transformers.env.allowLocalModels = false;
+          transformers.env.allowRemoteModels = true;
+        }
+      } catch (_envErr) { /* nb — fail-soft, Default-Verhalten bleibt */ }
       var pipeline = transformers.pipeline;
       try {
         var p = await pipeline("feature-extraction", EMBEDDING_MODEL, {
