@@ -59,6 +59,7 @@
       if (dict[k] != null) el.setAttribute("placeholder", dict[k]);
     });
     try { renderAppLinks(); } catch (_e) {}
+    try { renderToolButtons(); } catch (_e) {}
     try { global.dispatchEvent(new CustomEvent("fp:lang", { detail: { lang: lang } })); } catch (_e) {}
   }
   function getLang() { return lang; }
@@ -247,6 +248,45 @@
     if (lblEl) lblEl.textContent = (lang === "en" ? cfg.labelEn : cfg.labelDe) || "";
   }
 
+  // Prominente Werkzeug-Knöpfe ganz unten: das semantische Such-Werkzeug + die
+  // Pinnwand (beide eigenständige PWAs aus Sage, als Knoten nicht verbunden —
+  // reiner Direkt-Link). Auf jeder Seite, immer sichtbar (Klaus 2026-06-29).
+  var FP_TOOL_BTNS = [
+    { de: "🔍 Such-Werkzeug", en: "🔍 Search tool",
+      url: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/" },
+    { de: "📌 Pinnwand", en: "📌 Pinboard",
+      url: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" }
+  ];
+  function renderToolButtons() {
+    var footer = document.querySelector("footer");
+    if (!footer || footer.querySelector(".toolbtns")) {
+      // schon da → nur Labels nachziehen
+      var ex = footer && footer.querySelector(".toolbtns");
+      if (ex) {
+        var lblE = ex.querySelector(".lbl");
+        if (lblE) lblE.textContent = (lang === "en" ? "Tools:" : "Werkzeuge:");
+        ex.querySelectorAll("a.btn").forEach(function (a, i) {
+          if (FP_TOOL_BTNS[i]) a.textContent = lang === "en" ? FP_TOOL_BTNS[i].en : FP_TOOL_BTNS[i].de;
+        });
+      }
+      return;
+    }
+    var row = document.createElement("div"); row.className = "wrap";
+    var bar = document.createElement("div"); bar.className = "applinks toolbtns";
+    var lbl = document.createElement("span"); lbl.className = "lbl";
+    lbl.textContent = (lang === "en" ? "Tools:" : "Werkzeuge:");
+    bar.appendChild(lbl);
+    FP_TOOL_BTNS.forEach(function (a) {
+      var link = document.createElement("a");
+      link.className = "btn primary"; link.href = a.url;
+      link.target = "_blank"; link.rel = "noopener noreferrer";
+      link.textContent = lang === "en" ? a.en : a.de;
+      bar.appendChild(link);
+    });
+    row.appendChild(bar);
+    footer.appendChild(row);
+  }
+
   // ---- Init ----------------------------------------------------------------
   function init() {
     var lb = document.getElementById("langBtn");
@@ -259,6 +299,7 @@
     wireHoloButtons();
     renderAppLinks();
     renderPublicAppLinks();
+    renderToolButtons();
   }
 
   global.FP = {
