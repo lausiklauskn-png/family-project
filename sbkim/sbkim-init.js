@@ -371,168 +371,121 @@
     }
   }
 
-  // ---- ⑥ Gemeinsamer Raum (Rendezvous) — Klaus' Entwurf 2026-06-28 ----------
-  // Lösung der Adress-Wand: committete ID ≠ lebende ID. Statt an eine aus GitHub
-  // gelesene (committete) ID zu adressieren, treffen sich lebende Knoten in einem
-  // GETEILTEN Etikett (Tag) auf demselben Relais — wie Pinnwands „gemeinsamer
-  // Raum". Ein aktiver Knoten heftet auf bewusste Nutzer-Aktion seine LEBENDE
-  // Visitenkarte (echte Spore inkl. lebender nodeId) ans Brett; ein Suchender
-  // liest die Karten und handshaket die LEBENDE ID — die der Knoten ja gerade
-  // wirklich belauscht (listenNostr). Verfassungstreu: KEIN Dauer-Piepser
-  // (Pulsation verboten), beide Schritte sind nutzer-ausgelöste Pilz-Aktionen.
-  // Bewusst NUR Tool-Code über die öffentliche 05b-Publish/Subscribe-Fläche —
-  // die geteilten Kern-Module 05/05b bleiben unangetastet (kein Netz-Bruch).
-  var RDV_TAG = "sbkim-rdv";          // das geteilte Etikett = der gemeinsame Raum
-  var RDV_PRESENCE_KIND = "sbkim-presence";
-  var RDV_FRESH_SEC = 1800;           // Karten der letzten 30 min berücksichtigen
-  var RDV_LISTEN_MS = 4000;           // Sammelfenster beim Lesen des Raums
+  // ---- ⑥ Gemeinsamer Raum (Rendezvous) — Modul 23 (ausgegliedert 2026-06-28) --
+  // Der am 2026-06-28 bewiesene Rendezvous-Prototyp lebt jetzt als GETEILTES
+  // Modul 23 (SbkimRendezvous, sbkim/23_rendezvous.js — byte-1:1 aus Sage
+  // src/modules/23_rendezvous.js). family-project ist von nun an KONSUMENT des
+  // Moduls: die Mechanik (lebende Visitenkarte heften, Raum lesen/dedupen,
+  // Handshake an die lebende ID) lebt im Modul. Hier bleibt nur das family-
+  // eigene UI — der Anzeigename "Family Projekt", der app-spezifische
+  // Identitäts-Erzeuger (__fpErzeugeSpore mit Modell-Download-Fortschritt) und
+  // die Karten-Darstellung. Verfassungstreu unverändert (nutzer-ausgelöst,
+  // kein Dauer-Piepser → Empfangsmodus gewahrt). Modul 05/05b bleiben
+  // unangetastet; das Modul ruft nur deren öffentliche Flächen.
+  var FP_NODE_NAME = "Family Projekt";
 
-  async function getOwnLiveSpore() {
-    if (window.SbkimSpore && SbkimSpore.getOwnSpore) {
-      return await SbkimSpore.getOwnSpore().catch(function () { return null; });
+  function rdvReady(out) {
+    if (!window.SbkimRendezvous) {
+      if (out) out.textContent = "Modul 23 (SbkimRendezvous) nicht geladen.";
+      return false;
     }
-    return null;
+    SbkimRendezvous.configure({ nodeName: FP_NODE_NAME });
+    return true;
   }
 
-  // Kern: lauschen + lebende Visitenkarte ans Brett heften (+ Lampe ehrlich
-  // setzen). Von 📌 „Nur anmelden" und 🌐 „Mit dem Netz verbinden" geteilt.
-  function doAnnounce(out, own) {
-    function line(s) { if (out) out.textContent += s + "\n"; }
-    return Promise.resolve()
-      .then(function () {
-        if (window.SbkimAnastomose && typeof SbkimAnastomose.listenNostr === "function") {
-          return SbkimAnastomose.listenNostr().catch(function () {});
-        }
-      })
-      .then(function () {
-        var card = { kind: RDV_PRESENCE_KIND, nodeId: own.id, nodeName: "Family Projekt", spore: own, ts: Math.floor(Date.now() / 1000) };
-        return SbkimNostrRelay.publish({
-          kind: 1,
-          created_at: Math.floor(Date.now() / 1000),
-          tags: [["t", RDV_TAG]],
-          content: JSON.stringify(card)
-        });
-      })
-      .then(function () {
-        // Lampe ehrlich: VERKEHR bleibt an, solange wir lauschen.
-        try { window.dispatchEvent(new CustomEvent("sbkim:nostr-listening", { detail: { active: true } })); } catch (e) {}
-        line("✓ Du bist im Raum — lebende Visitenkarte hängt, du lauschst (VERKEHR an).");
-        line("  Lebende nodeId: " + own.id);
-        line("  Lass diesen Tab offen — eine geschlossene Seite ist nicht erreichbar.");
-      });
-  }
-
-  // 📌 Nur (neu) anmelden — setzt eine vorhandene Identität voraus.
-  async function announcePresence(out) {
-    function line(s) { if (out) out.textContent += s + "\n"; }
-    if (out) out.textContent = "";
-    if (!window.SbkimNostrRelay || typeof SbkimNostrRelay.publish !== "function") {
-      line("Modul 05b (Relais-Client) nicht geladen (type=module?)."); return;
-    }
-    var own = await getOwnLiveSpore();
-    if (!own || !own.id) { line("Noch keine Identität — nutze „🌐 Mit dem Netz verbinden“ (erzeugt sie + meldet an)."); return; }
-    line("→ Hefte lebende Visitenkarte ins Relais (Raum „" + RDV_TAG + "“) …");
-    doAnnounce(out, own).catch(function (e) { line("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
-  }
-
-  // 🌐 Mit dem Netz verbinden (Klaus' Wunsch 2026-06-28): EIN Klick = Identität
-  // erzeugen (falls noch keine da) + im Raum anmelden + lauschen. So entfällt der
-  // „erst ① , dann 📌“-Zwischenschritt. Bleibt nutzer-ausgelöst (kein Dauer-
-  // Piepser → Empfangsmodus gewahrt); das ist die saubere „Knoten erzeugen und
-  // beitreten“-Geste, mit der auch ein Nicht-Programmierer ans Netz kommt.
-  function connectToNet(out) {
-    function line(s) { if (out) out.textContent += s + "\n"; }
-    if (out) out.textContent = "";
-    if (!window.SbkimNostrRelay || typeof SbkimNostrRelay.publish !== "function") {
-      line("Modul 05b (Relais-Client) nicht geladen (type=module?)."); return;
-    }
-    getOwnLiveSpore().then(function (own) {
-      if (own && own.id) {
-        line("Identität vorhanden: " + own.id);
-        line("→ Melde dich im Raum an …");
-        return doAnnounce(out, own).catch(function (e) { line("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
-      }
+  // family-eigener Identitäts-Erzeuger als createIdentity-Callback fürs Modul:
+  // erzeugt die Spore via __fpErzeugeSpore und zeigt den Modell-Download-
+  // Fortschritt im Panel (Klaus' Befund 2026-06-27: ~30 MB beim ersten Lauf).
+  function fpCreateIdentity(out) {
+    return function () {
       out.textContent = "Erzeuge Identität … lade Modell (~30 MB beim ersten Mal, danach offline). Bleib online.\n";
       var onProg = function (e) {
         var d = (e && e.detail) || {};
         if (d.status === "progress" && d.file) {
           var pct = (d.progress != null) ? Math.round(d.progress) : null;
           out.textContent = "Lade Modell: " + d.file + (pct != null ? " … " + pct + "%" : " …") +
-            "\n(Einmalig ~30 MB. Bleib online — danach läuft es offline.)";
+            "\n(Einmalig ~30 MB von HuggingFace. Bleib online — danach läuft es offline.)";
         }
       };
       window.addEventListener("sbkim:embedding-progress", onProg);
-      return window.__fpErzeugeSpore()
-        .then(function () { return getOwnLiveSpore(); })
-        .then(function (fresh) {
-          window.removeEventListener("sbkim:embedding-progress", onProg);
-          out.textContent = "";
-          line("✓ Identität erzeugt: " + (fresh && fresh.id));
-          line("→ Melde dich im Raum an …");
-          return doAnnounce(out, fresh);
-        })
-        .catch(function (e) {
-          window.removeEventListener("sbkim:embedding-progress", onProg);
-          var msg = (e && e.message) ? e.message : String(e);
-          out.textContent = "✗ Verbinden fehlgeschlagen: " + msg +
-            "\n(Bei Netz-/Modell-Fehler: WLAN prüfen und „🌐 Mit dem Netz verbinden“ nochmal.)";
-        });
+      return window.__fpErzeugeSpore().then(function () {
+        window.removeEventListener("sbkim:embedding-progress", onProg);
+        out.textContent = "";
+      }, function (e) {
+        window.removeEventListener("sbkim:embedding-progress", onProg);
+        throw e;
+      });
+    };
+  }
+
+  // 📌 Nur (neu) anmelden — setzt eine vorhandene Identität voraus.
+  function announcePresence(out) {
+    if (!rdvReady(out)) return;
+    if (out) out.textContent = "→ Hefte lebende Visitenkarte ins Relais (Raum „sbkim-rdv“) …\n";
+    SbkimRendezvous.announce().then(function (r) {
+      if (r.ok) {
+        out.textContent += "✓ Du bist im Raum — lebende Visitenkarte hängt, du lauschst (VERKEHR an).\n";
+        out.textContent += "  Lebende nodeId: " + r.nodeId + "\n";
+        out.textContent += "  Lass diesen Tab offen — eine geschlossene Seite ist nicht erreichbar.";
+      } else {
+        out.textContent += "✗ " + (r.reason || "Anmelden fehlgeschlagen.");
+      }
+    }).catch(function (e) { out.textContent += "✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e); });
+  }
+
+  // 🌐 Mit dem Netz verbinden (Klaus' Wunsch 2026-06-28): EIN Klick = Identität
+  // erzeugen (falls noch keine da) + im Raum anmelden + lauschen.
+  function connectToNet(out) {
+    if (!rdvReady(out)) return;
+    if (out) out.textContent = "→ Verbinde mit dem Netz …\n";
+    SbkimRendezvous.connectAndAnnounce({ createIdentity: fpCreateIdentity(out) }).then(function (r) {
+      if (r.ok) {
+        if (r.created) out.textContent += "✓ Identität erzeugt: " + r.nodeId + "\n";
+        else out.textContent += "Identität vorhanden: " + r.nodeId + "\n";
+        out.textContent += "✓ Du bist im Raum — lebende Visitenkarte hängt, du lauschst (VERKEHR an).\n";
+        out.textContent += "  Lass diesen Tab offen — eine geschlossene Seite ist nicht erreichbar.";
+      } else {
+        out.textContent += "✗ Verbinden fehlgeschlagen: " + (r.reason || "(unbekannt)") +
+          "\n(Bei Netz-/Modell-Fehler: WLAN prüfen und „🌐 Mit dem Netz verbinden“ nochmal.)";
+      }
+    }).catch(function (e) {
+      out.textContent += "✗ Verbinden fehlgeschlagen: " + (e && e.message ? e.message : e);
     });
   }
 
-  // 👥 Wer ist im Raum?: lebende Visitenkarten lesen, dann pro Karte ein
-  // „🤝 Andocken“ an die LEBENDE ID anbieten.
+  // 👥 Wer ist im Raum?: lebende Visitenkarten lesen, dann pro Karte „🤝 Andocken".
   function discoverRoom(out) {
+    if (!rdvReady(out)) return;
+    out.textContent = "👥 Lese den gemeinsamen Raum (sammle Visitenkarten) …\n";
+    SbkimRendezvous.discover().then(function (r) {
+      if (!r.ok) { out.textContent = "✗ Raum-Lesen fehlgeschlagen: " + (r.reason || "(unbekannt)"); return; }
+      renderRoomCards(out, r.cards);
+    }).catch(function (e) { out.textContent = "✗ Raum-Lesen fehlgeschlagen: " + (e && e.message ? e.message : e); });
+  }
+
+  // Karten-Darstellung (family-eigenes UI). Bekommt die fertig dedupte +
+  // gefilterte Karten-Liste aus Modul 23 discover() ([{nodeId,nodeName,spore,
+  // ts,ageSec}]).
+  function renderRoomCards(out, cards) {
     function esc(s) {
       return String(s).replace(/[&<>"]/g, function (c) {
         return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;";
       });
     }
-    if (!window.SbkimNostrRelay || typeof SbkimNostrRelay.subscribe !== "function") {
-      out.textContent = "Modul 05b (Relais-Client) nicht geladen (type=module?)."; return;
-    }
-    out.textContent = "👥 Lese den gemeinsamen Raum (sammle ~" + Math.round(RDV_LISTEN_MS / 1000) + " s Visitenkarten) …\n";
-    var sinceSec = Math.floor(Date.now() / 1000) - RDV_FRESH_SEC;
-    var cards = {};            // nodeId -> { card, ts }
-    var ownId = null;
-    getOwnLiveSpore().then(function (own) { ownId = own && own.id; });
-    var unsub = null;
-    try {
-      unsub = SbkimNostrRelay.subscribe({ kinds: [1], "#t": [RDV_TAG], since: sinceSec }, function (ev) {
-        if (!ev || typeof ev.content !== "string") return;
-        var card; try { card = JSON.parse(ev.content); } catch (e) { return; }
-        if (!card || card.kind !== RDV_PRESENCE_KIND || !card.nodeId || !card.spore) return;
-        var ts = card.ts || ev.created_at || 0;
-        if (!cards[card.nodeId] || ts > cards[card.nodeId].ts) cards[card.nodeId] = { card: card, ts: ts };
-      });
-    } catch (e) {
-      out.textContent += "✗ Raum-Lesen fehlgeschlagen: " + (e && e.message ? e.message : e); return;
-    }
-    setTimeout(function () {
-      if (unsub) { try { unsub(); } catch (e) {} }
-      renderRoomCards(out, cards, ownId, esc);
-    }, RDV_LISTEN_MS);
-  }
-
-  function renderRoomCards(out, cards, ownId, esc) {
-    var ids = Object.keys(cards).filter(function (id) { return id !== ownId; });
-    if (ids.length === 0) {
-      out.textContent = "Niemand (Fremdes) im Raum. Lass den Gegenknoten zuerst „📌 Auffindbar machen“ drücken — dann hier nochmal „👥 Wer ist im Raum?“.";
+    if (!cards || cards.length === 0) {
+      out.textContent = "Niemand (Fremdes) im Raum. Lass den Gegenknoten zuerst „🌐 Mit dem Netz verbinden“ (oder „📌 Nur neu anmelden“) drücken — dann hier nochmal „👥 Wer ist im Raum?“.";
       return;
     }
-    var nowSec = Math.floor(Date.now() / 1000);
-    out.innerHTML = '<div style="color:#9ff7df;margin-bottom:6px">👥 ' + ids.length + ' lebende Visitenkarte(n) im Raum:</div>';
+    out.innerHTML = '<div style="color:#9ff7df;margin-bottom:6px">👥 ' + cards.length + ' lebende Visitenkarte(n) im Raum:</div>';
     var bs = "padding:5px 10px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
       "background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit";
-    ids.forEach(function (id) {
-      var c = cards[id].card;
-      var age = nowSec - (cards[id].ts || nowSec);
-      var ageTxt = age < 60 ? "gerade eben" : (Math.floor(age / 60) + " min");
+    cards.forEach(function (c) {
+      var ageTxt = c.ageSec < 60 ? "gerade eben" : (Math.floor(c.ageSec / 60) + " min");
       var row = document.createElement("div");
       row.style.cssText = "display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0;padding:6px 8px;" +
         "border:1px solid var(--line,#2a3340);border-radius:8px";
       row.innerHTML = '<span style="flex:1;min-width:150px"><b>' + esc(c.nodeName || "Knoten") + '</b>' +
-        '<br><span style="font:.66rem/1.3 var(--mono,monospace);color:#9aa7b6;word-break:break-all">' + esc(id) + '</span>' +
+        '<br><span style="font:.66rem/1.3 var(--mono,monospace);color:#9aa7b6;word-break:break-all">' + esc(c.nodeId) + '</span>' +
         '<br><span style="font-size:.7rem;color:#9aa7b6">angemeldet ' + ageTxt + '</span></span>';
       var b = document.createElement("button");
       b.type = "button"; b.style.cssText = bs; b.textContent = "🤝 Andocken";
@@ -543,28 +496,25 @@
   }
 
   function handshakeLiveCard(out, card) {
+    if (!window.SbkimRendezvous) { out.textContent = "Modul 23 (SbkimRendezvous) nicht geladen."; return; }
     function line(s) { out.textContent += "\n" + s; }
-    if (!window.SbkimAnastomose || typeof SbkimAnastomose.handshake !== "function") { out.textContent = "Modul 05 nicht geladen."; return; }
     out.textContent = "🤝 Handshake an LEBENDE ID " + card.nodeId + " (über Relais, max ~12 s) …";
-    SbkimAnastomose.handshake(card.spore, null, { transport: "nostr", timeoutMs: 12000 }).then(function (r) {
-      var oc = r && r.outcome;
+    SbkimRendezvous.handshakeCard(card).then(function (res) {
+      var oc = res && res.outcome;
       if (oc === "established") {
         line("✓ ANDOCK ETABLIERT mit " + (card.nodeName || "Knoten") + " (lebende ID)!");
         line("   Server-loser Live-Cross-Knoten-Handshake bewiesen — der gemeinsame Raum hat die Adress-Wand gelöst. 🎉");
       } else if (oc === "rejected-local") {
-        line("• Lokal abgelehnt — Bedeutungs-Ähnlichkeit " + (r.score != null ? Number(r.score).toFixed(4) : "?") + " < 0.80 (kein Fehler).");
+        line("• Lokal abgelehnt — Bedeutungs-Ähnlichkeit " + (res.score != null ? Number(res.score).toFixed(4) : "?") + " < 0.80 (kein Fehler).");
       } else if (oc === "rejected") {
-        line("• Vom Gegenknoten abgelehnt: " + (r.reason || "(kein Grund)"));
+        line("• Vom Gegenknoten abgelehnt: " + (res.reason || "(kein Grund)"));
+      } else if (oc === "timeout") {
+        line("✗ " + (res.reason || "Keine Antwort in der Frist — Knoten offline/nicht wach (Visitenkarte veraltet)."));
       } else {
-        line("• Ergebnis: " + JSON.stringify(r).slice(0, 200));
+        line("✗ Fehler: " + (res && res.reason ? res.reason : JSON.stringify(res)));
       }
     }).catch(function (e) {
-      var nm = e && e.name ? e.name : "";
-      if (nm === "HandshakeTimeoutError") {
-        line("✗ Keine Antwort in 12 s — der Knoten war angemeldet, ist aber offline/nicht mehr wach (Visitenkarte veraltet).");
-      } else {
-        line("✗ Fehler" + (nm ? " (" + nm + ")" : "") + ": " + (e && e.message ? e.message : e));
-      }
+      line("✗ Fehler: " + (e && e.message ? e.message : e));
     });
   }
 
