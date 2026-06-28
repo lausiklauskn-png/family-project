@@ -371,6 +371,148 @@
     }
   }
 
+  // ---- ⑥ Gemeinsamer Raum (Rendezvous) — Klaus' Entwurf 2026-06-28 ----------
+  // Lösung der Adress-Wand: committete ID ≠ lebende ID. Statt an eine aus GitHub
+  // gelesene (committete) ID zu adressieren, treffen sich lebende Knoten in einem
+  // GETEILTEN Etikett (Tag) auf demselben Relais — wie Pinnwands „gemeinsamer
+  // Raum". Ein aktiver Knoten heftet auf bewusste Nutzer-Aktion seine LEBENDE
+  // Visitenkarte (echte Spore inkl. lebender nodeId) ans Brett; ein Suchender
+  // liest die Karten und handshaket die LEBENDE ID — die der Knoten ja gerade
+  // wirklich belauscht (listenNostr). Verfassungstreu: KEIN Dauer-Piepser
+  // (Pulsation verboten), beide Schritte sind nutzer-ausgelöste Pilz-Aktionen.
+  // Bewusst NUR Tool-Code über die öffentliche 05b-Publish/Subscribe-Fläche —
+  // die geteilten Kern-Module 05/05b bleiben unangetastet (kein Netz-Bruch).
+  var RDV_TAG = "sbkim-rdv";          // das geteilte Etikett = der gemeinsame Raum
+  var RDV_PRESENCE_KIND = "sbkim-presence";
+  var RDV_FRESH_SEC = 1800;           // Karten der letzten 30 min berücksichtigen
+  var RDV_LISTEN_MS = 4000;           // Sammelfenster beim Lesen des Raums
+
+  async function getOwnLiveSpore() {
+    if (window.SbkimSpore && SbkimSpore.getOwnSpore) {
+      return await SbkimSpore.getOwnSpore().catch(function () { return null; });
+    }
+    return null;
+  }
+
+  // 📌 Auffindbar machen: lebende Visitenkarte ans Brett heften (+ sicherstellen,
+  // dass wir lauschen, sonst kann uns niemand die Hand geben).
+  async function announcePresence(out) {
+    function line(s) { if (out) out.textContent += s + "\n"; }
+    if (out) out.textContent = "";
+    if (!window.SbkimNostrRelay || typeof SbkimNostrRelay.publish !== "function") {
+      line("Modul 05b (Relais-Client) nicht geladen (type=module?)."); return;
+    }
+    var own = await getOwnLiveSpore();
+    if (!own || !own.id) { line("Noch keine eigene Spore — zuerst Schritt ① „Eigene Spore erzeugen“."); return; }
+    line("→ Hefte lebende Visitenkarte ins Relais (Raum „" + RDV_TAG + "“) …");
+    if (window.SbkimAnastomose && typeof SbkimAnastomose.listenNostr === "function") {
+      try { await SbkimAnastomose.listenNostr(); } catch (e) {}
+    }
+    var card = { kind: RDV_PRESENCE_KIND, nodeId: own.id, nodeName: "Family Projekt", spore: own, ts: Math.floor(Date.now() / 1000) };
+    try {
+      await SbkimNostrRelay.publish({
+        kind: 1,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [["t", RDV_TAG]],
+        content: JSON.stringify(card)
+      });
+      line("✓ Du bist jetzt auffindbar — deine lebende Visitenkarte hängt im Raum.");
+      line("  Lebende nodeId: " + own.id);
+      line("  Du lauschst gleichzeitig: wer dich im Raum sieht, kann dir die Hand geben.");
+      line("  (Lass diesen Tab offen — eine geschlossene Seite ist nicht erreichbar.)");
+    } catch (e) {
+      line("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e));
+    }
+  }
+
+  // 👥 Wer ist im Raum?: lebende Visitenkarten lesen, dann pro Karte ein
+  // „🤝 Andocken“ an die LEBENDE ID anbieten.
+  function discoverRoom(out) {
+    function esc(s) {
+      return String(s).replace(/[&<>"]/g, function (c) {
+        return c === "&" ? "&amp;" : c === "<" ? "&lt;" : c === ">" ? "&gt;" : "&quot;";
+      });
+    }
+    if (!window.SbkimNostrRelay || typeof SbkimNostrRelay.subscribe !== "function") {
+      out.textContent = "Modul 05b (Relais-Client) nicht geladen (type=module?)."; return;
+    }
+    out.textContent = "👥 Lese den gemeinsamen Raum (sammle ~" + Math.round(RDV_LISTEN_MS / 1000) + " s Visitenkarten) …\n";
+    var sinceSec = Math.floor(Date.now() / 1000) - RDV_FRESH_SEC;
+    var cards = {};            // nodeId -> { card, ts }
+    var ownId = null;
+    getOwnLiveSpore().then(function (own) { ownId = own && own.id; });
+    var unsub = null;
+    try {
+      unsub = SbkimNostrRelay.subscribe({ kinds: [1], "#t": [RDV_TAG], since: sinceSec }, function (ev) {
+        if (!ev || typeof ev.content !== "string") return;
+        var card; try { card = JSON.parse(ev.content); } catch (e) { return; }
+        if (!card || card.kind !== RDV_PRESENCE_KIND || !card.nodeId || !card.spore) return;
+        var ts = card.ts || ev.created_at || 0;
+        if (!cards[card.nodeId] || ts > cards[card.nodeId].ts) cards[card.nodeId] = { card: card, ts: ts };
+      });
+    } catch (e) {
+      out.textContent += "✗ Raum-Lesen fehlgeschlagen: " + (e && e.message ? e.message : e); return;
+    }
+    setTimeout(function () {
+      if (unsub) { try { unsub(); } catch (e) {} }
+      renderRoomCards(out, cards, ownId, esc);
+    }, RDV_LISTEN_MS);
+  }
+
+  function renderRoomCards(out, cards, ownId, esc) {
+    var ids = Object.keys(cards).filter(function (id) { return id !== ownId; });
+    if (ids.length === 0) {
+      out.textContent = "Niemand (Fremdes) im Raum. Lass den Gegenknoten zuerst „📌 Auffindbar machen“ drücken — dann hier nochmal „👥 Wer ist im Raum?“.";
+      return;
+    }
+    var nowSec = Math.floor(Date.now() / 1000);
+    out.innerHTML = '<div style="color:#9ff7df;margin-bottom:6px">👥 ' + ids.length + ' lebende Visitenkarte(n) im Raum:</div>';
+    var bs = "padding:5px 10px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
+      "background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit";
+    ids.forEach(function (id) {
+      var c = cards[id].card;
+      var age = nowSec - (cards[id].ts || nowSec);
+      var ageTxt = age < 60 ? "gerade eben" : (Math.floor(age / 60) + " min");
+      var row = document.createElement("div");
+      row.style.cssText = "display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0;padding:6px 8px;" +
+        "border:1px solid var(--line,#2a3340);border-radius:8px";
+      row.innerHTML = '<span style="flex:1;min-width:150px"><b>' + esc(c.nodeName || "Knoten") + '</b>' +
+        '<br><span style="font:.66rem/1.3 var(--mono,monospace);color:#9aa7b6;word-break:break-all">' + esc(id) + '</span>' +
+        '<br><span style="font-size:.7rem;color:#9aa7b6">angemeldet ' + ageTxt + '</span></span>';
+      var b = document.createElement("button");
+      b.type = "button"; b.style.cssText = bs; b.textContent = "🤝 Andocken";
+      b.addEventListener("click", function () { handshakeLiveCard(out, c); });
+      row.appendChild(b);
+      out.appendChild(row);
+    });
+  }
+
+  function handshakeLiveCard(out, card) {
+    function line(s) { out.textContent += "\n" + s; }
+    if (!window.SbkimAnastomose || typeof SbkimAnastomose.handshake !== "function") { out.textContent = "Modul 05 nicht geladen."; return; }
+    out.textContent = "🤝 Handshake an LEBENDE ID " + card.nodeId + " (über Relais, max ~12 s) …";
+    SbkimAnastomose.handshake(card.spore, null, { transport: "nostr", timeoutMs: 12000 }).then(function (r) {
+      var oc = r && r.outcome;
+      if (oc === "established") {
+        line("✓ ANDOCK ETABLIERT mit " + (card.nodeName || "Knoten") + " (lebende ID)!");
+        line("   Server-loser Live-Cross-Knoten-Handshake bewiesen — der gemeinsame Raum hat die Adress-Wand gelöst. 🎉");
+      } else if (oc === "rejected-local") {
+        line("• Lokal abgelehnt — Bedeutungs-Ähnlichkeit " + (r.score != null ? Number(r.score).toFixed(4) : "?") + " < 0.80 (kein Fehler).");
+      } else if (oc === "rejected") {
+        line("• Vom Gegenknoten abgelehnt: " + (r.reason || "(kein Grund)"));
+      } else {
+        line("• Ergebnis: " + JSON.stringify(r).slice(0, 200));
+      }
+    }).catch(function (e) {
+      var nm = e && e.name ? e.name : "";
+      if (nm === "HandshakeTimeoutError") {
+        line("✗ Keine Antwort in 12 s — der Knoten war angemeldet, ist aber offline/nicht mehr wach (Visitenkarte veraltet).");
+      } else {
+        line("✗ Fehler" + (nm ? " (" + nm + ")" : "") + ": " + (e && e.message ? e.message : e));
+      }
+    });
+  }
+
   function mountDevMailbox() {
     if (!isDev() || document.getElementById("fp-dev-mailbox")) return;
     var btn = document.createElement("button");
@@ -384,6 +526,7 @@
     var panel = document.createElement("div");
     panel.id = "fp-dev-mailbox";
     panel.style.cssText = "position:fixed;left:14px;bottom:58px;z-index:90;width:min(420px,92vw);display:none;" +
+      "max-height:84vh;overflow-y:auto;-webkit-overflow-scrolling:touch;" +
       "background:rgba(10,12,20,.92);border:1px solid var(--gold,#e6b450);border-radius:12px;padding:14px;" +
       "color:#eef2f8;font:.82rem/1.5 var(--sans,system-ui);backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.5)";
     var bs = "padding:7px 12px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
@@ -396,7 +539,7 @@
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
       '<strong style="color:var(--gold,#e6b450)">🔌 Andock-Tool</strong>' +
       '<button id="fp-dev-close" style="background:none;border:none;color:#9aa7b6;font-size:1.1rem;cursor:pointer">✕</button></div>' +
-      '<p style="margin:0;color:#9aa7b6">Werkzeug des Knoten-Betreibers (öffentlich versteckt). Fünf Schritte, um diesen Knoten ans Mycel zu bringen — klick-geführt, ohne Konsole.</p>' +
+      '<p style="margin:0;color:#9aa7b6">Werkzeug des Knoten-Betreibers (öffentlich versteckt). Sechs Schritte, um diesen Knoten ans Mycel zu bringen — klick-geführt, ohne Konsole.</p>' +
       '<div style="' + stepStyle + '">① Identität erzeugen</div>' +
       '<div style="' + rowStyle + '"><button id="fp-dev-spore" style="' + bs + '">Eigene Spore erzeugen</button></div>' +
       '<div style="' + stepStyle + '">② Ins Repo bringen / an deine KI geben</div>' +
@@ -423,6 +566,11 @@
       '</select>' +
       '<button id="fp-dev-handshake" style="' + bs + '">🤝 Andocken (Handshake senden)</button></div>' +
       '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Relais-Transport (Modul 05 Nostr / <code>relay.family-projekt.de</code>) ist <b>live</b>. „Andocken“ sendet einen <b>echten</b> Handshake an den gewählten Knoten — der muss in einem anderen Tab offen sein und lauschen. Liegt die Domäne unter der Bedeutungs-Schwelle (0.80), lehnt der Knoten lokal ab und sendet bewusst nichts (kein Fehler).</p>' +
+      '<div style="' + stepStyle + '">⑥ Gemeinsamer Raum — lebende Knoten finden (löst die Adress-Wand)</div>' +
+      '<div style="' + rowStyle + '">' +
+      '<button id="fp-dev-announce" style="' + bs + '">📌 Auffindbar machen</button>' +
+      '<button id="fp-dev-discover" style="' + bsGhost + '">👥 Wer ist im Raum?</button></div>' +
+      '<p style="margin:6px 0 0;color:#9aa7b6;font-size:.72rem">Beides sind <b>bewusste</b> Aktionen (kein Dauer-Funken → Empfangsmodus gewahrt). „Auffindbar machen“ heftet deine <b>lebende</b> Visitenkarte (echte nodeId) ins Relais; „Wer ist im Raum?“ liest die Karten und handshaket die <b>lebende</b> ID — genau das, was die committete ID nicht konnte. Test: ein Gerät 📌, das andere 👥.</p>' +
       '<pre id="fp-dev-out" style="margin:10px 0 0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:42vh;overflow:auto"></pre>';
     document.body.appendChild(btn);
     document.body.appendChild(panel);
@@ -446,6 +594,8 @@
       var label = (sel && sel.options[sel.selectedIndex]) ? FP_PEERS_NICE[repo] || sel.options[sel.selectedIndex].text : repo;
       sendHandshake(out, repo, label);
     });
+    panel.querySelector("#fp-dev-announce").addEventListener("click", function () { announcePresence(out); });
+    panel.querySelector("#fp-dev-discover").addEventListener("click", function () { discoverRoom(out); });
     panel.querySelector("#fp-dev-safe").addEventListener("click", function () {
       if (window.SbkimSafe && typeof SbkimSafe.open === "function") {
         out.textContent = "Safe wird geöffnet … (Passwort setzen oder entsperren im Fenster)\n";
