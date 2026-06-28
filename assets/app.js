@@ -287,6 +287,33 @@
     footer.appendChild(row);
   }
 
+  // Geheimer, unbeschrifteter Knopf ganz vorne im Footer: öffnet WorkFloh erst
+  // nach 5 Klicks (Klaus 2026-06-28). Bewusst ohne Text/Branding — WorkFloh ist
+  // noch ISD⁺-gebrandet und hat kein eigenes Impressum, soll daher öffentlich
+  // nicht beschriftet/verlinkt erscheinen, aber für Eingeweihte erreichbar sein.
+  var FP_WORKFLOH_URL = "https://lausiklauskn-png.github.io/Mein-WorkFloh/";
+  function renderSecretWorkflow() {
+    var footer = document.querySelector("footer");
+    if (!footer || footer.querySelector(".wf-secret")) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "wf-secret";
+    btn.setAttribute("aria-hidden", "true");
+    btn.tabIndex = -1;
+    var clicks = 0, timer = null;
+    btn.addEventListener("click", function () {
+      clicks++;
+      if (timer) clearTimeout(timer);
+      if (clicks >= 5) {
+        clicks = 0;
+        window.open(FP_WORKFLOH_URL, "_blank", "noopener,noreferrer");
+        return;
+      }
+      timer = setTimeout(function () { clicks = 0; }, 1500);
+    });
+    footer.insertBefore(btn, footer.firstChild);
+  }
+
   // ---- Init ----------------------------------------------------------------
   function init() {
     var lb = document.getElementById("langBtn");
@@ -300,6 +327,7 @@
     renderAppLinks();
     renderPublicAppLinks();
     renderToolButtons();
+    renderSecretWorkflow();
   }
 
   global.FP = {

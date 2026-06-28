@@ -344,5 +344,8 @@ h2{font-size:1.55rem;margin:0 0 6px}
 footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:.85rem;margin-top:20px}
 footer .frow{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 footer a{color:var(--muted)} footer a:hover{color:var(--accent)}
+/* Leerer, unbeschrifteter Knopf ganz vorne im Footer (öffnet WorkFloh nach 5 Klicks). */
+.wf-secret{display:block;width:18px;height:18px;margin:0 0 14px;padding:0;border:0;border-radius:6px;background:transparent;cursor:default;-webkit-appearance:none;appearance:none}
+.wf-secret:focus{outline:none}
 
 @media (prefers-reduced-motion: reduce){ *{animation:none!important} }
