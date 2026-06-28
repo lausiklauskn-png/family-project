@@ -394,8 +394,35 @@
     return null;
   }
 
-  // 📌 Auffindbar machen: lebende Visitenkarte ans Brett heften (+ sicherstellen,
-  // dass wir lauschen, sonst kann uns niemand die Hand geben).
+  // Kern: lauschen + lebende Visitenkarte ans Brett heften (+ Lampe ehrlich
+  // setzen). Von 📌 „Nur anmelden" und 🌐 „Mit dem Netz verbinden" geteilt.
+  function doAnnounce(out, own) {
+    function line(s) { if (out) out.textContent += s + "\n"; }
+    return Promise.resolve()
+      .then(function () {
+        if (window.SbkimAnastomose && typeof SbkimAnastomose.listenNostr === "function") {
+          return SbkimAnastomose.listenNostr().catch(function () {});
+        }
+      })
+      .then(function () {
+        var card = { kind: RDV_PRESENCE_KIND, nodeId: own.id, nodeName: "Family Projekt", spore: own, ts: Math.floor(Date.now() / 1000) };
+        return SbkimNostrRelay.publish({
+          kind: 1,
+          created_at: Math.floor(Date.now() / 1000),
+          tags: [["t", RDV_TAG]],
+          content: JSON.stringify(card)
+        });
+      })
+      .then(function () {
+        // Lampe ehrlich: VERKEHR bleibt an, solange wir lauschen.
+        try { window.dispatchEvent(new CustomEvent("sbkim:nostr-listening", { detail: { active: true } })); } catch (e) {}
+        line("✓ Du bist im Raum — lebende Visitenkarte hängt, du lauschst (VERKEHR an).");
+        line("  Lebende nodeId: " + own.id);
+        line("  Lass diesen Tab offen — eine geschlossene Seite ist nicht erreichbar.");
+      });
+  }
+
+  // 📌 Nur (neu) anmelden — setzt eine vorhandene Identität voraus.
   async function announcePresence(out) {
     function line(s) { if (out) out.textContent += s + "\n"; }
     if (out) out.textContent = "";
@@ -403,26 +430,54 @@
       line("Modul 05b (Relais-Client) nicht geladen (type=module?)."); return;
     }
     var own = await getOwnLiveSpore();
-    if (!own || !own.id) { line("Noch keine eigene Spore — zuerst Schritt ① „Eigene Spore erzeugen“."); return; }
+    if (!own || !own.id) { line("Noch keine Identität — nutze „🌐 Mit dem Netz verbinden“ (erzeugt sie + meldet an)."); return; }
     line("→ Hefte lebende Visitenkarte ins Relais (Raum „" + RDV_TAG + "“) …");
-    if (window.SbkimAnastomose && typeof SbkimAnastomose.listenNostr === "function") {
-      try { await SbkimAnastomose.listenNostr(); } catch (e) {}
+    doAnnounce(out, own).catch(function (e) { line("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+  }
+
+  // 🌐 Mit dem Netz verbinden (Klaus' Wunsch 2026-06-28): EIN Klick = Identität
+  // erzeugen (falls noch keine da) + im Raum anmelden + lauschen. So entfällt der
+  // „erst ① , dann 📌“-Zwischenschritt. Bleibt nutzer-ausgelöst (kein Dauer-
+  // Piepser → Empfangsmodus gewahrt); das ist die saubere „Knoten erzeugen und
+  // beitreten“-Geste, mit der auch ein Nicht-Programmierer ans Netz kommt.
+  function connectToNet(out) {
+    function line(s) { if (out) out.textContent += s + "\n"; }
+    if (out) out.textContent = "";
+    if (!window.SbkimNostrRelay || typeof SbkimNostrRelay.publish !== "function") {
+      line("Modul 05b (Relais-Client) nicht geladen (type=module?)."); return;
     }
-    var card = { kind: RDV_PRESENCE_KIND, nodeId: own.id, nodeName: "Family Projekt", spore: own, ts: Math.floor(Date.now() / 1000) };
-    try {
-      await SbkimNostrRelay.publish({
-        kind: 1,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [["t", RDV_TAG]],
-        content: JSON.stringify(card)
-      });
-      line("✓ Du bist jetzt auffindbar — deine lebende Visitenkarte hängt im Raum.");
-      line("  Lebende nodeId: " + own.id);
-      line("  Du lauschst gleichzeitig: wer dich im Raum sieht, kann dir die Hand geben.");
-      line("  (Lass diesen Tab offen — eine geschlossene Seite ist nicht erreichbar.)");
-    } catch (e) {
-      line("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e));
-    }
+    getOwnLiveSpore().then(function (own) {
+      if (own && own.id) {
+        line("Identität vorhanden: " + own.id);
+        line("→ Melde dich im Raum an …");
+        return doAnnounce(out, own).catch(function (e) { line("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+      }
+      out.textContent = "Erzeuge Identität … lade Modell (~30 MB beim ersten Mal, danach offline). Bleib online.\n";
+      var onProg = function (e) {
+        var d = (e && e.detail) || {};
+        if (d.status === "progress" && d.file) {
+          var pct = (d.progress != null) ? Math.round(d.progress) : null;
+          out.textContent = "Lade Modell: " + d.file + (pct != null ? " … " + pct + "%" : " …") +
+            "\n(Einmalig ~30 MB. Bleib online — danach läuft es offline.)";
+        }
+      };
+      window.addEventListener("sbkim:embedding-progress", onProg);
+      return window.__fpErzeugeSpore()
+        .then(function () { return getOwnLiveSpore(); })
+        .then(function (fresh) {
+          window.removeEventListener("sbkim:embedding-progress", onProg);
+          out.textContent = "";
+          line("✓ Identität erzeugt: " + (fresh && fresh.id));
+          line("→ Melde dich im Raum an …");
+          return doAnnounce(out, fresh);
+        })
+        .catch(function (e) {
+          window.removeEventListener("sbkim:embedding-progress", onProg);
+          var msg = (e && e.message) ? e.message : String(e);
+          out.textContent = "✗ Verbinden fehlgeschlagen: " + msg +
+            "\n(Bei Netz-/Modell-Fehler: WLAN prüfen und „🌐 Mit dem Netz verbinden“ nochmal.)";
+        });
+    });
   }
 
   // 👥 Wer ist im Raum?: lebende Visitenkarten lesen, dann pro Karte ein
@@ -568,9 +623,11 @@
       '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Relais-Transport (Modul 05 Nostr / <code>relay.family-projekt.de</code>) ist <b>live</b>. „Andocken“ sendet einen <b>echten</b> Handshake an den gewählten Knoten — der muss in einem anderen Tab offen sein und lauschen. Liegt die Domäne unter der Bedeutungs-Schwelle (0.80), lehnt der Knoten lokal ab und sendet bewusst nichts (kein Fehler).</p>' +
       '<div style="' + stepStyle + '">⑥ Gemeinsamer Raum — lebende Knoten finden (löst die Adress-Wand)</div>' +
       '<div style="' + rowStyle + '">' +
-      '<button id="fp-dev-announce" style="' + bs + '">📌 Auffindbar machen</button>' +
+      '<button id="fp-dev-connect" style="' + bs + '">🌐 Mit dem Netz verbinden</button>' +
       '<button id="fp-dev-discover" style="' + bsGhost + '">👥 Wer ist im Raum?</button></div>' +
-      '<p style="margin:6px 0 0;color:#9aa7b6;font-size:.72rem">Beides sind <b>bewusste</b> Aktionen (kein Dauer-Funken → Empfangsmodus gewahrt). „Auffindbar machen“ heftet deine <b>lebende</b> Visitenkarte (echte nodeId) ins Relais; „Wer ist im Raum?“ liest die Karten und handshaket die <b>lebende</b> ID — genau das, was die committete ID nicht konnte. Test: ein Gerät 📌, das andere 👥.</p>' +
+      '<div style="' + rowStyle + ';margin-top:6px">' +
+      '<button id="fp-dev-announce" style="' + bsGhost + '">📌 Nur neu anmelden</button></div>' +
+      '<p style="margin:6px 0 0;color:#9aa7b6;font-size:.72rem"><b>🌐 Mit dem Netz verbinden</b> = ein Klick: Identität erzeugen (falls keine da) + im Raum anmelden + lauschen. „Wer ist im Raum?“ liest die <b>lebenden</b> Visitenkarten und handshaket die <b>lebende</b> ID — genau das, was die committete ID nicht konnte. Beides ist nutzer-ausgelöst (kein Dauer-Funken → Empfangsmodus gewahrt). Test: ein Gerät 🌐, das andere 👥.</p>' +
       '<pre id="fp-dev-out" style="margin:10px 0 0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:42vh;overflow:auto"></pre>';
     document.body.appendChild(btn);
     document.body.appendChild(panel);
@@ -594,6 +651,7 @@
       var label = (sel && sel.options[sel.selectedIndex]) ? FP_PEERS_NICE[repo] || sel.options[sel.selectedIndex].text : repo;
       sendHandshake(out, repo, label);
     });
+    panel.querySelector("#fp-dev-connect").addEventListener("click", function () { connectToNet(out); });
     panel.querySelector("#fp-dev-announce").addEventListener("click", function () { announcePresence(out); });
     panel.querySelector("#fp-dev-discover").addEventListener("click", function () { discoverRoom(out); });
     panel.querySelector("#fp-dev-safe").addEventListener("click", function () {

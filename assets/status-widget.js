@@ -157,10 +157,20 @@
     if (!el) return; el.classList.remove("on", "warn"); if (cls) el.classList.add(cls);
   }
   var vkT;
-  function flashVerkehr() { lamp("verkehr", "on"); clearTimeout(vkT); vkT = setTimeout(function () { lamp("verkehr", ""); }, 1400); }
+  // VERKEHR-Lampe: bleibt ruhig an, solange der Knoten am Relais lauscht
+  // (sbkim:nostr-listening); ein Handschlag/postMessage blitzt kurz auf und
+  // kehrt danach in den Lausch-Zustand zurück. Klaus' Befund 2026-06-28: ein
+  // bloßer 1,4-s-Blitz ist leicht zu verpassen (man schaut aufs andere Gerät) —
+  // die Lampe muss den Lausch-/Verkehrs-Zustand EHRLICH halten (wie Modul 17).
+  var verkehrListening = false;
+  function flashVerkehr() { lamp("verkehr", "on"); clearTimeout(vkT); vkT = setTimeout(function () { lamp("verkehr", verkehrListening ? "on" : ""); }, 1400); }
   global.addEventListener("sbkim:alive", function () { lamp("lebt", "on"); });
   global.addEventListener("sbkim:postmessage", flashVerkehr);
   global.addEventListener("sbkim:handshake", flashVerkehr);
+  global.addEventListener("sbkim:nostr-listening", function (e) {
+    verkehrListening = !(e && e.detail && e.detail.active === false);
+    lamp("verkehr", verkehrListening ? "on" : "");
+  });
   global.addEventListener("sbkim:fremd-alert", function () { lamp("fremd", "warn"); });
   global.addEventListener("sbkim:siegel-certified", function () { lamp("siegel", "on"); var s = w.querySelector('[data-slot="siegel"]'); if (s) s.title = "SBKIM-Siegel ausgestellt"; });
   setTimeout(function () { lamp("lebt", "on"); }, 1200);   // Spore lebt nach Init
