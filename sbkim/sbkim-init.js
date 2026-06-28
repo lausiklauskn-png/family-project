@@ -299,6 +299,78 @@
     })();
   }
 
+  // Echte Andock-Geste (Klaus' Wunsch 2026-06-28): EIN Knopf, der einen echten
+  // ausgehenden Handshake über das Live-Relais an einen gewählten Knoten sendet —
+  // konsolen-frei. Das ist der „Verbindung herstellen"-Schritt, der bisher als
+  // „in Vorbereitung" markiert war; hier wird er klick-auslösbar und EHRLICH
+  // berichtet (established / rejected / rejected-local / timeout). Modul 05
+  // bleibt unangetastet (1:1 aus Sage) — reines Tool-Code, das handshake() ruft.
+  //
+  // Bedeutungs-Schwelle (Modul 04, PROVIDER_MIN_MATCH = 0.80): liegt die
+  // semantische Ähnlichkeit beider Domänen darunter, antwortet handshake() lokal
+  // mit „rejected-local" und sendet bewusst NICHTS ans Relais. Das ist Absicht
+  // (kein Crawler, keine sinnlose Last), kein Fehler — und wird klar gemeldet.
+  var FP_PEERS_NICE = {
+    "Mein-Rezeptbuch": "Mein Rezeptbuch",
+    "Sage-Protokol": "Sage-Protokoll",
+    "SB-KIMTool-Point": "SB-KIMTool-Point",
+    "BookLedgerPro": "BookLedgerPro",
+    "Mein-Mixarium": "Mein Mixarium",
+    "Mein-Tresor": "Mein Tresor",
+    "Jasons-Tresor": "Jasons Tresor"
+  };
+  function targetSporeUrl(repo) {
+    return "https://raw.githubusercontent.com/lausiklauskn-png/" + repo + "/main/sbkim/spore.json";
+  }
+  async function sendHandshake(out, repo, label) {
+    function line(s) { if (out) out.textContent += s + "\n"; console.info("[FP-Handshake]", s); }
+    if (out) out.textContent = "";
+    if (!window.SbkimAnastomose || typeof SbkimAnastomose.handshake !== "function") {
+      line("Modul 05 (Anastomose) nicht geladen."); return;
+    }
+    if (!window.SbkimNostrRelay) {
+      line("Modul 05b (Relais-Client) nicht geladen (type=module?)."); return;
+    }
+    var own = (window.SbkimSpore && SbkimSpore.getOwnSpore)
+      ? await SbkimSpore.getOwnSpore().catch(function () { return null; }) : null;
+    if (!own || !own.id) { line("Noch keine eigene Spore — zuerst Schritt ① „Eigene Spore erzeugen“."); return; }
+    line("Eigene Spore: " + own.id);
+    line("→ Lade Ziel-Spore von " + label + " (GitHub raw/main) …");
+    var target;
+    try {
+      var res = await fetch(targetSporeUrl(repo), { cache: "no-store" });
+      if (!res.ok) { line("✗ Ziel-Spore nicht erreichbar — HTTP " + res.status + " (hat " + label + " sbkim/spore.json auf main?)"); return; }
+      target = await res.json();
+    } catch (e) { line("✗ Ziel-Spore nicht ladbar: " + (e && e.message ? e.message : e)); return; }
+    if (!target || !target.id) { line("✗ Ziel-Spore ohne nodeId."); return; }
+    line("Ziel: " + label + " · nodeId " + target.id);
+    line("→ Sende Handshake über wss://relay.family-projekt.de (Antwort max ~12 s) …");
+    line("   Hinweis: " + label + " muss in einem ANDEREN Tab geöffnet sein und lauschen (VERKEHR-Lampe grün).");
+    try {
+      var r = await SbkimAnastomose.handshake(target, null, { transport: "nostr", timeoutMs: 12000 });
+      var oc = r && r.outcome;
+      if (oc === "established") {
+        line("✓ ANDOCK ETABLIERT mit " + label + " (established" + (r.score != null ? ", score " + Number(r.score).toFixed(3) : "") + ").");
+        line("   " + label + " hat geantwortet — dort füllt sich jetzt die VERKEHR-Liste. Cross-Knoten-Handshake live bewiesen.");
+      } else if (oc === "rejected-local") {
+        line("• Lokal abgelehnt (rejected-local) — Bedeutungs-Ähnlichkeit " + (r.score != null ? Number(r.score).toFixed(4) : "?") + " < 0.80.");
+        line("   Kein Fehler: die semantische Schwelle hält zu verschiedene Domänen auseinander. Es wurde NICHTS ans Relais gesendet.");
+        line("   Tipp: für die Live-Demo einen Knoten mit ähnlicher Domäne wählen (Rezeptbuch / Sage / SB-KIMTool / BookLedgerPro liegen über 0.80; Mixarium bei 0.78).");
+      } else if (oc === "rejected") {
+        line("• Vom Gegenknoten abgelehnt (rejected): " + (r.reason || "(kein Grund genannt)"));
+      } else {
+        line("• Ergebnis: " + JSON.stringify(r).slice(0, 300));
+      }
+    } catch (e) {
+      var nm = e && e.name ? e.name : "";
+      if (nm === "HandshakeTimeoutError") {
+        line("✗ Keine Antwort in 12 s (timeout). Ist " + label + " in einem anderen Tab offen und lauscht? (VERKEHR-Lampe grün)");
+      } else {
+        line("✗ Handshake-Fehler" + (nm ? " (" + nm + ")" : "") + ": " + (e && e.message ? e.message : e));
+      }
+    }
+  }
+
   function mountDevMailbox() {
     if (!isDev() || document.getElementById("fp-dev-mailbox")) return;
     var btn = document.createElement("button");
@@ -324,7 +396,7 @@
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
       '<strong style="color:var(--gold,#e6b450)">🔌 Andock-Tool</strong>' +
       '<button id="fp-dev-close" style="background:none;border:none;color:#9aa7b6;font-size:1.1rem;cursor:pointer">✕</button></div>' +
-      '<p style="margin:0;color:#9aa7b6">Werkzeug des Knoten-Betreibers (öffentlich versteckt). Vier Schritte, um diesen Knoten ans Mycel zu bringen — klick-geführt, ohne Konsole.</p>' +
+      '<p style="margin:0;color:#9aa7b6">Werkzeug des Knoten-Betreibers (öffentlich versteckt). Fünf Schritte, um diesen Knoten ans Mycel zu bringen — klick-geführt, ohne Konsole.</p>' +
       '<div style="' + stepStyle + '">① Identität erzeugen</div>' +
       '<div style="' + rowStyle + '"><button id="fp-dev-spore" style="' + bs + '">Eigene Spore erzeugen</button></div>' +
       '<div style="' + stepStyle + '">② Ins Repo bringen / an deine KI geben</div>' +
@@ -338,7 +410,19 @@
       '<button id="fp-dev-test" style="' + bsGhost + '">Verbindung testen</button>' +
       '<button id="fp-dev-relayselftest" style="' + bs + '">🛰 Relais-Selbsttest</button>' +
       '<button id="fp-dev-listen" style="' + bsGhost + '">👂 Empfänger lauschen</button></div>' +
-      '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Relais-Transport (Modul 05 Nostr / <code>relay.family-projekt.de</code>) ist <b>live</b>. Der volle Cross-Knoten-Handshake (zwei laufende Knoten) ist die Generalprobe.</p>' +
+      '<div style="' + stepStyle + '">⑤ Andocken — echten Handshake an einen Knoten senden</div>' +
+      '<div style="' + rowStyle + ';align-items:center">' +
+      '<select id="fp-dev-target" style="padding:7px 10px;border-radius:8px;border:1px solid var(--line,#2a3340);background:rgba(0,0,0,.4);color:#eef2f8;font:inherit">' +
+      '<option value="Mein-Rezeptbuch">Mein Rezeptbuch</option>' +
+      '<option value="Sage-Protokol">Sage-Protokoll</option>' +
+      '<option value="SB-KIMTool-Point">SB-KIMTool-Point</option>' +
+      '<option value="BookLedgerPro">BookLedgerPro</option>' +
+      '<option value="Mein-Mixarium">Mein Mixarium (≈0.78 – unter Schwelle)</option>' +
+      '<option value="Mein-Tresor">Mein Tresor</option>' +
+      '<option value="Jasons-Tresor">Jasons Tresor</option>' +
+      '</select>' +
+      '<button id="fp-dev-handshake" style="' + bs + '">🤝 Andocken (Handshake senden)</button></div>' +
+      '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.74rem">Relais-Transport (Modul 05 Nostr / <code>relay.family-projekt.de</code>) ist <b>live</b>. „Andocken“ sendet einen <b>echten</b> Handshake an den gewählten Knoten — der muss in einem anderen Tab offen sein und lauschen. Liegt die Domäne unter der Bedeutungs-Schwelle (0.80), lehnt der Knoten lokal ab und sendet bewusst nichts (kein Fehler).</p>' +
       '<pre id="fp-dev-out" style="margin:10px 0 0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:42vh;overflow:auto"></pre>';
     document.body.appendChild(btn);
     document.body.appendChild(panel);
@@ -356,6 +440,12 @@
       }).catch(function (e) { out.textContent += "Fehler: " + (e && e.message ? e.message : e); });
     });
     panel.querySelector("#fp-dev-spore").addEventListener("click", function () { startSporeGeneration(out); });
+    panel.querySelector("#fp-dev-handshake").addEventListener("click", function () {
+      var sel = panel.querySelector("#fp-dev-target");
+      var repo = sel ? sel.value : "Mein-Rezeptbuch";
+      var label = (sel && sel.options[sel.selectedIndex]) ? FP_PEERS_NICE[repo] || sel.options[sel.selectedIndex].text : repo;
+      sendHandshake(out, repo, label);
+    });
     panel.querySelector("#fp-dev-safe").addEventListener("click", function () {
       if (window.SbkimSafe && typeof SbkimSafe.open === "function") {
         out.textContent = "Safe wird geöffnet … (Passwort setzen oder entsperren im Fenster)\n";

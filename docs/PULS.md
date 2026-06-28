@@ -4,7 +4,41 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
-## Letzter Stand — 2026-06-27 (Bau-Sitzung 1: Grundgerüst + alle Seiten)
+## Letzter Stand — 2026-06-28 (Andock-Tool ⑤: echter Handshake-Knopf)
+
+**Getan (Branch `claude/spore-generation-network-receipt-eyzz27-f9lpew`):**
+
+- **Andock-Tool (Dev-Briefkasten, `?dev`) um Schritt ⑤ „Andocken" erweitert**
+  (`sbkim/sbkim-init.js`): Ziel-Knoten-Auswahl (Dropdown) + Knopf **🤝 Andocken
+  (Handshake senden)** löst einen **echten** ausgehenden Handshake über das
+  Live-Relais aus (`SbkimAnastomose.handshake(target, null, {transport:"nostr",
+  timeoutMs:12000})`) — **konsolen-frei**, kein `__fpErzeugeSpore()`/DevTools mehr.
+  Ziel-Spore wird live von `raw/main` geladen. Ergebnis wird **ehrlich** berichtet:
+  `established` / `rejected` / `rejected-local` / `timeout`. Modul 05 **unangetastet**
+  (1:1 aus Sage) — reines Tool-Code.
+- **Ehrlicher Befund (Bedeutungs-Schwelle 0.80, Modul 04 `PROVIDER_MIN_MATCH`):**
+  die Domänen-Cosinus von Family zu den Geschwistern: **Mixarium 0.7753 < 0.80**
+  (→ `rejected-local`, sendet bewusst NICHTS ans Relais — gewollt, kein Bug),
+  Rezeptbuch 0.807 · BookLedgerPro 0.803 · Sage 0.829 · SB-KIMTool 0.831 (alle ≥0.80).
+  **Folge für den Clean-Slate-Test:** für die Live-VERKEHR-Demo (Empfänger-Liste
+  füllt sich) einen Knoten **≥0.80** als Ziel wählen — **nicht** Mixarium. Der Befund
+  ist im Knopf-Output + im Dropdown („Mixarium ≈0.78") sichtbar gemacht.
+- **Smoke `tests/smoke_all.mjs` 75/75 grün** (neue ⑤-Probe: Knopf + Ziel-Auswahl +
+  `handshake()` verfügbar). §11.6: `sbkim/SIGNAL.json` seq 3 → **4**.
+
+**Offen / wartet auf Klaus:** der **Clean-Slate-Test** (deinstallieren → Browser tief
+reinigen → frisch installieren → Sporen neu → VERKEHR-Lampen grün → **ein** echter
+Cross-Knoten-Handshake via Schritt ⑤, Ziel ≥0.80, Empfänger-VERKEHR-Liste füllt sich).
+Headless ist grün, ersetzt aber Klaus' Browser-Lauf nicht.
+
+**Goal-3-Befund:** Sage `sbkim/SIGNAL.json` Auto-Lauschen war im Brief als offen
+gelistet, ist aber auf `main` **bereits gemeldet** (Sage SIGNAL **seq 34**, 2026-06-27:
+„Stufe 2 Auto-Lauschen … alle sieben Browser-Knoten lauschen jetzt"). Kein Redundanz-
+Eintrag nötig.
+
+---
+
+## Stand — 2026-06-27 (Bau-Sitzung 1: Grundgerüst + alle Seiten)
 
 **Getan (Branch `claude/family-projekt-bau-2ji792`):**
 
