@@ -28,6 +28,35 @@ Spore) → nach ① auf dem zweiten Gerät → **ETABLIERT**.
 (Briefkasten zeigt verified-match 0.80–0.85 zu allen Nachbarn), async-Briefkasten
 (GitHub §11.6) ✅, **und jetzt: Live-Rendezvous + Cross-Knoten-Handshake server-los ✅.**
 
+## Stand — 2026-06-28 (Rendezvous als geteiltes Modul 23 ausgegliedert — family wird Konsument)
+
+**Getan (Branch `claude/module-23-rendezvous-rollout-zqaa8u`):**
+
+- Der bewiesene Rendezvous-Code (Schritt ⑥) ist jetzt ein **geteiltes Modul 23**
+  (`SbkimRendezvous`). In Sage spezifiziert + gebaut (`src/modules/23_rendezvous.js`,
+  Smoke 40/40); **byte-1:1 nach `family-project/sbkim/23_rendezvous.js` kopiert**.
+- **`sbkim/sbkim-init.js` refaktoriert:** der Inline-Rendezvous-Code (Konstanten +
+  `doAnnounce`/`announcePresence`/`connectToNet`/`discoverRoom`/`renderRoomCards`/
+  `handshakeLiveCard`/`getOwnLiveSpore`) wurde durch **`SbkimRendezvous`-Aufrufe**
+  ersetzt (`announce`/`connectAndAnnounce`/`discover`/`handshakeCard`). family liefert
+  nur noch den **nodeName „Family Projekt"**, den app-eigenen **Identitäts-Erzeuger**
+  (`__fpErzeugeSpore` mit Modell-Download-Fortschritt, als `createIdentity`-Callback)
+  und die **Karten-Darstellung** (`renderRoomCards`). Das Dev-Tool-UI (Schritt ⑥
+  Knöpfe) ist **unverändert**.
+- `23_rendezvous.js` in **alle vier Seiten** geladen (index/werkzeuge/netzwerk/markt),
+  vor `sbkim-init.js`.
+- Kern-Module 05/05b/02 **unangetastet**. Verfassungstreu unverändert (nutzer-
+  ausgelöst, kein Dauer-Piepser).
+- Smoke `tests/smoke_all.mjs` **77/77 grün** (inkl. der Schritt-⑥-Knopf-Proben) —
+  beweist im Headless-Chromium, dass die Seiten nach dem Refactor fehlerfrei laden
+  und die Rendezvous-Knöpfe vorhanden bleiben.
+- §11.6: `sbkim/SIGNAL.json` seq 6.
+
+**Offen:** Klaus' Live-Cross-App-Sichttest (zwei Geräte/Tabs, echtes Relais) —
+unverändert die finale Abnahme; headless ersetzt ihn nicht.
+
+---
+
 ## Stand — 2026-06-28 (Andock-Tool ⑥ Rendezvous + 🌐-Verbinden + Lampe-Fix)
 
 **Getan (Branch `claude/spore-generation-network-receipt-eyzz27-f9lpew`):**
