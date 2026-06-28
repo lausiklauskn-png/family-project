@@ -1,8 +1,8 @@
 {
   "node": "family-project",
-  "lastBuild": "2026-06-27",
-  "seq": 3,
-  "headline": "Netz-Quittung beidseitig bestaetigt: Sage (seq 33) und SB-KIMTool-Point (seq 25) haben Family Projekt aufgenommen + verifiziert (verified-match, Cosinus 0.83). Family quittiert zurueck: ack[Sage-Protokol]=33, ack[SB-KIMTool-Point]=25. Family Projekt ist ein verifizierter Mycel-Knoten. Offen: Deploy (Hetzner, family-projekt.de).",
+  "lastBuild": "2026-06-28",
+  "seq": 4,
+  "headline": "Andock-Tool (Dev-Briefkasten, ?dev) um echten Handshake-Knopf erweitert: Schritt 5 'Andocken' waehlt einen Ziel-Knoten und sendet einen ECHTEN ausgehenden Handshake ueber das Live-Relais (Modul 05 transport nostr) - konsolen-frei, keine __fpErzeugeSpore()-Konsole mehr noetig. Berichtet ehrlich: established / rejected / rejected-local / timeout. Bedeutungs-Schwelle 0.80 (Modul 04) wird erklaert statt versteckt. Ehrlicher Befund: Family<->Mixarium Cosinus 0.7753 < 0.80 -> rejected-local (gewollt, kein Bug); fuer die Live-VERKEHR-Demo Knoten ueber 0.80 waehlen (Rezeptbuch 0.807 / BookLedgerPro 0.803 / Sage 0.829 / SB-KIMTool 0.831). Modul 05 unangetastet (1:1 aus Sage). Smoke 75/75 gruen. Browser-Sichttest wartet auf Klaus (Clean-Slate-Test).",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json",
   "nodeId": "HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE",
   "mailboxes": {
@@ -33,6 +33,11 @@
       "seq": 3,
       "date": "2026-06-27",
       "headline": "Quittungen empfangen: Sage (seq 33) + SB-KIMTool-Point (seq 25) haben Family aufgenommen + verifiziert. Zurueck-quittiert (ack hochgesetzt). Uebergabe beidseitig bestaetigt."
+    },
+    {
+      "seq": 4,
+      "date": "2026-06-28",
+      "headline": "Andock-Tool ?dev Schritt 5 'Andocken': echter ausgehender Handshake-Knopf an waehlbaren Knoten ueber das Live-Relais (Modul 05 nostr), konsolen-frei. Ehrlich berichtet (established/rejected/rejected-local/timeout) + Bedeutungs-Schwelle 0.80 erklaert. Befund Family<->Mixarium 0.7753 < 0.80 (rejected-local, gewollt). Smoke 75/75. Wartet auf Klaus' Clean-Slate-Browser-Lauf."
     }
   ]
 }
