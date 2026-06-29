@@ -109,7 +109,62 @@
       <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
     </div>
     <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+    <div class="wrap fp-eggs" style="margin-top:10px;text-align:center">
+      <!-- Zwei versteckte „leere" Buttons: je 5 Klicks -> Repo geht auf
+           (noch nicht freigegebene Projekte: ISD+ Werbetechnik & WorkFloh) -->
+      <button class="isd-egg" type="button" aria-label=""
+        data-store="fp_isd_unlocked"
+        data-label="ISD+ · Werbetechnik-Entwurf →"
+        data-href="https://github.com/lausiklauskn-png/ISD-Page-Entwurf"></button>
+      <button class="isd-egg" type="button" aria-label=""
+        data-store="fp_wf_unlocked"
+        data-label="ISD plus · WorkFloh →"
+        data-href="https://github.com/lausiklauskn-png/Mein-WorkFloh"></button>
+    </div>
   </footer>
+
+  <style>
+    /* Versteckte Easter-Egg-Buttons: je 5 Klicks -> Projekt-Repo öffnet */
+    .fp-eggs{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap}
+    .isd-egg{width:14px;height:14px;border-radius:50%;border:1px solid var(--line);
+      background:rgba(127,127,127,.12);cursor:pointer;padding:0;opacity:.3;font:inherit;
+      transition:opacity .25s,transform .12s,background .3s,box-shadow .3s,color .3s,padding .3s}
+    .isd-egg:hover{opacity:.55}
+    .isd-egg.on{width:auto;height:auto;border-radius:999px;padding:8px 16px;opacity:1;
+      font-weight:800;letter-spacing:.3px;color:#fff;border-color:#E0231B;
+      background:linear-gradient(135deg,#E0231B,#7a0f0a);
+      box-shadow:0 0 16px rgba(224,35,27,.5),inset 0 2px 1px rgba(255,255,255,.5);
+      animation:isdpulse 1.8s ease-in-out infinite}
+    @keyframes isdpulse{0%,100%{box-shadow:0 0 14px rgba(224,35,27,.4),inset 0 2px 1px rgba(255,255,255,.5)}
+      50%{box-shadow:0 0 28px rgba(224,35,27,.85),inset 0 2px 1px rgba(255,255,255,.5)}}
+  </style>
+  <script>
+    (function () {
+      var eggs = document.querySelectorAll(".isd-egg");
+      Array.prototype.forEach.call(eggs, function (egg) {
+        var TARGET = egg.getAttribute("data-href");
+        var STORE = egg.getAttribute("data-store");
+        var LABEL = egg.getAttribute("data-label");
+        var clicks = 0, unlocked = false;
+        try { unlocked = localStorage.getItem(STORE) === "1"; } catch (e) {}
+        function activate(open) {
+          egg.classList.add("on");
+          egg.textContent = LABEL;
+          egg.title = LABEL.replace(/\s*→$/, "") + " öffnen";
+          try { localStorage.setItem(STORE, "1"); } catch (e) {}
+          if (open) window.open(TARGET, "_blank", "noopener");
+        }
+        if (unlocked) activate(false);
+        egg.addEventListener("click", function () {
+          if (egg.classList.contains("on")) { window.open(TARGET, "_blank", "noopener"); return; }
+          clicks++;
+          egg.style.transform = "scale(1.35)";
+          setTimeout(function () { egg.style.transform = ""; }, 120);
+          if (clicks >= 5) activate(true);
+        });
+      });
+    })();
+  </script>
 
   <!-- three.js-Mycel-Hintergrund -->
   <script type="module" src="assets/mycel-bg.js"></script>
