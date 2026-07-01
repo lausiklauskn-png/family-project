@@ -96,6 +96,9 @@ console.log("\nDetail-Checks");
 { const { page } = await load("/markt.html");
   ok(await page.evaluate(()=>!document.getElementById("mkEmpty").hidden), "markt: Leer-Hinweis (noch keine Einträge)");
   ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .mic").length>=1), "markt: Mikrofon im Einreich-Formular");
+  ok(await page.evaluate(()=>!!window.SbkimOcr && typeof window.SbkimOcr.recognize==="function"), "markt: Modul 24 (SbkimOcr) geladen");
+  ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .field .cam").length>=1), "markt: 📷 Foto→Text-Knopf am Formular-Feld nachgerüstet");
+  ok(await page.evaluate(()=>{const c=document.querySelector("#mkSubmit .field .cam");return c && c.textContent==="📷" && /Foto|photo/i.test(c.title);}), "markt: 📷-Knopf korrekt beschriftet");
   // Formular-Validierung: ungültiges Bild -> Hinweis
   await page.fill("#sbTitle","Test"); await page.fill("#sbBy","@test");
   await page.fill("#sbUrl","https://example.com/app/"); await page.fill("#sbImg","https://example.com/x.svg");

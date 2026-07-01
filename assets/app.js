@@ -132,6 +132,140 @@
     document.querySelectorAll(".mic").forEach(wireMic);
   }
 
+  // ---- Kamera/OCR: 📷 Foto → Text an jedem Feld (Geschwister zum 🎤) --------
+  // Nutzt Modul 24 (SbkimOcr): Foto/Screenshot → Text, EU/Mistral BYOK, fail-soft.
+  // Der 📷-Knopf erscheint NUR, wenn Modul 24 geladen ist; ohne Schlüssel führt
+  // der erste Klick durch eine schlanke 1·2·3-Schlüssel-Fläche. Der Schlüssel
+  // bleibt lokal (localStorage, nur dieses Gerät) — kein PII, kein Schlüssel im Code.
+  var OCR_KEY_LS = "fp_ocr_key";
+  function getOcrKey() {
+    try { return localStorage.getItem(OCR_KEY_LS) || ""; } catch (_e) { return ""; }
+  }
+  function setOcrKey(k) {
+    try { if (k) localStorage.setItem(OCR_KEY_LS, k); else localStorage.removeItem(OCR_KEY_LS); } catch (_e) {}
+  }
+
+  var _ocrFileInput = null;
+  function ocrFileInput() {
+    if (_ocrFileInput) return _ocrFileInput;
+    var f = document.createElement("input");
+    f.type = "file"; f.accept = "image/*"; f.style.display = "none";
+    f.setAttribute("aria-hidden", "true");
+    document.body.appendChild(f);
+    _ocrFileInput = f;
+    return f;
+  }
+
+  // Schlanke Schlüssel-Fläche (Schritte 1·2·3 + Direktlink). Kein Framework.
+  function ocrKeyModal(onSaved) {
+    var en = (lang === "en");
+    var ov = document.createElement("div");
+    ov.setAttribute("role", "dialog");
+    ov.style.cssText = "position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);padding:16px;";
+    var box = document.createElement("div");
+    box.style.cssText = "max-width:420px;width:100%;background:#12151c;color:#e7ecf3;border:1px solid #2a3140;border-radius:14px;padding:20px;font:15px/1.5 system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.5);";
+    box.innerHTML =
+      '<div style="font-size:17px;font-weight:600;margin-bottom:10px;">📷 ' +
+      (en ? "Text from photo — one-time setup" : "Text aus Foto — einmalig einrichten") + "</div>" +
+      '<ol style="margin:0 0 12px;padding-left:20px;">' +
+      "<li>" + (en ? "Open " : "Öffne ") +
+      '<a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener" style="color:#7fb2ff;">console.mistral.ai/api-keys</a></li>' +
+      "<li>" + (en ? "Create a key and copy it." : "Schlüssel erstellen und kopieren.") + "</li>" +
+      "<li>" + (en ? "Paste it here — stays only on this device." : "Hier einfügen — bleibt nur auf diesem Gerät.") + "</li>" +
+      "</ol>";
+    var inp = document.createElement("input");
+    inp.type = "password"; inp.placeholder = en ? "Mistral API key" : "Mistral-API-Schlüssel";
+    inp.style.cssText = "width:100%;box-sizing:border-box;padding:10px;border-radius:8px;border:1px solid #2a3140;background:#0c0f15;color:#e7ecf3;margin-bottom:12px;";
+    inp.value = getOcrKey();
+    box.appendChild(inp);
+    var btnRow = document.createElement("div");
+    btnRow.style.cssText = "display:flex;gap:8px;justify-content:flex-end;";
+    function mkBtn(label, primary) {
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = label;
+      b.style.cssText = "padding:8px 14px;border-radius:8px;border:1px solid #2a3140;cursor:pointer;font:inherit;" +
+        (primary ? "background:#2f6bff;color:#fff;border-color:#2f6bff;" : "background:#1b1f28;color:#c7cfda;");
+      return b;
+    }
+    var cancel = mkBtn(en ? "Cancel" : "Abbrechen", false);
+    var save = mkBtn(en ? "Save" : "Speichern", true);
+    btnRow.appendChild(cancel); btnRow.appendChild(save);
+    box.appendChild(btnRow);
+    ov.appendChild(box);
+    function close() { try { document.body.removeChild(ov); } catch (_e) {} }
+    cancel.addEventListener("click", close);
+    ov.addEventListener("click", function (e) { if (e.target === ov) close(); });
+    save.addEventListener("click", function () {
+      var k = inp.value.trim();
+      setOcrKey(k);
+      close();
+      if (k && typeof onSaved === "function") onSaved(k);
+    });
+    document.body.appendChild(ov);
+    try { inp.focus(); } catch (_e) {}
+  }
+
+  function fileToDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var r = new FileReader();
+      r.onload = function () { resolve(r.result); };
+      r.onerror = function () { reject(r.error || new Error("read failed")); };
+      r.readAsDataURL(file);
+    });
+  }
+
+  function runOcr(input, camBtn) {
+    var en = (lang === "en");
+    if (!global.SbkimOcr) return;
+    var fi = ocrFileInput();
+    fi.value = "";
+    fi.onchange = function () {
+      var file = fi.files && fi.files[0];
+      if (!file) return;
+      var key = getOcrKey();
+      if (!key) { ocrKeyModal(function () { camBtn.click(); }); return; }
+      var prev = camBtn.textContent;
+      camBtn.disabled = true; camBtn.classList.add("live"); camBtn.textContent = "⏳";
+      function done() { camBtn.disabled = false; camBtn.classList.remove("live"); camBtn.textContent = prev; }
+      fileToDataUrl(file).then(function (dataUrl) {
+        return global.SbkimOcr.recognize(dataUrl, { apiKey: key, mimeType: file.type || "image/png" });
+      }).then(function (res) {
+        if (res && res.available && res.text) {
+          var cur = input.value ? (input.value + " ") : "";
+          input.value = cur + String(res.text).replace(/\s+/g, " ").trim();
+          try { input.dispatchEvent(new Event("input", { bubbles: true })); } catch (_e) {}
+        } else {
+          alert(res && res.reason ? res.reason : (en ? "Text recognition not available — please type." : "Texterkennung nicht möglich — bitte tippen."));
+        }
+        done();
+      }).catch(function (e) {
+        alert(global.SbkimOcr ? global.SbkimOcr.ocrErrorHint(e) : (en ? "Not available — please type." : "Nicht möglich — bitte tippen."));
+        done();
+      });
+    };
+    fi.click();
+  }
+
+  // Fügt einem .field mit Text-Eingabe einen 📷-Knopf neben dem 🎤 hinzu.
+  function addCamButton(field, input) {
+    if (!field || !input || !global.SbkimOcr) return;   // ohne Modul 24 kein Knopf
+    if (field.querySelector(".cam")) return;             // idempotent
+    var cam = document.createElement("button");
+    cam.type = "button"; cam.className = "mic cam";
+    cam.title = (lang === "en") ? "Text from photo" : "Text aus Foto";
+    cam.setAttribute("aria-label", cam.title);
+    cam.textContent = "📷";
+    field.appendChild(cam);
+    cam.addEventListener("click", function () { runOcr(input, cam); });
+  }
+  function wireAllCams() {
+    if (!global.SbkimOcr) return;
+    document.querySelectorAll(".field").forEach(function (field) {
+      var input = field.querySelector("input,textarea");
+      if (input) addCamButton(field, input);
+    });
+  }
+
   // Rüstet blanke Text-Eingaben (außerhalb eines .field, ohne data-nomic) mit
   // einem Mikrofon nach — für Klaus' Regel „Mikrofon in JEDEM Textfeld" auch
   // bei dynamisch eingehängten Feldern (z.B. Andock-Wizard). Idempotent.
@@ -151,6 +285,7 @@
       mic.textContent = "🎤";
       field.appendChild(mic);
       wireMic(mic);
+      addCamButton(field, input);
     });
   }
 
@@ -296,6 +431,7 @@
     applyTheme(ti);
     applyLang(lang);
     wireAllMics();
+    wireAllCams();
     wireHoloButtons();
     renderAppLinks();
     renderPublicAppLinks();
