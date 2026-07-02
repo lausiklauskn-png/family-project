@@ -4,6 +4,31 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## PLAN — 2026-07-02: Landingpage-Galerie „Meine Apps" + Kim-Benennung (Brief 07)
+
+**Verankert für alle Folge-Sitzungen.** Klaus' Plan: den leeren Marktplatz / die Liste
+verbundener PWAs **selbst füllen** — mit Klaus' **eigenen, echten Apps**, ehrlich als
+**„Beispiel/Vorlage"** benannt (NICHT als erfundene fremde Anwender — Verfassungstreue,
+Anti-Greenwashing/„keine verkleideten Reviews"). Zwei Ebenen: **einheitliche Hub-Liste**
+(`listings.js`/`meineapps.js`) + **individuell gestaltete Landingpage pro App dahinter**
+= Design-Galerie, jede als **kopierbare Vorlage** (Doppelnutzen: Vorstellung + verkaufbares
+Design). Datengetrieben auf `assets/tool-landing.js` (Farbe pro App = ein Feld). Start mit
+2–3 Design-Archetypen, organisch wachsen.
+
+**Erster Bau-Schritt:** die schon gute vorhandene „IST"-Landingpage als Basis nehmen, alles
+IST-/Platzhalter-Spezifische raus, **auf Mein Rezeptbuch umbranden**. 🔒 **GATE:** erst wenn
+ein **sehr gutes Icon** für Mein Rezeptbuch vorliegt (kommt später, Klaus gibt Signal).
+⚠️ Genaue „IST"-Datei zu Sitzungsbeginn mit Klaus bestätigen.
+
+**Namen (Kim-Familie):** Kimboard (Pinnwand-App) · Kimseek (Suche) · Kimsync (Finden &
+Verständigen) · Kim/Kimhub (Zusammenführung, offen). Volle Tafel: Sage `docs/NAMENSGEBUNG_KIM_FAMILIE.md`
+(PR #527). DE „Pinnwand" (zwei n), Marke ein n.
+
+**Wieder anknüpfen (davon abgewichen):** Lauschen-Rollout Stufe 2 (Nostr) restliche Knoten
++ Hetzner-Deploy (`SESSION_BRIEF_LAUSCHEN_ROLLOUT.md`); Sage semantic-matching-quality Strang A/B.
+
+**Voller Plan + offene Fäden:** [`docs/sessions/BRIEF_07_LANDINGPAGE_GALERIE_MEINE_APPS.md`](sessions/BRIEF_07_LANDINGPAGE_GALERIE_MEINE_APPS.md).
+
 ## ⭐ MEILENSTEIN — 2026-06-28: Live-Cross-Knoten-Handshake BEWIESEN (cross-device, server-los)
 
 **Der vollautomatische Relais-Handshake, der in Sages Meilenstein-Doku ehrlich als
