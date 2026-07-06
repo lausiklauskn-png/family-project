@@ -4,6 +4,30 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-06 (Abend): family-projekt.com → 301 auf .de (gleiche Sitzung)
+
+Klaus wollte die .com „mit denselben Inhalten füllen" — bewusst NICHT getan
+(Duplicate Content würde Ranking-Signale zersplittern). Stattdessen der
+Google-empfohlene Weg: **301-Redirect .com → .de**, alle Signale zahlen auf
+eine Domain ein.
+
+- **DNS (INWX, nicht Hetzner!):** Domains liegen bei INWX (`ns.inwx.de`),
+  nur der Server bei Hetzner. Drei A-Records der .com-Zone (`*`, `@`, `www`)
+  von Parking `185.181.104.242` auf `167.233.204.72` umgestellt (Klaus im
+  INWX-Panel, 2026-07-06 ~18:00). `.de` war schon korrekt.
+- **Caddy läuft im Docker-Container** `caddy` (caddy:2); Host-Caddyfile:
+  **`/opt/relay/Caddyfile`** (gemountet nach /etc/caddy/Caddyfile; darum ist
+  /etc/caddy auf dem Host leer). Webroot `/srv/family-project` 1:1 gemountet.
+  Redirect-Block `family-projekt.com, www.family-projekt.com { redir
+  https://family-projekt.de{uri} permanent }` ANGEHÄNGT (Backup:
+  `Caddyfile.bak-20260706`), `docker exec caddy caddy reload`.
+- **Live bestätigt:** `curl -sI https://family-projekt.com/` → HTTP/2 301
+  (TLS-Zertifikat automatisch via Let's Encrypt). Die .com braucht KEINE
+  eigene Search-Console-Anmeldung — der 301 reicht.
+- Der Redirect-Block steht sinngemäß auch in `Caddyfile.example` im Repo.
+
+---
+
 ## ✅ 2026-07-06: SEO-Grundausbau + Google Search Console LIVE (Sitzung „family-projekt-seo")
 
 **Ziel:** family-projekt.de bei Google auffindbar machen (Seite war praktisch unsichtbar).
