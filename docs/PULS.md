@@ -52,12 +52,16 @@ Wochen hinter main. Klaus hat den Einrichtungs-Einzeiler per SSH (Server 167.233
 Verzeichnis `/srv/family-project`) ausgeführt: sofortiger Pull + 2-Minuten-Cron dauerhaft
 aktiv. **Ab jetzt deployt jeder Merge nach main automatisch.**
 
-**Offen / als Nächstes:**
-1. Sitemap-Status in der Search Console prüfen (1–2 Tage): „Konnte nicht abgerufen
-   werden" direkt nach dem Einreichen ist Google-üblich; Auslieferung live geprüft
-   (HTTP 200, text/xml) — sollte von selbst „Erfolgreich" werden.
-2. Die drei Unterseiten (netzwerk/werkzeuge/markt) per URL-Prüfung ebenfalls zur
-   Indexierung beantragen (gleiche Klicks wie Startseite).
+**Nachtrag 2026-07-06 (Abend) — ALLES ERLEDIGT:**
+1. ✅ Sitemap wird von Google gelesen (URL-Prüfung zeigt sitemap.xml als Quelle);
+   netzwerk.html war schon INDEXIERT („URL ist auf Google", <1 Tag nach Anmeldung).
+2. ✅ Alle drei Unterseiten per URL-Prüfung angemeldet (Klaus, „alle 3" bestätigt).
+3. ✅ BING Webmaster Tools: per GSC-Import angemeldet (1 Website + 1 Sitemap
+   übernommen, Rolle Administrator) — deckt auch DuckDuckGo/Ecosia ab.
+
+**Ursprüngliche Punkte (erledigt bzw. obsolet):**
+1. ~~Sitemap-Status prüfen~~ → von Google nachweislich gelesen.
+2. ~~Unterseiten anmelden~~ → erledigt.
 3. Backlinks setzen: ✅ ERLEDIGT 2026-07-06 (Abend) — Footer-Links zu family-projekt.de
    in Mein-Mixarium-Page (PR #7), Mein-Rezeptbuch-Page (PR #12, footerHTML + impressum),
    Tomys-Hub (PR #70, index + impressum); alle gemergt. App-Impressen (Mixarium/
