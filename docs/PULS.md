@@ -67,7 +67,13 @@ aktiv. **Ab jetzt deployt jeder Merge nach main automatisch.**
    Tomys-Hub (PR #70, index + impressum); alle gemergt. App-Impressen (Mixarium/
    Rezeptbuch/Muttis) bewusst NICHT angefasst (JS-mehrsprachig gerendert, Risiko ohne
    Mehrwert — alle GitHub-Pages zählen ohnehin als EIN verweisender Host).
-4. Impressum-Platzhalter ausfüllen (Rechtspflicht + Vertrauenssignal).
+4. ✅ Impressum: ERLEDIGT 2026-07-06 (Abend). Befund: Betreiber-Daten waren bereits
+   eingetragen (identisch zu Mein-/Muttis-Rezeptbuch); Klaus hat Adresse + E-Mail-
+   Erreichbarkeit (t-online, wird gelesen) ausdrücklich bestätigt. Feinschliff:
+   Nummerierung repariert (1–9), Datenschutz um §5 Relais (relay.family-projekt.de,
+   nutzer-ausgelöst, E2E) + §8 KI-Modell-Download (Hugging Face, IP-Hinweis) ergänzt.
+   Die alte „KEIN PII"-Vorlagen-Regel (Brief §5) ist damit bewusst abgelöst —
+   Impressumspflicht §5 DDG verlangt echte Angaben (im Datei-Kopf dokumentiert).
 
 ---
 
