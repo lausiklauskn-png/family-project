@@ -58,7 +58,11 @@ aktiv. **Ab jetzt deployt jeder Merge nach main automatisch.**
    (HTTP 200, text/xml) — sollte von selbst „Erfolgreich" werden.
 2. Die drei Unterseiten (netzwerk/werkzeuge/markt) per URL-Prüfung ebenfalls zur
    Indexierung beantragen (gleiche Klicks wie Startseite).
-3. Backlinks setzen: von Klaus' anderen Seiten/Repos auf family-projekt.de verlinken.
+3. Backlinks setzen: ✅ ERLEDIGT 2026-07-06 (Abend) — Footer-Links zu family-projekt.de
+   in Mein-Mixarium-Page (PR #7), Mein-Rezeptbuch-Page (PR #12, footerHTML + impressum),
+   Tomys-Hub (PR #70, index + impressum); alle gemergt. App-Impressen (Mixarium/
+   Rezeptbuch/Muttis) bewusst NICHT angefasst (JS-mehrsprachig gerendert, Risiko ohne
+   Mehrwert — alle GitHub-Pages zählen ohnehin als EIN verweisender Host).
 4. Impressum-Platzhalter ausfüllen (Rechtspflicht + Vertrauenssignal).
 
 ---
