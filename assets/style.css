@@ -205,7 +205,8 @@ h2{font-size:1.55rem;margin:0 0 6px}
   transition:transform .28s cubic-bezier(.22,.61,.36,1);   /* sanftes Wegkippen statt Ruck */
   will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .doodle .ph{position:absolute;left:50%;top:56%;transform:translateX(-50%);z-index:2;font-family:var(--mono);font-size:.78rem;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:6px 12px;background:rgba(0,0,0,.25)}
-.lead.hero-lead{margin:20px auto 0;text-align:center}
+.hero-h1{margin:22px auto 0;text-align:center;font-size:clamp(1.6rem,4.4vw,2.5rem);line-height:1.14;max-width:20ch}
+.lead.hero-lead{margin:12px auto 0;text-align:center}
 
 .searchrow{margin:22px auto 0;max-width:680px;display:flex;gap:10px}
 .searchrow .field{flex:1}

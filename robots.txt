@@ -1,0 +1,13 @@
+# Family Projekt — robots.txt
+# Alle seriösen Suchmaschinen dürfen alles crawlen.
+User-agent: *
+Allow: /
+
+# Interne/technische Pfade nicht crawlen (kein Mehrwert für die Suche)
+Disallow: /sbkim/
+Disallow: /tests/
+Disallow: /vendor/
+Disallow: /deploy/
+Disallow: /docs/
+
+Sitemap: https://family-projekt.de/sitemap.xml
