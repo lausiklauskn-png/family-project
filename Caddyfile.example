@@ -2,7 +2,10 @@
 # Siehe docs/DEPLOY.md für den vollständigen Ablauf (Verzeichnis + git pull +
 # reload). Auto-TLS via Let's Encrypt ist Caddy-Standard.
 
-family-projekt.de, www.family-projekt.de {
+# Kanonische Domain: family-projekt.de (ohne www). www leitet dauerhaft (301)
+# hierher um — sonst würde Google denselben Inhalt unter zwei Adressen sehen
+# (Duplicate Content) und die Ranking-Signale zersplittern.
+family-projekt.de {
 	root * /srv/family-project
 	encode zstd gzip
 	file_server
@@ -12,15 +15,34 @@ family-projekt.de, www.family-projekt.de {
 	@js path *.js
 	header @js Content-Type "text/javascript; charset=utf-8"
 
+	# Lange Cache-Zeit für statische Assets (schnellere Seite = besseres Ranking).
+	# HTML bleibt kurz, damit Änderungen schnell sichtbar werden.
+	@assets path *.css *.js *.png *.svg *.woff2 *.webp
+	header @assets Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
+	@html path *.html /
+	header @html Cache-Control "public, max-age=300, must-revalidate"
+
+	# robots.txt und sitemap.xml mit sauberem Content-Type ausliefern
+	@robots path /robots.txt
+	header @robots Content-Type "text/plain; charset=utf-8"
+	@sitemap path /sitemap.xml
+	header @sitemap Content-Type "application/xml; charset=utf-8"
+
 	# Etwas Sicherheit (statische Seite, keine fremden Einbettungen)
 	header {
 		X-Content-Type-Options "nosniff"
-		Referrer-Policy "no-referrer-when-downgrade"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
 		-Server
 	}
 }
 
-# .com kanonisch auf .de umleiten (alternativ denselben root-Block für beide)
+# www dauerhaft auf die kanonische Domain umleiten (301)
+www.family-projekt.de {
+	redir https://family-projekt.de{uri} permanent
+}
+
+# .com kanonisch auf .de umleiten
 family-projekt.com, www.family-projekt.com {
 	redir https://family-projekt.de{uri} permanent
 }
