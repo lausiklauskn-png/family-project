@@ -4,6 +4,41 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-06: SEO-Grundausbau + Google Search Console LIVE (Sitzung „family-projekt-seo")
+
+**Ziel:** family-projekt.de bei Google auffindbar machen (Seite war praktisch unsichtbar).
+Alles gemergt (PR #23, #24, #25, Selbst-Merge-Freibrief) und **live verifiziert**.
+
+**Gebaut (PR #23):** `robots.txt` + `sitemap.xml`; pro Seite: einzigartige keyword-Titel,
+Meta-Descriptions, Canonical, robots-Meta, Open-Graph-/Twitter-Tags; Startseite bekam ihr
+fehlendes `<h1>` (DE/EN via i18n, CSS `.hero-h1`); JSON-LD (WebSite + SearchAction +
+Organization); Share-Bild `og-image.png` (1200×630, Chromium-gerendert); Caddyfile.example:
+www→Apex 301, Cache-Header; `sw.js` CACHE_VERSION v4. Impressum bewusst `noindex`.
+Headless verifiziert: je Seite genau 1 H1, gültiges JSON-LD, keine Konsolen-Fehler.
+
+**Search Console (PR #24 + #25, mit Klaus Schritt für Schritt):** Bestätigungsdatei
+`google9616ba6b6bbe62ad.html` + Meta-Tag `google-site-verification` in `index.html`
+(BEIDE dauerhaft liegen lassen, sonst verfällt die Bestätigung!).
+**Inhaberschaft bestätigt ✅ · sitemap.xml eingereicht ✅ · Indexierung der Startseite
+beantragt ✅** (alles von Klaus im Browser bezeugt, 2026-07-06).
+
+**Wichtiger Server-Befund (behoben):** Der Hetzner-Auto-Deploy-Cron aus
+`deploy/AUTO_DEPLOY.md` war auf dem Server **nie eingerichtet** — die Live-Seite hing
+Wochen hinter main. Klaus hat den Einrichtungs-Einzeiler per SSH (Server 167.233.204.72,
+Verzeichnis `/srv/family-project`) ausgeführt: sofortiger Pull + 2-Minuten-Cron dauerhaft
+aktiv. **Ab jetzt deployt jeder Merge nach main automatisch.**
+
+**Offen / als Nächstes:**
+1. Sitemap-Status in der Search Console prüfen (1–2 Tage): „Konnte nicht abgerufen
+   werden" direkt nach dem Einreichen ist Google-üblich; Auslieferung live geprüft
+   (HTTP 200, text/xml) — sollte von selbst „Erfolgreich" werden.
+2. Die drei Unterseiten (netzwerk/werkzeuge/markt) per URL-Prüfung ebenfalls zur
+   Indexierung beantragen (gleiche Klicks wie Startseite).
+3. Backlinks setzen: von Klaus' anderen Seiten/Repos auf family-projekt.de verlinken.
+4. Impressum-Platzhalter ausfüllen (Rechtspflicht + Vertrauenssignal).
+
+---
+
 ## PLAN — 2026-07-02: Landingpage-Galerie „Meine Apps" + Kim-Benennung (Brief 07)
 
 **Verankert für alle Folge-Sitzungen.** Klaus' Plan: den leeren Marktplatz / die Liste
