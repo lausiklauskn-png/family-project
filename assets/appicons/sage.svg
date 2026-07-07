@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Sage-Protokol — Steinpilz auf Mycel-Grün">
+  <title>Sage-Protokol</title>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"  stop-color="#86EFAC"/>
+      <stop offset="100%" stop-color="#15803D"/>
+    </linearGradient>
+    <filter id="dropshadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="8" dy="10" stdDeviation="6" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Hintergrund: abgerundetes Quadrat, Verlauf hellgrün → dunkelgrün -->
+  <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="url(#bg)"/>
+
+  <!-- Steinpilz, weiß, mit schwarzem Schlagschatten (Word-Schrift-Stil) -->
+  <g filter="url(#dropshadow)">
+    <!-- Stiel: bauchige Knolle (klassischer Boletus edulis) -->
+    <path d="
+      M 200 410
+      C 180 400, 160 360, 180 320
+      C 195 290, 205 280, 215 268
+      L 297 268
+      C 307 280, 317 290, 332 320
+      C 352 360, 332 400, 312 410
+      C 308 422, 290 426, 256 426
+      C 222 426, 204 422, 200 410
+      Z
+    " fill="#FFFFFF"/>
+
+    <!-- Kappe: bauchige Halbkugel mit leicht eingerollter Krempe -->
+    <path d="
+      M 96 250
+      C 96 162, 168 96, 256 96
+      C 344 96, 416 162, 416 250
+      C 416 268, 410 282, 396 286
+      C 360 296, 308 282, 256 282
+      C 204 282, 152 296, 116 286
+      C 102 282, 96 268, 96 250
+      Z
+    " fill="#FFFFFF"/>
+
+    <!-- Dezentes Halbkugel-Highlight auf der Kappe (weiß, niedrige Opacity) -->
+    <path d="
+      M 150 200
+      C 170 160, 220 130, 270 134
+      C 240 140, 200 170, 180 210
+      Z
+    " fill="#FFFFFF" fill-opacity="0.55"/>
+  </g>
+</svg>

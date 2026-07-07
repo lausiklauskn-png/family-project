@@ -118,8 +118,15 @@
           var href = ext ? (w.open || w.page) : w.page;
           var attrs = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
           var label = ext ? (l === "en" ? "→ Open app" : "→ App öffnen") : FP.t("wt_open");
+          // Echte App-Logos statt Emojis (Klaus 2026-07-07): iconImg zeigt das
+          // Logo aus assets/appicons/; das Emoji bleibt als Fallback, falls das
+          // Bild nicht lädt (fail-soft, keine leere Kachel).
+          var ico = w.iconImg
+            ? '<img src="' + esc(w.iconImg) + '" alt="" loading="lazy" style="width:40px;height:40px;border-radius:9px;object-fit:contain;vertical-align:middle" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'">' +
+              '<span style="display:none">' + esc(w.icon || "🧰") + '</span>'
+            : esc(w.icon || "🧰");
           return '<a class="glass area" href="' + esc(href) + '"' + attrs + '>' +
-            '<div class="ico">' + esc(w.icon || "🧰") + '</div>' +
+            '<div class="ico">' + ico + '</div>' +
             '<h3>' + esc(w.name) + '</h3>' +
             '<p>' + esc(l === "en" ? w.en : w.de) + '</p>' +
             '<span class="go">' + esc(label) + '</span></a>';

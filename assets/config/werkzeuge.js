@@ -4,7 +4,7 @@
  *   install: Link/Hinweis zum Installieren (leer = nur öffnen)
  * Schema: { id, name, icon, de, en, page, open, install } */
 window.FP_WERKZEUGE = [
-  { id: "such", name: "Such-Werkzeug", icon: "🔍",
+  { id: "such", name: "Such-Werkzeug", icon: "🔍", iconImg: "assets/appicons/such.png",
     de: "Findet nach Bedeutung statt nach Stichwörtern — komplett im Browser, ohne Server, ohne Konto.",
     en: "Finds by meaning, not by keywords — fully in the browser, no server, no account.",
     page: "werkzeuge/such-werkzeug.html",
@@ -25,17 +25,18 @@ window.FP_WERKZEUGE = [
 
   /* Klaus' EIGENE, öffentliche Apps (2026-06-27 freigeschaltet). external:true →
    * die Karte öffnet die LIVE-App direkt in einem neuen Tab (keine eigene
-   * Zwischen-Landingpage nötig). Nur Apps mit eigenem Impressum sind hier gelistet
-   * (Mein Tresor / Jasons Tresor / BookLedgerPro / WorkFloh bewusst NICHT). */
-  { id: "rezeptbuch", name: "Mein Rezeptbuch", icon: "📖", external: true,
+   * Zwischen-Landingpage nötig). Rezeptbuch/Mixarium verlinken auf ihre
+   * Landingpages (Klaus 2026-07-07); Jasons Tresor + Mein Tresor sind auf Klaus'
+   * ausdrücklichen Wunsch (2026-07-07) gelistet. BookLedgerPro/WorkFloh weiter nicht. */
+  { id: "rezeptbuch", name: "Mein Rezeptbuch", icon: "📖", iconImg: "assets/appicons/rezeptbuch.png", external: true,
     de: "Rezepte sammeln, ordnen, kochen und teilen — mit Wochenplan, mehrsprachig, offline. Als App installierbar.",
     en: "Collect, organise, cook and share recipes — weekly plan, multilingual, offline. Installable as an app.",
-    open: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/" },
-  { id: "mixarium", name: "Mein Mixarium", icon: "🍹", external: true,
+    open: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/" },
+  { id: "mixarium", name: "Mein Mixarium", icon: "🍹", iconImg: "assets/appicons/mixarium.png", external: true,
     de: "Dein Getränke-Labor: Cocktails, Mocktails, Smoothies, Limonaden, Tees & Sirupe — mehrsprachig, offline.",
     en: "Your drinks lab: cocktails, mocktails, smoothies, lemonades, teas & syrups — multilingual, offline.",
-    open: "https://lausiklauskn-png.github.io/Mein-Mixarium/" },
-  { id: "sage", name: "Sage-Protokoll", icon: "🍄", external: true,
+    open: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/" },
+  { id: "sage", name: "Sage-Protokoll", icon: "🍄", iconImg: "assets/appicons/sage.svg", external: true,
     de: "Die Mycel-Bibliothek und der Bau-Hub des Netzwerks — Glossar, Protokoll-Doku und Werkzeuge.",
     en: "The mycelium library and the build hub of the network — glossary, protocol docs and tools.",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/" },
@@ -43,11 +44,19 @@ window.FP_WERKZEUGE = [
     de: "Die bebilderte Einladung ins Mycel: was das Netzwerk ist, wie es gedacht ist und wie man mitmacht.",
     en: "The illustrated invitation into the mycelium: what the network is and how to join.",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" },
-  { id: "kimtoolpoint", name: "SB-KIMTool-Point", icon: "🛰️", external: true,
+  { id: "kimtoolpoint", name: "SB-KIMTool-Point", icon: "🛰️", iconImg: "assets/appicons/point.png", external: true,
     de: "Der öffentliche Knoten-Punkt: Werkzeugkiste und Andock-Stelle, um eine eigene Seite ans Netzwerk zu bringen.",
     en: "The public node point: toolbox and docking station to bring your own site onto the network.",
     open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/" },
-  { id: "pinnwand", name: "Pinnwand", icon: "📌", external: true,
+  { id: "jasonstresor", name: "Jasons Tresor", icon: "🔐", iconImg: "assets/appicons/jasons.svg", external: true,
+    de: "Der verschlüsselte Daten-Tresor: JSON-Dateien und Schlüssel sicher laden, ordnen und mit Passwort schützen — offline, im Browser.",
+    en: "The encrypted data vault: load, organise and password-protect JSON files and keys — offline, in the browser.",
+    open: "https://lausiklauskn-png.github.io/Jasons-Tresor/" },
+  { id: "meintresor", name: "Mein Tresor", icon: "🗝️", iconImg: "assets/appicons/meintresor.svg", external: true,
+    de: "Der Dreh-Safe mit 20 Fächern: jedes Fach ein echter AES-Tresor mit eigenem Passwort — Tarnfach und Schlüssel-Teilung inklusive.",
+    en: "The dial safe with 20 compartments: each one a real AES vault with its own password — decoy compartment and key splitting included.",
+    open: "https://lausiklauskn-png.github.io/Mein-Tresor/" },
+  { id: "pinnwand", name: "Pinnwand", icon: "📌", iconImg: "assets/appicons/pinnwand.png", external: true,
     de: "Ein offenes Frage-Antwort-Brett: Antworten lassen sich nach Bedeutung sortieren (gratis, als Rangfolge) — optional versteht ein KI-Richter die Absicht, z. B. alkoholfrei = wirklich kein Alkohol. Im Browser, ohne Konto.",
     en: "An open question-and-answer board: answers can be sorted by meaning (free, as a ranking) — optionally an AI judge grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account.",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" },
