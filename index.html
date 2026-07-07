@@ -407,9 +407,15 @@
       // Pro Eintrag kann Klaus (Bauphase) ein Bild per 5-fach-Klick + Drag&Drop
       // setzen — gespeichert in diesem Browser, fällt sonst auf das Config-Bild/Emoji zurück.
       function weeklyKey(a) { return "fp_weekly_img:" + (a.url || a.name || ""); }
+      // Eigene App-Logos unter assets/appicons/ sind von der SVG-Sperre
+      // ausgenommen (Klaus 2026-07-07): die Sperre schützt vor FREMDEN
+      // SVG-Dateien (können Skripte tragen) — eigene Repo-Dateien sind so
+      // vertrauenswürdig wie unser übriger Code.
+      function isOwnIcon(s) { return typeof s === "string" && s.indexOf("assets/appicons/") === 0; }
       function weeklyImg(a) {
         try { var o = localStorage.getItem(weeklyKey(a)); if (o && !isSvg(o)) return o; } catch (e) {}
-        return (a.img && !isSvg(a.img)) ? a.img : "";
+        if (a.img && (isOwnIcon(a.img) || !isSvg(a.img))) return a.img;
+        return "";
       }
       function renderDiscover(i) {
         if (!APPS.length) return;
