@@ -15,6 +15,7 @@
  *   getNodeId() -> Promise<string>
  *   getPublicKeyJwk() -> Promise<JsonWebKey>
  *   generateOwnSpore(meta, key?) -> Promise<SporeJson>
+ *   regenerateOwnSpore(updates, key?) -> Promise<SporeJson>  // gleiche nodeId, neu signiert
  *   getOwnSpore(key?) -> Promise<SporeJson | null>
  *   verifyForeignSpore(spore) -> Promise<{ valid, reason? }>
  *   setActiveIdentity(key) -> Promise<void>
@@ -669,6 +670,17 @@
     if (typeof meta.domainDescription === "string") unsigned.domainDescription = meta.domainDescription;
     if (Array.isArray(meta.domainKeywords)) unsigned.domainKeywords = meta.domainKeywords.slice();
     if (Array.isArray(meta.domainVector)) unsigned.domainVector = meta.domainVector.slice();
+    // M04-Erweiterung (Brief 03) + inhalts-treuer Vektor (2026-06-28): die
+    // beiden Vektor-Felder + Provenienz-Marker in die Allow-List aufnehmen,
+    // sonst würden sie still ignoriert (wie stammCategories vor 2026-05-15).
+    // embeddingSource = "content" | "description" (wie der domainVector
+    // entstand); embeddingVersion = Re-Embedding-Zähler (Drift-Erkennung).
+    if (Array.isArray(meta.embeddingCapabilities)) unsigned.embeddingCapabilities = meta.embeddingCapabilities.slice();
+    if (Array.isArray(meta.embeddingNeeds)) unsigned.embeddingNeeds = meta.embeddingNeeds.slice();
+    if (typeof meta.embeddingSource === "string") unsigned.embeddingSource = meta.embeddingSource;
+    if (typeof meta.embeddingVersion === "number" && isFinite(meta.embeddingVersion)) {
+      unsigned.embeddingVersion = meta.embeddingVersion;
+    }
     if (Array.isArray(meta.stammCategories)) unsigned.stammCategories = meta.stammCategories.slice();
     if (Array.isArray(meta.guestCategories)) unsigned.guestCategories = meta.guestCategories.slice();
     if (meta.endpointPaths && typeof meta.endpointPaths === "object") {
@@ -700,6 +712,70 @@
     var stored = await storage.get(SPORE_STORE, slotKey);
     if (!stored) return null;
     return stored.sporeJson || null;
+  }
+
+  // --- Sporen-Regeneration (Modul 18 Sub f, Brief 2026-06-28) ---------------
+  // Erzeugt die Spore mit der BESTEHENDEN Identität (gleiche nodeId) neu —
+  // kein neuer Schlüssel. `updates` überschreibt einzelne Felder; alle nicht
+  // genannten Felder werden aus der vorhandenen Spore übernommen (sonst gingen
+  // z.B. embeddingNeeds beim Neu-Signieren verloren). Typischer Einsatz: der
+  // Endknoten hat seinen domainVector inhalts-treu neu gerechnet (Modul 03
+  // embedContentVector) und reicht ihn als updates.domainVector +
+  // embeddingSource:"content" herein.
+  //
+  // embeddingVersion-Logik: ändert sich der domainVector (updates.domainVector
+  // ist ein Array), wird die Version hochgezählt (Drift-Marker); sonst bleibt
+  // sie erhalten. Ein explizites updates.embeddingVersion gewinnt immer.
+  async function regenerateOwnSpore(updates, key) {
+    updates = (updates && typeof updates === "object") ? updates : {};
+    var slotKey = key || await getActiveIdentityKey();
+    var existing = await getOwnSpore(slotKey);
+    var base = existing || {};
+
+    function pickStr(u, b) { return typeof u === "string" ? u : b; }
+    function pickArr(u, b) {
+      if (Array.isArray(u)) return u;
+      if (Array.isArray(b)) return b;
+      return undefined;
+    }
+
+    var meta = {
+      domain: pickStr(updates.domain, base.domain),
+      nodeType: pickStr(updates.nodeType, base.nodeType),
+      endpoint: pickStr(updates.endpoint, base.endpoint),
+      embeddingModel: pickStr(updates.embeddingModel, base.embeddingModel),
+      protocolVersion: typeof base.protocolVersion === "string" ? base.protocolVersion : PROTOCOL_VERSION,
+      nodeName: pickStr(updates.nodeName, base.nodeName),
+      domainDescription: pickStr(updates.domainDescription, base.domainDescription),
+      domainKeywords: pickArr(updates.domainKeywords, base.domainKeywords),
+      stammCategories: pickArr(updates.stammCategories, base.stammCategories),
+      guestCategories: pickArr(updates.guestCategories, base.guestCategories),
+      embeddingCapabilities: pickArr(updates.embeddingCapabilities, base.embeddingCapabilities),
+      embeddingNeeds: pickArr(updates.embeddingNeeds, base.embeddingNeeds),
+    };
+    if (updates.endpointPaths && typeof updates.endpointPaths === "object") {
+      meta.endpointPaths = updates.endpointPaths;
+    } else if (base.endpointPaths && typeof base.endpointPaths === "object") {
+      meta.endpointPaths = base.endpointPaths;
+    }
+
+    var vectorChanged = Array.isArray(updates.domainVector);
+    var newVector = vectorChanged ? updates.domainVector : base.domainVector;
+    if (Array.isArray(newVector)) meta.domainVector = newVector;
+
+    var src = pickStr(updates.embeddingSource, base.embeddingSource);
+    if (typeof src === "string") meta.embeddingSource = src;
+
+    var prevVer = (typeof base.embeddingVersion === "number") ? base.embeddingVersion : 0;
+    if (typeof updates.embeddingVersion === "number") {
+      meta.embeddingVersion = updates.embeddingVersion;
+    } else if (vectorChanged) {
+      meta.embeddingVersion = prevVer + 1;
+    } else if (typeof base.embeddingVersion === "number") {
+      meta.embeddingVersion = base.embeddingVersion;
+    }
+
+    return generateOwnSpore(meta, slotKey);
   }
 
   function checkRequiredFields(spore) {
@@ -1115,6 +1191,7 @@
     getNodeId: getNodeId,
     getPublicKeyJwk: getPublicKeyJwk,
     generateOwnSpore: generateOwnSpore,
+    regenerateOwnSpore: regenerateOwnSpore,
     getOwnSpore: getOwnSpore,
     verifyForeignSpore: verifyForeignSpore,
     setActiveIdentity: setActiveIdentity,
@@ -1159,7 +1236,7 @@
   if (typeof console !== "undefined" && console.info) {
     console.info(
       "MODUL 02 SPORE bereit, Funktionen: " +
-        "init/getOrCreateIdentity/getNodeId/getPublicKeyJwk/generateOwnSpore/getOwnSpore/" +
+        "init/getOrCreateIdentity/getNodeId/getPublicKeyJwk/generateOwnSpore/regenerateOwnSpore/getOwnSpore/" +
         "verifyForeignSpore/setActiveIdentity/getActiveIdentityKey/listIdentities/" +
         "removeIdentity/resetIdentityCache/exportBackup/importBackup",
     );

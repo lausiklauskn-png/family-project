@@ -131,6 +131,12 @@
       aspect:      "Schlüssel-Tresor (Identitäts-Sicherung)",
       description: "Die SBKIM-Identität (nodeId + privater Knotenschlüssel + Spore) wird lokal verschlüsselt gesichert (Modul-02-Krypto-Kern: PBKDF2-SHA256 ≥600k + AES-GCM-256), mit Shamir-Recovery 2 von 3 über das Passwort — gegen Identitäts-Verlust/-Wandern. Nur Identität/Schlüssel, kein PII, nie übers Netz.",
     },
+    {
+      since:       "2026-07-01",
+      module:      "15",
+      aspect:      "KI-Richter im Cross-Knoten-Antwort-Pfad (opt-in)",
+      description: "Der op:\"query\"-Empfänger (Membran Sub b) kann eingehende Fremd-Anfragen optional durch den KI-Richter (Modul 04 queryLocalJudged, BYOK) nach Bedeutung beurteilen und sortieren, statt nur nach rohem Cosinus. Default AUS (roher Vorfilter), Schlüssel RAM-only/nie im Code, fail-soft; der 0.80-Andock-Riegel bleibt unberührt.",
+    },
   ];
 
   // ---- Aspekt-4-Anker (Karte 16 § Sub (e) dynamische Render-Variante) ----

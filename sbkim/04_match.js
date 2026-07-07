@@ -6,8 +6,10 @@
  * Aehnlichkeit. Reine Funktion, kein async, kein Zustand.
  *
  * Public surface (registered on window.SbkimMatch):
- *   match(queryVec, passageVec) -> number
+ *   match(queryVec, passageVec) -> number   (roher Cosinus; ANDOCK-Boden via PROVIDER_MIN_MATCH)
  *   isAboveProviderThreshold(score) -> boolean
+ *   relatedness(aVec, bVec) -> number       (zentrierter Cosinus; echte Verwandtschaft, gatet NICHTS)
+ *   isRelated(score) -> boolean             (score >= RELATEDNESS_MIN)
  *   matchDimensions(queryCap, queryNeeds, passageCap, passageNeeds) -> MatchDimensionsResult
  *   explainMatchLLM(matchResult, apiKey, options?) -> Promise<ExplainResult>
  *   queryLocal(text, k?, options?) -> Promise<Array<{label, score, anchorId}>>
@@ -206,6 +208,104 @@
 
   function isAboveProviderThreshold(score) {
     return score >= PROVIDER_MIN_MATCH;
+  }
+
+  // --- Zentrierter (whitened-light) Cosinus — Verwandtschafts-Score (2026-06-28) -----
+  // LEHRE docs/LEHRE-EMBEDDING-MATCH-KALIBRIERUNG.md: der ROHE e5-Cosinus hat einen
+  // hohen Anisotropie-Boden (~0.82) — zwei UNVERWANDTE Domänen liegen schon nahe der
+  // Andock-Schwelle 0.80. match()/PROVIDER_MIN_MATCH bleiben davon UNBERÜHRT: 0.80 ist
+  // der ANDOCK-Boden (Identitäts-/Peer-Tor, Modul 05 isAboveProviderThreshold) und MUSS
+  // niedrig bleiben, sonst bräche jeder Hub↔Endknoten-Handshake (Messung 2026-06-28:
+  // alle Hub↔Endknoten roh 0.79–0.85, also über 0.80).
+  //
+  // relatedness() ist ADDITIV + DIAGNOSTISCH: es zieht den Mittelwert-Vektor (die
+  // gemeinsame Anisotropie-Richtung) ab und re-normalisiert, dann Cosinus. ERST dann
+  // heißt 0 "unverwandt": echte Verwandtschaft bleibt hoch (Schwestern ~1.0,
+  // Essen/Trinken ~0.70), fremde Domänen fallen auf ~0/negativ. NUR Anzeige/Ranking —
+  // es GATET NICHTS (kein Aufrufer im Handshake/Provider-Pfad).
+  //
+  // RELATEDNESS_CENTER (MEAN_VECTOR): einmal vorab gemittelter, L2-normierter e5-Vektor
+  // über das Referenz-Korpus (7 Knoten-Domänen-Vektoren, 2026-06-28). v1, illustrativ —
+  // sauberes Whitening braucht ein größeres Korpus (LEHRE-Caveat). Additiv ersetzbar,
+  // ohne Vertrag/PROTOCOL_VERSION zu brechen.
+  var RELATEDNESS_CENTER = new Float32Array([
+    0.072849, -0.012892, -0.039543, -0.081636, 0.054174, -0.051481, 0.044509, 0.054632,
+    0.020353, -0.012345, 0.036567, 0.028845, 0.063881, -0.035261, -0.035739, 0.043703,
+    0.031231, -0.043608, -0.02488, -0.043558, 0.057558, -0.023875, -0.047727, -0.009844,
+    0.067867, 0.055715, -0.052105, 0.015301, 0.043903, -0.062814, -0.072505, -0.02895,
+    0.054828, -0.095637, 0.070388, 0.018328, -0.04905, -0.056507, 0.062878, -0.081007,
+    0.000057, 0.026106, 0.054144, 0.067578, 0.023585, 0.076127, -0.022871, 0.031206,
+    -0.034654, -0.04787, -0.043435, 0.072748, 0.016011, 0.02264, 0.027207, -0.058184,
+    -0.064092, -0.052798, -0.06719, 0.008657, 0.053638, -0.025978, 0.038749, 0.021846,
+    0.080548, 0.080472, 0.045793, 0.043234, -0.081523, -0.040388, -0.047951, 0.052269,
+    0.004947, -0.036636, 0.006293, 0.026241, 0.019788, -0.053102, 0.021077, -0.028727,
+    -0.079603, -0.048187, -0.05293, 0.04123, -0.043611, 0.060918, 0.059286, -0.041559,
+    0.058735, -0.016282, 0.043083, 0.055459, -0.054073, -0.069448, -0.117343, -0.094852,
+    -0.048264, 0.072785, 0.01705, -0.043272, 0.060332, -0.053966, 0.013333, -0.066647,
+    -0.024604, 0.067778, 0.020262, -0.029783, 0.044672, -0.067088, -0.079189, 0.020705,
+    0.093594, 0.05703, -0.069997, -0.057747, -0.019709, -0.0358, 0.050675, -0.078948,
+    0.050898, -0.016881, -0.056561, -0.066327, -0.06222, -0.042978, 0.049824, 0.058311,
+    -0.003419, 0.016235, 0.027214, 0.038062, 0.014969, 0.070877, 0.049555, 0.091244,
+    -0.095579, 0.011485, 0.00583, -0.018634, -0.035399, 0.063875, -0.018628, 0.02873,
+    0.054464, 0.053093, 0.081461, -0.022948, 0.039368, -0.038853, 0.04297, 0.000353,
+    0.073839, 0.033601, 0.062314, -0.066126, -0.025088, -0.042459, 0.057128, 0.044785,
+    -0.058858, -0.079299, -0.073565, -0.018761, -0.04378, -0.012193, 0.05483, 0.062567,
+    -0.052515, -0.037688, -0.037511, 0.077538, -0.017955, 0.055511, -0.011111, 0.066638,
+    -0.065233, 0.021416, 0.074515, 0.064143, -0.029699, -0.0428, -0.075233, -0.069012,
+    -0.060089, -0.029225, -0.026447, 0.020839, 0.017684, -0.012196, -0.004805, 0.025714,
+    -0.043651, -0.105895, -0.06195, 0.031401, -0.025594, 0.045441, 0.047552, 0.07498,
+    -0.001347, -0.03711, 0.043219, 0.04583, 0.061667, 0.03075, -0.083391, 0.058037,
+    -0.057771, 0.055301, 0.08062, -0.078809, -0.040182, 0.052638, -0.061573, -0.032796,
+    0.020186, 0.060251, -0.057845, 0.035826, 0.023479, -0.037095, 0.051308, -0.097761,
+    -0.060549, 0.065302, 0.03882, -0.058015, -0.043009, 0.047748, -0.078017, -0.041192,
+    -0.054518, -0.071464, -0.063712, -0.073038, -0.028292, 0.037332, 0.022069, -0.040821,
+    -0.018661, -0.001792, 0.04989, -0.067535, 0.052569, -0.043729, -0.047084, 0.046774,
+    -0.062755, 0.062095, 0.031343, -0.049343, -0.070053, -0.040427, -0.023502, 0.0424,
+    0.05178, 0.089305, -0.067341, 0.027265, 0.011272, -0.02918, 0.078241, 0.058312,
+    0.038544, 0.040039, -0.024449, -0.01627, -0.05531, -0.034875, -0.03116, 0.024896,
+    0.037855, -0.042199, -0.054072, -0.013583, 0.039508, 0.084721, -0.019442, -0.046265,
+    0.015945, 0.043729, 0.062357, 0.018071, 0.061816, -0.011538, -0.04805, 0.067388,
+    -0.023622, -0.047508, -0.054851, -0.060533, 0.03697, -0.044871, 0.101787, 0.048231,
+    -0.009851, 0.063793, -0.030704, 0.047061, 0.012712, -0.092098, 0.025606, 0.036172,
+    -0.05885, 0.026019, -0.000048, 0.003122, 0.010827, 0.042024, 0.041648, 0.08151,
+    -0.050076, -0.024539, 0.076283, 0.042423, 0.00563, 0.04405, -0.085145, -0.041592,
+    -0.069708, -0.053447, 0.005615, -0.058475, 0.054413, 0.060588, -0.051479, -0.024852,
+    0.057925, 0.008081, 0.054944, -0.040432, -0.003496, 0.049985, -0.059906, -0.016247,
+    -0.053834, 0.05571, -0.073306, -0.046085, 0.010823, 0.052388, -0.073711, 0.067009,
+    -0.043092, -0.078313, 0.081544, -0.043436, -0.016913, 0.031273, 0.043937, -0.100875,
+    0.045753, 0.057051, -0.037883, 0.044493, -0.040335, -0.023951, 0.074565, 0.04768,
+    -0.042407, -0.023928, 0.03948, 0.072449, 0.062676, 0.020118, -0.027013, -0.016562,
+    0.007436, -0.028368, 0.064212, 0.071613, -0.066955, 0.014177, -0.039106, -0.068354,
+    -0.036767, 0.061028, -0.039993, -0.065251, 0.040611, 0.028804, 0.04467, 0.077607,
+  ]);
+  // Empirisch (Messung 2026-06-28, tools/match_baseline.mjs zentriert): echte Paare
+  // ≥0.70, höchstes unverwandtes Paar ~ -0.04. 0.30 trennt mit großem Sicherheits-Rand.
+  var RELATEDNESS_MIN = 0.30;
+
+  // Zentrierter Cosinus zweier Domänen-Vektoren. Additiv, gatet nichts.
+  function relatedness(aVec, bVec) {
+    assertVector(aVec, "aVec");
+    assertVector(bVec, "bVec");
+    var a = new Float32Array(EMBEDDING_DIM);
+    var b = new Float32Array(EMBEDDING_DIM);
+    var na = 0, nb = 0;
+    for (var i = 0; i < EMBEDDING_DIM; i++) {
+      a[i] = aVec[i] - RELATEDNESS_CENTER[i];
+      b[i] = bVec[i] - RELATEDNESS_CENTER[i];
+      na += a[i] * a[i];
+      nb += b[i] * b[i];
+    }
+    na = Math.sqrt(na);
+    nb = Math.sqrt(nb);
+    if (na === 0 || nb === 0) return 0; // entartet → unverwandt
+    var dot = 0;
+    for (var j = 0; j < EMBEDDING_DIM; j++) dot += (a[j] / na) * (b[j] / nb);
+    return dot;
+  }
+
+  // Schwelle für "echt verwandt" auf dem zentrierten Score. Reine Anzeige-Hilfe.
+  function isRelated(score) {
+    return typeof score === "number" && isFinite(score) && score >= RELATEDNESS_MIN;
   }
 
   // Bau 04.A: null-safe wrapper um match(). Returns null, wenn eine
@@ -653,6 +753,14 @@
             ", erwartet " + EMBEDDING_DIM + " (siehe INTERFACES.md §0 EMBEDDING_DIM).",
         );
       }
+      // Bau 04.F: optionales `text`-Feld (roher Passage-Text für BM25). Nur
+      // validiert, wenn vorhanden — Bestands-Korpora ohne `text` bleiben gültig
+      // (BM25 fällt dann auf `label` zurück). Rein additiv, kein Vertrags-Bruch.
+      if (item.text !== undefined && item.text !== null && typeof item.text !== "string") {
+        throw InvalidCorpusError(
+          "Korpus[" + i + "].text muss String sein (oder fehlen), war: " + describe(item.text) + ".",
+        );
+      }
     }
   }
 
@@ -678,6 +786,102 @@
     throw InvalidCorpusError(
       "setLocalCorpus erwartet Array, Funktion oder null, war: " + describe(corpusOrProvider) + ".",
     );
+  }
+
+  // ---- Bau 04.F: BM25 lexikalischer Vorfilter + Hybrid-Fusion (additiv) ----
+  //
+  // STRANG A1 (Brief 2026-07-01): Der rohe e5-Cosinus trennt Bedeutung nicht
+  // zuverlässig (LEHRE-EMBEDDING-MATCH-KALIBRIERUNG: Anisotropie-Boden ~0.82).
+  // BM25 ist ein lokaler, offline, deterministischer LEXIKALISCHER Score, der
+  // exakte Wort-Treffer belohnt — komplementär zum Vektor-Score. Die Hybrid-
+  // Fusion (Reciprocal Rank Fusion, RRF) hebt Treffer, die EIN Verfahren allein
+  // verfehlt. Rein additiv:
+  //   - `queryLocal` bleibt ohne `options.hybrid:true` BYTE-GLEICH (nur Cosinus).
+  //   - PROVIDER_MIN_MATCH (0.80) bleibt Vektor-Pfad-Boden UND Andock-Riegel
+  //     (Modul 05) — unberührt. Der Hybrid-Modus fügt einen zweiten, lexikalischen
+  //     Kandidaten-Pfad hinzu (opt-in), er senkt keine Schwelle.
+  //   - Kein Netz, kein LLM, kein Schlüssel — reine lokale Rechnung.
+
+  var BM25_K1 = 1.5;   // Term-Frequenz-Sättigung (Standard-Literaturwert).
+  var BM25_B = 0.75;   // Längen-Normalisierung (Standard-Literaturwert).
+  var RRF_K = 60;      // Reciprocal-Rank-Fusion-Konstante (Cormack et al. 2009).
+
+  // Tokenizer: unicode-bewusst, lowercase, Wort-/Zahl-Läufe. Server-los,
+  // sprach-agnostisch (DE/EN/… ohne Stemming — bewusst simpel + deterministisch).
+  function tokenizeBM25(text) {
+    if (typeof text !== "string" || text.length === 0) return [];
+    var m = text.toLowerCase().match(/[\p{L}\p{N}]+/gu);
+    return m || [];
+  }
+
+  // bm25Scores(queryText, docTexts, options?) -> Array<number>
+  // Reiner BM25-Score je Dokument (0 = kein gemeinsamer Term). Exportiert
+  // für Panel-04-Messung (VERFAHREN-VERGLEICH) + Testbarkeit. Deterministisch.
+  function bm25Scores(queryText, docTexts, options) {
+    var opts = options || {};
+    var k1 = (typeof opts.k1 === "number" && isFinite(opts.k1)) ? opts.k1 : BM25_K1;
+    var b = (typeof opts.b === "number" && isFinite(opts.b)) ? opts.b : BM25_B;
+    if (!Array.isArray(docTexts)) {
+      throw InvalidCorpusError(
+        "bm25Scores: 'docTexts' muss ein Array sein, war: " + describe(docTexts) + ".",
+      );
+    }
+    var N = docTexts.length;
+    if (N === 0) return [];
+    // Dokument-Tokens + Längen + Dokument-Frequenzen (df).
+    var docTokens = new Array(N);
+    var docLen = new Array(N);
+    var totalLen = 0;
+    var df = Object.create(null); // document frequency je Term.
+    for (var i = 0; i < N; i++) {
+      var toks = tokenizeBM25(docTexts[i]);
+      docTokens[i] = toks;
+      docLen[i] = toks.length;
+      totalLen += toks.length;
+      var seen = Object.create(null);
+      for (var t = 0; t < toks.length; t++) {
+        var tok = toks[t];
+        if (!seen[tok]) { seen[tok] = true; df[tok] = (df[tok] || 0) + 1; }
+      }
+    }
+    var avgdl = totalLen / N || 1;
+    var qTokens = tokenizeBM25(queryText);
+    // Eindeutige Query-Terme (Wiederholung im Query zählt für BM25 nicht).
+    var qUnique = [];
+    var qSeen = Object.create(null);
+    for (var qi = 0; qi < qTokens.length; qi++) {
+      if (!qSeen[qTokens[qi]]) { qSeen[qTokens[qi]] = true; qUnique.push(qTokens[qi]); }
+    }
+    var scores = new Array(N);
+    for (var d = 0; d < N; d++) {
+      // Term-Frequenz im Dokument d.
+      var tf = Object.create(null);
+      var dt = docTokens[d];
+      for (var j = 0; j < dt.length; j++) tf[dt[j]] = (tf[dt[j]] || 0) + 1;
+      var score = 0;
+      for (var u = 0; u < qUnique.length; u++) {
+        var term = qUnique[u];
+        var f = tf[term] || 0;
+        if (f === 0) continue;
+        var n = df[term] || 0;
+        // Robertson-Sparck-Jones-IDF (mit +1 unter dem Log → nie negativ).
+        var idf = Math.log(1 + (N - n + 0.5) / (n + 0.5));
+        var denom = f + k1 * (1 - b + b * (docLen[d] / avgdl));
+        score += idf * (f * (k1 + 1)) / denom;
+      }
+      scores[d] = score;
+    }
+    return scores;
+  }
+
+  // Reciprocal Rank Fusion: verschmilzt zwei Rang-Listen ohne Score-
+  // Normalisierung. Fehlt ein Rang (kein lexikalischer Treffer) → nur der
+  // vorhandene Beitrag zählt. Rang ist 1-basiert (bester = 1).
+  function rrfScore(vektorRank, lexRank) {
+    var s = 0;
+    if (vektorRank !== null && vektorRank !== undefined) s += 1 / (RRF_K + vektorRank);
+    if (lexRank !== null && lexRank !== undefined) s += 1 / (RRF_K + lexRank);
+    return s;
   }
 
   // queryLocal — lokale semantische Such-Funktion. Karte 04 § Sub (c).
@@ -728,7 +932,12 @@
       corpus = opts.corpus;
     } else if (typeof _localCorpusProvider === "function") {
       try {
-        corpus = _localCorpusProvider();
+        // `await`: Endknoten-Provider bauen den Korpus faul (async — Embeddings
+        // via Modul 03). Ohne await landet ein Promise in validateCorpus →
+        // "Korpus muss ein Array sein, war: Promise" (Live-Befund 2026-07-02).
+        // Ein sync-Provider (Array-Snapshot) bleibt unberührt: `await array`
+        // gibt das Array zurück.
+        corpus = await _localCorpusProvider();
       } catch (err) {
         throw InvalidCorpusError(
           "queryLocal: _localCorpusProvider hat geworfen: " + (err && err.message ? err.message : String(err)),
@@ -762,21 +971,199 @@
       );
     }
 
-    // 5. Score + Filter + Sort + Top-k.
-    var scored = [];
+    // 5a. Vektor-Score für JEDEN Korpus-Eintrag (Cosinus).
+    var cos = new Array(corpus.length);
     for (var i = 0; i < corpus.length; i++) {
-      var item = corpus[i];
-      var score = match(queryVec, item.passageVec);
-      if (score >= PROVIDER_MIN_MATCH) {
-        scored.push({
-          label: item.label,
-          score: score,
-          anchorId: (typeof item.anchorId === "string") ? item.anchorId : null,
-        });
+      cos[i] = match(queryVec, corpus[i].passageVec);
+    }
+
+    // 5b. DEFAULT-Pfad (kein opts.hybrid): byte-gleiches Verhalten wie Bau 04.C —
+    //     Cosinus-Filter >= PROVIDER_MIN_MATCH, absteigend, Top-k.
+    if (!opts.hybrid) {
+      var scored = [];
+      for (var s = 0; s < corpus.length; s++) {
+        if (cos[s] >= PROVIDER_MIN_MATCH) {
+          scored.push({
+            label: corpus[s].label,
+            score: cos[s],
+            anchorId: (typeof corpus[s].anchorId === "string") ? corpus[s].anchorId : null,
+          });
+        }
+      }
+      scored.sort(function (a, b) { return b.score - a.score; });
+      return scored.slice(0, effectiveK);
+    }
+
+    // 5c. HYBRID-Pfad (opt-in): BM25 (lexikalisch, lokal) + Vektor via RRF.
+    //     Additiv — der Vektor-Pfad-Boden (PROVIDER_MIN_MATCH) bleibt eine
+    //     Aufnahme-Bedingung, der lexikalische Treffer (bm25 > 0) ist die
+    //     zweite. Kein Riegel wird gesenkt, keine Andock-Schwelle berührt.
+    var docTexts = corpus.map(function (it) {
+      return (typeof it.text === "string" && it.text.length > 0) ? it.text : it.label;
+    });
+    var bm = bm25Scores(text, docTexts);
+
+    // Aufnahme-Menge: Vektor-Pfad (cos >= Boden) ODER lexikalischer Treffer.
+    var included = [];
+    for (var c = 0; c < corpus.length; c++) {
+      if (cos[c] >= PROVIDER_MIN_MATCH || bm[c] > 0) {
+        included.push({ idx: c, cos: cos[c], bm25: bm[c] });
       }
     }
-    scored.sort(function (a, b) { return b.score - a.score; });
-    return scored.slice(0, effectiveK);
+
+    // Vektor-Rang (1-basiert, höchster Cosinus = Rang 1) über die Aufnahme-Menge.
+    var byVec = included.slice().sort(function (a, b) { return b.cos - a.cos; });
+    var vecRank = Object.create(null);
+    for (var vr = 0; vr < byVec.length; vr++) vecRank[byVec[vr].idx] = vr + 1;
+
+    // Lexikalischer Rang (nur Einträge mit bm25 > 0).
+    var byLex = included.filter(function (e) { return e.bm25 > 0; })
+      .sort(function (a, b) { return b.bm25 - a.bm25; });
+    var lexRank = Object.create(null);
+    for (var lr = 0; lr < byLex.length; lr++) lexRank[byLex[lr].idx] = lr + 1;
+
+    // Fusion + Sortierung. `score` bleibt der Cosinus (unveränderte Semantik
+    // für Bestands-Aufrufer); `bm25` + `fused` sind additive Felder.
+    var hybridResult = included.map(function (e) {
+      var lx = (lexRank[e.idx] !== undefined) ? lexRank[e.idx] : null;
+      return {
+        label: corpus[e.idx].label,
+        score: e.cos,
+        anchorId: (typeof corpus[e.idx].anchorId === "string") ? corpus[e.idx].anchorId : null,
+        bm25: e.bm25,
+        fused: rrfScore(vecRank[e.idx], lx),
+      };
+    });
+    hybridResult.sort(function (a, b) {
+      if (b.fused !== a.fused) return b.fused - a.fused;
+      return b.score - a.score; // Tie-Break: höherer Cosinus zuerst.
+    });
+    return hybridResult.slice(0, effectiveK);
+  }
+
+  // ---- Bau 04.H: Query-Expansion / Multi-Query (Strang A4, additiv) --------
+  //
+  // STRANG A4 (Brief 2026-07-01): Eine Nutzer-Frage trifft oft nur EINE
+  // Formulierung. Wer anders formuliert (Synonyme, Umschreibungen), verpasst
+  // Treffer, die dieselbe BEDEUTUNG anders benennen. A4 erzeugt aus der Frage
+  // mehrere Varianten, sucht mit JEDER und verschmilzt die Trefferlisten via
+  // Reciprocal Rank Fusion (RRF) — dieselbe gratis/offline Fusion wie Bau 04.F,
+  // nur über VARIANTEN statt über BM25/Vektor. Rein additiv:
+  //   - Bestehende queryLocal/hybrid-Pfade UNVERÄNDERT (byte-gleich).
+  //   - Kein Netz, kein LLM nötig (freie Synonym-Karte). Ein LLM-Generator wäre
+  //     ein späterer opt-in-Aufsatz (BYOK) — die Fusion bliebe gleich.
+  //   - PROVIDER_MIN_MATCH (0.80) + Andock-Riegel (Modul 05) unberührt: jede
+  //     Teil-Suche nutzt denselben Boden; A4 senkt keine Schwelle.
+
+  var MULTI_MAX_VARIANTS = 8;    // Deckel gegen Varianten-Explosion.
+
+  // expandQuerySimple(text, options?) -> string[]  (Original zuerst, dedupe)
+  // Freie, deterministische Varianten-Erzeugung über eine optionale Synonym-
+  // Karte options.synonyms = { term(lowercase): [alt, ...] }. Ohne Karte:
+  // nur [text] (kein Netz, kein LLM). Jede Ersetzung tauscht EIN Token gegen
+  // EINE Alternative (kombinatorisch auf maxVariants gedeckelt).
+  function expandQuerySimple(text, options) {
+    var opts = options || {};
+    if (typeof text !== "string" || text.trim().length === 0) {
+      throw EmptyQueryError(
+        "expandQuerySimple: 'text' muss nicht-leerer String sein, war: " + describe(text) + ".",
+      );
+    }
+    var base = text.trim();
+    var cap = (typeof opts.maxVariants === "number" && opts.maxVariants >= 1)
+      ? Math.floor(opts.maxVariants) : MULTI_MAX_VARIANTS;
+    var out = [base];
+    var seen = Object.create(null);
+    seen[base.toLowerCase()] = true;
+    var syn = (opts.synonyms && typeof opts.synonyms === "object") ? opts.synonyms : null;
+    if (syn) {
+      var tokens = base.split(/\s+/);
+      for (var i = 0; i < tokens.length && out.length < cap; i++) {
+        var key = tokens[i].toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+        var alts = syn[key];
+        if (!Array.isArray(alts)) continue;
+        for (var a = 0; a < alts.length && out.length < cap; a++) {
+          if (typeof alts[a] !== "string" || alts[a].trim().length === 0) continue;
+          var repl = tokens.slice();
+          repl[i] = alts[a].trim();
+          var variant = repl.join(" ");
+          var low = variant.toLowerCase();
+          if (!seen[low]) { seen[low] = true; out.push(variant); }
+        }
+      }
+    }
+    return out;
+  }
+
+  // queryLocalMulti(queries, k, options?)
+  //   -> Promise<Array<{label, score, anchorId, fused, matchedQueries}>>
+  // Sucht mit JEDER Query-Variante (queryLocal, options durchgereicht — inkl.
+  // hybrid) und verschmilzt die Rang-Listen via RRF. `score` = bester Cosinus
+  // des Treffers über alle Varianten; `matchedQueries` = wie viele Varianten
+  // ihn fanden. Deterministisch, fail-soft (eine werfende Variante wird
+  // übersprungen, die Suche bricht nicht ab).
+  async function queryLocalMulti(queries, k, options) {
+    if (!Array.isArray(queries) || queries.length === 0) {
+      throw EmptyQueryError(
+        "queryLocalMulti: 'queries' muss ein nicht-leeres Array sein, war: " + describe(queries) + ".",
+      );
+    }
+    var vars = [];
+    var seenQ = Object.create(null);
+    for (var i = 0; i < queries.length; i++) {
+      var q = queries[i];
+      if (typeof q !== "string" || q.trim().length === 0) continue;
+      var qn = q.trim();
+      if (!seenQ[qn.toLowerCase()]) { seenQ[qn.toLowerCase()] = true; vars.push(qn); }
+    }
+    if (vars.length === 0) {
+      throw EmptyQueryError("queryLocalMulti: keine nicht-leere Query-Variante.");
+    }
+    var effectiveK = (k === undefined || k === null) ? 5 : k;
+    if (typeof effectiveK !== "number" || !isFinite(effectiveK) ||
+        effectiveK < 1 || Math.floor(effectiveK) !== effectiveK) {
+      throw InvalidKError(
+        "queryLocalMulti: 'k' muss Integer >= 1 sein, war: " + describe(k) + ".",
+      );
+    }
+    var opts = options || {};
+    var perK = (typeof opts.perQueryK === "number" && opts.perQueryK >= 1)
+      ? Math.floor(opts.perQueryK) : Math.max(effectiveK * 3, 10);
+
+    var fused = Object.create(null); // key -> Treffer mit akkumuliertem RRF
+    for (var v = 0; v < vars.length; v++) {
+      var list;
+      try {
+        list = await queryLocal(vars[v], perK, opts);
+      } catch (_e) {
+        continue; // Variante übersprungen, Suche läuft weiter.
+      }
+      for (var r = 0; r < list.length; r++) {
+        var it = list[r];
+        var idKey = (typeof it.anchorId === "string" && it.anchorId)
+          ? ("id:" + it.anchorId) : ("lbl:" + it.label);
+        var contrib = 1 / (RRF_K + (r + 1));
+        if (!fused[idKey]) {
+          fused[idKey] = {
+            label: it.label,
+            score: it.score,
+            anchorId: (typeof it.anchorId === "string") ? it.anchorId : null,
+            fused: contrib,
+            matchedQueries: 1,
+          };
+        } else {
+          fused[idKey].fused += contrib;
+          fused[idKey].matchedQueries += 1;
+          if (it.score > fused[idKey].score) fused[idKey].score = it.score;
+        }
+      }
+    }
+    var merged = Object.keys(fused).map(function (kk) { return fused[kk]; });
+    merged.sort(function (a, b) {
+      if (b.fused !== a.fused) return b.fused - a.fused;
+      return b.score - a.score;
+    });
+    return merged.slice(0, effectiveK);
   }
 
   // ---- Bau 04.D: Hybrid-Match — Match-Zeit-LLM-Richter (additiv) ----
@@ -935,6 +1322,7 @@
             method: "POST",
             headers: {
               "x-api-key": o.apiKey,
+              "anthropic-dangerous-direct-browser-access": "true",
               "anthropic-version": ANTHROPIC_API_VERSION,
               "content-type": "application/json",
             },
@@ -1350,13 +1738,149 @@
     return r === "both" ? (passtA && passtB) : (passtA || passtB);
   }
 
+  // ---- Bau 04.G: queryLocalJudged — Vorfilter + Richter, komponiert (additiv) ----
+  //
+  // STRANG A2 (Brief 2026-07-01): verankert den KI-Richter (`hybridMatch`) fest
+  // im ANTWORT-Pfad, als EINE komponierte, opt-in Funktion — ohne ein anderes
+  // Modul anzufassen. Ablauf:
+  //   1. VORFILTER: queryLocal(text, k, {hybrid?}) liefert lokale Top-k
+  //      (server-los; A1-Hybrid wird durchgereicht, wenn options.hybrid).
+  //   2. RICHTER (opt-in/BYOK): nur wenn options.apiKey gesetzt ist, urteilt
+  //      hybridMatch über die Finalisten (Bedeutungs-Urteil je Kandidat) und
+  //      sortiert sie um (passt zuerst, dann nach Richter-Score).
+  //   3. FAIL-SOFT: kein Schlüssel / leerer Vorfilter / Richter nicht erreichbar
+  //      → das rohe Vorfilter-Ergebnis gilt weiter, KEIN Throw.
+  // Rein additiv: queryLocal / hybridMatch / PROVIDER_MIN_MATCH / der 0.80-
+  // Andock-Riegel (Modul 05) bleiben unberührt. Der Richter beurteilt den
+  // Passage-TEXT — dafür braucht er den Korpus-Text; queryLocalJudged löst den
+  // Korpus GENAU wie queryLocal auf (options.corpus | registrierter Provider)
+  // und reicht ihn identisch an queryLocal weiter.
+  //
+  // Rückgabe: {
+  //   judged:  boolean,                 // true = Richter lief + lieferte Urteil
+  //   candidates: Array<{ label, score, anchorId, bm25?, fused?,
+  //                       passt?, judgeScore?, begruendung? }>,  // umsortiert wenn judged
+  //   judgment: HybridJudgment | null,  // rohes hybridMatch-Resultat (inkl. attestation)
+  // }
+  async function queryLocalJudged(text, k, options) {
+    var opts = options || {};
+
+    // Korpus identisch zu queryLocal auflösen (damit wir den Passage-Text
+    // für den Richter kennen). Kein eigener Embedding-/Score-Pfad.
+    var corpus;
+    if (Object.prototype.hasOwnProperty.call(opts, "corpus") && opts.corpus !== undefined) {
+      corpus = opts.corpus;
+    } else if (typeof _localCorpusProvider === "function") {
+      try {
+        // `await`: Endknoten-Provider bauen den Korpus faul (async — Embeddings
+        // via Modul 03). Ohne await landet ein Promise in queryLocal/validateCorpus
+        // → "Korpus muss ein Array sein, war: Promise". Gleicher Bug wie queryLocal
+        // (PR #533), hier für Bau 04.G nachgezogen. Sync-Array-Provider bleiben
+        // unberührt: `await array` gibt das Array zurück.
+        corpus = await _localCorpusProvider();
+      } catch (err) {
+        throw InvalidCorpusError(
+          "queryLocalJudged: _localCorpusProvider hat geworfen: " + (err && err.message ? err.message : String(err)),
+        );
+      }
+    } else {
+      corpus = [];
+    }
+
+    // 1. VORFILTER — queryLocal mit exakt demselben Korpus (Hybrid durchgereicht).
+    var vorfilter = await queryLocal(text, k, {
+      corpus: corpus,
+      hybrid: opts.hybrid === true,
+    });
+
+    // Kein Schlüssel ODER keine Finalisten → reiner Vorfilter, Richter aus.
+    var apiKey = opts.apiKey;
+    if (typeof apiKey !== "string" || apiKey.length === 0 || vorfilter.length === 0) {
+      return { judged: false, candidates: vorfilter, judgment: null };
+    }
+
+    // Text-Karte (anchorId bevorzugt, sonst label) → Passage-Text für den Richter.
+    function keyOf(item) {
+      return (typeof item.anchorId === "string" && item.anchorId.length > 0) ? "a:" + item.anchorId : "l:" + item.label;
+    }
+    var textByKey = Object.create(null);
+    for (var ci = 0; ci < corpus.length; ci++) {
+      var it = corpus[ci];
+      if (!it || typeof it !== "object") continue;
+      var t = (typeof it.text === "string" && it.text.length > 0) ? it.text : it.label;
+      if (typeof t === "string" && t.length > 0) textByKey[keyOf(it)] = t;
+    }
+
+    // Richter-Kandidaten in Vorfilter-Reihenfolge (max HYBRID_MAX_CANDIDATES).
+    var judgeSlice = vorfilter.slice(0, HYBRID_MAX_CANDIDATES);
+    var judgeCandidates = judgeSlice.map(function (r) {
+      var txt = textByKey[keyOf(r)];
+      return {
+        label: r.label,
+        text: (typeof txt === "string" && txt.length > 0) ? txt : r.label,
+        cosine: r.score,
+        anchorId: r.anchorId,
+      };
+    });
+
+    // 2. RICHTER — hybridMatch (opt-in via apiKey). Fail-soft integriert.
+    var judgment = await hybridMatch(
+      { text: text, label: (typeof opts.queryLabel === "string" ? opts.queryLabel : null) },
+      judgeCandidates,
+      opts,
+    );
+
+    if (!judgment || judgment.available !== true || !Array.isArray(judgment.verdicts)) {
+      // 3. FAIL-SOFT — Vorfilter gilt, Grund steckt in judgment.reason.
+      return { judged: false, candidates: vorfilter, judgment: judgment || null };
+    }
+
+    // Urteil index-gleich auf die Finalisten heften.
+    var judged = judgeSlice.map(function (r, i) {
+      var v = judgment.verdicts[i] || {};
+      var merged = {
+        label: r.label,
+        score: r.score,
+        anchorId: r.anchorId,
+        passt: (typeof v.passt === "boolean") ? v.passt : null,
+        judgeScore: (typeof v.score === "number") ? v.score : null,
+        begruendung: (typeof v.begruendung === "string") ? v.begruendung : null,
+      };
+      if (typeof r.bm25 === "number") merged.bm25 = r.bm25;
+      if (typeof r.fused === "number") merged.fused = r.fused;
+      return merged;
+    });
+    // Umsortieren: passt=true zuerst, dann nach Richter-Score absteigend,
+    // Tie-Break Vorfilter-Cosinus. REINE Anzeige-Sortierung, gatet nichts.
+    judged.sort(function (a, b) {
+      var pa = a.passt === true ? 1 : 0, pb = b.passt === true ? 1 : 0;
+      if (pb !== pa) return pb - pa;
+      var ja = (typeof a.judgeScore === "number") ? a.judgeScore : -1;
+      var jb = (typeof b.judgeScore === "number") ? b.judgeScore : -1;
+      if (jb !== ja) return jb - ja;
+      return b.score - a.score;
+    });
+    // Etwaigen ungerichteten Rest (falls Vorfilter > HYBRID_MAX_CANDIDATES)
+    // unverändert hinten anhängen.
+    var tail = vorfilter.slice(HYBRID_MAX_CANDIDATES);
+    return { judged: true, candidates: judged.concat(tail), judgment: judgment };
+  }
+
   var SbkimMatch = {
     match: match,
     isAboveProviderThreshold: isAboveProviderThreshold,
+    relatedness: relatedness,
+    isRelated: isRelated,
+    RELATEDNESS_MIN: RELATEDNESS_MIN,
     matchDimensions: matchDimensions,
     explainMatchLLM: explainMatchLLM,
     queryLocal: queryLocal,
+    queryLocalJudged: queryLocalJudged,
+    queryLocalMulti: queryLocalMulti,
+    expandQuerySimple: expandQuerySimple,
     setLocalCorpus: setLocalCorpus,
+    bm25Scores: bm25Scores,
+    tokenizeBM25: tokenizeBM25,
     hybridMatch: hybridMatch,
     pickJudgeProvider: pickJudgeProvider,
     bidirectionalVerdict: bidirectionalVerdict,
@@ -1376,6 +1900,9 @@
       embeddingDim: EMBEDDING_DIM,
       providerMinMatch: PROVIDER_MIN_MATCH,
       schichtMinMatch: SCHICHT_MIN_MATCH,
+      relatednessMin: RELATEDNESS_MIN,
+      relatednessCentered: true, // zentrierter (whitened-light) Score; gatet nichts
+      schichtMinMatchNote: "0.80 = ANDOCK-Boden (gatet Handshake), relatednessMin = echte Verwandtschaft (nur Anzeige)",
       matchDimensionsLanes: MATCH_DIMENSIONS_LANES.slice(),
       stufeBDefaultModel: STUFE_B_DEFAULT_MODEL,
       stufeBMaxTokens: STUFE_B_MAX_TOKENS,
@@ -1384,6 +1911,16 @@
       queryLocalDefaultK: 5,
       queryLocalMaxTextLen: LLM_MAX_OUTPUT_CHARS,
       get localCorpusRegistered() { return typeof _localCorpusProvider === "function"; },
+      // Bau 04.F Hybrid BM25+Vektor (Strang A1) Read-Anker.
+      bm25K1: BM25_K1,
+      bm25B: BM25_B,
+      rrfK: RRF_K,
+      hybridQueryLocalNote: "queryLocal(text,k,{hybrid:true}) fusioniert BM25+Vektor via RRF; Default (ohne hybrid) unverändert Cosinus. PROVIDER_MIN_MATCH + Andock-Riegel unberührt.",
+      // Bau 04.G queryLocalJudged (Strang A2) Read-Anker.
+      queryLocalJudgedNote: "queryLocalJudged(text,k,{hybrid?,apiKey?,provider?,euOnly?}) = Vorfilter (queryLocal) + Richter (hybridMatch, opt-in/BYOK, fail-soft). Sortiert Finalisten um (passt zuerst), gatet nichts, Modul 05 unberührt.",
+      // Bau 04.H Query-Expansion / Multi-Query (Strang A4) Read-Anker.
+      multiMaxVariants: MULTI_MAX_VARIANTS,
+      queryLocalMultiNote: "expandQuerySimple(text,{synonyms?,maxVariants?}) erzeugt gratis/offline Varianten (Original zuerst); queryLocalMulti(queries,k,{hybrid?,...}) sucht mit jeder + verschmilzt via RRF. Rein additiv, PROVIDER_MIN_MATCH + Andock-Riegel unberührt; LLM-Varianten-Generator wäre späterer opt-in-Aufsatz.",
       // Bau 04.D Hybrid-Match (Richter) Read-Anker.
       hybridProviders: Object.keys(HYBRID_PROVIDERS).map(function (id) {
         return { id: id, label: HYBRID_PROVIDERS[id].label, region: HYBRID_PROVIDERS[id].region };
@@ -1403,7 +1940,7 @@
   // Block nennt PROVIDER_MIN_MATCH und SCHICHT_MIN_MATCH.
   if (typeof console !== "undefined" && console.info) {
     console.info(
-      "MODUL 04 MATCH bereit, Funktionen: match/isAboveProviderThreshold/matchDimensions/explainMatchLLM/queryLocal/hybridMatch, " +
+      "MODUL 04 MATCH bereit, Funktionen: match/isAboveProviderThreshold/relatedness/isRelated/matchDimensions/explainMatchLLM/queryLocal/bm25Scores/hybridMatch/queryLocalJudged/queryLocalMulti/expandQuerySimple, " +
         "Schwellen: PROVIDER_MIN_MATCH=" + PROVIDER_MIN_MATCH +
         ", SCHICHT_MIN_MATCH=" + SCHICHT_MIN_MATCH,
     );

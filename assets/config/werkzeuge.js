@@ -50,5 +50,15 @@ window.FP_WERKZEUGE = [
   { id: "pinnwand", name: "Pinnwand", icon: "📌", external: true,
     de: "Ein offenes Frage-Antwort-Brett: Antworten lassen sich nach Bedeutung sortieren (gratis, als Rangfolge) — optional versteht ein KI-Richter die Absicht, z. B. alkoholfrei = wirklich kein Alkohol. Im Browser, ohne Konto.",
     en: "An open question-and-answer board: answers can be sorted by meaning (free, as a ranking) — optionally an AI judge grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account.",
-    open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" }
+    open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" },
+
+  /* Referenz-Beispiele (2026-07-06, Klaus): eigene Seite mit live eingebetteten
+   * Beispielen neu gebauter Internetseiten aus der Werkstatt. Erste Referenz:
+   * Tomys Schaufenster. */
+  { id: "referenzen", name: "Referenz-Beispiele", icon: "🖼️",
+    de: "So sieht eine neu gebaute Internetseite aus: echte Beispiele aus der Werkstatt, live eingebettet — als Erstes Tomys Schaufenster.",
+    en: "What a freshly built web page looks like: real examples from the workshop, embedded live — starting with Tomy's showcase.",
+    page: "referenzen.html",
+    open: "referenzen.html",
+    install: "" }
 ];
