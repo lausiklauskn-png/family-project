@@ -128,6 +128,24 @@
   //            content = JSON.stringify(signedResponse)  (nonceEcho = request.nonce)
   var NOSTR_TAG_REQUEST = "sbkim-anastomosis";
   var NOSTR_TAG_REPLY = "sbkim-anastomosis-reply";
+  // Bau Query-über-Relais (2026-06-28): Frage→Antwort über das Nostr-Brett.
+  // Ein Knoten fragt (queryNostr), der lauschende Knoten antwortet mit
+  // bedeutungs-sortierten Treffern aus seinem AKTUELLEN Inhalt (Modul 04.C
+  // queryLocal). Spiegelt nur, was Modul 15 op:"query"/op:"queryResult" über
+  // postMessage schon tut, auf das server-lose Relais-Medium.
+  //   Frage:   tags [["t","sbkim-query"],["d",<ZielNodeId>],["x",<nonce>]]
+  //            content = JSON.stringify({type:"sbkim-query", fromNodeId, toNodeId, text, k, nonce, ...})
+  //   Antwort: tags [["t","sbkim-query-reply"],["d",<FragerNodeId>],["x",<nonce>]]
+  //            content = JSON.stringify({type:"sbkim-query-reply", nonceEcho, fromNodeId, results, ...})
+  // EMPFANGSMODUS gewahrt: der Knoten ANTWORTET nur auf eingehende Fragen,
+  // initiiert NIE von sich aus. Die Frage trägt KEINE Identität/Krypto —
+  // nur Klartext + nonce; die Antwort ist ein öffentlicher, unsignierter
+  // Treffer-Zettel (das Brett trägt öffentliche Zettel — Härtung folgt in
+  // eigener Sitzung). Keine Buchhaltungs-/PII-Daten, nur Korpus-Labels.
+  var NOSTR_TAG_QUERY = "sbkim-query";
+  var NOSTR_TAG_QUERY_REPLY = "sbkim-query-reply";
+  var NOSTR_QUERY_TIMEOUT_MS = 12000;  // großzügig — Empfänger lädt evtl. Embedding-Modell
+  var NOSTR_QUERY_K_DEFAULT = 5;       // wie Modul 04 queryLocalDefaultK
   var NOSTR_KIND = 1;
   var NOSTR_REPLY_TIMEOUT_MS = 8000;   // Relais-tauglich, großzügiger als HTTP/Channel
   var NOSTR_REPLAY_TTL_MS = 600000;    // 10 min — gesehene nonces ablehnen
@@ -326,6 +344,9 @@
   // Receiver-Subscription-Handle (listenNostr) — null wenn nicht aktiv.
   // Empfangsmodus: NICHT automatisch in init() gestartet, nur explizit.
   var nostrListenUnsub = null;
+  // Query-Empfänger-Subscription-Handle (listenNostr, Bau Query-über-Relais)
+  // — null wenn nicht aktiv. Empfangsmodus: antwortet nur, initiiert nie.
+  var nostrQueryListenUnsub = null;
   // Replay-Schutz: gesehene Anfrage-nonces mit Zeitstempel. Map<nonce, ms>.
   var nostrSeenNonces = new Map();
 
@@ -651,6 +672,16 @@
     return null;
   }
 
+  // Match-Modul (04) auflösen — für den Query-über-Relais-Empfänger, der die
+  // eingehende Frage über SbkimMatch.queryLocal beantwortet. Fail-soft: ohne
+  // geladenes Modul 04 (oder ohne queryLocal) gibt es null → der Empfänger
+  // antwortet dann mit einer leeren Treffer-Liste statt zu werfen.
+  function resolveMatchModule() {
+    var g = global.SbkimMatch;
+    if (g && typeof g.queryLocal === "function") return g;
+    return null;
+  }
+
   // Replay-Schutz-Helfer: prunt abgelaufene nonces + deckelt die Map-Größe.
   function pruneNostrSeen(nowMs) {
     var cutoff = nowMs - NOSTR_REPLAY_TTL_MS;
@@ -796,6 +827,209 @@
     return await consumeResponse(targetSpore, responseJson, preScore, opSlot);
   }
 
+  // ---- Query-über-Relais: Sender-Pfad (Bau 2026-06-28) -------------------
+  //
+  // queryNostr(targetNodeId, text, options) — stellt eine Frage an EINEN
+  // Ziel-Knoten über das Relais und gibt dessen bedeutungs-sortierte Treffer
+  // zurück. Das ist eine BEWUSSTE Nutzer-Aktion (Pilz-Schicht, kein Crawler):
+  // der Frager initiiert hier ausdrücklich — anders als der Empfangsmodus-
+  // Knoten, der nur antwortet. Fail-soft: ohne Relais-Client kommt ein
+  // sauberes Result-„rejected" statt eines Throws; Timeout wirft.
+  //
+  // options: { k?:number, timeoutMs?:number, fromNodeId?:string }
+  // Rückgabe (erfolgreich): { outcome:"answered", results:[...], fromNodeId,
+  //   nonceEcho }. Bei fehlendem Relais: { outcome:"rejected", reason }.
+  async function queryNostr(targetNodeId, text, options) {
+    options = (options && typeof options === "object") ? options : {};
+    if (typeof targetNodeId !== "string" || targetNodeId.length === 0) {
+      throw makeError("InvalidArgumentError", "queryNostr braucht eine targetNodeId (String).");
+    }
+    if (typeof text !== "string" || text.length === 0) {
+      throw makeError("InvalidArgumentError", "queryNostr braucht eine nicht-leere Frage (text).");
+    }
+    var client = resolveNostrRelayClient();
+    if (!client) {
+      return {
+        outcome: "rejected",
+        reason: "Kein Nostr-Relay-Client verfügbar — SbkimNostrRelay laden oder " +
+          "_setNostrRelayClient(client) setzen (Modul 05b).",
+      };
+    }
+    await ensureReady();
+    var ownNodeId = (typeof options.fromNodeId === "string" && options.fromNodeId.length > 0)
+      ? options.fromNodeId
+      : (await getSpore().getOrCreateIdentity()).nodeId;
+    var k = (typeof options.k === "number" && isFinite(options.k) && options.k > 0)
+      ? Math.floor(options.k) : NOSTR_QUERY_K_DEFAULT;
+    var nonce = randomNonceB64();
+    var queryPayload = {
+      type: "sbkim-query",
+      fromNodeId: ownNodeId,
+      toNodeId: targetNodeId,
+      text: text,
+      k: k,
+      nonce: nonce,
+      protocolVersion: PROTOCOL_VERSION,
+      timestamp: nowIso(),
+    };
+    var replyTimeout = (typeof options.timeoutMs === "number" && isFinite(options.timeoutMs) && options.timeoutMs > 0)
+      ? options.timeoutMs : NOSTR_QUERY_TIMEOUT_MS;
+
+    var settled = false;
+    var unsub = null;
+    var resultPromise = new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        if (unsub) { try { unsub(); } catch (e) {} }
+        reject(makeError(
+          "QueryTimeoutError",
+          "Nostr-Query-Reply > " + replyTimeout + " ms ausgeblieben.",
+        ));
+      }, replyTimeout);
+
+      try {
+        unsub = client.subscribe(
+          { kinds: [NOSTR_KIND], "#t": [NOSTR_TAG_QUERY_REPLY], "#d": [ownNodeId] },
+          function onQueryReplyEvent(event) {
+            if (settled) return;
+            if (!event || typeof event.content !== "string") return;
+            if (tagValue(event, "x") !== nonce) return;
+            var parsed;
+            try { parsed = JSON.parse(event.content); } catch (e) { return; }
+            if (!parsed || typeof parsed !== "object") return;
+            if (parsed.nonceEcho !== nonce) return;
+            settled = true;
+            clearTimeout(timer);
+            if (unsub) { try { unsub(); } catch (e2) {} }
+            resolve(parsed);
+          },
+        );
+      } catch (subErr) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        reject(makeError(
+          "QueryNetworkError",
+          "Nostr-Query-Subscribe fehlgeschlagen: " + (subErr && subErr.message ? subErr.message : subErr),
+          subErr,
+        ));
+      }
+    });
+
+    var eventBody = buildNostrEventBody(NOSTR_TAG_QUERY, targetNodeId, nonce, queryPayload);
+    try {
+      await client.publish(eventBody);
+    } catch (pubErr) {
+      if (!settled) {
+        settled = true;
+        if (unsub) { try { unsub(); } catch (e) {} }
+      }
+      throw makeError(
+        "QueryNetworkError",
+        "Nostr-Query-Publish fehlgeschlagen: " + (pubErr && pubErr.message ? pubErr.message : pubErr),
+        pubErr,
+      );
+    }
+
+    var replyJson = await resultPromise;
+    return {
+      outcome: "answered",
+      results: Array.isArray(replyJson.results) ? replyJson.results : [],
+      fromNodeId: typeof replyJson.fromNodeId === "string" ? replyJson.fromNodeId : targetNodeId,
+      nonceEcho: nonce,
+    };
+  }
+
+  // ---- Query-über-Relais: Empfänger-Pfad (Bau 2026-06-28) ----------------
+  //
+  // handleIncomingNostrQuery — beantwortet eine über das Relais eingehende
+  // Frage mit bedeutungs-sortierten Treffern aus dem eigenen, AKTUELLEN
+  // Inhalt (Modul 04.C queryLocal über den per setLocalCorpus registrierten
+  // Korpus). Empfangsmodus: antwortet nur, initiiert nie.
+  //
+  // SICHERHEIT (untrusted external data): der content ist Fremd-Eingabe.
+  // Self-Hit ignorieren, Replay (doppelte nonce) ablehnen, created_at-Fenster
+  // prüfen — wie der Handshake-Empfänger. Die Antwort enthält NUR Korpus-
+  // Labels/Scores (keine PII, keine Buchhaltungsdaten). Fehlt Modul 04 oder
+  // wirft queryLocal, kommt eine leere Treffer-Liste zurück (fail-soft).
+  async function handleIncomingNostrQuery(client, event) {
+    if (!event || typeof event.content !== "string") return;
+    var nowMs = Date.now();
+
+    if (typeof event.created_at === "number") {
+      var evMs = event.created_at * 1000;
+      if (Math.abs(nowMs - evMs) > NOSTR_CLOCK_SKEW_MS) return;
+    }
+
+    var query;
+    try { query = JSON.parse(event.content); } catch (e) { return; }
+    if (!query || typeof query !== "object") return;
+    if (typeof query.text !== "string" || query.text.length === 0) return;
+
+    // Self-Hit-Schutz: eigene Frage → ignorieren.
+    if (typeof query.fromNodeId === "string" && receiverMap.has(query.fromNodeId)) return;
+
+    // toNodeId muss eine eigene Persona sein (der #d-Filter sichert das schon,
+    // hier defensiv doppelt). Diese nodeId trägt die Antwort als Absender.
+    var ownTargetId = (typeof query.toNodeId === "string" && receiverMap.has(query.toNodeId))
+      ? query.toNodeId
+      : (receiverMap.size > 0 ? receiverMap.keys().next().value : null);
+    if (!ownTargetId) return;
+
+    var nonce = query.nonce;
+    if (typeof nonce !== "string" || nonce.length === 0) return;
+    if (nostrNonceSeen(nonce, nowMs)) return;
+
+    var k = (typeof query.k === "number" && isFinite(query.k) && query.k > 0)
+      ? Math.floor(query.k) : NOSTR_QUERY_K_DEFAULT;
+
+    var results = [];
+    var match = resolveMatchModule();
+    if (match) {
+      try {
+        var raw = await match.queryLocal(query.text, k);
+        if (Array.isArray(raw)) {
+          // Nur serialisierbare Felder durchreichen (label/score/anchorId).
+          results = raw.map(function (r) {
+            return {
+              label: (r && typeof r.label === "string") ? r.label : "",
+              score: (r && typeof r.score === "number") ? r.score : 0,
+              anchorId: (r && r.anchorId !== undefined) ? r.anchorId : null,
+            };
+          });
+        }
+      } catch (err) {
+        // fail-soft: leere Treffer-Liste statt Throw.
+        results = [];
+      }
+    }
+
+    // nonce erst nach gültig geformter, beantworteter Frage merken.
+    nostrRememberNonce(nonce, nowMs);
+
+    var replyPayload = {
+      type: "sbkim-query-reply",
+      nonceEcho: nonce,
+      fromNodeId: ownTargetId,
+      toNodeId: typeof query.fromNodeId === "string" ? query.fromNodeId : "",
+      results: results,
+      protocolVersion: PROTOCOL_VERSION,
+      timestamp: nowIso(),
+    };
+    var replyBody = buildNostrEventBody(
+      NOSTR_TAG_QUERY_REPLY,
+      typeof query.fromNodeId === "string" ? query.fromNodeId : "",
+      nonce,
+      replyPayload,
+    );
+    try {
+      await client.publish(replyBody);
+    } catch (e) {
+      // wer-nicht-publishen-kann-schweigt — kein Log-Spam.
+    }
+  }
+
   // Empfänger-Pfad: listenNostr() abonniert eingehende Request-Events an
   // die eigene(n) nodeId(s) und antwortet server-los über das Relais.
   // ADDITIV, NICHT automatisch in init() — Empfangsmodus: der Knoten lauscht
@@ -827,12 +1061,24 @@
       // fire-and-forget; Fehler werden geschluckt (Empfangsmodus: schweigen).
       handleIncomingNostrRequest(client, event).catch(function () {});
     });
+
+    // Query-über-Relais: zweite Subscription auf eingehende Fragen an MICH.
+    // Empfangsmodus: antwortet mit queryLocal-Treffern, initiiert nie selbst.
+    var queryFilter = { kinds: [NOSTR_KIND], "#t": [NOSTR_TAG_QUERY] };
+    if (ownIds.length > 0) queryFilter["#d"] = ownIds;
+    nostrQueryListenUnsub = client.subscribe(queryFilter, function onQueryEvent(event) {
+      handleIncomingNostrQuery(client, event).catch(function () {});
+    });
   }
 
   function stopListenNostr() {
     if (nostrListenUnsub) {
       try { nostrListenUnsub(); } catch (e) {}
       nostrListenUnsub = null;
+    }
+    if (nostrQueryListenUnsub) {
+      try { nostrQueryListenUnsub(); } catch (e) {}
+      nostrQueryListenUnsub = null;
     }
   }
 
@@ -1590,6 +1836,11 @@
     listenNostr: listenNostr,
     stopListenNostr: stopListenNostr,
 
+    // Query-über-Relais (Bau 2026-06-28). queryNostr ist die BEWUSSTE Frage-
+    // Aktion eines Knotens an einen Ziel-Knoten; der Empfänger-Zweig läuft
+    // additiv in listenNostr mit (antwortet nur, initiiert nie).
+    queryNostr: queryNostr,
+
     // Test-Brücken
     _invokeDirect: receiveHandshake,
     _buildSignedRequest: _buildSignedRequest,
@@ -1626,6 +1877,10 @@
       // Nostr-Transport (additiv, 2026-06-27).
       nostrTagRequest: NOSTR_TAG_REQUEST,
       nostrTagReply: NOSTR_TAG_REPLY,
+      nostrTagQuery: NOSTR_TAG_QUERY,
+      nostrTagQueryReply: NOSTR_TAG_QUERY_REPLY,
+      nostrQueryTimeoutMs: NOSTR_QUERY_TIMEOUT_MS,
+      get nostrQueryListening() { return nostrQueryListenUnsub !== null; },
       nostrKind: NOSTR_KIND,
       nostrReplyTimeoutMs: NOSTR_REPLY_TIMEOUT_MS,
       get nostrRelayClientSet() { return resolveNostrRelayClient() !== null; },
