@@ -1,8 +1,8 @@
 {
   "node": "family-project",
-  "lastBuild": "2026-06-28",
-  "seq": 6,
-  "headline": "Rendezvous als geteiltes MODUL 23 ausgegliedert: der am 2026-06-28 bewiesene Gemeinsame-Raum-Code (sbkim-rdv) lebt jetzt als SbkimRendezvous (sbkim/23_rendezvous.js, byte-1:1 aus Sage src/modules/23_rendezvous.js). family-project ist von nun an KONSUMENT des Moduls: der Inline-Rendezvous-Code in sbkim-init.js wurde durch SbkimRendezvous-Aufrufe (announce/connectAndAnnounce/discover/handshakeCard) ersetzt; family liefert nur noch nodeName 'Family Projekt' + app-eigenen Identitaets-Erzeuger (__fpErzeugeSpore mit Fortschritt) + Karten-Darstellung. 23_rendezvous.js in alle vier Seiten (index/werkzeuge/netzwerk/markt) geladen. Verfassungstreu unveraendert (nutzer-ausgeloest, kein Dauer-Piepser). Kern 05/05b/02 unangetastet. Browser-Smoke 77/77 gruen (inkl. Schritt-6-Knoepfe). Damit ist Sages Modul 23 in der Praxis als family-Konsument bewiesen; Rollout in die uebrigen Endknoten folgt. Klaus' Live-Cross-App-Sichttest (zwei Geraete) wartet.",
+  "lastBuild": "2026-07-06",
+  "seq": 7,
+  "headline": "Bau 23.B (Cross-Knoten-Frage) empfangen + Module auf Sage-Kanon geheilt; Quittung fuer Sage seq 43 (Inhalte von der Bau-Sitzung 2026-07-06 selbst verarbeitet).",
   "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/family-project/main/sbkim/spore.json",
   "nodeId": "HLXUEJFWHGt6DlRFgzvN4d_YdHRfnrehlVdRb4BHvAE",
   "mailboxes": {
@@ -14,7 +14,7 @@
     "SB-KIMTool-Point"
   ],
   "ack": {
-    "Sage-Protokol": 33,
+    "Sage-Protokol": 43,
     "SB-KIMTool-Point": 25
   },
   "_doc": "Maschinenlesbarer Briefkasten-Aushang (INTERFACES §11.6). seq steigt +1 pro gemeldetem Bau; Gegenseite liest bei Sitzungsstart, vergleicht mit ihrem ack und quittiert. Server-los: das Pushen dieser Datei IST das Signal.",
@@ -48,6 +48,11 @@
       "seq": 6,
       "date": "2026-06-28",
       "headline": "Rendezvous als geteiltes MODUL 23 ausgegliedert (SbkimRendezvous, sbkim/23_rendezvous.js byte-1:1 aus Sage). family-project ist jetzt KONSUMENT: Inline-Code in sbkim-init.js durch SbkimRendezvous-Aufrufe ersetzt (announce/connectAndAnnounce/discover/handshakeCard); family liefert nur nodeName + app-eigenen Identitaets-Erzeuger + Karten-Render. 23 in alle vier Seiten geladen. Kern 05/05b/02 unangetastet. Browser-Smoke 77/77 (inkl. Schritt-6-Knoepfe). Rollout in uebrige Endknoten folgt; Klaus' Live-Cross-App-Sichttest wartet."
+    },
+    {
+      "seq": 7,
+      "date": "2026-07-06",
+      "headline": "Bau 23.B empfangen, Modul-Drift geheilt, ack Sage=43."
     }
   ]
 }
