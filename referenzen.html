@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- Family Projekt — Referenzen: Beispiele neu gebauter Seiten aus der Werkstatt.
+     Erste Referenz: das Schaufenster von Tomys Hub (live eingebettet). -->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Referenz-Beispiele — so sieht eine neu gebaute Seite aus — Family Projekt</title>
+  <meta name="description" content="Referenz-Beispiele aus der Family-Projekt-Werkstatt: echte, neu gebaute Internetseiten zum Ansehen — live eingebettet, mit einem Klick im eigenen Tab." />
+  <link rel="canonical" href="https://family-projekt.de/referenzen.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="Family Projekt" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Family Projekt" />
+  <meta property="og:locale" content="de_DE" />
+  <meta property="og:title" content="Referenz-Beispiele — Family Projekt" />
+  <meta property="og:description" content="Echte, neu gebaute Internetseiten als Referenz — live eingebettet." />
+  <meta property="og:url" content="https://family-projekt.de/referenzen.html" />
+  <meta property="og:image" content="https://family-projekt.de/og-image.png" />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Family Projekt" />
+  <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='1' stop-color='%237aa2ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset="1" stop-color="#7aa2ff"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#hg)"/></svg>
+        <a href="index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="index.html" data-i18n="nav_start">Start</a>
+        <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+        <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span id="fp-dock" class="fp-dock" title="Knoten-Status"></span>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <span class="eyebrow">🖼️ <span data-i18n="rf_eyebrow">Referenzen</span></span>
+        <h1 data-i18n="rf_title">Referenz-Beispiele — so sieht eine neu gebaute Seite aus</h1>
+        <p class="sub" data-i18n="rf_sub">Echte Beispiele aus der Werkstatt: fertig gebaute Internetseiten, live eingebettet — kein Mock-up, keine Attrappe. Was du hier siehst, ist die Seite selbst. Weitere Beispiele (Seiten, gestaltete PDFs) kommen nach und nach dazu.</p>
+
+        <!-- Referenz 1: Tomys Hub — Schaufenster -->
+        <div class="glass" style="padding:18px;margin-top:18px">
+          <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
+            <h3 style="margin:0">🛍️ <span data-i18n="rf_t1">Tomys Schaufenster — „Du gestaltest, wir drucken"</span></h3>
+            <a class="pill" href="https://lausiklauskn-png.github.io/Tomys-Hub/showcase/" target="_blank" rel="noopener noreferrer" data-i18n="rf_open">↗ In neuem Tab öffnen</a>
+          </div>
+          <p style="opacity:.85" data-i18n="rf_d1">Eine komplette Kunden-Landingpage für personalisierten Digitaldruck (Tassen, T-Shirts, Handtücher): selbst gestalten, Vorlage prüfen, drucken lassen. Gebaut als schnelle, installierbare Seite ohne Konto-Zwang — unten live zum Anfassen.</p>
+          <iframe src="https://lausiklauskn-png.github.io/Tomys-Hub/showcase/"
+                  title="Referenz: Tomys Schaufenster (live)"
+                  loading="lazy"
+                  style="width:100%;height:72vh;min-height:420px;border:1px solid rgba(154,167,182,.25);border-radius:14px;background:#0b0d14"></iframe>
+          <p style="opacity:.6;font-size:.82rem;margin-top:8px" data-i18n="rf_note">Eingebettet von lausiklauskn-png.github.io — falls dein Browser das Einbetten blockiert, nutze den „In neuem Tab öffnen"-Knopf oben.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap bar" style="flex-wrap:wrap;gap:10px">
+      <a href="index.html" data-i18n="nav_start">Start</a>
+      <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+      <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+      <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+  </footer>
+
+  <script type="module" src="assets/mycel-bg.js"></script>
+  <script src="sbkim/01_storage.js"></script>
+  <script src="sbkim/02_spore.js"></script>
+  <script src="sbkim/03_embedding.js"></script>
+  <script src="sbkim/04_match.js"></script>
+  <script src="sbkim/05_anastomose.js"></script>
+  <script src="sbkim/07_apoptose.js"></script>
+  <script src="sbkim/15_membran.js"></script>
+  <script src="sbkim/16_siegel.js"></script>
+  <script src="sbkim/17_floating_widget.js"></script>
+  <script src="sbkim/20_schluessel_safe.js"></script>
+  <script type="module" src="sbkim/05b_nostr_relay.js"></script>
+  <script src="sbkim/23_rendezvous.js"></script>
+  <script src="sbkim/sbkim-init.js"></script>
+  <script>
+    window.FP_PAGE_I18N = {
+      de: { rf_eyebrow: "Referenzen", rf_title: "Referenz-Beispiele — so sieht eine neu gebaute Seite aus",
+        rf_sub: "Echte Beispiele aus der Werkstatt: fertig gebaute Internetseiten, live eingebettet — kein Mock-up, keine Attrappe. Was du hier siehst, ist die Seite selbst. Weitere Beispiele (Seiten, gestaltete PDFs) kommen nach und nach dazu.",
+        rf_t1: "Tomys Schaufenster — „Du gestaltest, wir drucken\u201c",
+        rf_d1: "Eine komplette Kunden-Landingpage für personalisierten Digitaldruck (Tassen, T-Shirts, Handtücher): selbst gestalten, Vorlage prüfen, drucken lassen. Gebaut als schnelle, installierbare Seite ohne Konto-Zwang — unten live zum Anfassen.",
+        rf_open: "↗ In neuem Tab öffnen",
+        rf_note: "Eingebettet von lausiklauskn-png.github.io — falls dein Browser das Einbetten blockiert, nutze den „In neuem Tab öffnen\u201c-Knopf oben." },
+      en: { rf_eyebrow: "References", rf_title: "Reference examples — what a freshly built page looks like",
+        rf_sub: "Real examples from the workshop: finished web pages, embedded live — no mock-up. What you see here is the page itself. More examples (pages, designed PDFs) will follow.",
+        rf_t1: "Tomy's showcase — \"You design, we print\"",
+        rf_d1: "A complete customer landing page for personalised digital printing (mugs, t-shirts, towels): design yourself, check the template, have it printed. Built as a fast, installable page without forced accounts — live below.",
+        rf_open: "↗ Open in new tab",
+        rf_note: "Embedded from lausiklauskn-png.github.io — if your browser blocks embedding, use the \"Open in new tab\" button above." }
+    };
+  </script>
+  <script src="assets/app.js"></script>
+  <script src="assets/status-widget.js"></script>
+  <script>FP.init();</script>
+</body>
+</html>
