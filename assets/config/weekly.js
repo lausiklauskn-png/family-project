@@ -53,10 +53,8 @@ window.FP_WEEKLY = [
     de: "Getränke-Labor für Cocktails, Mocktails und Smoothies.",
     en: "Drinks lab for cocktails, mocktails and smoothies.",
     url: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/" },
-  { name: "BookLedgerPro", emoji: "📊", img: "assets/appicons/blp.png",
-    de: "Verschlüsselte Offline-Buchhaltung für Deutschland.",
-    en: "Encrypted offline accounting for Germany.",
-    url: "https://lausiklauskn-png.github.io/BookLedgerPro/" },
+  /* BookLedgerPro bewusst NICHT in der öffentlichen Rotation (Klaus 2026-07-07):
+   * Preise/Inhalte noch nicht freigegeben — kommt nach der Freigabe zurück. */
   { name: "Jasons Tresor", emoji: "🔐", img: "assets/appicons/jasons.svg",
     de: "Verschlüsselter Daten-Tresor für JSON-Dateien und Schlüssel.",
     en: "Encrypted data vault for JSON files and keys.",
