@@ -120,6 +120,10 @@ console.log("\nFooter-Bauleiste (dev-only) + öffentliche App-Leiste");
 { const { page } = await load("/index.html");
   ok(await page.evaluate(()=>!document.querySelector("footer .applinks:not(.pubapplinks)")), "footer: Bauleiste öffentlich verborgen (kein ?dev)");
   ok(await page.evaluate(()=>!!document.querySelector("footer .pubapplinks a[href*='Mein-Rezeptbuch']")), "footer: öffentliche App-Leiste sichtbar (Rezeptbuch verlinkt)");
+  // Öffentlicher „🌐 Mit dem Netz verbinden"-Knopf (Klaus 2026-07-08): sichtbar OHNE ?dev;
+  // das Dev-Andock-Tool bleibt dabei verborgen (§6b nur für den Rendezvous-Knopf aufgehoben).
+  ok(await page.evaluate(()=>!!document.getElementById("fp-connect-btn") && !document.getElementById("fp-dev-mailbox-btn")), "connect: öffentlicher 🌐-Knopf sichtbar ohne ?dev (Dev-Andock-Tool bleibt verborgen)");
+  ok(await page.evaluate(()=>{const b=document.getElementById("fp-connect-btn");if(!b)return false;b.click();const p=document.getElementById("fp-connect-panel");return !!p && p.style.display==="block" && !!document.getElementById("fp-connect-go") && !!document.getElementById("fp-connect-discover") && !!document.getElementById("fp-connect-announce");}), "connect: 🌐-Panel öffnet mit Verbinden/Wer-ist-im-Raum/Nur-neu-anmelden");
   await page.close();
   const dev = await browser.newPage();
   await dev.goto(base+"/index.html?dev",{waitUntil:"load"}); await dev.waitForTimeout(600);

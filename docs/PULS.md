@@ -4,6 +4,38 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-08: „🌐 Mit dem Netz verbinden" öffentlich sichtbar gemacht
+
+**Befund (Klaus):** Auf family-projekt.de fehlte der „Mit dem Netz verbinden"-Knopf
+bzw. löste nicht aus; im Netzwerk-Tab nichts zu sehen. **Ursache — kein Bug:** Der
+Knopf saß nur im **dev-versteckten** Andock-Tool (`mountDevMailbox`, `if(!isDev())return`,
+Brief §6b „vor Launch aus"). Ohne `?dev` wird das Panel gar nicht gebaut → kein Knopf,
+nichts im Netz. (Zusätzlich: die Relais-Verbindung ist ein **WebSocket** `wss://relay.family-projekt.de`
+→ erscheint in DevTools nur unter „WS", nicht „Fetch/XHR".)
+
+**Entscheidung (Klaus 2026-07-08, AskUserQuestion):** öffentlich sichtbar machen — konsistent
+mit SB-KIMTool-Point, das den Knopf schon öffentlich hat.
+
+**Gebaut** (`sbkim/sbkim-init.js`): neue Funktion `mountPublicConnect()` — ein öffentlicher,
+NICHT dev-gegateter Floating-Knopf „🌐 Mit dem Netz verbinden" (unten rechts) mit Panel
+(Verbinden / Wer ist im Raum? / Nur neu anmelden + Ausgabe). Nutzt die **bestehenden,
+live-bewiesenen** Funktionen `connectToNet`/`discoverRoom`/`announcePresence` — kein
+Doppel-Code, Modul 23/05/05b unangetastet. Erscheint nur, wo Modul 23 geladen ist (fail-soft).
+Das restliche Betreiber-Werkzeug (Spore erzeugen / Safe / Handshake-Auswahl / Verbindungs-Test)
+bleibt dev-versteckt.
+
+**Bewusste Regel-Aufhebung:** §6b „Rendezvous-Knopf vor Launch versteckt" ist NUR für diesen
+einen öffentlichen Knopf aufgehoben (Klaus' ausdrückliche Entscheidung). Dokumentiert hier +
+im Code-Kommentar.
+
+**Verifikation:** `node --check sbkim/sbkim-init.js` ok; Smoke `tests/smoke_all.mjs` **81/82**
+(zwei neue Connect-Assertions grün: öffentlicher Knopf sichtbar ohne `?dev`, Panel öffnet mit
+den drei Aktionen). Das eine rote ist **vorbestehend** („footer: Bauleiste öffentlich verborgen",
+auch ohne diese Änderung rot — eigener Befund, nicht in dieser Sitzung gefixt). **Browser-
+Sichttest auf family-projekt.de wartet auf Klaus** (nach Deploy + Hard-Reload wegen SW-Cache).
+
+---
+
 ## ✅ 2026-07-06 (Abend): family-projekt.com → 301 auf .de (gleiche Sitzung)
 
 Klaus wollte die .com „mit denselben Inhalten füllen" — bewusst NICHT getan
