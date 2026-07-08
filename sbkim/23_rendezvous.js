@@ -32,14 +32,30 @@
  * Darstellung sind app-eigen (siehe Karte 23 § UI-Stück) — so bleibt die
  * Modul-Datei byte-1:1 in jeder PWA kopierbar.
  *
+ * IDENTITÄTS-HYGIENE (Klaus 2026-07-08, Skill „saubere-netz-anmeldung"):
+ * Weil alle Endknoten-PWAs unter EINER Origin liegen und IndexedDB/Service-
+ * Worker/Caches an der Origin hängen (nicht am Pfad), teilen sich sonst alle
+ * Apps EINE Default-DB `sbkim` → dieselbe nodeId. Darum zwei Modi (NIE mischen):
+ *   Modus A — ensureIdentity(): sanft, automatisch (bei init), idempotent,
+ *     NICHT zerstörend. Eigene Schublade `sbkim_<suffix>` + EINMAL Identität,
+ *     falls keine da. Kein Löschen, KEIN Auto-Anmelden (Empfangsmodus).
+ *   Modus B — repairAndReconnect(): zerstörend, NUR hinter Nutzer-Knopf.
+ *     Reinigt NUR die eigene Origin (löscht `sbkim`, Service-Worker, Caches —
+ *     eigene Schublade bleibt), dann frische Identität + Spore + Anmelden +
+ *     „hart neu laden".
+ *
  * Public surface (registered on window.SbkimRendezvous):
  *   init(opts?) -> Promise<void>
- *       opts = { nodeName, relayClient, anastomose, spore, freshSec, listenMs }
- *       Alle optional. nodeName ist der Anzeigename der eigenen Visitenkarte
- *       (Default "SBKIM-Knoten"). relayClient/anastomose/spore werden sonst
- *       aus den Globals (SbkimNostrRelay / SbkimAnastomose / SbkimSpore)
- *       aufgelöst. init() ist idempotent + fail-soft.
+ *       opts = { nodeName, relayClient, anastomose, spore, storage, dbSuffix,
+ *                createIdentity, ensureIdentity, freshSec, listenMs }
+ *       Alle optional. relayClient/anastomose/spore/storage sonst aus den
+ *       Globals. dbSuffix = eigene Schublade. createIdentity = app-eigener
+ *       async-Callback. ensureIdentity:true fährt Modus A einmal (lokal).
+ *       init() ist idempotent + fail-soft, baut NICHTS ins Netz.
  *   configure(opts) -> void           (Teil-Update der Konfig, gleiche Felder)
+ *   ensureIdentity(opts?) -> Promise<{ ok, created, nodeId?, reason? }>  (Modus A)
+ *   cleanupSharedOrigin() -> Promise<{ dbDeleted, swUnregistered, cachesDeleted, notes }>
+ *   repairAndReconnect(opts?) -> Promise<{ ok, cleaned, created, nodeId?, reason?, reloadHint }>  (Modus B)
  *   announce(opts?) -> Promise<{ ok, nodeId?, reason? }>
  *       Lauscht (listenNostr) + heftet die lebende Visitenkarte ans Brett.
  *       Setzt eine vorhandene Identität voraus.
@@ -69,8 +85,9 @@
  *   askNode(cardOderNodeId, text, opts?) -> Promise<{ ok, results?, ... }>
  *       (Bau 23.B) Nutzer-ausgelöste Cross-Knoten-Frage; wartet auf den
  *       Antwort-Zettel (Default 15 s). Vertrag: INTERFACES §1 Modul 23.
- *   _meta -> { version, tag, presenceKind, freshSec, listenMs, nodeName,
- *              hasRelay, hasAnastomose, hasSpore, hasMatch,
+ *   _meta -> { version, tag, presenceKind, sharedDbName, dbSuffix, freshSec,
+ *              listenMs, nodeName, hasRelay, hasAnastomose, hasSpore, hasMatch,
+ *              hasStorage, hasCreateIdentity,
  *              answering, answeredCount, queryTag, queryKind, queryResKind,
  *              queryMaxPerMin }
  *
@@ -89,6 +106,11 @@
   var RDV_LISTEN_MS_DEFAULT = 4000;     // Sammelfenster beim Lesen des Raums
   var RDV_HANDSHAKE_TIMEOUT_MS = 12000; // großzügig — Empfänger lädt evtl. Modell
   var NOSTR_KIND = 1;
+  // Der geteilte Alt-Topf (Default-DB des Storage-Moduls). Modus B löscht NUR
+  // diese DB — NIE die eigene Schublade `sbkim_<suffix>`.
+  var SHARED_DB_NAME = "sbkim";
+  var RELOAD_HINT = "Bitte jetzt hart neu laden (Strg+Shift+R bzw. „Cache leeren und " +
+    "neu laden“), damit der frische Service-Worker greift.";
 
   // ---- Konfig-Zustand ----
   var cfg = {
@@ -97,6 +119,9 @@
     anastomose: null,    // null → global.SbkimAnastomose
     spore: null,         // null → global.SbkimSpore
     match: null,         // null → global.SbkimMatch (optional, nur Anzeige-Score)
+    storage: null,       // null → global.SbkimStorage (Identitäts-Hygiene)
+    dbSuffix: null,      // eigene Schublade `sbkim_<dbSuffix>`
+    createIdentity: null,// app-eigener async-Callback (Spore-Erzeugung)
     freshSec: RDV_FRESH_SEC_DEFAULT,
     listenMs: RDV_LISTEN_MS_DEFAULT,
   };
@@ -123,6 +148,11 @@
   function resolveMatch() {
     var m = cfg.match || global.SbkimMatch;
     return (m && typeof m.relatedness === "function") ? m : null;
+  }
+  // Modul 01 (Storage) — nur für die Identitäts-Hygiene (eigene Schublade).
+  function resolveStorage() {
+    var s = cfg.storage || global.SbkimStorage;
+    return (s && typeof s.init === "function") ? s : null;
   }
 
   function nowSec() { return Math.floor(Date.now() / 1000); }
@@ -195,6 +225,96 @@
     }
   }
 
+  // ==== IDENTITÄTS-HYGIENE (Skill „saubere-netz-anmeldung") ====
+
+  // ---- Modus A: ensureIdentity() — sanft, automatisch, idempotent ----
+  async function ensureIdentity(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var suffix = (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) ? opts.dbSuffix : cfg.dbSuffix;
+    var storage = resolveStorage();
+    if (suffix && storage) {
+      try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    var spore = resolveSpore();
+    if (!spore || typeof spore.getOrCreateIdentity !== "function") {
+      return { ok: false, created: false, reason: "Modul 02 (Spore) nicht geladen." };
+    }
+    var existed = false;
+    if (typeof spore.getNodeId === "function") {
+      try { existed = !!(await spore.getNodeId()); } catch (_e) { existed = false; }
+    }
+    var id;
+    try {
+      id = await spore.getOrCreateIdentity();
+    } catch (e) {
+      return { ok: false, created: false, reason: "getOrCreateIdentity fehlgeschlagen: " + (e && e.message ? e.message : e) };
+    }
+    return { ok: true, created: !existed, nodeId: (id && id.nodeId) ? id.nodeId : undefined };
+  }
+
+  // ---- cleanupSharedOrigin() — Modus-B-Reinigung (NUR eigene Origin) ----
+  async function cleanupSharedOrigin() {
+    var result = { dbDeleted: false, swUnregistered: 0, cachesDeleted: 0, notes: [] };
+    try {
+      var idb = (typeof global.indexedDB !== "undefined" && global.indexedDB) ? global.indexedDB : null;
+      if (idb && typeof idb.deleteDatabase === "function") {
+        await new Promise(function (resolve) {
+          var settled = false;
+          function done() { if (!settled) { settled = true; resolve(); } }
+          var req;
+          try { req = idb.deleteDatabase(SHARED_DB_NAME); } catch (_e) { return done(); }
+          req.onsuccess = function () { result.dbDeleted = true; done(); };
+          req.onerror = function () { result.notes.push("DB-Löschen fehlgeschlagen (fail-soft)."); done(); };
+          req.onblocked = function () { result.notes.push("DB blockiert (offene Verbindung) — nach hartem Neuladen erneut."); done(); };
+        });
+      } else { result.notes.push("Kein IndexedDB verfügbar."); }
+    } catch (_e) { result.notes.push("DB-Löschen übersprungen (fail-soft)."); }
+    try {
+      var nav = global.navigator;
+      if (nav && nav.serviceWorker && typeof nav.serviceWorker.getRegistrations === "function") {
+        var regs = await nav.serviceWorker.getRegistrations();
+        for (var i = 0; i < (regs ? regs.length : 0); i++) {
+          try { if (await regs[i].unregister()) result.swUnregistered++; } catch (_e) { /* fail-soft */ }
+        }
+      }
+    } catch (_e) { result.notes.push("Service-Worker-Abmeldung übersprungen (fail-soft)."); }
+    try {
+      var cs = global.caches;
+      if (cs && typeof cs.keys === "function") {
+        var keys = await cs.keys();
+        for (var j = 0; j < (keys ? keys.length : 0); j++) {
+          try { if (await cs.delete(keys[j])) result.cachesDeleted++; } catch (_e) { /* fail-soft */ }
+        }
+      }
+    } catch (_e) { result.notes.push("Cache-Leerung übersprungen (fail-soft)."); }
+    return result;
+  }
+
+  // ---- Modus B: repairAndReconnect() — zerstörend, nutzer-ausgelöst ----
+  async function repairAndReconnect(opts) {
+    opts = (opts && typeof opts === "object") ? opts : {};
+    var cleaned = await cleanupSharedOrigin();
+    var suffix = (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) ? opts.dbSuffix : cfg.dbSuffix;
+    var storage = resolveStorage();
+    if (suffix && storage) {
+      try { await storage.init({ dbSuffix: suffix }); } catch (_e) { /* fail-soft */ }
+    }
+    if (opts.newIdentity === true) {
+      var sp = resolveSpore();
+      if (sp && typeof sp.getActiveIdentityKey === "function" && typeof sp.removeIdentity === "function") {
+        try {
+          var activeKey = await sp.getActiveIdentityKey();
+          await sp.removeIdentity(activeKey);
+        } catch (_e) { /* fail-soft: dann bleibt die bestehende Identität */ }
+      }
+    }
+    var res = await connectAndAnnounce({ createIdentity: opts.createIdentity || cfg.createIdentity || undefined });
+    return {
+      ok: res.ok, cleaned: cleaned, created: res.created,
+      nodeId: res.nodeId, reason: res.reason, reloadHint: RELOAD_HINT,
+    };
+  }
+
   // ---- init / configure ----
   function applyOpts(opts) {
     if (!opts || typeof opts !== "object") return;
@@ -203,6 +323,9 @@
     if (opts.anastomose !== undefined) cfg.anastomose = opts.anastomose;
     if (opts.spore !== undefined) cfg.spore = opts.spore;
     if (opts.match !== undefined) cfg.match = opts.match;
+    if (opts.storage !== undefined) cfg.storage = opts.storage;
+    if (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) cfg.dbSuffix = opts.dbSuffix;
+    if (typeof opts.createIdentity === "function") cfg.createIdentity = opts.createIdentity;
     if (typeof opts.freshSec === "number" && isFinite(opts.freshSec) && opts.freshSec > 0) {
       cfg.freshSec = Math.floor(opts.freshSec);
     }
@@ -213,7 +336,11 @@
 
   async function init(opts) {
     applyOpts(opts);
-    // init() baut KEINE Verbindung auf (Empfangsmodus). Nur Konfig setzen.
+    // init() baut KEINE Verbindung auf (Empfangsmodus). Modus A (sanft, lokal,
+    // idempotent) nur wenn ausdrücklich verlangt — das ist KEINE Netz-Aktion.
+    if (opts && opts.ensureIdentity) {
+      try { await ensureIdentity(); } catch (_e) { /* fail-soft */ }
+    }
     return Promise.resolve();
   }
 
@@ -279,8 +406,9 @@
       var rA = await doAnnounce(own);
       return { ok: rA.ok, created: false, nodeId: rA.nodeId, reason: rA.reason };
     }
-    // Keine Identität — über den app-eigenen Callback erzeugen.
-    if (typeof opts.createIdentity !== "function") {
+    // Keine Identität — über den app-eigenen Callback erzeugen (opts oder cfg).
+    var makeId = (typeof opts.createIdentity === "function") ? opts.createIdentity : cfg.createIdentity;
+    if (typeof makeId !== "function") {
       return {
         ok: false, created: false,
         reason: "Keine Identität und kein createIdentity-Callback übergeben " +
@@ -288,7 +416,7 @@
       };
     }
     try {
-      await opts.createIdentity();
+      await makeId();
     } catch (e) {
       return { ok: false, created: false, reason: "Identitäts-Erzeugung fehlgeschlagen: " + (e && e.message ? e.message : e) };
     }
@@ -579,11 +707,16 @@
     disableAnswering: disableAnswering, // Bau 23.B
     askNode: askNode,                   // Bau 23.B — nutzer-ausgelöste Cross-Knoten-Frage
     relatednessForCards: relatednessForCards, // pure (cards, ownSpore) → angereicherte Liste; reine Anzeige
+    ensureIdentity: ensureIdentity,             // Modus A (sanft, automatisch, idempotent)
+    cleanupSharedOrigin: cleanupSharedOrigin,   // Modus-B-Reinigung (nur eigene Origin)
+    repairAndReconnect: repairAndReconnect,     // Modus B (zerstörend, nutzer-ausgelöst)
     get _meta() {
       return {
         version: VERSION,
         tag: RDV_TAG,
         presenceKind: RDV_PRESENCE_KIND,
+        sharedDbName: SHARED_DB_NAME,
+        dbSuffix: cfg.dbSuffix,
         freshSec: cfg.freshSec,
         listenMs: cfg.listenMs,
         nodeName: cfg.nodeName,
@@ -591,6 +724,8 @@
         hasAnastomose: resolveAnastomose() !== null,
         hasSpore: resolveSpore() !== null,
         hasMatch: resolveMatch() !== null,
+        hasStorage: resolveStorage() !== null,
+        hasCreateIdentity: typeof cfg.createIdentity === "function",
         answering: answerUnsub !== null,          // Bau 23.B
         answeredCount: answeredCount,             // Bau 23.B
         queryTag: RDV_QUERY_TAG,                  // Bau 23.B
@@ -607,7 +742,8 @@
     console.info(
       "MODUL 23 RENDEZVOUS bereit (gemeinsamer Raum, Empfangsmodus/nutzer-ausgelöst), " +
         "Funktionen: init/configure/announce/connectAndAnnounce/discover/handshakeCard/" +
-        "enableAnswering/disableAnswering/askNode/relatednessForCards",
+        "enableAnswering/disableAnswering/askNode/relatednessForCards/" +
+        "ensureIdentity/cleanupSharedOrigin/repairAndReconnect",
     );
   }
 })(typeof window !== "undefined" ? window : globalThis);

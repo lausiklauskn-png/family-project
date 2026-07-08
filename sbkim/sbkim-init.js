@@ -629,48 +629,39 @@
   // (connectToNet / discoverRoom / announcePresence) wie das Dev-Panel — kein
   // Doppel-Code, Modul 23/05/05b unangetastet. Erscheint nur, wo der Rendezvous-
   // Stack (Modul 23) geladen ist; fehlt er, kein Knopf (fail-soft).
+  // family-eigener Identitäts-Erzeuger als schlichter createIdentity-Callback
+  // fürs geteilte Modul/UI (erzeugt die Spore mit family-Domäne; Fortschritt
+  // läuft über die vorhandenen sbkim:embedding-progress-Events + Konsole).
+  function fpCreateIdentityShared() { return window.__fpErzeugeSpore(); }
+
+  // Öffentliche Rendezvous-UI = das GETEILTE Modul-23-UI (byte-1:1 aus Sage /
+  // Kim-Bell), damit family dieselbe volle Fassung trägt wie die anderen
+  // Knoten: „Mit dem Netz verbinden / Wer ist im Raum? / Nur neu anmelden /
+  // 🧬 nur verwandte / FRAGE-NACH-BEDEUTUNG-SUCHE + Antworten / 🧹 Aufräumen".
+  // Ersetzt die frühere family-eigene Panel-Fassung (die kein Suchfeld hatte).
+  // Das Dev-Andock-Tool (Spore erzeugen / Safe / Handshake) bleibt unter ?dev.
   function mountPublicConnect() {
     if (!window.SbkimRendezvous) return;
-    if (document.getElementById("fp-connect-btn")) return;
-    var btn = document.createElement("button");
-    btn.id = "fp-connect-btn";
-    btn.type = "button";
-    btn.textContent = "🌐 Mit dem Netz verbinden";
-    btn.title = "Triff andere SBKIM-Knoten im gemeinsamen Raum — nutzer-ausgelöst, server-los.";
-    btn.style.cssText = "position:fixed;right:14px;bottom:14px;z-index:88;font:600 .8rem var(--sans,system-ui);" +
-      "padding:9px 14px;border-radius:999px;border:1px solid var(--accent,#6ee7d3);" +
-      "background:rgba(10,12,20,.7);color:var(--accent,#6ee7d3);cursor:pointer;backdrop-filter:blur(6px);" +
-      "box-shadow:0 6px 20px rgba(0,0,0,.4)";
-    var panel = document.createElement("div");
-    panel.id = "fp-connect-panel";
-    panel.style.cssText = "position:fixed;right:14px;bottom:58px;z-index:88;width:min(400px,92vw);display:none;" +
-      "max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;" +
-      "background:rgba(10,12,20,.94);border:1px solid var(--accent,#6ee7d3);border-radius:12px;padding:14px;" +
-      "color:#eef2f8;font:.82rem/1.5 var(--sans,system-ui);backdrop-filter:blur(10px);box-shadow:0 12px 34px rgba(0,0,0,.5)";
-    var bs = "padding:7px 12px;border-radius:8px;border:1px solid var(--accent,#6ee7d3);" +
-      "background:rgba(110,231,211,.12);color:#eef2f8;cursor:pointer;font:inherit";
-    var bsGhost = "padding:7px 12px;border-radius:8px;border:1px solid var(--line,#2a3340);" +
-      "background:transparent;color:#eef2f8;cursor:pointer;font:inherit";
-    panel.innerHTML =
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px">' +
-      '<strong style="color:var(--accent,#6ee7d3)">🌐 Mit dem Netz verbinden</strong>' +
-      '<button id="fp-connect-close" type="button" style="background:none;border:none;color:#9aa7b6;font-size:1.1rem;cursor:pointer">✕</button></div>' +
-      '<p style="margin:0 0 8px;color:#cfe0ff">Triff andere SBKIM-Knoten im gemeinsamen Raum — server-los, direkt aus deinem Browser. Lass diesen Tab offen, damit du erreichbar bleibst.</p>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
-      '<button id="fp-connect-go" type="button" style="' + bs + '">🌐 Mit dem Netz verbinden</button>' +
-      '<button id="fp-connect-discover" type="button" style="' + bsGhost + '">👥 Wer ist im Raum?</button></div>' +
-      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px">' +
-      '<button id="fp-connect-announce" type="button" style="' + bsGhost + '">📌 Nur neu anmelden</button></div>' +
-      '<pre id="fp-connect-out" style="margin:10px 0 0;white-space:pre-wrap;word-break:break-word;font:.74rem/1.5 var(--mono,monospace);color:#cfe0ff;max-height:44vh;overflow:auto"></pre>' +
-      '<p style="margin:8px 0 0;color:#9aa7b6;font-size:.72rem">Es wird nur deine öffentliche Visitenkarte (Spore) im Raum gezeigt — dein privater Schlüssel bleibt in diesem Browser.</p>';
-    document.body.appendChild(btn);
-    document.body.appendChild(panel);
-    var out = panel.querySelector("#fp-connect-out");
-    btn.addEventListener("click", function () { panel.style.display = panel.style.display === "none" ? "block" : "none"; });
-    panel.querySelector("#fp-connect-close").addEventListener("click", function () { panel.style.display = "none"; });
-    panel.querySelector("#fp-connect-go").addEventListener("click", function () { connectToNet(out); });
-    panel.querySelector("#fp-connect-discover").addEventListener("click", function () { discoverRoom(out); });
-    panel.querySelector("#fp-connect-announce").addEventListener("click", function () { announcePresence(out); });
+    // Modul 23 mit family-Konfig + Modus A (eigene Schublade sbkim_familyprojekt
+    // + stabile Identität sichern — idempotent, nicht zerstörend, keine Netz-Aktion).
+    try {
+      SbkimRendezvous.init({
+        nodeName: FP_NODE_NAME,
+        dbSuffix: FP.dbSuffix,
+        createIdentity: fpCreateIdentityShared,
+        ensureIdentity: true,
+      });
+    } catch (e) { console.warn("[FP-SBKIM] Rendezvous Modus A übersprungen:", e); }
+    if (!window.SbkimRendezvousUI) { console.warn("[FP-SBKIM] SbkimRendezvousUI (sbkim/23_rendezvous_ui.js) nicht geladen."); return; }
+    try {
+      SbkimRendezvousUI.init({
+        nodeName: FP_NODE_NAME,
+        dbSuffix: FP.dbSuffix,
+        corner: "br",
+        createIdentity: fpCreateIdentityShared,
+      });
+      console.info("[FP-SBKIM] Öffentliche Rendezvous-UI (geteilt, mit Suche + Aufräumen) gemountet.");
+    } catch (e) { console.warn("[FP-SBKIM] Rendezvous-UI übersprungen:", e); }
   }
 
   function mountSbkimUi() { mountPublicConnect(); mountDevMailbox(); }
