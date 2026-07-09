@@ -1,0 +1,123 @@
+<!doctype html>
+<!-- Family Projekt — Mycel-Karte: die lebende Netz-Karte des SBKIM-Mycels,
+     live eingebettet (1:1) von lausiklauskn-png.github.io/mycel-karte/.
+     Eigenständige Seite im Family-Projekt-Stil. Nav-Verlinkung + SEO-Feinschliff
+     folgen später (Klaus 2026-07-09). -->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Mycel-Karte — die lebende Netz-Karte des Mycels — Family Projekt</title>
+  <meta name="description" content="Die lebende Netz-Karte des SBKIM-Mycels: alle bekannten Knoten als Kräfte-Graph, live eingebettet. Reine Anzeige, offline-fähig, ohne Konto." />
+  <link rel="canonical" href="https://family-projekt.de/mycelkarte.html" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="author" content="Family Projekt" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Family Projekt" />
+  <meta property="og:locale" content="de_DE" />
+  <meta property="og:title" content="Mycel-Karte — die lebende Netz-Karte — Family Projekt" />
+  <meta property="og:description" content="Die lebende Netz-Karte des SBKIM-Mycels, live eingebettet — alle Knoten als Kräfte-Graph." />
+  <meta property="og:url" content="https://family-projekt.de/mycelkarte.html" />
+  <meta property="og:image" content="https://family-projekt.de/og-image.png" />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Family Projekt" />
+  <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='1' stop-color='%237aa2ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css" />
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset="1" stop-color="#7aa2ff"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#hg)"/></svg>
+        <a href="index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="index.html" data-i18n="nav_start">Start</a>
+        <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+        <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span id="fp-dock" class="fp-dock" title="Knoten-Status"></span>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <span class="eyebrow">🍄 <span data-i18n="mc_eyebrow">Mycel-Karte</span></span>
+        <h1 data-i18n="mc_title">Die lebende Netz-Karte des Mycels</h1>
+        <p class="sub" data-i18n="mc_sub">Alle bekannten Knoten des Netzwerks als Kräfte-Graph — kleine Pillen, dünne Fäden. Reine Anzeige (Empfangsmodus): die Karte lauscht nur und sendet nie. Läuft eine Netzwerk-App im selben Browser, leuchtet echter Verkehr live auf. Offline-fähig, ohne Konto.</p>
+
+        <div class="glass" style="padding:18px;margin-top:18px">
+          <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap">
+            <h3 style="margin:0">🍄 <span data-i18n="mc_card">Mycel-Karte — live</span></h3>
+            <a class="pill" href="https://lausiklauskn-png.github.io/mycel-karte/" target="_blank" rel="noopener noreferrer" data-i18n="mc_open">↗ In neuem Tab öffnen</a>
+          </div>
+          <p style="opacity:.85" data-i18n="mc_d1">Unten läuft die echte Mycel-Karte — kein Bild, kein Mock-up. Zieh an den Knoten, dreh die Pillengröße und die Farben, oder starte den 🎬 Probelauf (klar als Simulation markiert). Am schönsten in Vollbild.</p>
+          <iframe src="https://lausiklauskn-png.github.io/mycel-karte/"
+                  title="Mycel-Karte — lebende Netz-Karte des SBKIM-Mycels (live)"
+                  loading="lazy"
+                  allowfullscreen
+                  style="width:100%;height:82vh;min-height:480px;border:1px solid rgba(154,167,182,.25);border-radius:14px;background:#0b0d14"></iframe>
+          <p style="opacity:.6;font-size:.82rem;margin-top:8px" data-i18n="mc_note">Eingebettet von lausiklauskn-png.github.io — falls dein Browser das Einbetten blockiert, nutze den „In neuem Tab öffnen"-Knopf oben. Live-Verkehr leuchtet nur auf, wenn eine Netzwerk-App im selben Browser läuft.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap bar" style="flex-wrap:wrap;gap:10px">
+      <a href="index.html" data-i18n="nav_start">Start</a>
+      <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+      <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+      <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+  </footer>
+
+  <script type="module" src="assets/mycel-bg.js"></script>
+  <script src="sbkim/01_storage.js"></script>
+  <script src="sbkim/02_spore.js"></script>
+  <script src="sbkim/03_embedding.js"></script>
+  <script src="sbkim/04_match.js"></script>
+  <script src="sbkim/05_anastomose.js"></script>
+  <script src="sbkim/07_apoptose.js"></script>
+  <script src="sbkim/15_membran.js"></script>
+  <script src="sbkim/16_siegel.js"></script>
+  <script src="sbkim/17_floating_widget.js"></script>
+  <script src="sbkim/20_schluessel_safe.js"></script>
+  <script type="module" src="sbkim/05b_nostr_relay.js"></script>
+  <script src="sbkim/23_rendezvous.js"></script>
+  <script src="sbkim/sbkim-init.js"></script>
+  <script>
+    window.FP_PAGE_I18N = {
+      de: { mc_eyebrow: "Mycel-Karte", mc_title: "Die lebende Netz-Karte des Mycels",
+        mc_sub: "Alle bekannten Knoten des Netzwerks als Kräfte-Graph — kleine Pillen, dünne Fäden. Reine Anzeige (Empfangsmodus): die Karte lauscht nur und sendet nie. Läuft eine Netzwerk-App im selben Browser, leuchtet echter Verkehr live auf. Offline-fähig, ohne Konto.",
+        mc_card: "Mycel-Karte — live",
+        mc_open: "↗ In neuem Tab öffnen",
+        mc_d1: "Unten läuft die echte Mycel-Karte — kein Bild, kein Mock-up. Zieh an den Knoten, dreh die Pillengröße und die Farben, oder starte den 🎬 Probelauf (klar als Simulation markiert). Am schönsten in Vollbild.",
+        mc_note: "Eingebettet von lausiklauskn-png.github.io — falls dein Browser das Einbetten blockiert, nutze den „In neuem Tab öffnen“-Knopf oben. Live-Verkehr leuchtet nur auf, wenn eine Netzwerk-App im selben Browser läuft." },
+      en: { mc_eyebrow: "Mycelium map", mc_title: "The living network map of the mycelium",
+        mc_sub: "All known nodes of the network as a force graph — small pills, thin threads. Display only (receive mode): the map only listens, never sends. If a network app runs in the same browser, real traffic lights up live. Offline-capable, no account.",
+        mc_card: "Mycelium map — live",
+        mc_open: "↗ Open in new tab",
+        mc_d1: "Below runs the real mycelium map — no image, no mock-up. Drag the nodes, adjust pill size and colours, or start the 🎬 dry run (clearly marked as a simulation). Best in fullscreen.",
+        mc_note: "Embedded from lausiklauskn-png.github.io — if your browser blocks embedding, use the \"Open in new tab\" button above. Live traffic only lights up when a network app runs in the same browser." }
+    };
+  </script>
+  <script src="assets/app.js"></script>
+  <script src="assets/status-widget.js"></script>
+  <script>FP.init();</script>
+</body>
+</html>

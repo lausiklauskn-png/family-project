@@ -61,6 +61,24 @@ window.FP_WERKZEUGE = [
     en: "An open question-and-answer board: answers can be sorted by meaning (free, as a ranking) — optionally an AI judge grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account.",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" },
 
+  /* Neue eigenständige SBKIM-Knoten-PWAs (2026-07-09): Kim-Bell, Kimseek und
+   * Kimboard sind jeweils ein eigenes Repo mit eigener Live-URL. Kimseek ist das
+   * Such-Werkzeug, Kimboard die Pinnwand — beide nun als vollwertige Endknoten;
+   * Kim-Bell ist die „Mit dem Netz verbinden"-Glocke. external:true → öffnen die
+   * Live-App direkt in einem neuen Tab. */
+  { id: "kimbell", name: "Kim-Bell", icon: "🔔", iconImg: "assets/appicons/kimbell.png", external: true,
+    de: "Die Netz-Glocke: melde dich mit einer eigenen, stabilen Identität sauber im gemeinsamen SBKIM-Raum an und finde andere Knoten — server-los im Browser.",
+    en: "The network bell: sign in cleanly to the shared SBKIM room with your own stable identity and find other nodes — server-less, in the browser.",
+    open: "https://lausiklauskn-png.github.io/Kim-Bell/" },
+  { id: "kimseek", name: "Kimseek", icon: "🔍", iconImg: "assets/appicons/kimseek.png", external: true,
+    de: "Semantische Suche, die die Bedeutung hinter der Frage versteht statt nur Stichwörter — mit Sprache, Bild-/Handschrift-Erkennung und KI-Brücke. Ein eigener Knoten im Netz.",
+    en: "Semantic search that grasps the meaning behind your question, not just keywords — with voice, image/handwriting recognition and an AI bridge. Its own node in the network.",
+    open: "https://lausiklauskn-png.github.io/Kimseek/" },
+  { id: "kimboard", name: "Kimboard", icon: "📌", iconImg: "assets/appicons/kimboard.png", external: true,
+    de: "Die semantische Pinnwand: Fragen und Notizen an ein geborgtes, geteiltes Brett heften, geräteübergreifend, nach Bedeutung sortiert. Ein eigener Knoten im Netz.",
+    en: "The semantic pinboard: pin questions and notes to a borrowed \"dumb board\", across devices, sorted by meaning. Its own node in the network.",
+    open: "https://lausiklauskn-png.github.io/Kimboard/" },
+
   /* Referenz-Beispiele (2026-07-06, Klaus): eigene Seite mit live eingebetteten
    * Beispielen neu gebauter Internetseiten aus der Werkstatt. Erste Referenz:
    * Tomys Schaufenster. */
