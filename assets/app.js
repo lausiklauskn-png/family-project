@@ -325,7 +325,7 @@
   }
 
   // Footer-Schnell-Links zu Klaus' PWAs (Bauphase), aus window.FP_MYAPPS.
-  // NUR im Dev-Modus sichtbar (enthält u.a. WorkFloh/ISD⁺ — soll nicht
+  // NUR im Dev-Modus sichtbar (enthält u.a. WorkFloh — soll nicht
   // dauerhaft öffentlich verlinkt sein, Brief Phase 3 + meineapps.js-Hinweis).
   function renderAppLinks() {
     if (!isDev()) return;
