@@ -4,8 +4,7 @@
  *
  * Wechselbar ohne Code. Schema: { name, url }.
  * WICHTIG vor dem öffentlichen Launch: diese Leiste ausblenden oder dev-only
- * schalten (Bauphase). Sie enthält u.a. WorkFloh (Klaus' eigenes Repo, aktuell
- * ISD⁺-gebrandet, wird später umgebrandet) — soll NICHT dauerhaft öffentlich
+ * schalten (Bauphase). Sie enthält u.a. WorkFloh (Klaus' eigenes Repo, privat) — soll NICHT dauerhaft öffentlich
  * verlinkt bleiben. */
 window.FP_MYAPPS = {
   labelDe: "Meine Apps (Bauphase):",

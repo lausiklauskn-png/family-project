@@ -4,7 +4,7 @@
  *
  * Nur Apps mit eigenem Impressum sind hier gelistet. Bewusst NICHT dabei:
  * Mein Tresor / Jasons Tresor (noch kein Impressum), BookLedgerPro (später),
- * WorkFloh (ISD⁺-gebrandet, privat).
+ * WorkFloh (privat).
  *
  * Wechselbar ohne weiteren Code. Schema: { name, url }. */
 window.FP_PUBLICAPPS = {
