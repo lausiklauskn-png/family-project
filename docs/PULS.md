@@ -4,6 +4,27 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-10: GitHub-Pages-Vorschau (immer-aktuell) als Fallback zum Hetzner-Deploy
+
+**Befund (Klaus):** `family-projekt.de` (Hetzner) hing auf altem Stand — der Live-Server
+lieferte `sw.js` v8 (Stand vor PR #37), obwohl `main` längst v11 ist. Der Server-Auto-Deploy
+läuft unzuverlässig; Zugang zur Server-Konsole gerade umständlich. Klaus' Entscheidung:
+die Seite **zusätzlich** über GitHub Pages automatisch aktuell halten.
+
+**Gebaut:** `.nojekyll` (Root) → Pages liefert die App unverändert (ohne Jekyll). README-Abschnitt
+„Zwei Adressen". Kein CNAME (Domain bleibt bewusst auf Hetzner — Pages ist die **Vorschau**
+`https://lausiklauskn-png.github.io/family-project/`, „zusätzlich", nicht ersetzend).
+Alle Pfade relativ (SW `register("sw.js")`, manifest `start_url:"."`) → läuft unter dem
+`/family-project/`-Unterpfad. Subpfad-Smoke **5/5** (Seite lädt, Rendezvous-UI mit
+Aufräumen-Knopf mountet, keine kritischen Fehler).
+
+**Klaus' Einmal-Schritt:** GitHub → Settings → Pages → Source „Deploy from a branch" →
+`main` / `/ (root)` → Save. Danach aktualisiert sich die Vorschau bei jedem Merge auf `main`.
+**Offen:** Hetzner-Server irgendwann wieder ziehen lassen (v8→v11) ODER später bewusst
+entscheiden, die Domain auf Pages zu zeigen (DNS bei INWX; Relay-Subdomain bleibt Hetzner).
+
+---
+
 ## ✅ 2026-07-10: Embedding-Modell — Offline-first + „Unexpected token '<'"-Fix
 
 **Befund (Klaus, Screenshots):** Auf `family-projekt.de` schlug „Mit dem Netz verbinden"

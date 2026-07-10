@@ -14,6 +14,20 @@ ein freies Netzwerk (Mycel-Knoten) und einen Marktplatz.
 
 Aufbau / Deploy: siehe `docs/DEPLOY.md`. Stand/Aufgaben: `docs/PULS.md`.
 
+## Zwei Adressen — Produktion + immer-aktuelle Vorschau
+
+- **Produktion:** `https://family-projekt.de` (Hetzner + Caddy, `git pull` auf dem
+  Server; siehe `docs/DEPLOY.md`). Wenn das Server-Update mal hängt, ist die Seite
+  dort veraltet.
+- **Vorschau (GitHub Pages):** `https://lausiklauskn-png.github.io/family-project/`
+  — aktualisiert sich bei **jedem Merge auf `main`** von selbst, ganz ohne Server.
+  Einrichten: **GitHub → Settings → Pages → Source: „Deploy from a branch" →
+  Branch `main` / `/ (root)` → Save.** Die Datei `.nojekyll` sorgt dafür, dass die
+  App unverändert (ohne Jekyll) ausgeliefert wird. Alle Pfade sind relativ, läuft
+  daher auch unter dem `/family-project/`-Unterpfad (headless bestätigt).
+  Hinweis: Auf der Pages-Adresse lädt das Embedding-Modell von HuggingFace (das
+  Selbst-Hosten unter `/models/` greift nur auf der Root-Domain).
+
 ## Lokaler Sichttest
 ```
 python3 -m http.server 8000   # dann http://localhost:8000 im Browser
