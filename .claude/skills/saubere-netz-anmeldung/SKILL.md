@@ -176,6 +176,28 @@ Kim-Bell** im Browser („✓ ANDOCK ETABLIERT"). Dabei bestätigte Lehren:
 - **Kopieren, nicht klonen:** das Modul byte-gleich in jede App, Drift-Guard im
   Smoke-Test.
 
+## Der `dbSuffix` entscheidet die Identität — NICHT der Pfad (Lehre 13)
+
+Häufige Verwirrung, wenn ein Nutzer **mehrere** Apps angemeldet hat: *Welche
+erzeugt jetzt die Spore für diesen Browser?* Antwort: **immer die, deren
+`dbSuffix` gerade läuft — nicht die URL, nicht der Pfad.**
+
+- **Gleicher `dbSuffix` = eine Identität**, auch über verschiedene Pfade/Fenster.
+  **Verschiedener `dbSuffix` = zwei getrennte Identitäten.**
+- Beispiel Mycel-Karte: läuft sie **unter Sage** (Sage-Origin, kein eigener
+  `dbSuffix`), nutzt sie **Sages** Identität. Läuft dieselbe Karte als **eigene
+  PWA** mit eigenem `dbSuffix`, ist sie ein **eigener** Knoten. Wird sie **aus Sage
+  heraus** geöffnet, ohne eigenen `dbSuffix` zu setzen → sie erzeugt **keine
+  eigene** Spore, sondern spricht mit Sages Identität.
+- **Reine Anzeige-/Betrachter-Tools** (Mycel-Karte als Relais-Visualisierer)
+  **erzeugen KEINE Identität** — sie zeigen nur, was andere angemeldet haben. Nie
+  „aus Versehen" dort eine Anmeldung auslösen.
+
+**Pflicht beim Einbau:** jeder Knoten setzt seinen **eigenen** `dbSuffix` beim
+Mount (`mixarium`, `rezeptbuch`, `toolpoint`, …). Ein Betrachter setzt **keinen**.
+Volle Fassung + Nicht-Programmierer-Erklärung (Ausweis/Namensschild/Schaufenster):
+Sage-Protokol `docs/OBSERVATORIUM_BROWSER.md` **Lehre 13**.
+
 ## Kurz-Merksatz
 
 **Erst die eigene Schublade (Suffix), dann prüfen/anlegen (sanft, automatisch).**
