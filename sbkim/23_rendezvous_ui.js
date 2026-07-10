@@ -16,7 +16,7 @@
  *
  * Dieses UI-Modul wird — wie Modul 23 selbst — **byte-1:1 in jede PWA kopiert**.
  * Die App parametrisiert nur:
- *   SbkimRendezvousUI.init({ nodeName, createIdentity, corner?, accent? })
+ *   SbkimRendezvousUI.init({ nodeName, createIdentity, prepareCorpus?, corner?, accent? })
  * - nodeName:       Anzeigename der eigenen Visitenkarte (z.B. "Mein Rezeptbuch").
  * - createIdentity: optional async () -> void; erzeugt die lebende Identität,
  *                   falls noch keine da ist (app-spezifisch, da Domänen-
@@ -43,7 +43,7 @@
 
   var VERSION = "0.1";
 
-  var cfg = { nodeName: "SBKIM-Knoten", createIdentity: null, dbSuffix: null, corner: "bl", accent: null };
+  var cfg = { nodeName: "SBKIM-Knoten", createIdentity: null, dbSuffix: null, prepareCorpus: null, corner: "bl", accent: null };
   var mounted = false;
   var btnEl = null, panelEl = null, outEl = null, cardsEl = null, relOnlyBtn = null;
   var askInputEl = null, answerBtn = null;   // Bau 23.B — Frage-Feld + Antwortrecht-Schalter
@@ -77,6 +77,104 @@
   function appendOut(text) { if (outEl) outEl.textContent += text; }
   function clear(node) { while (node && node.firstChild) node.removeChild(node.firstChild); }
 
+  // PFLICHT (Klaus 2026-07-08): jede Operation, die das ~30-MB-Embedding-Modell
+  // laden kann (Verbinden / Nur-neu-anmelden / „Wer ist im Raum?" — über
+  // getOwnLiveSpore/createIdentity), zeigt einen Prozent-Balken im Panel. Ohne
+  // ihn wirkt die Seite eingefroren (Modell-Laden > 12 s) und wird zu früh
+  // geschlossen. Quelle: Modul-03-Event sbkim:embedding-progress.
+  var _progHandler = null, _progBase = "";
+  function startModelProgress(baseText) {
+    _progBase = baseText || "";
+    if (_progHandler || !outEl) return;
+    _progHandler = function (ev) {
+      var dd = ev && ev.detail; if (!dd || !outEl) return;
+      if (typeof dd.progress === "number" && isFinite(dd.progress)) {
+        var pct = Math.max(0, Math.min(100, Math.round(dd.progress)));
+        var filled = Math.round(pct / 5);
+        var bar = new Array(filled + 1).join("█") + new Array(20 - filled + 1).join("░");
+        outEl.textContent = _progBase + "\nSprach-Modell lädt  " + bar + "  " + pct + " %" +
+          "\n(einmalig ~30 MB — kann am Tablet 1–2 Min dauern, bitte offen lassen)";
+      } else if (dd.status === "done" || dd.status === "ready") {
+        outEl.textContent = _progBase + "\nSprach-Modell geladen ✓";
+      }
+    };
+    try { global.addEventListener("sbkim:embedding-progress", _progHandler); } catch (_e) {}
+  }
+  function stopModelProgress() {
+    if (!_progHandler) return;
+    try { global.removeEventListener("sbkim:embedding-progress", _progHandler); } catch (_e) {}
+    _progHandler = null;
+  }
+
+  // ---- Flying-Widget: frei verschiebbar + minimierbar (Klaus 2026-07-10) ----
+  // Das „Mit dem Netz verbinden"-Panel klebte in einer Ecke und verdeckte die
+  // Seite. Jetzt: an der Kopfzeile frei ziehbar, per „–" zur Blase minimierbar,
+  // Position in localStorage gemerkt. Bubble ⇄ Panel teilen sich EINE Position.
+  var POS_KEY = "sbkim_rdv_ui_pos";
+  function loadPos() {
+    try {
+      var s = global.localStorage.getItem(POS_KEY);
+      if (!s) return null;
+      var p = JSON.parse(s);
+      if (p && typeof p.x === "number" && typeof p.y === "number") return p;
+    } catch (_e) {}
+    return null;
+  }
+  function savePos(x, y) {
+    try { global.localStorage.setItem(POS_KEY, JSON.stringify({ x: Math.round(x), y: Math.round(y) })); } catch (_e) {}
+  }
+  function clampInts(x, y, node) {
+    var vw = global.innerWidth || 1024, vh = global.innerHeight || 768;
+    var w = (node && node.offsetWidth) || 60, h = (node && node.offsetHeight) || 60;
+    var mx = Math.max(4, vw - w - 4), my = Math.max(4, vh - h - 4);
+    return { x: Math.min(Math.max(4, x), mx), y: Math.min(Math.max(4, y), my) };
+  }
+  function applyPos(node, p) {
+    if (!node || !p) return;
+    node.style.left = p.x + "px"; node.style.top = p.y + "px";
+    node.style.right = "auto"; node.style.bottom = "auto";
+  }
+  function makeDraggable(node, handle) {
+    handle = handle || node;
+    handle.style.touchAction = "none";
+    var sx = 0, sy = 0, ox = 0, oy = 0, moved = false, dragging = false;
+    handle.addEventListener("pointerdown", function (ev) {
+      var tg = ev.target;
+      if (tg && tg !== handle && (tg.tagName === "BUTTON" || tg.tagName === "INPUT" ||
+          tg.tagName === "TEXTAREA" || tg.tagName === "A" || tg.tagName === "SELECT")) return;
+      dragging = true; moved = false;
+      var r = node.getBoundingClientRect();
+      ox = r.left; oy = r.top; sx = ev.clientX; sy = ev.clientY;
+      try { handle.setPointerCapture(ev.pointerId); } catch (_e) {}
+    });
+    handle.addEventListener("pointermove", function (ev) {
+      if (!dragging) return;
+      var dx = ev.clientX - sx, dy = ev.clientY - sy;
+      if (!moved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) moved = true;
+      if (!moved) return;
+      applyPos(node, clampInts(ox + dx, oy + dy, node));
+      ev.preventDefault();
+    });
+    function end(ev) {
+      if (!dragging) return;
+      dragging = false;
+      try { handle.releasePointerCapture(ev.pointerId); } catch (_e) {}
+      if (moved) {
+        var r = node.getBoundingClientRect();
+        var c = clampInts(r.left, r.top, node);
+        savePos(c.x, c.y);
+        if (node === panelEl && btnEl) applyPos(btnEl, c);
+        if (node === btnEl && panelEl) applyPos(panelEl, c);
+      }
+    }
+    handle.addEventListener("pointerup", end);
+    handle.addEventListener("pointercancel", end);
+    // Nach einem Zug den nachfolgenden Klick verschlucken (Bubble ist ein Button).
+    node.addEventListener("click", function (ev) {
+      if (moved) { ev.stopPropagation(); ev.preventDefault(); moved = false; }
+    }, true);
+  }
+
   function mount() {
     if (mounted) return;
     var d = doc();
@@ -102,11 +200,19 @@
       "box-shadow:0 12px 34px rgba(0,0,0,.5)");
     panelEl.id = "sbkim-rdv-panel";
 
-    var head = el("div", "display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px");
+    var head = el("div", "display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;cursor:move");
+    head.title = "Ziehen zum Verschieben";
     head.appendChild(el("strong", "color:" + ac, "🌐 Mit dem Netz verbinden"));
+    var headBtns = el("div", "display:flex;align-items:center;gap:2px");
+    var minBtn = el("button", "background:none;border:none;color:#9aa7b6;font-size:1.4rem;line-height:.6;cursor:pointer;padding:0 6px", "–");
+    minBtn.type = "button";
+    minBtn.title = "Minimieren — zur Blase verkleinern";
+    headBtns.appendChild(minBtn);
     var closeBtn = el("button", "background:none;border:none;color:#9aa7b6;font-size:1.1rem;cursor:pointer", "✕");
     closeBtn.type = "button";
-    head.appendChild(closeBtn);
+    closeBtn.title = "Schließen (zur Blase)";
+    headBtns.appendChild(closeBtn);
+    head.appendChild(headBtns);
     panelEl.appendChild(head);
 
     panelEl.appendChild(el("p", "margin:0 0 10px;color:#9aa7b6",
@@ -129,6 +235,20 @@
     filterRow.appendChild(relOnlyBtn);
     panelEl.appendChild(filterRow);
 
+    // Modus B — „🧹 Aufräumen & neu anmelden" (Identitäts-Hygiene, zerstörend,
+    // dezent gestrichelt). Löscht NUR den geteilten Alt-Topf `sbkim` dieser
+    // Origin, behält die eigene Schublade + stabile Identität; erst mit dem
+    // Notfall gibt es eine ganz neue Identität.
+    var repairRow = el("div", "margin-top:8px");
+    var repairBtn = el("button", "padding:6px 11px;border-radius:8px;border:1px dashed var(--line,#5a4a3a);" +
+      "background:transparent;color:#e6b980;cursor:pointer;font:inherit;font-size:.74rem",
+      "🧹 Aufräumen & neu anmelden"); repairBtn.type = "button";
+    repairBtn.title = "Löscht den geteilten Alt-Speicher dieser Adresse (nicht deine eigene Schublade), " +
+      "meldet Service-Worker ab, behält deine stabile Identität und meldet dich neu an. Danach hart neu laden.";
+    repairBtn.addEventListener("click", function () { onRepair(); });
+    repairRow.appendChild(repairBtn);
+    panelEl.appendChild(repairRow);
+
     // Bau 23.B — Cross-Knoten-Frage: EIN Frage-Feld + „Antworten"-Schalter.
     // Fragen ist nutzer-ausgelöst (❓-Knopf je Karte nutzt dieses Feld);
     // Antworten ist das Antwortrecht (Default AUS, bewusster Schalter).
@@ -144,16 +264,6 @@
     askRow.appendChild(askInputEl);
     askRow.appendChild(answerBtn);
     panelEl.appendChild(askRow);
-
-    // Modus B — Reparatur/Aufräumen (Identitäts-Hygiene, zerstörend, dezent).
-    var repairRow = el("div", "margin-top:8px");
-    var repairBtn = el("button", "padding:6px 11px;border-radius:8px;border:1px dashed var(--line,#5a4a3a);" +
-      "background:transparent;color:#e6b980;cursor:pointer;font:inherit;font-size:.74rem",
-      "🧹 Aufräumen & neu anmelden"); repairBtn.type = "button";
-    repairBtn.title = "Löscht den geteilten Alt-Speicher dieser Adresse (nicht deine eigene Schublade), " +
-      "meldet Service-Worker ab, erzeugt eine frische Identität und meldet dich neu an. Danach hart neu laden.";
-    repairRow.appendChild(repairBtn);
-    panelEl.appendChild(repairRow);
 
     cardsEl = el("div", "margin-top:10px");
     cardsEl.id = "sbkim-rdv-cards";
@@ -172,6 +282,7 @@
 
     btnEl.addEventListener("click", function () { toggle(); });
     closeBtn.addEventListener("click", function () { hide(); });
+    minBtn.addEventListener("click", function () { hide(); });
     connectBtn.addEventListener("click", function () { onConnect(); });
     discoverBtn.addEventListener("click", function () { onDiscover(); });
     announceBtn.addEventListener("click", function () { onAnnounce(); });
@@ -181,17 +292,34 @@
       renderCards(lastCards); // ohne Neu-Lesen umsortieren/filtern
     });
     answerBtn.addEventListener("click", function () { onToggleAnswering(); });
-    repairBtn.addEventListener("click", function () { onRepair(); });
+
+    // Flying-Widget: gemerkte Position wiederherstellen + Drag verdrahten.
+    var savedPos = loadPos();
+    if (savedPos) applyPos(btnEl, savedPos);
+    makeDraggable(btnEl, btnEl);   // Blase direkt ziehbar
+    makeDraggable(panelEl, head);  // Panel an der Kopfzeile ziehbar
+    // Bei Fenster-/Splitscreen-Änderung ins Sichtfeld zurückklemmen (fail-soft).
+    try {
+      global.addEventListener("resize", function () {
+        var p = loadPos(); if (!p) return;
+        var vis = isOpen() ? panelEl : btnEl;
+        var c = clampInts(p.x, p.y, vis); applyPos(vis, c); savePos(c.x, c.y);
+      });
+    } catch (_e) { /* kein Fenster-Kontext (Test) */ }
 
     mounted = true;
   }
 
+  // Modul 23 mit der vollen Konfig füttern (nodeName + dbSuffix + createIdentity)
+  // — dbSuffix ist Pflicht, damit Modus B (repairAndReconnect) NUR den geteilten
+  // Alt-Topf `sbkim` löscht und die eigene Schublade `sbkim_<suffix>` behält.
   function configModule() {
     var r = rdv();
     if (!r) return;
     var o = { nodeName: cfg.nodeName };
     if (cfg.dbSuffix) o.dbSuffix = cfg.dbSuffix;
     if (typeof cfg.createIdentity === "function") o.createIdentity = cfg.createIdentity;
+    if (typeof cfg.prepareCorpus === "function") o.prepareCorpus = cfg.prepareCorpus;
     try { r.configure(o); } catch (_e) {}
   }
 
@@ -202,6 +330,7 @@
     return r;
   }
 
+  // Modus B — „🧹 Aufräumen & neu anmelden" (zerstörend, nur hinter Nutzer-Knopf).
   function onRepair() {
     var r = ensureRdv();
     if (!r) return;
@@ -210,7 +339,9 @@
       return;
     }
     setOut("🧹 Räume den geteilten Alt-Speicher dieser Adresse auf …\n");
+    startModelProgress("🧹 Räume auf & melde neu an …");
     r.repairAndReconnect().then(function (res) {
+      stopModelProgress(); if (outEl) outEl.textContent = "🧹 Aufgeräumt & neu angemeldet:\n";
       var c = res && res.cleaned;
       if (c) {
         appendOut("• Alt-Topf „sbkim“ gelöscht: " + (c.dbDeleted ? "ja" : "nein") + "\n");
@@ -219,20 +350,22 @@
       }
       if (res && res.ok) {
         if (res.created) appendOut("✓ Frische Identität: " + res.nodeId + "\n");
-        else appendOut("Identität (eigene Schublade): " + res.nodeId + "\n");
+        else appendOut("Identität (eigene Schublade bleibt): " + res.nodeId + "\n");
         appendOut("✓ Neu im Raum angemeldet.\n");
       } else {
         appendOut("✗ " + ((res && res.reason) || "Neu-Anmelden fehlgeschlagen.") + "\n");
       }
       if (res && res.reloadHint) appendOut("\nℹ️ " + res.reloadHint);
-    }).catch(function (e) { appendOut("✗ Aufräumen fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+    }).catch(function (e) { stopModelProgress(); setOut("✗ Aufräumen fehlgeschlagen: " + (e && e.message ? e.message : e)); });
   }
 
   function onConnect() {
     var r = ensureRdv();
     if (!r) return;
     setOut("→ Verbinde mit dem Netz …\n");
+    startModelProgress("→ Verbinde mit dem Netz …");
     r.connectAndAnnounce({ createIdentity: cfg.createIdentity || undefined }).then(function (res) {
+      stopModelProgress(); if (outEl) outEl.textContent = "";
       if (res.ok) {
         if (res.created) appendOut("✓ Identität erzeugt: " + res.nodeId + "\n");
         else appendOut("Identität vorhanden: " + res.nodeId + "\n");
@@ -242,27 +375,31 @@
         appendOut("✗ " + (res.reason || "Verbinden fehlgeschlagen.") +
           (cfg.createIdentity ? "\n(Bei Netz-/Modell-Fehler: Verbindung prüfen und nochmal.)" : ""));
       }
-    }).catch(function (e) { appendOut("✗ Verbinden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+    }).catch(function (e) { stopModelProgress(); setOut("✗ Verbinden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
   }
 
   function onAnnounce() {
     var r = ensureRdv();
     if (!r) return;
     setOut("→ Hefte deine Visitenkarte in den gemeinsamen Raum …\n");
+    startModelProgress("→ Hefte deine Visitenkarte in den gemeinsamen Raum …");
     r.announce().then(function (res) {
+      stopModelProgress(); if (outEl) outEl.textContent = "";
       if (res.ok) appendOut("✓ Du bist im Raum (nodeId " + res.nodeId + "). Lass den Tab offen.");
       else appendOut("✗ " + (res.reason || "Anmelden fehlgeschlagen."));
-    }).catch(function (e) { appendOut("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+    }).catch(function (e) { stopModelProgress(); setOut("✗ Anmelden fehlgeschlagen: " + (e && e.message ? e.message : e)); });
   }
 
   function onDiscover() {
     var r = ensureRdv();
     if (!r) return;
     setOut("👥 Lese den gemeinsamen Raum …\n");
+    startModelProgress("👥 Lese den gemeinsamen Raum …");
     r.discover().then(function (res) {
+      stopModelProgress();
       if (!res.ok) { setOut("✗ Raum-Lesen fehlgeschlagen: " + (res.reason || "(unbekannt)")); return; }
       renderCards(res.cards);
-    }).catch(function (e) { setOut("✗ Raum-Lesen fehlgeschlagen: " + (e && e.message ? e.message : e)); });
+    }).catch(function (e) { stopModelProgress(); setOut("✗ Raum-Lesen fehlgeschlagen: " + (e && e.message ? e.message : e)); });
   }
 
   function renderCards(cards) {
@@ -391,8 +528,14 @@
     }).catch(function (e) { if (outEl) outEl.textContent += "\n✗ Fehler: " + (e && e.message ? e.message : e); });
   }
 
-  function show() { if (panelEl) panelEl.style.display = "block"; }
-  function hide() { if (panelEl) panelEl.style.display = "none"; }
+  function show() {
+    if (panelEl) { panelEl.style.display = "block"; var p = loadPos(); if (p) applyPos(panelEl, p); }
+    if (btnEl) btnEl.style.display = "none";      // Panel offen → Blase weg (Flying-Widget)
+  }
+  function hide() {
+    if (panelEl) panelEl.style.display = "none";
+    if (btnEl) btnEl.style.display = "";          // minimiert → Blase zeigt sich wieder
+  }
   function isOpen() { return !!(panelEl && panelEl.style.display !== "none"); }
   function toggle() { if (isOpen()) hide(); else show(); }
 
@@ -400,6 +543,7 @@
     if (!opts || typeof opts !== "object") return;
     if (typeof opts.nodeName === "string" && opts.nodeName.length > 0) cfg.nodeName = opts.nodeName;
     if (typeof opts.createIdentity === "function") cfg.createIdentity = opts.createIdentity;
+    if (typeof opts.prepareCorpus === "function") cfg.prepareCorpus = opts.prepareCorpus;
     if (typeof opts.dbSuffix === "string" && opts.dbSuffix.length > 0) cfg.dbSuffix = opts.dbSuffix;
     if (typeof opts.corner === "string") cfg.corner = opts.corner;
     if (typeof opts.accent === "string") cfg.accent = opts.accent;
