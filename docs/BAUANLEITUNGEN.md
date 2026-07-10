@@ -52,6 +52,16 @@ Wenn mehrere Apps im selben Browser angemeldet sind, fragt man sich schnell:
 Volle technische Fassung: Sage-Protokol `docs/OBSERVATORIUM_BROWSER.md` **Lehre 13**;
 Einbau-Regel im Skill oben (§ 1, Abschnitt „Der `dbSuffix` entscheidet die Identität").
 
+## 4. ⭐ Meilenstein 10.07.2026 — zwei Knoten unterhalten sich nach Bedeutung
+
+**Datei:** [`meilenstein/2026-07-10_zwei-knoten-nach-bedeutung.md`](meilenstein/2026-07-10_zwei-knoten-nach-bedeutung.md) (+ Bild)
+
+Zum ersten Mal haben sich zwei Apps **nach Bedeutung** unterhalten — server-los,
+in beide Richtungen (Sage↔Mixarium). Der andere Knoten durchsucht seinen **eigenen
+Inhalt** nach dem Sinn der Frage und antwortet. Die volle bidirektionale
+Cross-Knoten-Suche ist damit **live bewiesen**. Voller Werdegang: Sage-Protokol
+`docs/MEILENSTEIN_SEMANTISCHE_SUCHE.md` § 4.
+
 ---
 
 *Diese Bauanleitungen liegen identisch in **Sage-Protokol** (`.claude/skills/`)
