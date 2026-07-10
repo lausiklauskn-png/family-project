@@ -32,7 +32,27 @@ Identität & Spore erzeugen/verwalten), ✍ Semantik-Beschreibung, 🛡 Schutz-B
 ⛨ fremden Knoten andocken. Regel: jedes Siegel wird nach diesem Muster gebaut —
 mit dem Werkzeug darin, nicht nur als Badge.
 
+## 3. Welche App erzeugt die Identität? — der `dbSuffix`, nicht die Adresse
+
+**In einfachen Worten (auch ohne Programmierkenntnisse wichtig — Klaus 2026-07-10):**
+
+Wenn mehrere Apps im selben Browser angemeldet sind, fragt man sich schnell:
+*„Welche erzeugt jetzt eigentlich meine Netz-Identität (die Spore)?"*
+
+- Jede App hat eine **eigene Schublade** — ihren `dbSuffix` (z. B. `mixarium`,
+  `rezeptbuch`, `toolpoint`). **Diese Schublade** entscheidet, wer man im Netz ist —
+  **nicht** die Internet-Adresse und **nicht**, aus welchem Fenster man startet.
+- Bild: der `dbSuffix` ist der **Ausweis**. Zwei Fenster mit demselben Ausweis sind
+  **dieselbe** Person; zwei verschiedene Ausweise sind **zwei** Personen.
+- **Betrachter-Werkzeuge** wie die **Mycel-Karte** sind nur ein **Schaufenster**:
+  sie **zeigen**, wer im Raum ist, aber melden **niemanden** an und erzeugen **keine**
+  eigene Identität. Wird die Karte **aus Sage heraus** geöffnet, spricht sie mit
+  **Sages** Ausweis — sie legt keinen neuen an.
+
+Volle technische Fassung: Sage-Protokol `docs/OBSERVATORIUM_BROWSER.md` **Lehre 13**;
+Einbau-Regel im Skill oben (§ 1, Abschnitt „Der `dbSuffix` entscheidet die Identität").
+
 ---
 
-*Diese beiden Bauanleitungen liegen identisch in **Sage-Protokol** (`.claude/skills/`)
+*Diese Bauanleitungen liegen identisch in **Sage-Protokol** (`.claude/skills/`)
 und hier in **family-project**. Bei Weiterentwicklung beide Orte nachziehen.*
