@@ -11,6 +11,18 @@ family-projekt.de {
 	file_server
 	try_files {path} {path}/ /index.html
 
+	# OPTIONAL (empfohlen, nicht nötig): Das Embedding-Modell unter /models/…
+	# echt ausliefern und bei fehlender Datei mit 404 antworten — statt (wie
+	# durch try_files oben) die index.html zurückzugeben. Sonst könnte die
+	# Modell-Bibliothek im Browser die HTML-Startseite als JSON lesen
+	# („Unexpected token '<'“). Die App fängt diesen Fall inzwischen selbst ab
+	# (Body-Probe in sbkim/03_embedding.js) — diese Zeilen sind reine
+	# Zusatz-Härtung. Zum Aktivieren einkommentieren (handle-Blöcke haben
+	# Vorrang vor dem globalen try_files):
+	# handle /models/* {
+	# 	file_server
+	# }
+
 	# Korrekte MIME-Typen für JS (ältere Caddy-Versionen)
 	@js path *.js
 	header @js Content-Type "text/javascript; charset=utf-8"

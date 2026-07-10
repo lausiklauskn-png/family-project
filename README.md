@@ -20,3 +20,28 @@ python3 -m http.server 8000   # dann http://localhost:8000 im Browser
 ```
 Headless-Smoke (Beweis der Logik): `node tests/smoke_start.mjs`
 (braucht playwright-core + Chromium; Klaus' Browser-Sichttest bleibt unersetzbar).
+
+## Embedding-Modell (Identität / Suche)
+
+Die Identitäts-Erzeugung und die Bedeutungs-Suche brauchen das Modell
+**`Xenova/multilingual-e5-small`** (~30 MB). Family-Projekt kann es aus **zwei
+Quellen** laden — die App entscheidet **automatisch**:
+
+- **Selbst-gehostet (offline-first, bevorzugt):** liegt das Modell unter
+  `models/Xenova/multilingual-e5-small/…` im Repo, lädt die App es vom eigenen
+  Server — keine HuggingFace-Abhängigkeit, funktioniert offline.
+- **HuggingFace (Fallback):** fehlt das lokale Modell, lädt die App es beim
+  ersten Anmelden von HuggingFace (einmal Internet nötig, danach im Browser
+  gecacht).
+
+Warum die Auto-Erkennung nötig ist: der Server liefert für fehlende Pfade die
+`index.html` aus (`try_files … /index.html`). Prüft man nur den HTTP-Status,
+hält die Modell-Bibliothek diese HTML-Seite für die Modell-Datei und wirft
+„Unexpected token '<'“. Darum prüft `sbkim/03_embedding.js` (Funktion
+`detectModelSource`) den **Inhalt** der Antwort, nicht nur den Status.
+
+**Modell selbst ins Repo holen:** GitHub → **Actions** →
+**„Embedding-Modell ins Repo holen"** → **Run workflow** (Branch wählen). Der
+Lauf lädt die Dateien auf GitHubs Servern und committet sie nach
+`models/…`. Danach `git pull` + auf der Seite einmal **Strg+Shift+R**. Details:
+`models/Xenova/multilingual-e5-small/PLATZHALTER.md`.

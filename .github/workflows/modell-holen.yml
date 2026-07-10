@@ -1,0 +1,57 @@
+name: Embedding-Modell ins Repo holen
+
+# Holt das Modell "Xenova/multilingual-e5-small" von HuggingFace und legt es
+# unter models/… ins Repo, damit Family-Projekt es offline vom eigenen Server
+# lädt. Läuft NUR auf Knopfdruck (Actions -> diese Workflow -> "Run workflow").
+# Der Lauf committet die Modell-Dateien in genau den Branch, auf dem er
+# gestartet wurde.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  modell-holen:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v4
+
+      - name: Modell-Dateien herunterladen
+        run: |
+          set -euo pipefail
+          BASE="https://huggingface.co/Xenova/multilingual-e5-small/resolve/main"
+          DIR="models/Xenova/multilingual-e5-small"
+          mkdir -p "$DIR/onnx"
+          for f in config.json tokenizer.json tokenizer_config.json special_tokens_map.json; do
+            echo "Lade $f ..."
+            curl -sSL --fail --retry 3 -o "$DIR/$f" "$BASE/$f"
+          done
+          echo "Lade onnx/model_quantized.onnx (~30 MB) ..."
+          curl -sSL --fail --retry 3 -o "$DIR/onnx/model_quantized.onnx" "$BASE/onnx/model_quantized.onnx"
+
+      - name: Dateien prüfen (kein HTML statt JSON, ONNX groß genug)
+        run: |
+          set -euo pipefail
+          DIR="models/Xenova/multilingual-e5-small"
+          # config.json muss echtes JSON sein (mit '{' beginnen), keine Fehlerseite
+          head -c1 "$DIR/config.json" | grep -q '{' || { echo "config.json ist kein JSON"; exit 1; }
+          python3 -c "import json,sys; json.load(open('$DIR/config.json')); json.load(open('$DIR/tokenizer.json'))"
+          SZ=$(stat -c%s "$DIR/onnx/model_quantized.onnx")
+          echo "ONNX-Größe: $SZ Bytes"
+          test "$SZ" -gt 5000000 || { echo "ONNX-Datei zu klein — Download fehlgeschlagen?"; exit 1; }
+
+      - name: Ins Repo committen
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add models/Xenova/multilingual-e5-small
+          if git diff --cached --quiet; then
+            echo "Keine Änderung — Modell ist bereits aktuell."
+          else
+            git commit -m "Embedding-Modell (Xenova/multilingual-e5-small) selbst-gehostet ins Repo"
+            git push origin HEAD:"${GITHUB_REF_NAME}"
+          fi

@@ -4,6 +4,35 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-10: Embedding-Modell — Offline-first + „Unexpected token '<'"-Fix
+
+**Befund (Klaus, Screenshots):** Auf `family-projekt.de` schlug „Mit dem Netz verbinden"
+fehl: *Modell 'Xenova/multilingual-e5-small' konnte nicht geladen werden: Unexpected token
+'<', "<!doctype "… is not valid JSON*. Auf Sage (github.io) klappte es zeitgleich — also
+kein Konto-/Token-Problem (Klaus hatte parallel API-Keys gelöscht; unschuldig).
+
+**Ursache:** transformers.js prüft per Default ZUERST einen lokalen Modell-Pfad. Der
+Caddy-`try_files … /index.html` liefert für den (nicht existenten) lokalen Pfad die
+HTML-Startseite mit **HTTP 200** (statt 404) → die Bibliothek liest `<!doctype …` als JSON.
+GitHub Pages gibt echte 404 → dort fällt sie sauber auf HuggingFace zurück.
+
+**Gebaut** (`sbkim/03_embedding.js`): eigene **Body-Probe** `detectModelSource()` — prüft den
+**Inhalt** (nicht nur Status) von `/models/<modell>/config.json`. Echtes JSON → `allowLocalModels`
+(offline, eigener Server); sonst `allowLocalModels=false` + HuggingFace (kein Trap). Fail-soft.
+Auto-Erkennung, keine Config nötig. Surface `+getModelSource/_detectModelSource`, `_meta.localModel*`.
+- `sw.js`: `/models/` nicht mehr abfangen/cachen (kein poisoned index.html); `CACHE_VERSION` v10→v11.
+- `Caddyfile.example`: optionaler (auskommentierter) `handle /models/*`-Härtungsblock.
+- **Selbst-hosten vorbereitet:** `models/Xenova/multilingual-e5-small/` (Platzhalter-Doku) +
+  GitHub-Action `.github/workflows/modell-holen.yml` (Knopf: holt die ~30 MB von HuggingFace auf
+  GitHubs Servern und committet sie — der Sandbox-Egress blockiert HuggingFace, daher nicht hier
+  ladbar). README-Abschnitt „Embedding-Modell".
+
+**Tests:** `tests/smoke_modell_quelle.mjs` **7/7** (JSON→local, SPA-Falle/404/offline→remote),
+Start-Smoke **15/15**. **Browser-Sichttest an family-projekt.de wartet auf Klaus** (echter
+SPA-Server + HuggingFace nur dort prüfbar).
+
+---
+
 ## ✅ 2026-07-08: „🌐 Mit dem Netz verbinden" öffentlich sichtbar gemacht
 
 **Befund (Klaus):** Auf family-projekt.de fehlte der „Mit dem Netz verbinden"-Knopf

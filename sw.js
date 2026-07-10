@@ -9,7 +9,7 @@
  * CACHE-BUST: bei jeder Shell-Änderung CACHE_VERSION erhöhen (oder beim
  * Deploy Hard-Reload), sonst liefert der SW alte Dateien.
  */
-var CACHE_VERSION = "family-projekt-v10";
+var CACHE_VERSION = "family-projekt-v11";
 var CORE = [
   "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html",
   "assets/style.css", "assets/app.js", "manifest.json", "icon-192.png", "icon-512.png", "og-image.png"
@@ -38,6 +38,11 @@ self.addEventListener("fetch", function (e) {
   var url;
   try { url = new URL(req.url); } catch (_e) { return; }
   if (url.origin !== self.location.origin) return; // Fremd-Origins durchreichen
+  // Embedding-Modell (/models/…) NICHT abfangen/cachen: transformers.js
+  // pflegt seinen eigenen Modell-Cache, und ein SPA-Fallback (index.html für
+  // fehlende Pfade) darf hier nie unter einer Modell-URL zwischengespeichert
+  // werden — sonst liest die Bibliothek HTML als JSON. Direkt durchreichen.
+  if (url.pathname.indexOf("/models/") === 0) return;
   e.respondWith(
     caches.match(req).then(function (hit) {
       var net = fetch(req).then(function (res) {
