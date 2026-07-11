@@ -155,6 +155,46 @@
     }
   }
 
+  // A5 (Bau 22f-Rollout, 2026-07-11): der Cross-Knoten-ANTWORT-Pfad (op:"query")
+  //   beantwortet eingehende Bedeutungs-Fragen jetzt über den INKLUSIONS-Pfad:
+  //   A4 fächert die Frage über eine app-eigene Synonym-Karte auf (RRF-Fusion
+  //   via queryLocalMulti), A1 hebt den Vorfilter auf BM25+Vektor. Rein additiv,
+  //   konsequent fail-soft. Der 0.80-Cosinus-Boden (Modul 05 Andock-Riegel)
+  //   bleibt unberührt; der Gewinn ist INKLUSION über den lexikalischen BM25-Pfad.
+  //   family-project ist die Marktplatz-Drehscheibe → netzweit harmlose
+  //   Umschreibungen (kein enges Fach-Vokabular).
+  var FP_QUERY_SYNONYMS = {
+    "kfz": ["auto"], "auto": ["kfz", "wagen"], "wagen": ["auto"],
+    "notebook": ["laptop"], "laptop": ["notebook"],
+    "handy": ["smartphone"], "smartphone": ["handy"],
+    "arznei": ["medikament"], "medikament": ["arznei", "arzneimittel"],
+    "foto": ["bild"], "bild": ["foto"],
+  };
+
+  // queryWithInclusion(match, text, k) -> Promise<Array>
+  //   A4 → A1 → einfacher Cosinus, jede Stufe fail-soft. Wirft NICHT (der
+  //   äußere try/catch im Empfänger sendet sonst die fail-soft-Fehlerantwort).
+  async function queryWithInclusion(match, text, k) {
+    // A4 + A1: Varianten auffächern, dann Hybrid-Multi-Suche mit RRF-Fusion.
+    if (typeof match.queryLocalMulti === "function" &&
+        typeof match.expandQuerySimple === "function") {
+      try {
+        var variants = match.expandQuerySimple(text, { synonyms: FP_QUERY_SYNONYMS });
+        return await match.queryLocalMulti(variants, k, { hybrid: true });
+      } catch (e1) {
+        warn("A4/A1-Multi-Pfad fehlgeschlagen — Fallback auf Hybrid-queryLocal.", e1);
+      }
+    }
+    // A1 allein: Hybrid-queryLocal (BM25+Vektor) ohne Varianten-Auffächerung.
+    try {
+      return await match.queryLocal(text, k, { hybrid: true });
+    } catch (e2) {
+      warn("A1-Hybrid-Pfad fehlgeschlagen — Fallback auf einfachen Cosinus.", e2);
+    }
+    // Letzter Boden: der bewährte reine Cosinus-Pfad (Bau 04.C).
+    return await match.queryLocal(text, k);
+  }
+
   // Sub (b) Hilfen: Replay-Dedupe + FIFO-Eviction.
   function pruneSeenNonces(nowMs) {
     if (seenNonces.size === 0) return;
@@ -492,7 +532,7 @@
       var match = global.SbkimMatch;
       if (match && typeof match.queryLocal === "function") {
         try {
-          var results = await match.queryLocal(payload.text, k);
+          var results = await queryWithInclusion(match, payload.text, k);
           sendQueryResultReply(event, nonce, Array.isArray(results) ? results : [], null);
           recordPostMessageEntry(event, op, nonce, "accepted");
         } catch (err) {

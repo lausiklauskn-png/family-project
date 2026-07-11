@@ -212,6 +212,17 @@
       var ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img); }); // Bild-Pflicht
       var view = ALL.slice();
 
+      // A5 (2026-07-11): Multi-Query-Synonym-Karte für die Marktplatz-Bedeutungs-
+      // Suche. Ein Token → eine Alternative (deterministisch, kein Netz/LLM).
+      // Marktplatz-Drehscheibe → netzweit harmlose Umschreibungen.
+      var MK_SYN = {
+        "kfz": ["auto"], "auto": ["kfz", "wagen"], "wagen": ["auto"],
+        "notebook": ["laptop"], "laptop": ["notebook"],
+        "handy": ["smartphone"], "smartphone": ["handy"],
+        "arznei": ["medikament"], "medikament": ["arznei", "arzneimittel"],
+        "foto": ["bild"], "bild": ["foto"]
+      };
+
       function card(x) {
         var img = safeImg(x.img), url = safeUrl(x.url);
         return '<div class="glass listing">' +
@@ -254,9 +265,22 @@
           if (!ALL._vecs) {
             ALL._vecs = await SbkimEmbedding.embedPassageBatch(ALL.map(function (x) { return x.text || x.label; }));
           }
-          var qv = await SbkimEmbedding.embedQuery(q);
-          var scored = ALL.map(function (x, i) { return { x: x, s: SbkimMatch.match(qv, ALL._vecs[i]) }; })
-            .sort(function (a, b) { return b.s - a.s; });
+          // A5: Multi-Query als reine SORTIER-Verbesserung — die Frage über
+          // MK_SYN auffächern, jede Variante einbetten, und jeden Eintrag mit
+          // dem BESTEN Cosinus über alle Varianten bewerten. So versteht die
+          // Suche Synonyme (Frage „kfz" bewertet auch einen „auto"-Eintrag
+          // hoch), OHNE etwas zu verstecken (kein queryLocal-Filter, kein
+          // 0.80-Boden). Fail-soft: ohne expandQuerySimple → nur die Frage.
+          var variants = [q];
+          if (SbkimMatch && typeof SbkimMatch.expandQuerySimple === "function") {
+            try { var vv = SbkimMatch.expandQuerySimple(q, { synonyms: MK_SYN }); if (Array.isArray(vv) && vv.length) variants = vv; } catch (_e) { /* nur die Frage */ }
+          }
+          var qvs = await Promise.all(variants.map(function (v) { return SbkimEmbedding.embedQuery(v); }));
+          var scored = ALL.map(function (x, i) {
+            var best = -Infinity;
+            for (var j = 0; j < qvs.length; j++) { var s = SbkimMatch.match(qvs[j], ALL._vecs[i]); if (s > best) best = s; }
+            return { x: x, s: best };
+          }).sort(function (a, b) { return b.s - a.s; });
           view = scored.map(function (r) { return r.x; });
           note.textContent = "Nach Bedeutung sortiert.";
           render();
