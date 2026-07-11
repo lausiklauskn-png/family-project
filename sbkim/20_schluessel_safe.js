@@ -281,6 +281,104 @@
 
   function lock() { unlocked = false; }
 
+  // ==========================================================================
+  // Generische Geheimnis-Ablage (Bau 2026-07-11) — beliebige KLEINE Geheimnisse
+  // (z.B. ein KI-Richter-API-Schlüssel) verschlüsselt im Safe ablegen, damit sie
+  // Hard-Reload/App-Schließen überleben, OHNE je im Klartext in localStorage/
+  // IndexedDB zu liegen. Echte Krypto, identisches Muster wie Modul 02 Backup:
+  // PBKDF2-SHA256 600k → AES-GCM-256, frisches Salt + IV pro Geheimnis.
+  // Fremdnutzer-/Marktplatz-sicher: eine andere App auf derselben geteilten
+  // Adresse liest nur den Chiffretext, nie den Klartext (ohne das Passwort).
+  // Unabhängig vom Identitäts-Vault (kein createVault nötig) — jedes Geheimnis
+  // trägt seinen eigenen Umschlag. Fail-soft: falsches Passwort / Manipulation
+  // / kein WebCrypto → null, kein Klartext-Hinweis.
+  var SECRET_PREFIX = "secret:";
+  var SECRET_KDF_ITERATIONS = 600000;   // = Modul 02 BACKUP_KDF_ITERATIONS
+
+  function getSubtle() {
+    var c = global.crypto;
+    return (c && c.subtle) ? c.subtle : null;
+  }
+  async function deriveSecretKey(subtle, password, salt) {
+    var baseKey = await subtle.importKey("raw", pwToBytes(password), { name: "PBKDF2" }, false, ["deriveKey"]);
+    return await subtle.deriveKey(
+      { name: "PBKDF2", salt: salt, iterations: SECRET_KDF_ITERATIONS, hash: "SHA-256" },
+      baseKey, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  function secretKey(name) { return SECRET_PREFIX + String(name); }
+
+  var MAX_HINT_LEN = 140;   // Merkhilfe ist ein kurzes Stichwort, kein Aufsatz.
+
+  async function hasSecret(name) {
+    var st = getStorage(); if (!st) return false;
+    try { await ensureVaultStore(); return !!(await st.get(STORE_NAME, secretKey(name))); }
+    catch (e) { return false; }
+  }
+
+  // Legt `plaintext` unter `name` verschlüsselt ab. Wirft nur bei klarem
+  // Aufrufer-Fehler (leerer Name/Wert, zu kurzes Passwort, kein WebCrypto).
+  // `opts.hint` (optional) ist eine KLARTEXT-Merkhilfe fürs Passwort — sie
+  // wird bewusst NICHT verschlüsselt, weil man sie ja VOR dem Passwort lesen
+  // können muss. Sie liegt im app-eigenen Speicher (Modul 01 dbSuffix), nicht
+  // netzweit; der Aufrufer sorgt dafür, dass sie NICHT das Passwort selbst ist.
+  async function putSecret(name, plaintext, password, opts) {
+    if (typeof name !== "string" || name.length === 0) throw makeError("InvalidSecretNameError", "Geheimnis-Name muss ein nicht-leerer String sein.");
+    if (typeof plaintext !== "string" || plaintext.length === 0) throw makeError("InvalidSecretValueError", "Geheimnis-Wert muss ein nicht-leerer String sein.");
+    if (typeof password !== "string" || password.length < MIN_PASSWORD_LEN) throw makeError("WeakPasswordError", "Passwort muss mindestens " + MIN_PASSWORD_LEN + " Zeichen lang sein.");
+    var subtle = getSubtle();
+    if (!subtle) throw makeError("CryptoUnavailableError", "WebCrypto (crypto.subtle) ist nicht verfügbar.");
+    var st = getStorage();
+    if (!st) throw makeError("StorageUnavailableError", "Modul 01 (SbkimStorage) ist nicht geladen.");
+    await ensureVaultStore();
+    var salt = randomBytes(16), iv = randomBytes(12);
+    var aesKey = await deriveSecretKey(subtle, password, salt);
+    var ctBuf = await subtle.encrypt({ name: "AES-GCM", iv: iv }, aesKey, pwToBytes(plaintext));
+    var blob = {
+      v: 1, kdf: "PBKDF2-SHA256", iterations: SECRET_KDF_ITERATIONS, cipher: "AES-GCM-256",
+      salt: b64urlEncode(salt), iv: b64urlEncode(iv), ct: b64urlEncode(new Uint8Array(ctBuf)),
+    };
+    var hint = (opts && typeof opts.hint === "string") ? opts.hint.trim().slice(0, MAX_HINT_LEN) : "";
+    if (hint) blob.hint = hint;
+    await st.put(STORE_NAME, secretKey(name), blob);
+    return true;
+  }
+
+  // Liest die Klartext-Merkhilfe zu `name` OHNE Passwort. null, wenn keine
+  // hinterlegt ist (oder Speicher fehlt). Nur die Merkhilfe — nie das Geheimnis.
+  async function getSecretHint(name) {
+    if (typeof name !== "string" || !name.length) return null;
+    var st = getStorage(); if (!st) return null;
+    try {
+      await ensureVaultStore();
+      var blob = await st.get(STORE_NAME, secretKey(name));
+      return (blob && typeof blob.hint === "string" && blob.hint) ? blob.hint : null;
+    } catch (e) { return null; }
+  }
+
+  // Entschlüsselt das Geheignis `name`. null bei fehlend / falschem Passwort /
+  // Manipulation / kein WebCrypto (fail-soft, kein Klartext-Hinweis).
+  async function getSecret(name, password) {
+    if (typeof name !== "string" || !name.length || typeof password !== "string" || !password.length) return null;
+    var subtle = getSubtle(); var st = getStorage();
+    if (!subtle || !st) return null;
+    try {
+      await ensureVaultStore();
+      var blob = await st.get(STORE_NAME, secretKey(name));
+      if (!blob || !blob.salt || !blob.iv || !blob.ct) return null;
+      var salt = b64urlDecode(blob.salt), iv = b64urlDecode(blob.iv), ct = b64urlDecode(blob.ct);
+      var aesKey = await deriveSecretKey(subtle, password, salt);
+      var ptBuf = await subtle.decrypt({ name: "AES-GCM", iv: iv }, aesKey, ct);
+      return bytesToPw(new Uint8Array(ptBuf));
+    } catch (e) { return null; }
+  }
+
+  async function removeSecret(name) {
+    var st = getStorage();
+    if (!st || typeof st.del !== "function") return false;
+    try { await ensureVaultStore(); await st.del(STORE_NAME, secretKey(name)); return true; }
+    catch (e) { return false; }
+  }
+
   // Rekonstruiert das Passwort aus >= k Shamir-Anteilen. null bei zu wenigen
   // oder ungültigen Anteilen. Reines Lokal-Verfahren.
   function recoverPassword(shares) {
@@ -498,6 +596,13 @@
     unlock: unlock,
     lock: lock,
     recoverPassword: recoverPassword,
+    // Generische Geheimnis-Ablage (z.B. KI-Richter-Schlüssel) — verschlüsselt,
+    // überlebt Reload/App-Schließen; andere Apps lesen nur Chiffretext.
+    putSecret: putSecret,
+    getSecret: getSecret,
+    getSecretHint: getSecretHint,
+    hasSecret: hasSecret,
+    removeSecret: removeSecret,
     // Test-Brücken (KEIN Public-Use): reine Shamir-Funktionen headless prüfbar.
     _shamirSplitBytes: shamirSplitBytes,
     _shamirCombineBytes: shamirCombineBytes,
