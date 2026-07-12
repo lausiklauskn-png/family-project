@@ -114,7 +114,8 @@
           <div><label data-i18n="mk_f_cat">Kategorie</label><div class="field"><input id="sbCat" type="text" maxlength="40" data-i18n-ph="mk_ph_cat" placeholder="z. B. Rezepte, Werkzeug, Spiel" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
           <div><label data-i18n="mk_f_desc">Beschreibung (in eigenen Worten, mit Synonymen) *</label><div class="field"><textarea id="sbText" required maxlength="600" data-i18n-ph="mk_ph_desc" placeholder="Was macht deine App? Schreib frei und mit Synonymen — das hilft der Suche."></textarea><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
           <div class="haftung">
-            <p style="margin:0 0 8px"><b data-i18n="mk_angebot_h">Gründer-Angebot:</b> <span data-i18n="mk_angebot">die ersten 100 Apps bleiben dauerhaft kostenlos gelistet. Trag deine App jetzt ein — solange die ersten 100 Plätze frei sind. Ist die 100 voll, läuft das Angebot aus.</span></p>
+            <p style="margin:0 0 8px"><b data-i18n="mk_angebot_h">Gründer-Angebot:</b> <span data-i18n="mk_angebot">die ersten 100 Apps von anderen bleiben dauerhaft kostenlos gelistet — meine eigenen Beispiele zählen nicht mit. Trag deine App jetzt ein, solange Plätze frei sind. Ist die 100 voll, läuft das Angebot aus.</span></p>
+            <p style="margin:0 0 8px;font-weight:600;color:var(--accent)" id="mkFreeCount"></p>
             <p style="margin:0 0 8px"><b data-i18n="mk_verkauf_h">Verkaufen?</b> <span data-i18n="mk_verkauf">Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store / dein eigenes Konto — wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.</span></p>
             <p style="margin:0" data-i18n="mk_haft"><b>Hinweis:</b> Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.</p>
           </div>
@@ -191,7 +192,8 @@
         mk_img_bad: "Bild lädt nicht — prüfe den Link (https, JPG/PNG/WebP, kein SVG).",
         mk_f_btn: "Eintrag vorbereiten",
         mk_angebot_h: "Gründer-Angebot:",
-        mk_angebot: "die ersten 100 Apps bleiben dauerhaft kostenlos gelistet. Trag deine App jetzt ein — solange die ersten 100 Plätze frei sind. Ist die 100 voll, läuft das Angebot aus.",
+        mk_angebot: "die ersten 100 Apps von anderen bleiben dauerhaft kostenlos gelistet — meine eigenen Beispiele zählen nicht mit. Trag deine App jetzt ein, solange Plätze frei sind. Ist die 100 voll, läuft das Angebot aus.",
+        mk_free: "Noch {n} von 100 Gratis-Plätzen frei.",
         mk_verkauf_h: "Verkaufen?",
         mk_verkauf: "Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store / dein eigenes Konto — wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.",
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
@@ -224,7 +226,8 @@
         mk_img_bad: "Image won't load — check the link (https, JPG/PNG/WebP, no SVG).",
         mk_f_btn: "Prepare entry",
         mk_angebot_h: "Founder offer:",
-        mk_angebot: "the first 100 apps stay listed for free, permanently. Add your app now — while the first 100 spots are open. Once 100 is full, the offer ends.",
+        mk_angebot: "the first 100 apps from others stay listed for free, permanently — my own examples don't count. Add your app now, while spots are open. Once 100 is full, the offer ends.",
+        mk_free: "{n} of 100 free spots left.",
         mk_verkauf_h: "Selling?",
         mk_verkauf: "Family Projekt is a showcase, not a payment service. You sell your app through your own store / your own account — we only list and link, no commission, no payment handling.",
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
@@ -481,12 +484,25 @@
       }
       window.addEventListener("fp:lang", renderDonate);
 
+      // Gründer-Angebot-Zähler: NUR fremde Einträge zählen (Klaus 2026-07-12).
+      // Eigene Beispiel-Apps tragen own:true und zählen NICHT zu den 100.
+      function renderFreeCount() {
+        var el = document.getElementById("mkFreeCount");
+        if (!el) return;
+        var T = (window.FP && FP.t) ? FP.t : function (k) { return k; };
+        var foreign = ALL.filter(function (x) { return !x.own; }).length;
+        var free = Math.max(0, 100 - foreign);
+        el.textContent = T("mk_free").replace("{n}", free);
+      }
+      window.addEventListener("fp:lang", renderFreeCount);
+
       // ?q= von der Startseite übernehmen
       var pq = new URLSearchParams(location.search).get("q");
       window.addEventListener("fp:lang", render);
       FP.init();
       render();
       renderDonate();
+      renderFreeCount();
       if (pq) { input.value = pq; wordSearch(pq); }
     })();
   </script>
