@@ -9,7 +9,10 @@
  *     by:       Anbieter-Handle (KEIN Klarname / kein PII),
  *     url:      Link zur Anbieter-Seite (target=_blank rel=noopener),
  *     img:      PFLICHT — Bild-Link (https, JPG/PNG/WebP; KEIN SVG),
- *     category: optionale Kategorie
+ *     category: optionale Kategorie,
+ *     own:      true = Klaus' eigene Beispiel-App (aus seinen Repos). Zählt
+ *               NICHT zu den 100 Gratis-Plätzen des Gründer-Angebots — nur
+ *               FREMDE Einträge (ohne own) werden gezählt (Klaus 2026-07-12).
  *   }
  *
  * SICHERHEIT (Brief §5): FREMDE Einträge werden NICHT automatisch veröffentlicht.
@@ -31,7 +34,8 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
     img: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/icons/icon-book-blue-512.png",
-    category: "Küche"
+    category: "Küche",
+    own: true
   },
   {
     label: "Mein Mixarium",
@@ -40,7 +44,8 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
     img: "https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png",
-    category: "Getränke"
+    category: "Getränke",
+    own: true
   },
   {
     label: "BookLedgerPro",
@@ -49,7 +54,8 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/BookLedgerPro/",
     img: "https://lausiklauskn-png.github.io/BookLedgerPro/assets/img/og-image.png",
-    category: "Büro"
+    category: "Büro",
+    own: true
   },
   {
     label: "Mein Tresor",
@@ -58,7 +64,8 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Mein-Tresor/",
     img: "https://family-projekt.de/assets/apps/mein-tresor.png",
-    category: "Sicherheit"
+    category: "Sicherheit",
+    own: true
   },
   {
     label: "Jasons Tresor",
@@ -67,7 +74,8 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Jasons-Tresor/",
     img: "https://family-projekt.de/assets/apps/jasons-tresor.png",
-    category: "Sicherheit"
+    category: "Sicherheit",
+    own: true
   },
   {
     label: "Such-Werkzeug",
@@ -76,7 +84,8 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
     img: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/icon-512.png",
-    category: "Werkzeug"
+    category: "Werkzeug",
+    own: true
   },
   {
     label: "Pinnwand",
@@ -85,6 +94,17 @@ window.FP_LISTINGS = [
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
     img: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/icon-512.png",
-    category: "Werkzeug"
+    category: "Werkzeug",
+    own: true
+  },
+  {
+    label: "Tomys Hub",
+    anchorId: "markt-tomys-hub",
+    text: "Werkzeug-Verbund für personalisierten Digitaldruck, Stickerei und kleine Werbeartikel: Druckvorlagen selbst im Browser gestalten (KI-Vorlage bis druckfertig), Schaufenster mit Beispielen und Werkstatt-Werkzeuge. Du gestaltest — wir drucken. Textildruck, Sublimation, bedruckte Tassen, Stick, Aufkleber, Werbetechnik. Offline nutzbar, ohne Konto.",
+    by: "@tomy",
+    url: "https://lausiklauskn-png.github.io/Tomys-Hub/",
+    img: "https://lausiklauskn-png.github.io/Tomys-Hub/icons/icon-512.png",
+    category: "Werkzeug",
+    own: true
   }
 ];
