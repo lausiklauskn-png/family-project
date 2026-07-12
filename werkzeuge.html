@@ -126,9 +126,14 @@
             ? '<img src="' + esc(w.iconImg) + '" alt="" loading="lazy" style="width:40px;height:40px;border-radius:9px;object-fit:contain;vertical-align:middle" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'\'">' +
               '<span style="display:none">' + esc(w.icon || "🧰") + '</span>'
             : esc(w.icon || "🧰");
+          var badge = w.badge
+            ? '<span class="wt-badge wt-badge-' + (w.badge.kind === "node" ? "node" : "app") + '">' +
+              esc(l === "en" ? w.badge.en : w.badge.de) + '</span>'
+            : '';
           return '<a class="glass area" href="' + esc(href) + '"' + attrs + '>' +
             '<div class="ico">' + ico + '</div>' +
             '<h3>' + esc(w.name) + '</h3>' +
+            badge +
             '<p>' + esc(l === "en" ? w.en : w.de) + '</p>' +
             '<span class="go">' + esc(label) + '</span></a>';
         }).join("");

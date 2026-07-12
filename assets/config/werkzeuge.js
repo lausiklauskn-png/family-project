@@ -5,8 +5,9 @@
  * Schema: { id, name, icon, de, en, page, open, install } */
 window.FP_WERKZEUGE = [
   { id: "such", name: "Such-Werkzeug", icon: "🔍", iconImg: "assets/appicons/such.png",
-    de: "Findet nach Bedeutung statt nach Stichwörtern — komplett im Browser, ohne Server, ohne Konto.",
-    en: "Finds by meaning, not by keywords — fully in the browser, no server, no account.",
+    badge: { kind: "app", de: "PWA-App · zum Installieren", en: "PWA app · to install" },
+    de: "Findet nach Bedeutung statt nach Stichwörtern — komplett im Browser, ohne Server, ohne Konto. Die reine App zum Installieren (ohne Netz-Anmeldung).",
+    en: "Finds by meaning, not by keywords — fully in the browser, no server, no account. The plain app to install (without network sign-in).",
     page: "werkzeuge/such-werkzeug.html",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
     install: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/" },
@@ -57,8 +58,9 @@ window.FP_WERKZEUGE = [
     en: "The dial safe with 20 compartments: each one a real AES vault with its own password — decoy compartment and key splitting included.",
     open: "https://lausiklauskn-png.github.io/Mein-Tresor/" },
   { id: "pinnwand", name: "Pinnwand", icon: "📌", iconImg: "assets/appicons/pinnwand.png", external: true,
-    de: "Ein offenes Frage-Antwort-Brett: Antworten lassen sich nach Bedeutung sortieren (gratis, als Rangfolge) — optional versteht ein KI-Richter die Absicht, z. B. alkoholfrei = wirklich kein Alkohol. Im Browser, ohne Konto.",
-    en: "An open question-and-answer board: answers can be sorted by meaning (free, as a ranking) — optionally an AI judge grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account.",
+    badge: { kind: "app", de: "PWA-App · zum Installieren", en: "PWA app · to install" },
+    de: "Ein offenes Frage-Antwort-Brett: Antworten lassen sich nach Bedeutung sortieren (gratis, als Rangfolge) — optional versteht ein KI-Richter die Absicht, z. B. alkoholfrei = wirklich kein Alkohol. Im Browser, ohne Konto. Die reine App zum Installieren (ohne Netz-Anmeldung).",
+    en: "An open question-and-answer board: answers can be sorted by meaning (free, as a ranking) — optionally an AI judge grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account. The plain app to install (without network sign-in).",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" },
 
   /* Neue eigenständige SBKIM-Knoten-PWAs (2026-07-09): Kim-Bell, Kimseek und
@@ -67,16 +69,19 @@ window.FP_WERKZEUGE = [
    * Kim-Bell ist die „Mit dem Netz verbinden"-Glocke. external:true → öffnen die
    * Live-App direkt in einem neuen Tab. */
   { id: "kimbell", name: "Kim-Bell", icon: "🔔", iconImg: "assets/appicons/kimbell.png", external: true,
+    badge: { kind: "node", de: "Eigener Knoten im Netz", en: "Its own node in the network" },
     de: "Die Netz-Glocke: melde dich mit einer eigenen, stabilen Identität sauber im gemeinsamen SBKIM-Raum an und finde andere Knoten — server-los im Browser.",
     en: "The network bell: sign in cleanly to the shared SBKIM room with your own stable identity and find other nodes — server-less, in the browser.",
     open: "https://lausiklauskn-png.github.io/Kim-Bell/" },
   { id: "kimseek", name: "Kimseek", icon: "🔍", iconImg: "assets/appicons/kimseek.png", external: true,
-    de: "Semantische Suche, die die Bedeutung hinter der Frage versteht statt nur Stichwörter — mit Sprache, Bild-/Handschrift-Erkennung und KI-Brücke. Ein eigener Knoten im Netz.",
-    en: "Semantic search that grasps the meaning behind your question, not just keywords — with voice, image/handwriting recognition and an AI bridge. Its own node in the network.",
+    badge: { kind: "node", de: "Eigener Knoten im Netz", en: "Its own node in the network" },
+    de: "Dieselbe Suche wie das Such-Werkzeug — aber als eigener Knoten im Netz: findet nach Bedeutung, mit Sprache, Bild-/Handschrift-Erkennung und KI-Brücke, und kann selbst andere Knoten fragen.",
+    en: "The same search as the Such-Werkzeug — but as its own node in the network: finds by meaning, with voice, image/handwriting recognition and an AI bridge, and can query other nodes itself.",
     open: "https://lausiklauskn-png.github.io/Kimseek/" },
   { id: "kimboard", name: "Kimboard", icon: "📌", iconImg: "assets/appicons/kimboard.png", external: true,
-    de: "Die semantische Pinnwand: Fragen und Notizen an ein geborgtes, geteiltes Brett heften, geräteübergreifend, nach Bedeutung sortiert. Ein eigener Knoten im Netz.",
-    en: "The semantic pinboard: pin questions and notes to a borrowed \"dumb board\", across devices, sorted by meaning. Its own node in the network.",
+    badge: { kind: "node", de: "Eigener Knoten im Netz", en: "Its own node in the network" },
+    de: "Dieselbe Pinnwand — aber als eigener Knoten im Netz: Fragen und Notizen an ein geteiltes Brett heften, geräteübergreifend, nach Bedeutung sortiert, verbunden mit anderen Knoten.",
+    en: "The same pinboard — but as its own node in the network: pin questions and notes to a shared board, across devices, sorted by meaning, connected to other nodes.",
     open: "https://lausiklauskn-png.github.io/Kimboard/" },
 
   /* Referenz-Beispiele (2026-07-06, Klaus): eigene Seite mit live eingebetteten
