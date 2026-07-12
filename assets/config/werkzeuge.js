@@ -87,7 +87,7 @@ window.FP_WERKZEUGE = [
   /* Referenz-Beispiele (2026-07-06, Klaus): eigene Seite mit live eingebetteten
    * Beispielen neu gebauter Internetseiten aus der Werkstatt. Erste Referenz:
    * Tomys Schaufenster. */
-  { id: "referenzen", name: "Referenz-Beispiele", icon: "🖼️",
+  { id: "referenzen", name: "Referenz-Beispiele", icon: "🖼️", iconImg: "assets/appicons/tomys.png",
     de: "So sieht eine neu gebaute Internetseite aus: echte Beispiele aus der Werkstatt, live eingebettet — als Erstes Tomys Schaufenster.",
     en: "What a freshly built web page looks like: real examples from the workshop, embedded live — starting with Tomy's showcase.",
     page: "referenzen.html",
