@@ -69,6 +69,28 @@
 
     <section>
       <div class="wrap">
+        <h2 data-i18n="nw_ways_h">Zwei Wege — welcher bist du?</h2>
+        <p class="sub" data-i18n="nw_ways_sub">Wähl, was zu dir passt. Beides ist kostenlos und ohne Konto.</p>
+        <div class="stages">
+          <div class="glass stage">
+            <span class="n" data-i18n="nw_wayA_tag">einfach · für alle</span>
+            <h3>🛒 <span data-i18n="nw_wayA_h">Im Marktplatz gefunden werden</span></h3>
+            <p data-i18n="nw_wayA_p">Du hast schon eine App oder Seite? Trag sie ein — Leute finden sie, wenn sie in eigenen Worten beschreiben, was sie suchen. Kein Code, kein Konto.</p>
+            <div class="cta" style="margin-top:14px"><a class="btn primary" href="markt.html" data-i18n="nw_wayA_btn">→ Im Marktplatz eintragen</a></div>
+          </div>
+          <div class="glass stage">
+            <span class="n" data-i18n="nw_wayB_tag">für Bastler &amp; Entwickler</span>
+            <h3>🪢 <span data-i18n="nw_wayB_h">Deine App selbst zum Knoten machen</span></h3>
+            <p data-i18n="nw_wayB_p">Bau die offenen Bausteine in deine eigene App ein: eigene Identität, Handshake, Status, Siegel. Volle Kontrolle.</p>
+            <p class="nw-vorteil"><b data-i18n="nw_wayB_vlabel">Der Vorteil:</b> <span data-i18n="nw_wayB_vorteil">Deine App wird nicht nur nach Stichwörtern gefunden, sondern nach Sinn — andere finden sie über die Bedeutung ihres Inhalts. Und es geht in beide Richtungen: dein Knoten kann selbst andere fragen. Alles server-los, direkt zwischen Browsern.</span></p>
+            <div class="cta" style="margin-top:14px"><a class="btn primary" href="#bauen" data-i18n="nw_wayB_btn">→ So wird deine App zum Knoten</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
         <h2 data-i18n="nw_promise_h">Das dreistufige, prüfbare Versprechen</h2>
         <p class="sub" data-i18n="nw_promise_sub">Drei Stufen, jede einzeln nachprüfbar.</p>
         <div class="stages">
@@ -82,38 +104,43 @@
       </div>
     </section>
 
-    <section id="andock">
+    <section id="bauen">
       <div class="wrap">
-        <h2 data-i18n="nw_andock_h">Deine Seite andocken</h2>
-        <p class="sub" data-i18n="nw_andock_sub">Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.</p>
-        <div class="glass" id="andockWizard"></div>
-        <p class="galnote" data-i18n="nw_andock_note">Das echte Signieren passiert in deiner eigenen App (Knoten-Werkzeug). Hier entsteht nur die Vorlage zum Kopieren.</p>
+        <h2 data-i18n="nw_build_h">Deine App zum Knoten — so entsteht eine Verbindung</h2>
+        <p class="sub" data-i18n="nw_build_sub">In drei Schritten, alles im Browser — ohne Server.</p>
+        <div class="stages">
+          <div class="glass stage"><span class="n">1</span><h3 data-i18n="nw_step1_h">Saubere Identität</h3><p data-i18n="nw_step1_p">Deine App legt eine eigene Identität an. Nichts verlässt das Gerät.</p></div>
+          <div class="glass stage"><span class="n">2</span><h3 data-i18n="nw_step2_h">Spore erzeugen</h3><p data-i18n="nw_step2_p">Daraus wird deine signierte „Spore" — deine Visitenkarte fürs Netz.</p></div>
+          <div class="glass stage"><span class="n">3</span><h3 data-i18n="nw_step3_h">Anmelden → Handshake</h3><p data-i18n="nw_step3_p">Du hinterlegst deine Karte im gemeinsamen Raum und schlägst die Verbindung selbst an.</p></div>
+        </div>
+
+        <div id="andock" style="margin-top:26px">
+          <h3 data-i18n="nw_andock_h">Schnellstart: Andock-Vorlage erzeugen</h3>
+          <p class="sub" data-i18n="nw_andock_sub">Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.</p>
+          <div class="glass" id="andockWizard"></div>
+          <p class="galnote" data-i18n="nw_andock_note">Das echte Signieren passiert in deiner eigenen App (Knoten-Werkzeug). Hier entsteht nur die Vorlage zum Kopieren.</p>
+        </div>
+
+        <div class="cta" style="margin-top:18px">
+          <a class="btn primary" href="werkzeuge/knoten-werkzeug.html" data-i18n="nw_knoten">→ Alle Bausteine holen (Knoten-Werkzeug)</a>
+          <a class="btn ghost" href="https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" target="_blank" rel="noopener" data-i18n="nw_profi">Zu kompliziert? → Profi-Ebene: Sage</a>
+        </div>
+
+        <div class="glass note-box">
+          <p data-i18n="nw_vision_honest"><b>Ehrlicher Stand (Stand 2026-07-12):</b> Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren — und der <b>server-lose Live-Handshake zwischen Knoten ist bewiesen</b>, sogar zwischen mehreren Knoten ohne zentralen Vermittler (gemeinsamer Raum „Rendezvous", Andock mit lebender Identität etabliert). Bewusst <b>nutzer-ausgelöst</b>: man hinterlegt seine lebende Karte im Raum und schlägt die Verbindung selbst an — kein automatischer Hintergrund-Handshake, und das ist Absicht (Empfangsmodus, keine Pulsation), kein Mangel. Offen bleibt der Komfort, dass die Gegenseite ganz ohne Zutun zurück-quittiert (dafür muss ihr Tab gerade offen und aktiv sein). Wir täuschen hier nichts vor.</p>
+        </div>
       </div>
     </section>
 
     <section>
       <div class="wrap">
-        <h2 data-i18n="nw_fremd_h">Eine fremde Seite ins Mycel holen</h2>
+        <h2 data-i18n="nw_fremd_h">Für Fortgeschrittene — eine fremde Seite ins Mycel holen <span class="prep" data-i18n="nw_fremd_tag">fortgeschritten</span></h2>
         <p class="sub" data-i18n="nw_fremd_sub">Du hast eine ganz normale Webseite, die noch nicht im Mycel ist? Gib ihrer KI / ihrem Agenten diese self-contained Anleitung — sie führt die Verbindung 1:1 aus, ohne offene Fragen. Endzustand: Identität + Bausteine + Eintrag + Siegel. (Der vollautomatische Rück-Handshake übers Relay bleibt „in Vorbereitung“.)</p>
         <div class="cta">
           <button class="btn primary" id="fpCopyAndock" type="button" data-i18n="nw_fremd_copy">⧉ Anleitung kopieren</button>
           <a class="btn ghost" href="docs/MYCEL-ANDOCK-AUFTRAG.md" target="_blank" rel="noopener" data-i18n="nw_fremd_open">→ Anleitung ansehen</a>
         </div>
         <p class="galnote" id="fpCopyNote"></p>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap">
-        <h2 data-i18n="nw_vision_h">Verbindung herstellen <span class="prep" data-i18n="nw_prep">in Vorbereitung</span></h2>
-        <p class="sub" data-i18n="nw_vision_sub">Die Vision: „sag <em>Verbindung herstellen</em> → Spore-Handshake → die Gegenseite quittiert automatisch übers Relay zurück."</p>
-        <div class="glass note-box">
-          <p data-i18n="nw_vision_honest"><b>Ehrlicher Stand (aktualisiert 2026-06-28):</b> Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren — und der <b>server-lose Live-Cross-Knoten-Handshake ist jetzt bewiesen</b> (zwei Geräte, gemeinsamer Raum „Rendezvous", ✓ Andock etabliert mit lebender ID). Bewusst <b>nutzer-ausgelöst</b>: man hinterlegt seine lebende Karte im Raum und schlägt die Verbindung selbst an — kein automatischer Hintergrund-Handshake, und das ist Absicht (Empfangsmodus, keine Pulsation), kein Mangel. Offen bleibt nur der reine Komfort, dass die Gegenseite ganz ohne Zutun zurück-quittiert. Wir täuschen hier nichts vor.</p>
-        </div>
-        <div class="cta" style="margin-top:18px">
-          <a class="btn primary" href="https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" target="_blank" rel="noopener" data-i18n="nw_profi">→ Profi-Ebene: das Mycel-Protokoll (Sage)</a>
-          <a class="btn ghost" href="werkzeuge/knoten-werkzeug.html" data-i18n="nw_knoten">→ Knoten-Werkzeug</a>
-        </div>
       </div>
     </section>
   </main>
@@ -150,39 +177,61 @@
         nw_eyebrow: "Netzwerk · gratis & neutral",
         nw_title: "Bau dein eigenes Netzwerk — oder lass dich als Knoten im Marktplatz leichter finden.",
         nw_lead: "Zwei Wege: Verbinde deine eigene Seite mit dem Netzwerk, oder trag sie in den Marktplatz ein — dann finden Leute sie, wenn sie in eigenen Worten beschreiben, was sie suchen. Kostenlos, ohne Konto — ohne einen Vermittler, der mitverdient oder bestimmt, wer oben steht.",
+        nw_ways_h: "Zwei Wege — welcher bist du?", nw_ways_sub: "Wähl, was zu dir passt. Beides ist kostenlos und ohne Konto.",
+        nw_wayA_tag: "einfach · für alle", nw_wayA_h: "Im Marktplatz gefunden werden",
+        nw_wayA_p: "Du hast schon eine App oder Seite? Trag sie ein — Leute finden sie, wenn sie in eigenen Worten beschreiben, was sie suchen. Kein Code, kein Konto.",
+        nw_wayA_btn: "→ Im Marktplatz eintragen",
+        nw_wayB_tag: "für Bastler & Entwickler", nw_wayB_h: "Deine App selbst zum Knoten machen",
+        nw_wayB_p: "Bau die offenen Bausteine in deine eigene App ein: eigene Identität, Handshake, Status, Siegel. Volle Kontrolle.",
+        nw_wayB_vlabel: "Der Vorteil:",
+        nw_wayB_vorteil: "Deine App wird nicht nur nach Stichwörtern gefunden, sondern nach Sinn — andere finden sie über die Bedeutung ihres Inhalts. Und es geht in beide Richtungen: dein Knoten kann selbst andere fragen. Alles server-los, direkt zwischen Browsern.",
+        nw_wayB_btn: "→ So wird deine App zum Knoten",
         nw_promise_h: "Das dreistufige, prüfbare Versprechen", nw_promise_sub: "Drei Stufen, jede einzeln nachprüfbar.",
         nw_s1_h: "App-Daten bleiben am Gerät", nw_s1_p: "Was du in Rezeptbuch, Mixarium oder dem Tresor speicherst, liegt in deinem Browser. Es erreicht uns nie. (local-first)",
         nw_s2_h: "Netz-Inhalte kann selbst der Betreiber nicht lesen", nw_s2_p: "Was du bewusst ins Netz schickst, ist Ende-zu-Ende verschlüsselt. Das Relay sieht nur Geheimtext. (E2E)",
         nw_s3_h: "Das Relay ist protokoll-frei und nachprüfbar", nw_s3_p: "Offene Konfiguration statt Versprechen. Für IP-Anonymität nutzt du Tor. Volle Metadaten-Garantie später per Mixnet.",
         nw_serverlos: "„Server-los“ ehrlich eingeordnet: für deine App-Daten stimmt es — sie brauchen keinen Server. Für Netz-Botschaften trifft „herren-los“: es gibt einen dummen Treffpunkt (Relay), aber keinen Vermittler. Wir behalten das Wort „server-los“ immer mit dieser Erklärung daneben.",
-        nw_andock_h: "Deine Seite andocken", nw_andock_sub: "Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.",
+        nw_build_h: "Deine App zum Knoten — so entsteht eine Verbindung", nw_build_sub: "In drei Schritten, alles im Browser — ohne Server.",
+        nw_step1_h: "Saubere Identität", nw_step1_p: "Deine App legt eine eigene Identität an. Nichts verlässt das Gerät.",
+        nw_step2_h: "Spore erzeugen", nw_step2_p: "Daraus wird deine signierte „Spore“ — deine Visitenkarte fürs Netz.",
+        nw_step3_h: "Anmelden → Handshake", nw_step3_p: "Du hinterlegst deine Karte im gemeinsamen Raum und schlägst die Verbindung selbst an.",
+        nw_andock_h: "Schnellstart: Andock-Vorlage erzeugen", nw_andock_sub: "Drei Eingaben — Repo, Domäne, Knotentyp — und du bekommst eine Spore-Vorlage, die status.json-Zeile und einen PR-Link. Reine Eingabe zu Text: keine Krypto, kein Netz.",
         nw_andock_note: "Das echte Signieren passiert in deiner eigenen App (Knoten-Werkzeug). Hier entsteht nur die Vorlage zum Kopieren.",
-        nw_fremd_h: "Eine fremde Seite ins Mycel holen",
+        nw_knoten: "→ Alle Bausteine holen (Knoten-Werkzeug)", nw_profi: "Zu kompliziert? → Profi-Ebene: Sage",
+        nw_vision_honest: "Ehrlicher Stand (Stand 2026-07-12): Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren — und der server-lose Live-Handshake zwischen Knoten ist bewiesen, sogar zwischen mehreren Knoten ohne zentralen Vermittler (gemeinsamer Raum „Rendezvous“, Andock mit lebender Identität etabliert). Bewusst nutzer-ausgelöst: man hinterlegt seine lebende Karte im Raum und schlägt die Verbindung selbst an — kein automatischer Hintergrund-Handshake, und das ist Absicht (Empfangsmodus, keine Pulsation), kein Mangel. Offen bleibt der Komfort, dass die Gegenseite ganz ohne Zutun zurück-quittiert (dafür muss ihr Tab gerade offen und aktiv sein). Wir täuschen hier nichts vor.",
+        nw_fremd_h: "Für Fortgeschrittene — eine fremde Seite ins Mycel holen", nw_fremd_tag: "fortgeschritten",
         nw_fremd_sub: "Du hast eine ganz normale Webseite, die noch nicht im Mycel ist? Gib ihrer KI / ihrem Agenten diese self-contained Anleitung — sie führt die Verbindung 1:1 aus, ohne offene Fragen. Endzustand: Identität + Bausteine + Eintrag + Siegel. (Der vollautomatische Rück-Handshake übers Relay bleibt „in Vorbereitung“.)",
-        nw_fremd_copy: "⧉ Anleitung kopieren", nw_fremd_open: "→ Anleitung ansehen",
-        nw_vision_h: "Verbindung herstellen", nw_prep: "in Vorbereitung",
-        nw_vision_sub: "Die Vision: „sag Verbindung herstellen → Spore-Handshake → die Gegenseite quittiert automatisch übers Relay zurück.",
-        nw_vision_honest: "Ehrlicher Stand (aktualisiert 2026-06-28): Spore-Erzeugung, lokale Krypto und der Relay-Transport funktionieren — und der server-lose Live-Cross-Knoten-Handshake ist jetzt bewiesen (zwei Geräte, gemeinsamer Raum „Rendezvous“, Andock etabliert mit lebender ID). Bewusst nutzer-ausgelöst: man hinterlegt seine lebende Karte im Raum und schlägt die Verbindung selbst an — kein automatischer Hintergrund-Handshake, und das ist Absicht (Empfangsmodus, keine Pulsation), kein Mangel. Offen bleibt nur der reine Komfort, dass die Gegenseite ganz ohne Zutun zurück-quittiert. Wir täuschen hier nichts vor.",
-        nw_profi: "→ Profi-Ebene: das Mycel-Protokoll (Sage)", nw_knoten: "→ Knoten-Werkzeug"
+        nw_fremd_copy: "⧉ Anleitung kopieren", nw_fremd_open: "→ Anleitung ansehen"
       },
       en: {
         nw_eyebrow: "Network · free & neutral",
         nw_title: "Build your own network — or get found more easily as a node in the marketplace.",
         nw_lead: "Two ways: connect your own site to the network, or list it in the marketplace — then people find it when they describe, in their own words, what they're looking for. Free, no account — no middleman who profits or decides who ranks on top.",
+        nw_ways_h: "Two ways — which one are you?", nw_ways_sub: "Pick what fits you. Both are free and account-free.",
+        nw_wayA_tag: "easy · for everyone", nw_wayA_h: "Get found in the marketplace",
+        nw_wayA_p: "Already have an app or site? List it — people find it when they describe, in their own words, what they're looking for. No code, no account.",
+        nw_wayA_btn: "→ List in the marketplace",
+        nw_wayB_tag: "for tinkerers & developers", nw_wayB_h: "Make your app a node itself",
+        nw_wayB_p: "Build the open blocks into your own app: own identity, handshake, status, seal. Full control.",
+        nw_wayB_vlabel: "The benefit:",
+        nw_wayB_vorteil: "Your app is found not just by keywords but by meaning — others find it through the sense of its content. And it works both ways: your node can ask others itself. All server-less, directly between browsers.",
+        nw_wayB_btn: "→ How your app becomes a node",
         nw_promise_h: "The three-stage, verifiable promise", nw_promise_sub: "Three stages, each verifiable on its own.",
         nw_s1_h: "App data stays on the device", nw_s1_p: "What you store in Rezeptbuch, Mixarium or the vault lives in your browser. It never reaches us. (local-first)",
         nw_s2_h: "Not even the operator can read network content", nw_s2_p: "What you deliberately send to the net is end-to-end encrypted. The relay only sees ciphertext. (E2E)",
         nw_s3_h: "The relay is log-free and verifiable", nw_s3_p: "Open configuration instead of promises. For IP anonymity you use Tor. Full metadata guarantee later via a mixnet.",
         nw_serverlos: "“Server-less” honestly placed: for your app data it's true — it needs no server. For network messages “masterless” fits: there is a dumb meeting point (relay), but no middleman. We keep the word “server-less” always with this explanation next to it.",
-        nw_andock_h: "Dock your site", nw_andock_sub: "Three inputs — repo, domain, node type — and you get a spore template, the status.json line and a PR link. Pure input to text: no crypto, no network.",
+        nw_build_h: "Your app to a node — how a connection forms", nw_build_sub: "In three steps, all in the browser — no server.",
+        nw_step1_h: "Clean identity", nw_step1_p: "Your app creates its own identity. Nothing leaves the device.",
+        nw_step2_h: "Create a spore", nw_step2_p: "From it comes your signed “spore” — your business card for the network.",
+        nw_step3_h: "Sign in → handshake", nw_step3_p: "You place your card in the shared room and start the connection yourself.",
+        nw_andock_h: "Quick start: create a docking template", nw_andock_sub: "Three inputs — repo, domain, node type — and you get a spore template, the status.json line and a PR link. Pure input to text: no crypto, no network.",
         nw_andock_note: "The real signing happens in your own app (node tool). Here only the template to copy is created.",
-        nw_fremd_h: "Bring a foreign site into the mycelium",
+        nw_knoten: "→ Get all blocks (node tool)", nw_profi: "Too complex? → Pro level: Sage",
+        nw_vision_honest: "Honest status (as of 2026-07-12): spore generation, local crypto and the relay transport work — and the server-less live handshake between nodes is proven, even between several nodes without a central middleman (shared room “Rendezvous”, dock established with the living identity). Deliberately user-triggered: you place your living card in the room and start the connection yourself — no automatic background handshake, and that is by design (receive-mode, no pulsing), not a shortcoming. What remains is the convenience of the other side acknowledging with no action (its tab needs to be open and active for that). We pretend nothing here.",
+        nw_fremd_h: "For advanced users — bring a foreign site into the mycelium", nw_fremd_tag: "advanced",
         nw_fremd_sub: "Got an ordinary website that isn't in the mycelium yet? Give its AI / agent this self-contained guide — it performs the connection 1:1, no open questions. End state: identity + building blocks + entry + seal. (The fully automatic return handshake over the relay stays “in preparation”.)",
-        nw_fremd_copy: "⧉ Copy the guide", nw_fremd_open: "→ View the guide",
-        nw_vision_h: "Establish connection", nw_prep: "in preparation",
-        nw_vision_sub: "The vision: “say Establish connection → spore handshake → the other side acknowledges automatically back over the relay.”",
-        nw_vision_honest: "Honest status (updated 2026-06-28): spore generation, local crypto and the relay transport work — and the server-less live cross-node handshake is now proven (two devices, shared room “Rendezvous”, dock established with the living ID). Deliberately user-triggered: you place your living card in the room and start the connection yourself — no automatic background handshake, and that is by design (receive-mode, no pulsing), not a shortcoming. What remains is only the convenience of the other side acknowledging fully automatically. We pretend nothing here.",
-        nw_profi: "→ Pro level: the mycelium protocol (Sage)", nw_knoten: "→ Node tool"
+        nw_fremd_copy: "⧉ Copy the guide", nw_fremd_open: "→ View the guide"
       }
     };
   </script>

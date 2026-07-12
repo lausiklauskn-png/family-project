@@ -4,6 +4,33 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## 🔨 2026-07-12: Netzwerk-Seite als zwei klare Wege umgebaut + Suche-Feinschliff
+
+Mehrere gemergte Schritte (Freibrief, Fast-Forward auf `main`, family deployt автоmatisch):
+- **Startseiten-Suche: Kamera raus** (`data-noocr` am Suchfeld) — OCR ist auf der Family-eigenen
+  App-/Marktplatz-Suche sinnlos (kein Web, keine Barcodes). Mikro + Tippen bleiben. Kamera
+  bleibt sinnvoll in Kimseek/Such-Tool (Internet-Modus). sw v38→v39.
+- **Netzwerk-Überschrift/Lead verständlich** statt „herren-los, nicht herrschaftlich":
+  „Bau dein eigenes Netzwerk — oder lass dich als Knoten im Marktplatz leichter finden." sw→v41.
+- **Netzwerk-Seite neu strukturiert (zwei klare Wege):** Hero → **Auswahl-Karten** (🛒 „im
+  Marktplatz gefunden werden" → markt.html · 🪢 „deine App selbst zum Knoten machen" → #bauen,
+  **mit Vorteil-Box**: nach Sinn statt Stichwörtern gefunden, bidirektional, server-los) →
+  3-stufiges Versprechen → **#bauen-Detail** (3 Schritte Identität→Spore→Handshake, Andock-Wizard
+  als Schnellstart erhalten, „alle Bausteine (Knoten-Werkzeug)" + „zu kompliziert → Sage",
+  **ehrlicher Stand aufgefrischt auf 2026-07-12**) → „Für Fortgeschrittene: fremde Seite ins
+  Mycel holen". Chattiger „Vision"-Satz raus. Funktions-IDs (#andock/#andockWizard/#fpCopyAndock)
+  + Wizard-Ausgang unverändert. sw v41→v42, `.nw-vorteil`-CSS.
+- **Ehrlichkeits-Check:** „Stand 2026-06-28" war noch ehrlich (eher untertrieben) — Cross-Knoten-
+  Handshake seit 07-10/07-11 sogar hub-unabhängig bewiesen; einzige Grenze (Antworter-Tab
+  vorn+wach) weiter korrekt benannt. Text entsprechend aufgefrischt, nichts überzogen.
+
+**Verifikation:** i18n 43/43 DE+EN paritätisch, keine toten Keys, Funktions-IDs erhalten,
+Sektionen balanciert, Syntax grün; smoke_all um Netzwerk-Assertions erweitert. **Voll-Smoke
+nicht lauffähig** (playwright-core in Sandbox fehlt) — **Klaus' Browser-Sichttest nach Deploy
++ Hard-Reload (SW v42) steht aus.**
+
+---
+
 ## 🔨 2026-07-12: Werkzeug-Landingpages „Andock" & „Knoten" GEBAUT (Brief 09)
 
 Nach der Klärung (siehe Eintrag darunter) umgesetzt — **nur Seiten-Text/Layout**, Kern-SBKIM

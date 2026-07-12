@@ -410,3 +410,8 @@ a.rf-step:hover{border-color:var(--accent);transform:translateY(-2px)}
 .dl-txt{display:flex;flex-direction:column;gap:3px}
 .dl-txt b{font-size:.95rem}
 .dl-txt small{color:var(--muted);font-size:.82rem;line-height:1.35}
+
+/* Netzwerk-Seite: hervorgehobene „Der Vorteil"-Box auf der Bau-Weg-Karte */
+.nw-vorteil{margin:12px 0 0;padding:11px 14px;border-radius:12px;font-size:.9rem;color:var(--muted);
+  background:linear-gradient(90deg,rgba(110,231,211,.09),rgba(160,107,255,.09));border:1px solid var(--line)}
+.nw-vorteil b{color:var(--text)}

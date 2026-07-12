@@ -60,7 +60,12 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>[...document.querySelectorAll("#toolMain a.rf-step,#toolMain .lm-link,#toolMain .dl-item")].every(a=>a.getAttribute("href")&&a.getAttribute("href")!=="#")), "knoten: kein Link ins Leere");
   await page.close(); }
 { const { page } = await load("/netzwerk.html");
-  ok(await page.evaluate(()=>document.querySelectorAll(".stages .stage").length===3), "netzwerk: 3 Versprechen-Stufen");
+  ok(await page.evaluate(()=>{const s=[...document.querySelectorAll("section")].find(x=>x.querySelector('[data-i18n="nw_promise_h"]'));return !!s && s.querySelectorAll(".stage").length===3;}), "netzwerk: 3 Versprechen-Stufen");
+  ok(await page.evaluate(()=>{const s=[...document.querySelectorAll("section")].find(x=>x.querySelector('[data-i18n="nw_ways_h"]'));return !!s && s.querySelectorAll(".stage").length===2 && !!s.querySelector('a[href="markt.html"]') && !!s.querySelector('a[href="#bauen"]');}), "netzwerk: zwei Wege-Karten (Marktplatz + Bauen)");
+  ok(await page.evaluate(()=>!!document.querySelector('#bauen .nw-vorteil, section:has([data-i18n="nw_wayB_vorteil"]) .nw-vorteil') || !!document.querySelector('[data-i18n="nw_wayB_vorteil"]')), "netzwerk: Bau-Weg zeigt den Vorteil (sinnbasiert gefunden werden)");
+  ok(await page.evaluate(()=>{const s=document.getElementById("bauen");return !!s && s.querySelectorAll(".stage").length===3 && !!document.getElementById("andock") && !!document.getElementById("andockWizard");}), "netzwerk: Bau-Detail mit 3 Schritten + Andock-Wizard erhalten");
+  ok(await page.evaluate(()=>{const p=document.querySelector('[data-i18n="nw_vision_honest"]');return !!p && /2026-07-12/.test(p.textContent) && /bewiesen/.test(p.textContent);}), "netzwerk: ehrlicher Stand aufgefrischt (2026-07-12)");
+  ok(await page.evaluate(()=>!document.querySelector('[data-i18n="nw_vision_sub"]') && !document.querySelector('.prep[data-i18n="nw_prep"]')), "netzwerk: chattiger Vision-Satz entfernt");
   ok(await page.evaluate(()=>!!document.getElementById("sbkim-aw-go")), "netzwerk: Andock-Wizard gemountet");
   ok(await page.evaluate(()=>!!document.querySelector("#andockWizard .field .mic")), "netzwerk: Mikrofon am Wizard-Feld nachgerüstet");
   ok(await page.evaluate(()=>!!document.getElementById("fpCopyAndock")), "netzwerk: 'Anleitung kopieren'-Knopf vorhanden");
