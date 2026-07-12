@@ -100,11 +100,11 @@ window.FP_LISTINGS = [
   {
     label: "Tomys Hub",
     anchorId: "markt-tomys-hub",
-    text: "Werkzeug-Verbund für personalisierten Digitaldruck, Stickerei und kleine Werbeartikel: Druckvorlagen selbst im Browser gestalten (KI-Vorlage bis druckfertig), Schaufenster mit Beispielen und Werkstatt-Werkzeuge. Du gestaltest — wir drucken. Textildruck, Sublimation, bedruckte Tassen, Stick, Aufkleber, Werbetechnik. Offline nutzbar, ohne Konto.",
+    text: "Tomy — dein Werkzeugkasten für personalisierten Druck: Gestalte im Browser druckfertige Vorlagen für T-Shirts, Tassen, Aufkleber und Werbeartikel. Vom KI-Motiv bis zur fertigen Druckdatei mit 300 dpi, mit Schaufenster voller Beispiele und Werkstatt-Werkzeugen für Auftrag und Angebot. Ideal für Verein, Firma oder privat, um Logo und eigene Motive individuell drucken zu lassen. Stichworte: Digitaldruck, Textildruck, Sublimation, Siebdruck, Stickerei, Werbetechnik, T-Shirt bedrucken, Tasse bedrucken, Aufkleber und Flyer drucken, Werbegeschenke, Druckvorlage gestalten, Motiv erstellen. Läuft offline im Browser, ohne Konto. Du gestaltest — wir drucken.",
     by: "@tomy",
     url: "https://lausiklauskn-png.github.io/Tomys-Hub/",
     img: "https://lausiklauskn-png.github.io/Tomys-Hub/icons/icon-512.png",
-    category: "Werkzeug",
+    category: "Druck & Design",
     own: true
   }
 ];
