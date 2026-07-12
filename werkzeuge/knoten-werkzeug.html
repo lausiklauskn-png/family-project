@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Knoten-Werkzeug — Family Projekt</title>
-  <meta name="description" content="Knoten-Werkzeug: macht deine eigene PWA selbst zu einem Knoten im Netzwerk — Identität, Handshake, Status." />
+  <meta name="description" content="Für Entwickler: mach deine PWA selbst zum Knoten im Mycel — Identität, Handshake, Status, Siegel. Kopier-Bausteine Datei für Datei aus dem offenen SBKIM-Baukasten." />
   <meta name="theme-color" content="#0b0d14" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
   <link rel="stylesheet" href="../assets/style.css" />
@@ -45,32 +45,83 @@
   <script>
     window.FP_TOOL = {
       id: "knoten", icon: "🪢",
-      openUrl: "https://lausiklauskn-png.github.io/Sage-Protokol/docs/observatorium/tools/mycelknoten.html",
+      openUrl: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/web/tools/mycelknoten.html",
       installUrl: "",
       de: {
-        back: "← zurück zu Family Projekt", eyebrow: "Werkzeug · für eigene PWAs",
-        h1pre: "Knoten-Werkzeug — mach deine PWA selbst zum", h1hl: "Knoten", h1post: "im Netzwerk.",
-        lead: "Die SBKIM-Bausteine geben deiner eigenen App eine Identität, einen Handshake mit Geschwister-Knoten und einen Status im Kopf (lebt / Verkehr / Fremd / Siegel). Kopieren, nicht klonen — Datei für Datei aus dem offenen Baukasten.",
-        open: "Knoten-Werkzeug öffnen", install: "",
-        microcopy: "Kostenlos · offene Bausteine · läuft im Browser.",
-        featTitle: "Was es kann", featSub: "Aus einer Seite wird ein vollwertiger Knoten.",
+        back: "← zurück zu Family Projekt", eyebrow: "Für Entwickler & Bastler · zum Selberbauen",
+        h1pre: "Schritt 2 — mach deine PWA selbst zum", h1hl: "Knoten", h1post: "im Mycel.",
+        lead: "Das ist der Entwickler-Schritt: deine eigene App bekommt eine Identität (Spore), einen Handshake mit Geschwister-Knoten und einen Status im Kopf (lebt / Verkehr / Fremd / Siegel). Kopieren, nicht klonen — Datei für Datei aus dem offenen Baukasten. Danach kommt Schritt 3: andocken.",
+        open: "Mycelknoten-Anleitung öffnen", install: "",
+        microcopy: "Kostenlos · offene Bausteine · für Entwickler, läuft im Browser.",
+        stepsTitle: "Wo du gerade bist", stepsSub: "Erst kennenlernen, dann anbauen — du bist bei Schritt 2.",
+        featTitle: "Was dein Knoten kann", featSub: "Aus einer Seite wird ein vollwertiger Knoten.",
+        dlTitle: "Kopier-Bausteine", dlSub: "Die offenen SBKIM-Module Datei für Datei — ansehen, kopieren, in deine App einbauen.",
+        linkmapTitle: "Wie geht's weiter?", linkmapSub: "Jeder Schritt führt direkt zum passenden Ort — nie ins Leere.",
         costTitle: "Was es kostet", costSub: "Die Bausteine sind frei und offen. Du kopierst, was du brauchst.",
         cost0: "kostenlos nutzen", costNote: "Offener Baukasten — keine Lizenz, kein Konto.",
         donate: "Spenden", soon: "bald", donateNote: "Freiwillige Unterstützung (PayPal) — kommt später.",
         trustTitle: "Worauf du dich verlassen kannst", trustSub: "Ehrlich und nachprüfbar — kein „vertrau mir“."
       },
       en: {
-        back: "← back to Family Projekt", eyebrow: "Tool · for your own PWAs",
-        h1pre: "Node tool — make your PWA a", h1hl: "node", h1post: "in the network itself.",
-        lead: "The SBKIM building blocks give your own app an identity, a handshake with sibling nodes and a status in the header (alive / traffic / foreign / seal). Copy, don't clone — file by file from the open kit.",
-        open: "Open node tool", install: "",
-        microcopy: "Free · open building blocks · runs in the browser.",
-        featTitle: "What it does", featSub: "A page becomes a full node.",
+        back: "← back to Family Projekt", eyebrow: "For developers & tinkerers · build it yourself",
+        h1pre: "Step 2 — make your PWA a", h1hl: "node", h1post: "in the mycelium itself.",
+        lead: "This is the developer step: your own app gets an identity (spore), a handshake with sibling nodes and a status in the header (alive / traffic / foreign / seal). Copy, don't clone — file by file from the open kit. Then comes step 3: docking.",
+        open: "Open mycel-node guide", install: "",
+        microcopy: "Free · open building blocks · for developers, runs in the browser.",
+        stepsTitle: "Where you are", stepsSub: "Understand first, then build — you're at step 2.",
+        featTitle: "What your node can do", featSub: "A page becomes a full node.",
+        dlTitle: "Copy building blocks", dlSub: "The open SBKIM modules file by file — view, copy, build into your app.",
+        linkmapTitle: "What's next?", linkmapSub: "Every step leads straight to the right place — never into the void.",
         costTitle: "What it costs", costSub: "The building blocks are free and open. You copy what you need.",
         cost0: "use for free", costNote: "Open kit — no license, no account.",
         donate: "Donate", soon: "soon", donateNote: "Voluntary support (PayPal) — coming later.",
         trustTitle: "What you can rely on", trustSub: "Honest and verifiable — no “trust me”."
       },
+      steps: [
+        { icon: "👀", href: "andock-werkzeug.html", de: { h: "1 · Kennenlernen", p: "Was das Mycel ist — Überblick & Siegel." },
+          en: { h: "1 · Get to know it", p: "What the mycelium is — overview & seal." } },
+        { icon: "🪢", active: true, de: { h: "2 · Knoten erzeugen", p: "Bausteine einbauen, Identität + Spore (du bist hier)." },
+          en: { h: "2 · Create a node", p: "Build in blocks, identity + spore (you are here)." } },
+        { icon: "🔗", href: "../netzwerk.html#andock", de: { h: "3 · Andocken", p: "Den fertigen Knoten im Netz anmelden." },
+          en: { h: "3 · Dock", p: "Register the finished node in the network." } }
+      ],
+      downloads: [
+        { icon: "🧰", href: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/werkzeuge.html",
+          de: { h: "Werkzeugkiste (alle Bausteine)", p: "Die offene Sammlung aller SBKIM-Module bei SB-KIMTool-Point." },
+          en: { h: "Toolbox (all blocks)", p: "The open collection of all SBKIM modules at SB-KIMTool-Point." } },
+        { icon: "📘", href: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/web/tools/mycelknoten.html",
+          de: { h: "Mycelknoten-Anleitung", p: "Schritt-für-Schritt: wie deine PWA zum Knoten wird." },
+          en: { h: "Mycel-node guide", p: "Step by step: how your PWA becomes a node." } },
+        { icon: "🆔", href: "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/web/tools/sbkim-spore.js",
+          de: { h: "Baustein: Identität & Spore (02)", p: "Rohdatei sbkim-spore.js — ansehen & kopieren." },
+          en: { h: "Block: identity & spore (02)", p: "Raw file sbkim-spore.js — view & copy." } },
+        { icon: "🌐", href: "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/web/tools/sbkim-rendezvous.js",
+          de: { h: "Baustein: Netz-Anmeldung (23)", p: "Rohdatei sbkim-rendezvous.js — ansehen & kopieren." },
+          en: { h: "Block: network sign-in (23)", p: "Raw file sbkim-rendezvous.js — view & copy." } },
+        { icon: "🏅", href: "https://raw.githubusercontent.com/lausiklauskn-png/SB-KIMTool-Point/main/web/tools/sbkim-siegel.js",
+          de: { h: "Baustein: Siegel (16)", p: "Rohdatei sbkim-siegel.js — das selbst-ausstellende Siegel." },
+          en: { h: "Block: seal (16)", p: "Raw file sbkim-siegel.js — the self-issuing seal." } },
+        { icon: "🖼", href: "../assets/sbkim-siegel-wappen.svg", dl: true,
+          de: { h: "Siegel-Wappen (SVG)", p: "Das goldene Wappen als Vektor-Datei — direkt herunterladen." },
+          en: { h: "Seal crest (SVG)", p: "The golden crest as a vector file — download directly." } }
+      ],
+      linkmap: [
+        { de: { q: "Knoten fertig — jetzt anmelden?" }, en: { q: "Node ready — sign in now?" },
+          links: [
+            { href: "../netzwerk.html#andock", tag: "Family", de: { label: "Netzwerk-Raum (andocken)" }, en: { label: "Network room (dock)" } },
+            { href: "andock-werkzeug.html", tag: "Family", de: { label: "Andock-Überblick" }, en: { label: "Docking overview" } }
+          ] },
+        { de: { q: "Alle Module & der Baukasten?" }, en: { q: "All modules & the kit?" },
+          links: [
+            { href: "https://lausiklauskn-png.github.io/Sage-Protokol/#module-list", tag: "Sage", de: { label: "Modul-Liste" }, en: { label: "Module list" } },
+            { href: "https://lausiklauskn-png.github.io/Sage-Protokol/#observatorium-vorteilspack", tag: "Sage", de: { label: "Vorteilspack" }, en: { label: "Bundle" } }
+          ] },
+        { de: { q: "Wie geht das genau — Modell & Sicherheit?" }, en: { q: "How exactly — model & security?" },
+          links: [
+            { href: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/modell.html", tag: "Point", de: { label: "Das Modell" }, en: { label: "The model" } },
+            { href: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/sicherheit.html", tag: "Point", de: { label: "Sicherheit" }, en: { label: "Security" } }
+          ] }
+      ],
       features: [
         { icon: "🆔", de: { h: "Eigene Identität", p: "Eine Ed25519-Spore macht deine App zu einem unterscheidbaren Knoten — lokal erzeugt, nichts verlässt das Gerät." },
           en: { h: "Own identity", p: "An Ed25519 spore makes your app a distinct node — generated locally, nothing leaves the device." } },

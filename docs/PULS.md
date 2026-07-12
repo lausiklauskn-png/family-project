@@ -4,6 +4,45 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## 🔨 2026-07-12: Werkzeug-Landingpages „Andock" & „Knoten" GEBAUT (Brief 09)
+
+Nach der Klärung (siehe Eintrag darunter) umgesetzt — **nur Seiten-Text/Layout**, Kern-SBKIM
+unberührt. Branch `claude/werkzeuge-andock-knoten-design-o0aztn`.
+
+**`assets/tool-landing.js` (neu strukturiert, additive optionale Blöcke):**
+- **Leere Screenshot-Galerie raus** (Klaus 2a): Galerie rendert nur noch bei echten
+  `FP_TOOL.shots`. Ohne Bilder → keine Galerie (kein „vom Anbieter eingefügt"-Platzhalter mehr).
+  Wirkt auf alle drei Seiten; Such-Werkzeug bleibt sonst unberührt (setzt die neuen Felder nicht).
+- Neue optionale Felder: `steps` (roter Faden), `seal` (selbst-gravierendes Siegel), `linkmap`
+  (jede Aussage ein Link), `downloads` (Bausteine zum Mitnehmen). Rendern nur wenn gesetzt.
+
+**Andock-Seite** = der **Kennenlernen-/Überblick-Einstieg** (Klaus 3b): roter Faden
+(1 kennenlernen aktiv → 2 Knoten → 3 andocken), **echtes SBKIM-Wappen mit Live-Namens-Gravur
++ SVG-Download** (Wappen aus Sage kopiert nach `assets/sbkim-siegel-wappen.svg`, Ribbon
+`#ribbonText`), **Link-Landkarte** (7 Frage-Gruppen, je Sage + SB-KIMTool-Point-Ziele),
+**Bausteine-Download** (Siegel-SVG, Werkzeugkiste, SBKIM-Module). openUrl → `netzwerk.html#andock`.
+
+**Knoten-Seite** = **für Entwickler** gekennzeichnet (Klaus 1a/4a): Schritt 2 aktiv,
+**Kopier-Bausteine** (Werkzeugkiste + Mycelknoten-Anleitung + 3 Roh-Module + Siegel-SVG),
+Vorwärts-Link zum Andocken. openUrl korrigiert → `SB-KIMTool-Point/web/tools/mycelknoten.html`
+(die Sage-`docs/observatorium/tools/`-URL war ungeprüft; die echte liegt bei SB-KIMTool-Point).
+
+**`werkzeuge.js`**: Andock → „Ans Netz anschließen" (Start/Überblick), Knoten → „Deine App
+zum Knoten" (Schritt 2, für Entwickler); Reihenfolge such → andock (kennenlernen) → knoten
+(Schritt 2) folgt dem roten Faden. **`sw.js` v37→v38** (+ tool-landing.js + Siegel-SVG in CORE).
+**`style.css`**: Stile für rf-/seal-/lm-/dl-Blöcke.
+
+**Verifikation (ehrlich):** JS-Syntax (`node --check`) grün; beide `FP_TOOL`-Blöcke parsen; die
+**Render-Logik** über einen Node-DOM-Shim geprüft — Andock 3 Schritte/Siegel/7 Landkarte-Gruppen/
+Bausteine, Knoten 3 Schritte/6 Bausteine, Such kein Platzhalter/kein Faden; **alle 18+14
+Inhalts-Links haben ein echtes Ziel** (kein Link ins Leere; einzige `#` ist der Spenden-„bald"-
+Knopf). `smoke_all.mjs` um Andock-/Knoten-Assertions erweitert + Such-Galerie-Assertion an neue
+Absicht angepasst — **Voll-Lauf hier nicht möglich** (`playwright-core` in der Sandbox nicht
+installiert). **Klaus' Browser-Sichttest (nach Merge + Hard-Reload, SW v38) steht aus** —
+besonders: Siegel-Gravur/Download am Tablet, alle Landkarte-Links live.
+
+---
+
 ## 🧭 2026-07-12: Klärung Werkzeug-Landingpages „Andock" & „Knoten" (Brief 08 → Brief 09)
 
 **Art:** Klärungs-Sitzung (Plan-vor-Code, kein Bau). Brief 08 stellte vier Richtungsfragen,

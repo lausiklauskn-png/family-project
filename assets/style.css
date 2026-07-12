@@ -362,3 +362,51 @@ footer .frow{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 footer a{color:var(--muted)} footer a:hover{color:var(--accent)}
 
 @media (prefers-reduced-motion: reduce){ *{animation:none!important} }
+
+/* ── Werkzeug-Landing: roter Faden (Schritt-Band) ──────────────────────────── */
+.rf-sec{padding:6px 0}
+.rf-band{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+.rf-step{flex:1 1 220px;min-width:200px;display:flex;align-items:center;gap:12px;padding:14px 16px;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+a.rf-step:hover{border-color:var(--accent);transform:translateY(-2px)}
+.rf-step.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.rf-num{flex:0 0 auto;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.85rem;font-weight:800;color:#0b0d14;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.rf-step.on .rf-num{background:linear-gradient(135deg,var(--gold),#ffd98a)}
+.rf-ico{font-size:1.35rem;line-height:1}
+.rf-txt{display:flex;flex-direction:column;gap:2px}
+.rf-txt b{font-size:.98rem}
+.rf-txt small{color:var(--muted);font-size:.82rem;line-height:1.3}
+.rf-arrow{align-self:center;color:var(--muted);font-size:1.2rem}
+@media(max-width:640px){.rf-arrow{display:none}}
+
+/* ── Werkzeug-Landing: selbst-gravierendes Siegel ──────────────────────────── */
+.seal-sec .seal-wrap{display:grid;grid-template-columns:minmax(200px,300px) 1fr;gap:28px;align-items:center}
+@media(max-width:640px){.seal-sec .seal-wrap{grid-template-columns:1fr}}
+.seal-svg{width:100%;max-width:300px;margin:0 auto;aspect-ratio:1;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.seal-svg svg,.seal-svg img{width:100%;height:auto;display:block;filter:drop-shadow(0 6px 24px rgba(244,180,53,.18))}
+.seal-ctl{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.seal-lbl{font-size:.85rem;color:var(--muted)}
+.seal-input{width:100%;max-width:340px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg2);color:inherit;font-size:1rem;font-family:var(--mono);letter-spacing:.04em}
+.seal-input:focus{outline:none;border-color:var(--gold)}
+
+/* ── Werkzeug-Landing: Link-Landkarte (jede Aussage ein Link) ──────────────── */
+.lm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.lm-group{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.lm-q{font-weight:700;margin-bottom:10px;font-size:.98rem}
+.lm-links{display:flex;flex-wrap:wrap;gap:8px}
+.lm-link{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:999px;
+  border:1px solid var(--line);color:var(--accent);text-decoration:none;font-size:.86rem;transition:border-color .2s,background .2s}
+.lm-link:hover{border-color:var(--accent);background:rgba(124,156,255,.08)}
+.lm-tag{font-size:.7rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+
+/* ── Werkzeug-Landing: Bausteine zum Mitnehmen ─────────────────────────────── */
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.dl-item{display:flex;align-items:flex-start;gap:12px;padding:15px 16px;background:var(--card);
+  border:1px solid var(--line);border-radius:14px;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s}
+.dl-item:hover{border-color:var(--accent);transform:translateY(-2px)}
+.dl-ico{font-size:1.4rem;line-height:1;flex:0 0 auto}
+.dl-txt{display:flex;flex-direction:column;gap:3px}
+.dl-txt b{font-size:.95rem}
+.dl-txt small{color:var(--muted);font-size:.82rem;line-height:1.35}

@@ -42,7 +42,22 @@ console.log("\nDetail-Checks");
 { const { page } = await load("/werkzeuge/such-werkzeug.html");
   ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .feat .f").length===4), "such-werkzeug: 4 Vorteils-Kacheln");
   ok(await page.evaluate(()=>!!document.querySelector("#toolMain .price")), "such-werkzeug: Preis-Block");
-  ok(await page.evaluate(()=>document.querySelectorAll("#thumbs .thumb").length>=3), "such-werkzeug: Galerie-Thumbnails");
+  ok(await page.evaluate(()=>!document.querySelector("#mainlabel") && !document.querySelector(".shot .ph")), "such-werkzeug: kein leerer Screenshot-Platzhalter mehr");
+  await page.close(); }
+{ const { page } = await load("/werkzeuge/andock-werkzeug.html");
+  ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .rf-band .rf-step").length===3), "andock: roter Faden mit 3 Schritten");
+  ok(await page.evaluate(()=>{const s=document.querySelector("#toolMain .rf-step.on .rf-txt b");return s && /Kennenlernen/.test(s.textContent);}), "andock: Schritt 1 (Kennenlernen) aktiv");
+  ok(await page.evaluate(()=>!!document.querySelector("#toolMain .seal-sec #sealName") && !!document.querySelector("#toolMain #sealDl")), "andock: Siegel-Block mit Namensfeld + Download");
+  ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .lm-sec .lm-group").length>=5), "andock: Link-Landkarte mit mehreren Gruppen");
+  ok(await page.evaluate(()=>[...document.querySelectorAll("#toolMain .lm-link,#toolMain .dl-item,#toolMain a.rf-step")].every(a=>a.getAttribute("href")&&a.getAttribute("href")!=="#")), "andock: kein Link ins Leere (jeder href gesetzt)");
+  ok(await page.evaluate(()=>!!document.querySelector('#toolMain .dl-item[href$="sbkim-siegel-wappen.svg"][download]')), "andock: Siegel-SVG als echter Download");
+  ok(await page.evaluate(()=>!document.querySelector("#mainlabel")), "andock: kein leerer Screenshot-Platzhalter");
+  await page.close(); }
+{ const { page } = await load("/werkzeuge/knoten-werkzeug.html");
+  ok(await page.evaluate(()=>/Entwickler/.test(document.querySelector("#toolMain .eyebrow").textContent)), "knoten: als Entwickler-Thema gekennzeichnet");
+  ok(await page.evaluate(()=>{const s=document.querySelector("#toolMain .rf-step.on .rf-txt b");return s && /Knoten erzeugen/.test(s.textContent);}), "knoten: Schritt 2 (Knoten erzeugen) aktiv");
+  ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .dl-sec .dl-item").length>=4), "knoten: Kopier-Bausteine vorhanden");
+  ok(await page.evaluate(()=>[...document.querySelectorAll("#toolMain a.rf-step,#toolMain .lm-link,#toolMain .dl-item")].every(a=>a.getAttribute("href")&&a.getAttribute("href")!=="#")), "knoten: kein Link ins Leere");
   await page.close(); }
 { const { page } = await load("/netzwerk.html");
   ok(await page.evaluate(()=>document.querySelectorAll(".stages .stage").length===3), "netzwerk: 3 Versprechen-Stufen");
