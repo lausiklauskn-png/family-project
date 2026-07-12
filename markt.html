@@ -66,7 +66,7 @@
         <h1 data-i18n="mk_title">Apps finden — und anbieten.</h1>
         <p class="lead" data-i18n="mk_lead">Such, was du brauchst. Oder liste deine eigene Seite: ein Link plus mindestens ein Bild.</p>
 
-        <form class="searchrow" id="mkSearchForm" style="margin-top:22px">
+        <form class="searchrow" id="mkSearchForm" style="margin-top:22px" data-noocr>
           <div class="field">
             <input id="mkSearch" type="search" data-i18n-ph="mk_search_ph" placeholder="Beschreib in eigenen Worten, was du suchst …" />
             <button class="mic" type="button" title="Sprechen statt tippen" aria-label="Spracheingabe">🎤</button>
@@ -95,15 +95,27 @@
       <div class="wrap">
         <h2 data-i18n="mk_submit_h">Deine eigene App eintragen</h2>
         <p class="sub" data-i18n="mk_submit_sub">Du hast selbst eine App, Seite oder ein Werkzeug? Trag sie kostenlos in den Marktplatz ein — so wie die Beispiele oben. Nötig sind nur ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild bleibt bei dir; wir speichern nur den Link. Jeder Eintrag wird vor der Veröffentlichung kurz geprüft.</p>
-        <form class="glass form-grid" id="mkSubmit" style="padding:22px">
-          <div><label data-i18n="mk_f_title">Titel *</label><div class="field"><input id="sbTitle" type="text" required maxlength="80" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
-          <div><label data-i18n="mk_f_handle">Handle / Anbieter (kein Klarname) *</label><div class="field"><input id="sbBy" type="text" required maxlength="40" placeholder="@handle" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
-          <div><label data-i18n="mk_f_url">Link zur Seite (https) *</label><div class="field"><input id="sbUrl" type="url" required placeholder="https://…" data-nomic /></div></div>
-          <div><label data-i18n="mk_f_img">Bild-Link (https, JPG/PNG/WebP) *</label><div class="field"><input id="sbImg" type="url" required placeholder="https://…/screenshot.jpg" data-nomic /></div></div>
-          <div><label data-i18n="mk_f_cat">Kategorie</label><div class="field"><input id="sbCat" type="text" maxlength="40" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
-          <div><label data-i18n="mk_f_desc">Beschreibung (in eigenen Worten, mit Synonymen) *</label><div class="field"><textarea id="sbText" required maxlength="600"></textarea><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+        <form class="glass form-grid" id="mkSubmit" style="padding:22px" data-noocr>
+          <div><label data-i18n="mk_f_title">Name deiner App *</label><div class="field"><input id="sbTitle" type="text" required maxlength="80" data-i18n-ph="mk_ph_title" placeholder="z. B. Mein Rezeptbuch" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_handle">Dein Kürzel / Anbieter (kein echter Name) *</label><div class="field"><input id="sbBy" type="text" required maxlength="40" placeholder="@handle" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_url">Adresse deiner App im Netz *</label><div class="field"><input id="sbUrl" type="url" required placeholder="https://…" data-nomic /></div><p class="mk-fieldhint" data-i18n="mk_hint_url">Wo die App online liegt — beginnt mit https://</p></div>
+          <div>
+            <label data-i18n="mk_f_img">Bild deiner App *</label>
+            <p class="mk-fieldhint" data-i18n="mk_hint_img">So erscheint deine App in der Liste. Wähle ein Bild vom Gerät (zur Vorschau) oder füge einen öffentlichen Bild-Link ein.</p>
+            <div class="mk-imgfield">
+              <div class="mk-imgprev" id="sbImgPrev"><span class="mk-imgprev-empty" data-i18n="mk_img_empty">Vorschau erscheint hier</span></div>
+              <div class="mk-imgctl">
+                <button type="button" class="btn slim" id="sbImgPick" data-i18n="mk_img_pick">🖼 Bild vom Gerät wählen</button>
+                <div class="field"><input id="sbImg" type="url" required data-i18n-ph="mk_ph_img" placeholder="oder Bild-Link: https://…/bild.jpg" data-nomic /></div>
+                <p class="mk-fieldhint" id="sbImgNote"></p>
+              </div>
+            </div>
+          </div>
+          <div><label data-i18n="mk_f_cat">Kategorie</label><div class="field"><input id="sbCat" type="text" maxlength="40" data-i18n-ph="mk_ph_cat" placeholder="z. B. Rezepte, Werkzeug, Spiel" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_desc">Beschreibung (in eigenen Worten, mit Synonymen) *</label><div class="field"><textarea id="sbText" required maxlength="600" data-i18n-ph="mk_ph_desc" placeholder="Was macht deine App? Schreib frei und mit Synonymen — das hilft der Suche."></textarea><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
           <div class="haftung">
-            <p style="margin:0 0 8px" data-i18n="mk_jahr"><b>Kleiner Jahresbeitrag (in Vorbereitung):</b> ein paar Euro pro Jahr (Höhe offen), als Anreiz und Spam-Bremse. Bezahlung wird vorbereitet — heute noch kein echter Einzug.</p>
+            <p style="margin:0 0 8px"><b data-i18n="mk_angebot_h">Gründer-Angebot:</b> <span data-i18n="mk_angebot">die ersten 100 Apps bleiben dauerhaft kostenlos gelistet. Trag deine App jetzt ein — solange die ersten 100 Plätze frei sind. Ist die 100 voll, läuft das Angebot aus.</span></p>
+            <p style="margin:0 0 8px"><b data-i18n="mk_verkauf_h">Verkaufen?</b> <span data-i18n="mk_verkauf">Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store / dein eigenes Konto — wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.</span></p>
             <p style="margin:0" data-i18n="mk_haft"><b>Hinweis:</b> Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.</p>
           </div>
           <button class="btn primary" type="submit" data-i18n="mk_f_btn">Eintrag vorbereiten</button>
@@ -166,10 +178,22 @@
         mk_empty: "Noch keine Einträge. Trag unten die erste Seite ein — sie erscheint nach Freigabe und (mit Bild) auch in der Weekly Discovery.",
         mk_submit_h: "Deine eigene App eintragen",
         mk_submit_sub: "Du hast selbst eine App, Seite oder ein Werkzeug? Trag sie kostenlos in den Marktplatz ein — so wie die Beispiele oben. Nötig sind nur ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild bleibt bei dir; wir speichern nur den Link. Jeder Eintrag wird vor der Veröffentlichung kurz geprüft.",
-        mk_f_title: "Titel *", mk_f_handle: "Handle / Anbieter (kein Klarname) *", mk_f_url: "Link zur Seite (https) *",
-        mk_f_img: "Bild-Link (https, JPG/PNG/WebP) *", mk_f_cat: "Kategorie", mk_f_desc: "Beschreibung (in eigenen Worten, mit Synonymen) *",
+        mk_f_title: "Name deiner App *", mk_f_handle: "Dein Kürzel / Anbieter (kein echter Name) *", mk_f_url: "Adresse deiner App im Netz *",
+        mk_f_img: "Bild deiner App *", mk_f_cat: "Kategorie", mk_f_desc: "Beschreibung (in eigenen Worten, mit Synonymen) *",
+        mk_ph_title: "z. B. Mein Rezeptbuch", mk_ph_cat: "z. B. Rezepte, Werkzeug, Spiel",
+        mk_ph_desc: "Was macht deine App? Schreib frei und mit Synonymen — das hilft der Suche.",
+        mk_ph_img: "oder Bild-Link: https://…/bild.jpg",
+        mk_hint_url: "Wo die App online liegt — beginnt mit https://",
+        mk_hint_img: "So erscheint deine App in der Liste. Wähle ein Bild vom Gerät (zur Vorschau) oder füge einen öffentlichen Bild-Link ein.",
+        mk_img_empty: "Vorschau erscheint hier", mk_img_pick: "🖼 Bild vom Gerät wählen",
+        mk_img_local: "Vorschau vom Gerät. Zum Veröffentlichen brauchst du einen öffentlichen Bild-Link (https) — das Bild bleibt bei dir, wir speichern nur den Link.",
+        mk_img_ok: "So erscheint dein Eintrag.",
+        mk_img_bad: "Bild lädt nicht — prüfe den Link (https, JPG/PNG/WebP, kein SVG).",
         mk_f_btn: "Eintrag vorbereiten",
-        mk_jahr: "Kleiner Jahresbeitrag (in Vorbereitung): ein paar Euro pro Jahr (Höhe offen), als Anreiz und Spam-Bremse. Bezahlung wird vorbereitet — heute noch kein echter Einzug.",
+        mk_angebot_h: "Gründer-Angebot:",
+        mk_angebot: "die ersten 100 Apps bleiben dauerhaft kostenlos gelistet. Trag deine App jetzt ein — solange die ersten 100 Plätze frei sind. Ist die 100 voll, läuft das Angebot aus.",
+        mk_verkauf_h: "Verkaufen?",
+        mk_verkauf: "Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store / dein eigenes Konto — wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.",
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ zur Seite des Anbieters", search_btn: "Suchen",
         mk_pr_btn: "Als Pull-Request einreichen →",
@@ -187,10 +211,22 @@
         mk_empty: "No entries yet. Add the first site below — it appears after approval and (with an image) in Weekly Discovery.",
         mk_submit_h: "List your own app",
         mk_submit_sub: "Got your own app, site or tool? List it in the marketplace for free — just like the examples above. All you need is a link and at least one image (JPG/PNG/WebP — no SVG). The image stays with you; we only store the link. Every entry is briefly reviewed before it goes live.",
-        mk_f_title: "Title *", mk_f_handle: "Handle / provider (no real name) *", mk_f_url: "Link to the site (https) *",
-        mk_f_img: "Image link (https, JPG/PNG/WebP) *", mk_f_cat: "Category", mk_f_desc: "Description (in your own words, with synonyms) *",
+        mk_f_title: "Your app's name *", mk_f_handle: "Your handle / provider (no real name) *", mk_f_url: "Your app's web address *",
+        mk_f_img: "Your app's image *", mk_f_cat: "Category", mk_f_desc: "Description (in your own words, with synonyms) *",
+        mk_ph_title: "e.g. My Recipe Book", mk_ph_cat: "e.g. Recipes, Tool, Game",
+        mk_ph_desc: "What does your app do? Write freely, with synonyms — it helps the search.",
+        mk_ph_img: "or image link: https://…/image.jpg",
+        mk_hint_url: "Where the app lives online — starts with https://",
+        mk_hint_img: "This is how your app appears in the list. Pick an image from your device (for preview) or paste a public image link.",
+        mk_img_empty: "Preview appears here", mk_img_pick: "🖼 Pick an image from your device",
+        mk_img_local: "Preview from your device. To publish you need a public image link (https) — the image stays with you, we only store the link.",
+        mk_img_ok: "This is how your entry looks.",
+        mk_img_bad: "Image won't load — check the link (https, JPG/PNG/WebP, no SVG).",
         mk_f_btn: "Prepare entry",
-        mk_jahr: "Small yearly fee (in preparation): a few euros per year (amount open), as an incentive and spam brake. Payment is being prepared — no real charge yet.",
+        mk_angebot_h: "Founder offer:",
+        mk_angebot: "the first 100 apps stay listed for free, permanently. Add your app now — while the first 100 spots are open. Once 100 is full, the offer ends.",
+        mk_verkauf_h: "Selling?",
+        mk_verkauf: "Family Projekt is a showcase, not a payment service. You sell your app through your own store / your own account — we only list and link, no commission, no payment handling.",
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ to the provider's site", search_btn: "Search",
         mk_pr_btn: "Submit as pull request →",
@@ -371,6 +407,53 @@
         prLink.href = prUrl;
         prLink.style.display = "inline-block";
       });
+
+      // ── Bild-Feld: Live-Vorschau + „Bild vom Gerät wählen" ──────────────
+      // Klaus 2026-07-12: das Feld muss zeigen, was als App-Bild erscheint.
+      // Ein gewähltes Gerät-Bild dient NUR der Vorschau (data-URI); veröffentlicht
+      // wird ein öffentlicher https-Link (safeImg) — der Marktplatz speichert nur
+      // den Link, das Bild bleibt beim Anbieter. Fail-soft.
+      (function setupImgPreview() {
+        var prev = document.getElementById("sbImgPrev");
+        var note = document.getElementById("sbImgNote");
+        var linkInp = document.getElementById("sbImg");
+        var pick = document.getElementById("sbImgPick");
+        if (!prev || !linkInp) return;
+        var T = (window.FP && FP.t) ? FP.t : function (k) { return k; };
+        function showEmpty() { prev.innerHTML = '<span class="mk-imgprev-empty">' + esc(T("mk_img_empty")) + "</span>"; }
+        function showImg(src) {
+          prev.innerHTML = "";
+          var im = document.createElement("img");
+          im.alt = ""; im.className = "mk-imgprev-img"; im.src = src;
+          im.onerror = function () { showEmpty(); if (note) note.textContent = T("mk_img_bad"); };
+          prev.appendChild(im);
+        }
+        // Öffentlichen Link eingeben → daraus vorschauen (das wird veröffentlicht).
+        linkInp.addEventListener("input", function () {
+          var v = linkInp.value.trim();
+          if (!v) { showEmpty(); if (note) note.textContent = ""; return; }
+          if (safeImg(v)) { showImg(v); if (note) note.textContent = T("mk_img_ok"); }
+          else if (note) note.textContent = T("mk_img_bad");
+        });
+        // Bild vom Gerät wählen → nur Vorschau (data-URI), ehrlicher Hinweis.
+        if (pick) {
+          var fileInp = document.createElement("input");
+          fileInp.type = "file"; fileInp.accept = "image/jpeg,image/png,image/webp"; fileInp.style.display = "none";
+          fileInp.setAttribute("aria-hidden", "true");
+          document.body.appendChild(fileInp);
+          pick.addEventListener("click", function () { fileInp.value = ""; fileInp.click(); });
+          fileInp.addEventListener("change", function () {
+            var f = fileInp.files && fileInp.files[0];
+            if (!f) return;
+            if (/svg/i.test(f.type)) { if (note) note.textContent = T("mk_img_bad"); return; }
+            var r = new FileReader();
+            r.onload = function () { showImg(r.result); if (note) note.textContent = T("mk_img_local"); };
+            r.onerror = function () { showEmpty(); };
+            r.readAsDataURL(f);
+          });
+        }
+        showEmpty();
+      })();
 
       // Spenden/Jahresbeitrag — opt-in-Platzhalter (assets/config/spenden.js).
       // enabled:false → deaktivierte „(in Vorbereitung)"-Knöpfe, kein echter Einzug.
