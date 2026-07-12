@@ -33,6 +33,13 @@ Werkzeuge → SB-KIMTool-Point-Werkzeuge, je BEIDE Seiten wo sinnvoll), **nie in
 verifizierte Ziel-Tabelle steht in `BRIEF_09` (§ Kontextuelle Link-Landkarte) — jeder Link
 muss beim Bau live geprüft werden.
 
+**Zusatz 2 (Klaus 2026-07-12) — logischer roter Faden:** feste Reihenfolge beim
+Sich-Einbringen: **kennenlernen → Knoten erzeugen → andocken** („erst kennenlernen, dann
+anbauen"). **Knoten kommt VOR Andock** (Andocken setzt einen erzeugten Knoten voraus).
+Konsistent in Text, Links und `werkzeuge.html`-Reihenfolge — kein Zickzack. Technische
+Reihenfolge für „Knoten erzeugen": Skill `saubere-netz-anmeldung`. Details in `BRIEF_09`
+(§ Logischer roter Faden).
+
 **Offen / nächster Schritt:** Bau-Sitzung nach `BRIEF_09_ANDOCK_KNOTEN_BAU.md` ausführen
 (Reihenfolge + Akzeptanzkriterien dort). Nur Seiten-Text/Layout, Kern-SBKIM nicht anfassen,
 `sw.js` `CACHE_VERSION`↑, Browser-Sichttest bleibt Klaus.

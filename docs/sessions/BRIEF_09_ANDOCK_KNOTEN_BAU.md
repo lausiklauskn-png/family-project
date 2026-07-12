@@ -36,6 +36,40 @@ Auf die vier offenen Fragen aus Brief 08 hat Klaus so entschieden:
 
 ---
 
+## ⭐ Logischer roter Faden — feste Reihenfolge (Klaus 2026-07-12, verbindlich)
+
+Beim Sich-ins-Mycel-Einbringen gilt eine **klare, logische Reihenfolge**, die auf beiden
+Seiten UND in der Werkzeug-Liste UND in allen Querverweisen **konsistent** eingehalten wird —
+sie darf nicht hin- und herspringen. Klaus' Worte: *„Erst kennenlernen, dann anbauen."*
+
+**Die Reihenfolge:**
+
+1. **Kennenlernen / verstehen** — was ist das Mycel, was bringt es? (Einladung, Mycel-Karte,
+   Erklärung). Der emotionale Einstieg, noch ohne „machen".
+2. **Knoten erzeugen** — die eigene App/den Browser sauber vorbereiten und eine **eigene
+   Identität + Spore** anlegen (das ist der „Knoten"-Schritt). **Technische Reihenfolge dafür:
+   Skill `saubere-netz-anmeldung`** (saubere, EIGENE Identität → saubere Spore → saubere
+   Anmeldung; verhindert Identitäts-Kollisionen auf geteilter Adresse). Der Andock-Wizard im
+   Siegel (🔑 Identität & Spore erzeugen) ist genau dieser Schritt.
+3. **Andocken** — den fertigen Knoten ins Netz **anmelden / Handshake** (Netzwerk-Raum,
+   Rendezvous). Kommt LOGISCH ZULETZT, weil es einen erzeugten Knoten voraussetzt.
+
+**Konsequenzen für den Bau (nicht springen lassen):**
+- **Knoten VOR Andock** in der Erzähl-/Klick-Reihenfolge. „Andocken" setzt „Knoten erzeugt"
+  voraus — das muss man auf der Seite sehen (z.B. Schritt-1/2/3-Band mit aktivem Schritt).
+- Empfohlene Rollen der zwei Seiten (Freiheit beim Umsetzen, aber Reihenfolge fix):
+  - **Andock-Seite** = der **rote-Faden-Einstieg** (Schritt 1 „kennenlernen" ausführlich +
+    Überblick über alle drei Schritte) und verlinkt für Schritt 2 auf die **Knoten-Seite** /
+    den Andock-Wizard, für Schritt 3 auf den **Netzwerk-Raum**.
+  - **Knoten-Seite** = Schritt 2 im Detail (Identität/Spore erzeugen, Kopier-Bausteine) und
+    zeigt „als Nächstes: andocken" → Netzwerk-Raum.
+- **`werkzeuge.html`**: die Einträge in **logischer Reihenfolge** listen/gruppieren
+  (kennenlernen → Knoten → Andock), nicht alphabetisch/zufällig.
+- Jeder „weiter"-Link zeigt vorwärts in der Kette, jeder „zurück/mehr dazu"-Link rückwärts —
+  konsistent, kein Zickzack.
+
+---
+
 ## Was konkret zu bauen ist
 
 ### Gemeinsam (beide Seiten): leere Screenshot-Galerie raus (Entscheidung 2a)
@@ -172,6 +206,8 @@ Ziel: **eigene Erklär-Anleitung mit Kopier-Bausteinen** (Entscheidung 4a), ehrl
 
 - [ ] Kein leerer „vom Anbieter eingefügt"-Screenshot-Rahmen mehr auf irgendeiner der drei
       Werkzeug-Seiten.
+- [ ] Logischer roter Faden konsistent: kennenlernen → Knoten erzeugen → andocken; **Knoten
+      vor Andock**; kein Zickzack in Text, Links und `werkzeuge.html`-Reihenfolge.
 - [ ] Andock-Seite: eigene Erklärung + sichtbares, selbst-ausfüllendes Siegel (nach Skill
       `status-leiste-siegel`) + Links zu Sage-Page & Einladung.
 - [ ] Kontextuelle Link-Landkarte umgesetzt: jede Kern-Aussage/Frage ist ein klickbarer Link
