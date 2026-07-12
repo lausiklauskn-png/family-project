@@ -124,6 +124,22 @@
     var featSec = feat ? ('<section><div class="wrap"><h2>' + esc(d.featTitle || "Was es kann") + '</h2>' +
       '<p class="sub">' + esc(d.featSub || "") + '</p><div class="feat">' + feat + '</div></div></section>') : "";
 
+    // Spenden: scharf geschaltet über window.FP_SPENDEN (assets/config/spenden.js),
+    // wie in markt.html #support. Gleiche Rezeptbuch-/Mixarium-Beschreibung (keine
+    // Garantie, kein Anspruch — echte Spende, wichtig für die Steuer). Fail-soft:
+    // ohne Config bleibt der „bald"-Platzhalter.
+    var sp = global.FP_SPENDEN || {};
+    var donateOn = !!(sp.enabled && sp.donateUrl);
+    var spNote = {
+      de: "Die Unterstützung erfolgt freiwillig und ohne Gegenleistung — sie begründet keinen Anspruch auf Funktionen, Updates oder Support und ist keine Garantie. Es ist eine private Spende, kein Kauf. Vielen Dank!",
+      en: "Support is voluntary and given without any return — it does not entitle you to features, updates or support and is no guarantee. It is a private donation, not a purchase. Thank you!"
+    };
+    var spLabel = { de: "☕ Unterstützen (PayPal)", en: "☕ Support (PayPal)" };
+    var donateBtnHtml = donateOn
+      ? '<a class="btn gold" href="' + esc(sp.donateUrl) + '" target="_blank" rel="noopener">' + esc(spLabel[l] || spLabel.de) + '</a>'
+      : '<a class="btn gold" href="#">♡ ' + esc(d.donate || "Spenden") + ' <span class="badge-soon">' + esc(d.soon || "bald") + '</span></a>';
+    var donateNoteHtml = esc(donateOn ? (spNote[l] || spNote.de) : (d.donateNote || "Freiwillige Unterstützung (PayPal) — kommt später."));
+
     main.innerHTML =
       '<section class="hero"><div class="wrap">' +
         '<a class="back" href="../werkzeuge.html">' + esc(d.back || "← zurück zu Family Projekt") + '</a>' +
@@ -149,8 +165,8 @@
         '<p class="sub">' + esc(d.costSub || "") + '</p>' +
         '<div class="glass price"><div><div class="big">0 € <small>· ' + esc(d.cost0 || "kostenlos nutzen") + '</small></div>' +
         '<div class="note">' + esc(d.costNote || "Öffnen, nutzen, installieren — ohne Konto, ohne Tracker.") + '</div></div>' +
-        '<div style="text-align:right"><a class="btn gold" href="#">♡ ' + esc(d.donate || "Spenden") + ' <span class="badge-soon">' + esc(d.soon || "bald") + '</span></a>' +
-        '<div class="note" style="margin-top:8px">' + esc(d.donateNote || "Freiwillige Unterstützung (PayPal) — kommt später.") + '</div></div></div></div></section>' +
+        '<div style="text-align:right">' + donateBtnHtml +
+        '<div class="note" style="margin-top:8px">' + donateNoteHtml + '</div></div></div></div></section>' +
 
       '<section><div class="wrap"><h2>' + esc(d.trustTitle || "Worauf du dich verlassen kannst") + '</h2>' +
         '<p class="sub">' + esc(d.trustSub || "Ehrlich und nachprüfbar — kein »vertrau mir«.") + '</p>' +
