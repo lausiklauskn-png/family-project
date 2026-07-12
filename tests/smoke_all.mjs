@@ -97,8 +97,15 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>!document.getElementById("mkEmpty").hidden), "markt: Leer-Hinweis (noch keine Einträge)");
   ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .mic").length>=1), "markt: Mikrofon im Einreich-Formular");
   ok(await page.evaluate(()=>!!window.SbkimOcr && typeof window.SbkimOcr.recognize==="function"), "markt: Modul 24 (SbkimOcr) geladen");
-  ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .field .cam").length>=1), "markt: 📷 Foto→Text-Knopf am Formular-Feld nachgerüstet");
-  ok(await page.evaluate(()=>{const c=document.querySelector("#mkSubmit .field .cam");return c && c.textContent==="📷" && /Foto|photo/i.test(c.title);}), "markt: 📷-Knopf korrekt beschriftet");
+  // Klaus 2026-07-12: KEINE 📷-OCR-Knöpfe im Eintrag-Formular (sinnlos für
+  // Titel/Link/Bild — getippte Adressen, keine abfotografierbaren Texte).
+  ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .cam").length===0), "markt: kein 📷 (OCR) im Eintrag-Formular (data-noocr)");
+  // Bild-Feld: Live-Vorschau + „Bild vom Gerät wählen".
+  ok(await page.evaluate(()=>!!document.getElementById("sbImgPrev") && !!document.getElementById("sbImgPick")), "markt: Bild-Feld mit Vorschau + Gerät-Auswahl");
+  ok(await page.evaluate(()=>{const p=document.getElementById("sbImgPrev");return !!p.querySelector(".mk-imgprev-empty");}), "markt: Bild-Vorschau zeigt Leer-Zustand vor Eingabe");
+  await page.fill("#sbImg","https://example.com/shot.jpg");
+  ok(await page.evaluate(()=>{const im=document.querySelector("#sbImgPrev img");return !!im && /shot\.jpg$/.test(im.src);}), "markt: Bild-Link erzeugt sofort eine Vorschau");
+  await page.fill("#sbImg","");
   // Formular-Validierung: ungültiges Bild -> Hinweis
   await page.fill("#sbTitle","Test"); await page.fill("#sbBy","@test");
   await page.fill("#sbUrl","https://example.com/app/"); await page.fill("#sbImg","https://example.com/x.svg");

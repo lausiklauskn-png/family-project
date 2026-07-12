@@ -249,6 +249,10 @@
   // Fügt einem .field mit Text-Eingabe einen 📷-Knopf neben dem 🎤 hinzu.
   function addCamButton(field, input) {
     if (!field || !input || !global.SbkimOcr) return;   // ohne Modul 24 kein Knopf
+    // Opt-out: Felder (oder ein Container) mit data-noocr bekommen KEINE Kamera.
+    // Foto→Text ist z.B. im Marktplatz-Eintrag sinnlos (Titel/Link/Bild sind
+    // getippte Adressen, keine abfotografierbaren Texte) — Klaus 2026-07-12.
+    if (input.closest("[data-noocr]")) return;
     if (field.querySelector(".cam")) return;             // idempotent
     var cam = document.createElement("button");
     cam.type = "button"; cam.className = "mic cam";

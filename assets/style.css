@@ -282,6 +282,15 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .mkbar-fill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .3s ease}
 .mkbar-ind{animation:mkbar-ind 1.1s ease-in-out infinite}
 @keyframes mkbar-ind{0%{transform:translateX(-120%)}100%{transform:translateX(320%)}}
+/* Marktplatz-Formular: Feld-Hinweise + Bild-Feld mit Live-Vorschau */
+.mk-fieldhint{color:var(--muted);font-size:.78rem;margin:5px 0 0}
+#sbImgNote{margin-top:7px}
+.mk-imgfield{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;margin-top:8px}
+.mk-imgprev{flex:0 0 132px;width:132px;height:99px;border-radius:12px;border:1px dashed var(--line);
+  background:rgba(127,127,127,.10);display:flex;align-items:center;justify-content:center;overflow:hidden;text-align:center}
+.mk-imgprev-empty{color:var(--muted);font-size:.72rem;padding:6px}
+.mk-imgprev-img{width:100%;height:100%;object-fit:cover;display:block}
+.mk-imgctl{flex:1 1 200px;min-width:0;display:flex;flex-direction:column;gap:9px}
 
 /* Netzwerk-Raum — dreistufiges Versprechen */
 .stages{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:8px}
