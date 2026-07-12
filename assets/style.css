@@ -328,6 +328,11 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .sbkim-aw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:14px}
 .sbkim-aw-grid label{display:block;font-size:.86rem;color:var(--muted)}
 .sbkim-aw-grid input,.sbkim-aw-grid select{width:100%;margin-top:6px;background:rgba(127,127,127,.10);border:1px solid var(--line);color:var(--text);border-radius:10px;padding:11px 13px;font-size:.95rem;font-family:var(--sans)}
+/* enhanceBareInputs wickelt den Input in .field (mit Mikro). Der 6px-Abstand zum
+   Label muss ans .field, nicht an den Input — sonst sitzt das Mikrofon nicht
+   mittig (Klaus 2026-07-12). */
+.sbkim-aw-grid .field{margin-top:6px}
+.sbkim-aw-grid .field input{margin-top:0}
 .sbkim-aw-grid input:focus,.sbkim-aw-grid select:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
 #andockWizard button#sbkim-aw-go{display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:12px;padding:11px 18px;font-size:.94rem;cursor:pointer;border:1px solid transparent;background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a;box-shadow:var(--shadow)}
 #andockWizard #sbkim-aw-status{margin-left:12px;font-size:.88rem;color:var(--muted)}
