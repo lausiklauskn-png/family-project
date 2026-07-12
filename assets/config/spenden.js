@@ -1,19 +1,18 @@
-/* Spenden / Jahresbeitrag — Platzhalter-Konfiguration (Phase 2).
+/* Spenden — Konfiguration.
  *
- * Klaus' Entscheidung 2026-06-27: PayPal-Knöpfe als opt-in-PLATZHALTER bauen,
- * aber NICHT scharf schalten, bis das Steuer-Wort gegeben ist. Solange
- * `enabled:false`, zeigen die Knöpfe „(in Vorbereitung)" und sind deaktiviert —
- * es gibt KEINEN echten Einzug.
+ * Klaus' Entscheidung 2026-07-12: die freiwillige Unterstützung SCHARF schalten
+ * (wie in Mein-Rezeptbuch / Mein-Mixarium), verweisend auf Klaus' PayPal. Es ist
+ * eine reine SPENDE ohne Gegenleistung — kein Verkauf, kein Abo. Der Hinweistext
+ * (keine Garantie, kein Anspruch) steht in markt.html (#support).
  *
- * Scharf schalten (später, auf Klaus' Wort):
- *   1. enabled: true setzen.
- *   2. donateUrl / yearlyUrl mit den echten PayPal-Links füllen
- *      (z.B. https://www.paypal.com/donate/?hosted_button_id=... oder paypal.me/…).
- * Kein PII / kein echter Empfänger ist hier hartcodiert (Leitplanke: kein
- * Klarname/Secret im Repo).
+ * `donateUrl` ist Klaus' öffentliche PayPal-Spendenadresse — dieselbe, die bereits
+ * in seinen deployten Apps öffentlich steht (ausdrücklich von Klaus so gewünscht).
+ *
+ * `yearlyUrl` (Jahresbeitrag für FREMDE Marktplatz-Einträge) bleibt vorerst leer
+ * = „(in Vorbereitung)" — das ist noch nicht geklärt.
  */
 window.FP_SPENDEN = {
-  enabled: false,
-  donateUrl: "",   // einmalige Spende (leer = Platzhalter)
-  yearlyUrl: ""    // Jahresbeitrag (leer = Platzhalter)
+  enabled: true,
+  donateUrl: "https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=Klaus-nitzsche@t-online.de&currency_code=EUR&item_name=Family+Projekt",
+  yearlyUrl: ""   // Jahresbeitrag (leer = „in Vorbereitung")
 };
