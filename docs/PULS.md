@@ -4,6 +4,34 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## 🧭 2026-07-12: Klärung Werkzeug-Landingpages „Andock" & „Knoten" (Brief 08 → Brief 09)
+
+**Art:** Klärungs-Sitzung (Plan-vor-Code, kein Bau). Brief 08 stellte vier Richtungsfragen,
+Klaus hat entschieden — Bau folgt in eigener Sitzung (`BRIEF_09_ANDOCK_KNOTEN_BAU.md`).
+
+**Befund (bestätigt am Code):** Alle drei Werkzeug-Seiten (`werkzeuge/*.html`) rendern über
+`assets/tool-landing.js` dieselbe **leere Screenshot-Galerie** („Screenshot 1 — [ vom Anbieter
+eingefügt ]", ＋/×) — ein Mockup-Platzhalter, nie gefüllt → wirkt kaputt. **Andock** springt
+nur nach `netzwerk.html#andock` (kryptisch), **Knoten** zu `mycelknoten.html` (sehr technisch).
+**Such** ist gut (echtes Tool).
+
+**Klaus' Entscheidungen (verbindlich für Brief 09):**
+1. **Zielgruppe:** unterschiedlich — Andock **breiter** (auch Seiten-Betreiber), Knoten ehrlich
+   als **„für Entwickler/Bastler"**.
+2. **Screenshots:** leeren Platzhalter **RAUS**, echte Bilder nur wo es zeigbares UI gibt
+   (Andock-Siegel), sonst weglassen — kein Fake.
+3. **Andock:** **eigene Erklär-Seite** in Family-Optik mit **Links zu Sage-Page + Einladung**
+   und einer **Anleitung mit echtem, selbst-ausfüllendem Siegel** (Skill `status-leiste-siegel`;
+   Vorbild SB-KIMTool-Point-Andock-Werkzeug).
+4. **Knoten:** **eigene Erklär-Anleitung mit Kopier-Bausteinen** statt undurchsichtigem
+   Sprung-Link; `mycelknoten.html` nur noch als „mehr dazu".
+
+**Offen / nächster Schritt:** Bau-Sitzung nach `BRIEF_09_ANDOCK_KNOTEN_BAU.md` ausführen
+(Reihenfolge + Akzeptanzkriterien dort). Nur Seiten-Text/Layout, Kern-SBKIM nicht anfassen,
+`sw.js` `CACHE_VERSION`↑, Browser-Sichttest bleibt Klaus.
+
+---
+
 ## ✅ 2026-07-12: Marktplatz-Feinschliff (Ladebalken + Eintrag-Formular sinnvoll)
 
 Zwei gemergte Sitzungs-Schritte (Selbst-Merge-Freibrief, je eigener PR):
