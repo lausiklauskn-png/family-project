@@ -255,14 +255,43 @@
         render();
       }
 
+      // Ladebalken für den einmaligen Modell-Download (~30 MB). Modul 03 sendet
+      // pro Datei ein `sbkim:embedding-progress`-Event (Feld progress 0–100).
+      // Fail-soft: kommt kein Event, bleibt der Text-Hinweis stehen. Label per
+      // textContent → kein HTML-Inject. Prozent geklemmt auf 0–100.
+      function renderBar(pct, label) {
+        var note = document.getElementById("mkSearchNote");
+        if (!note) return;
+        var indet = (pct == null);
+        var w = indet ? 40 : Math.max(0, Math.min(100, Math.round(pct)));
+        note.innerHTML = '<span class="mkbar-lbl"></span>' +
+          '<span class="mkbar"><span class="mkbar-fill' + (indet ? " mkbar-ind" : "") +
+          '" style="width:' + w + '%"></span></span>';
+        var lbl = note.querySelector(".mkbar-lbl");
+        if (lbl) lbl.textContent = label;
+      }
+
       // Semantische Suche (lazy Modul 03 + 04) — greift, sobald Einträge da sind.
       async function semanticSearch(q) {
         var note = document.getElementById("mkSearchNote");
         if (!ALL.length) { wordSearch(q); return; }
         if (!window.SbkimEmbedding || !window.SbkimMatch) { note.textContent = "Semantik-Module nicht geladen — nutze Wortsuche."; wordSearch(q); return; }
         note.textContent = "Lade Sprachmodell (~30 MB einmalig) …";
+        // Fortschritts-Balken während init() (Modell-Download). Listener nur für
+        // diese Phase; wird in JEDEM Ausgang (Erfolg/Fehler) wieder entfernt.
+        var onProg = function (ev) {
+          var d = (ev && ev.detail) || {};
+          if (d.status === "progress" && d.file) {
+            var pct = (d.progress != null) ? d.progress : null;
+            renderBar(pct, "Lade Sprachmodell" + (pct != null ? " … " + Math.round(pct) + "%" : " …"));
+          }
+        };
+        var stopProg = function () { try { window.removeEventListener("sbkim:embedding-progress", onProg); } catch (_e) {} };
+        window.addEventListener("sbkim:embedding-progress", onProg);
         try {
           await SbkimEmbedding.init();
+          stopProg();
+          if (!ALL._vecs) note.textContent = "Sortiere Einträge nach Bedeutung …";
           // Vektoren der Einträge einmal bauen + cachen.
           if (!ALL._vecs) {
             ALL._vecs = await SbkimEmbedding.embedPassageBatch(ALL.map(function (x) { return x.text || x.label; }));
@@ -287,6 +316,7 @@
           note.textContent = "Nach Bedeutung sortiert.";
           render();
         } catch (e) {
+          stopProg();
           note.textContent = "Semantik fehlgeschlagen — Wortsuche aktiv.";
           wordSearch(q);
         }
