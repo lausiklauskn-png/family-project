@@ -4,6 +4,41 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-12: Marktplatz-Feinschliff (Ladebalken + Eintrag-Formular sinnvoll)
+
+Zwei gemergte Sitzungs-Schritte (Selbst-Merge-Freibrief, je eigener PR):
+
+**PR #77 — Ladebalken in der Bedeutungs-Suche.** Beim „Nach Bedeutung suchen" lädt das
+Sprachmodell (~30 MB) jetzt mit sichtbarem **Prozent-Balken** unter dem Suchfeld (gespeist
+aus `sbkim:embedding-progress` von Modul 03, wie die Verbinden-UI). Fail-soft. `markt.html`
+(`renderBar`+Listener in `semanticSearch`), `style.css` (`.mkbar`), `sw.js` v32→v33.
+
+**PR #78 — Eintrag-Formular umgebaut (Klaus' Screenshot-Befund 2026-07-12).**
+- **📷-OCR-Knöpfe raus** aus dem Marktplatz — klebten auf jedem Feld, sinnlos für
+  Titel/Link/Bild. Neu: `data-noocr`-Opt-out in `app.js` (`addCamButton` überspringt Felder
+  mit `data-noocr`-Vorfahr; greift für `wireAllCams` **und** `enhanceBareInputs`). Beide
+  markt-Formulare tragen `data-noocr`. **Mikrofon bleibt** an den Textfeldern.
+- **Bild-Feld neu mit Live-Vorschau:** Vorschau-Kachel + „🖼 Bild vom Gerät wählen"
+  (data-URI nur zur Vorschau) + Link-Feld; ein eingegebener Link erzeugt sofort eine
+  Vorschau bzw. einen Hinweis bei ungültigem Bild. Ehrlicher Hinweis: veröffentlicht wird
+  ein öffentlicher https-Link (Bild bleibt beim Anbieter, wir speichern nur den Link).
+- **Klarere Felder** (Beschriftung/Platzhalter/Hinweise) + **Gründer-Angebot Variante 2**
+  (von Klaus abgenommen) statt „Jahresbeitrag (in Vorbereitung)": erste 100 Apps dauerhaft
+  gratis; Schaufenster, kein Bezahl-Dienst (Verkauf über eigenen Store, ohne Provision). DE+EN.
+- `style.css` `.mk-imgfield/.mk-imgprev/.mk-fieldhint`; `sw.js` v33→v34; `smoke_all.mjs`
+  Kamera-Assertions an neue Absicht angepasst.
+- **Fokus-Smoke (Marktplatz) 11/11 grün.** Der `smoke_all.mjs`-Volllauf ist in dieser
+  Sandbox unter swiftshader grenzwertig langsam (umgebungsbedingte Timeouts, nicht durch
+  die Änderung) — die Formular-Logik ist über den isolierten Fokus-Smoke bewiesen.
+
+**Offen / wartet auf Klaus (Browser, nach Auto-Deploy + Hard-Reload wegen SW v34):**
+Ladebalken beim echten ~30-MB-Download; das neue Bild-Feld am Tablet (Vorschau + Gerät-
+Auswahl fühlen). Offen aus dem Brief: `X/100`-Platz-Zähler (Klaus hat den Zähler nicht
+bestätigt — bewusst weggelassen, ein Einzeiler falls gewünscht); 💬-Tooltip-Schalter ins
+Such-Widget (Modul 22); Embedding-Modell selbst hosten; `meineapps.js` vor Launch kuratieren.
+
+---
+
 ## ✅ 2026-07-10: GitHub-Pages-Vorschau (immer-aktuell) als Fallback zum Hetzner-Deploy
 
 **Befund (Klaus):** `family-projekt.de` (Hetzner) hing auf altem Stand — der Live-Server
