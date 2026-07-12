@@ -93,8 +93,8 @@
 
     <section>
       <div class="wrap">
-        <h2 data-i18n="mk_submit_h">Tool anbieten</h2>
-        <p class="sub" data-i18n="mk_submit_sub">Trag deine eigene PWA oder Seite ein. Pflicht: ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild liegt bei dir; wir speichern nur den Link.</p>
+        <h2 data-i18n="mk_submit_h">Deine eigene App eintragen</h2>
+        <p class="sub" data-i18n="mk_submit_sub">Du hast selbst eine App, Seite oder ein Werkzeug? Trag sie kostenlos in den Marktplatz ein — so wie die Beispiele oben. Nötig sind nur ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild bleibt bei dir; wir speichern nur den Link. Jeder Eintrag wird vor der Veröffentlichung kurz geprüft.</p>
         <form class="glass form-grid" id="mkSubmit" style="padding:22px">
           <div><label data-i18n="mk_f_title">Titel *</label><div class="field"><input id="sbTitle" type="text" required maxlength="80" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
           <div><label data-i18n="mk_f_handle">Handle / Anbieter (kein Klarname) *</label><div class="field"><input id="sbBy" type="text" required maxlength="40" placeholder="@handle" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
@@ -116,10 +116,10 @@
     <section id="support">
       <div class="wrap">
         <h2 data-i18n="sp_h">Family Projekt unterstützen</h2>
-        <p class="sub" data-i18n="sp_sub">Family Projekt ist frei und werbefrei. Wer mag, kann freiwillig etwas dazugeben — das hält die Lichter an.</p>
+        <p class="sub" data-i18n="sp_sub">Family Projekt ist frei und werbefrei — ein privates Hobby-Projekt, kein Geschäft. Wer mag, kann es mit einer freiwilligen Spende unterstützen und hilft, die laufenden Kosten zu tragen.</p>
         <div class="glass" style="padding:22px;display:flex;flex-direction:column;gap:12px">
           <div id="spDonate" style="display:flex;gap:10px;flex-wrap:wrap"></div>
-          <p style="margin:0;opacity:.8;font-size:.92rem" data-i18n="sp_note">Hinweis: Bezahlung wird gerade vorbereitet — heute noch kein echter Einzug. Die Knöpfe werden scharf geschaltet, sobald alles geklärt ist.</p>
+          <p style="margin:0;opacity:.8;font-size:.92rem" data-i18n="sp_note">Die Unterstützung erfolgt freiwillig und ohne Gegenleistung — sie begründet keinen Anspruch auf Funktionen, Updates oder Support und ist keine Garantie. Es ist eine private Spende, kein Kauf. Vielen Dank!</p>
         </div>
       </div>
     </section>
@@ -148,7 +148,9 @@
   <script src="sbkim/17_floating_widget.js"></script>
   <script src="sbkim/20_schluessel_safe.js"></script>
   <script type="module" src="sbkim/05b_nostr_relay.js"></script>
+  <script src="sbkim/21_spracheingabe.js"></script>
   <script src="sbkim/23_rendezvous.js"></script>
+  <script src="sbkim/23_rendezvous_ui.js"></script>
   <script src="sbkim/24_ocr_eingabe.js"></script>
   <script src="sbkim/sbkim-init.js"></script>
   <script src="assets/config/listings.js"></script>
@@ -162,8 +164,8 @@
         mk_semantic: "Nach Bedeutung suchen (lädt einmalig ein Sprachmodell, ~30 MB)",
         mk_listings_h: "Einträge",
         mk_empty: "Noch keine Einträge. Trag unten die erste Seite ein — sie erscheint nach Freigabe und (mit Bild) auch in der Weekly Discovery.",
-        mk_submit_h: "Tool anbieten",
-        mk_submit_sub: "Trag deine eigene PWA oder Seite ein. Pflicht: ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild liegt bei dir; wir speichern nur den Link.",
+        mk_submit_h: "Deine eigene App eintragen",
+        mk_submit_sub: "Du hast selbst eine App, Seite oder ein Werkzeug? Trag sie kostenlos in den Marktplatz ein — so wie die Beispiele oben. Nötig sind nur ein Link und mindestens ein Bild (JPG/PNG/WebP — kein SVG). Das Bild bleibt bei dir; wir speichern nur den Link. Jeder Eintrag wird vor der Veröffentlichung kurz geprüft.",
         mk_f_title: "Titel *", mk_f_handle: "Handle / Anbieter (kein Klarname) *", mk_f_url: "Link zur Seite (https) *",
         mk_f_img: "Bild-Link (https, JPG/PNG/WebP) *", mk_f_cat: "Kategorie", mk_f_desc: "Beschreibung (in eigenen Worten, mit Synonymen) *",
         mk_f_btn: "Eintrag vorbereiten",
@@ -172,9 +174,9 @@
         mk_open: "→ zur Seite des Anbieters", search_btn: "Suchen",
         mk_pr_btn: "Als Pull-Request einreichen →",
         sp_h: "Family Projekt unterstützen",
-        sp_sub: "Family Projekt ist frei und werbefrei. Wer mag, kann freiwillig etwas dazugeben — das hält die Lichter an.",
-        sp_note: "Hinweis: Bezahlung wird gerade vorbereitet — heute noch kein echter Einzug. Die Knöpfe werden scharf geschaltet, sobald alles geklärt ist.",
-        sp_donate: "Einmalig spenden", sp_yearly: "Jahresbeitrag", sp_soon: "(in Vorbereitung)"
+        sp_sub: "Family Projekt ist frei und werbefrei — ein privates Hobby-Projekt, kein Geschäft. Wer mag, kann es mit einer freiwilligen Spende unterstützen und hilft, die laufenden Kosten zu tragen.",
+        sp_note: "Die Unterstützung erfolgt freiwillig und ohne Gegenleistung — sie begründet keinen Anspruch auf Funktionen, Updates oder Support und ist keine Garantie. Es ist eine private Spende, kein Kauf. Vielen Dank!",
+        sp_donate: "☕ Unterstützen (PayPal)", sp_yearly: "Jahresbeitrag", sp_soon: "(in Vorbereitung)"
       },
       en: {
         mk_eyebrow: "Marketplace", mk_title: "Find apps — and offer them.",
@@ -183,8 +185,8 @@
         mk_semantic: "Search by meaning (loads a language model once, ~30 MB)",
         mk_listings_h: "Entries",
         mk_empty: "No entries yet. Add the first site below — it appears after approval and (with an image) in Weekly Discovery.",
-        mk_submit_h: "Offer a tool",
-        mk_submit_sub: "List your own PWA or site. Required: a link and at least one image (JPG/PNG/WebP — no SVG). The image stays with you; we only store the link.",
+        mk_submit_h: "List your own app",
+        mk_submit_sub: "Got your own app, site or tool? List it in the marketplace for free — just like the examples above. All you need is a link and at least one image (JPG/PNG/WebP — no SVG). The image stays with you; we only store the link. Every entry is briefly reviewed before it goes live.",
         mk_f_title: "Title *", mk_f_handle: "Handle / provider (no real name) *", mk_f_url: "Link to the site (https) *",
         mk_f_img: "Image link (https, JPG/PNG/WebP) *", mk_f_cat: "Category", mk_f_desc: "Description (in your own words, with synonyms) *",
         mk_f_btn: "Prepare entry",
@@ -193,9 +195,9 @@
         mk_open: "→ to the provider's site", search_btn: "Search",
         mk_pr_btn: "Submit as pull request →",
         sp_h: "Support Family Projekt",
-        sp_sub: "Family Projekt is free and ad-free. If you like, you can chip in voluntarily — it keeps the lights on.",
-        sp_note: "Note: payment is being prepared — no real charge yet. The buttons go live once everything is settled.",
-        sp_donate: "Donate once", sp_yearly: "Yearly fee", sp_soon: "(in preparation)"
+        sp_sub: "Family Projekt is free and ad-free — a private hobby project, not a business. If you like, you can support it with a voluntary donation and help cover the running costs.",
+        sp_note: "Support is voluntary and given without any return — it does not entitle you to features, updates or support and is no guarantee. It is a private donation, not a purchase. Thank you!",
+        sp_donate: "☕ Support (PayPal)", sp_yearly: "Yearly fee", sp_soon: "(in preparation)"
       }
     };
   </script>
@@ -363,7 +365,6 @@
         }
         box.textContent = "";
         box.appendChild(btn("sp_donate", cfg.donateUrl));
-        box.appendChild(btn("sp_yearly", cfg.yearlyUrl));
       }
       window.addEventListener("fp:lang", renderDonate);
 
