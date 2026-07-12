@@ -57,7 +57,7 @@ window.FP_LISTINGS = [
     text: "Verschlüsselter Tresor für Dateien und Passwörter: alles sicher hinter Passwort und Schlüssel ablegen. Honigtopf-Tarnfach und Datei-Sicherung. Safe, Passwort-Manager, geheime Dateien, Datenschutz. Läuft offline im Browser, echte Verschlüsselung.",
     by: "@klaus",
     url: "https://lausiklauskn-png.github.io/Mein-Tresor/",
-    img: "https://lausiklauskn-png.github.io/Mein-Tresor/assets/safe/safe-front.png",
+    img: "https://family-projekt.de/assets/apps/mein-tresor.png",
     category: "Sicherheit"
   },
   {
