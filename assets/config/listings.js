@@ -29,7 +29,7 @@ window.FP_LISTINGS = [
     anchorId: "markt-rezeptbuch",
     text: "Rezeptbuch und Kochbuch für die Küche: eigene Rezepte sammeln, ordnen, suchen und kochen. Zutaten, Mengen, Einkaufsliste und Wochenplan / Menüplan. Läuft offline auf Handy und Tablet, ganz ohne Konto. Essen, Backen, Gerichte, Speisen, Mahlzeiten.",
     by: "@klaus",
-    url: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+    url: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
     img: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/icons/icon-book-blue-512.png",
     category: "Küche"
   },
@@ -38,7 +38,7 @@ window.FP_LISTINGS = [
     anchorId: "markt-mixarium",
     text: "Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken — mit und ohne Alkohol. Bar zuhause, trinken, Rezept, Mixgetränke. Offline nutzbar, kein Konto nötig.",
     by: "@klaus",
-    url: "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+    url: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
     img: "https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png",
     category: "Getränke"
   },
