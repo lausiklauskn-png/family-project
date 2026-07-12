@@ -26,6 +26,13 @@ nur nach `netzwerk.html#andock` (kryptisch), **Knoten** zu `mycelknoten.html` (s
 4. **Knoten:** **eigene Erklär-Anleitung mit Kopier-Bausteinen** statt undurchsichtigem
    Sprung-Link; `mycelknoten.html` nur noch als „mehr dazu".
 
+**Zusatz (Klaus 2026-07-12):** Die Andock-Erklärseite soll eine **kontextuelle
+Link-Landkarte** sein — jede Aussage/Frage ist selbst ein Link zum passenden Ziel (Mycel →
+Sage-Mycel-Karte, schwarze Löcher → Sage-Browser-Observatorium, Einladung → Sage-Einladung,
+Werkzeuge → SB-KIMTool-Point-Werkzeuge, je BEIDE Seiten wo sinnvoll), **nie ins Leere**. Die
+verifizierte Ziel-Tabelle steht in `BRIEF_09` (§ Kontextuelle Link-Landkarte) — jeder Link
+muss beim Bau live geprüft werden.
+
 **Offen / nächster Schritt:** Bau-Sitzung nach `BRIEF_09_ANDOCK_KNOTEN_BAU.md` ausführen
 (Reihenfolge + Akzeptanzkriterien dort). Nur Seiten-Text/Layout, Kern-SBKIM nicht anfassen,
 `sw.js` `CACHE_VERSION`↑, Browser-Sichttest bleibt Klaus.

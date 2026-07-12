@@ -76,6 +76,58 @@ Ziel: eine **eigene, gut erklärte** Andock-Seite in Family-Optik (Entscheidung 
    Netzwerk-Raum darf als „dort wirklich andocken" verlinkt bleiben, ist aber nicht mehr die
    einzige Erklärung.
 
+#### ⭐ Kontextuelle Link-Landkarte — „jede Aussage ist ein Link" (Klaus 2026-07-12, verbindlich)
+
+Klaus' ausdrücklicher Wunsch für die Andock-Erklärseite (analog wo sinnvoll für Knoten):
+**Jede Aussage / jede Frage im Text wird selbst zu einem Link**, der genau zum thematisch
+passenden Ziel führt — Tool, Seite oder Erklärung — **nie ins Leere, immer auf den konkreten
+Punkt**. Muster „Willst du dies? → hier. Willst du das? → dort." Und wo es passt, **je BEIDE
+Quellen** verlinken (Sage-Page UND SB-KIMTool-Point — „die beiden Internetseiten, wo man das
+Werkzeug direkt bekommt").
+
+**PFLICHT-REGEL:** Vor dem Ausliefern **jeden** Link live prüfen (HTTP 200 bzw. Anker
+existiert). Kein toter/ins-Leere-Link. Wenn ein Ziel nicht (mehr) lebt → anderes lebendes
+Ziel wählen oder Aussage ohne Link lassen (ehrlich), NICHT raten.
+
+**Verifizierte Ziele (Stand 2026-07-12, aus den Quell-`index.html` gezogen):**
+
+Sage-Page — Basis `https://lausiklauskn-png.github.io/Sage-Protokol/`:
+| Thema / Aussage | Ziel |
+|---|---|
+| „Wie funktioniert das Mycel? / Mycel in Aktion" | `mycel-karte/` (Live-Mycel-Karte) |
+| „Browsergeschichten / KI-Browser-Agenten / schwarze Löcher" | Blackhole-Karte `#observatorium-stage` bzw. `docs/OBSERVATORIUM_BROWSER.md` |
+| „Willst du mitmachen? / Einladung" | `docs/einladung/index.html` |
+| „Nach Bedeutung suchen / semantische Suche" | `#meilenstein-suche` + `#meilenstein-bidirektional`; Tool: `such-tool/` |
+| „Pinnwand" | `pinnwand/` |
+| „Was ist SBKIM / das Protokoll / Paper" | `paper.html` |
+| „Die Module / der Baukasten" | `#module-list` |
+| „Endknoten im Netz" | `#endknoten-grid` |
+| „Vorteilspack / alle Werkzeuge (Truhe)" | `#observatorium-vorteilspack` / `#observatorium` |
+
+SB-KIMTool-Point — Basis `https://lausiklauskn-png.github.io/SB-KIMTool-Point/`:
+| Thema / Aussage | Ziel |
+|---|---|
+| „Suchst du Werkzeuge?" | `werkzeuge.html` |
+| „Das echte Andock-Werkzeug (mit Siegel)" | `web/tools/andock.html` |
+| „Selbst zum Knoten werden" | `web/tools/mycelknoten.html` |
+| „Wie ist das Modell / die Erklärung" | `modell.html` |
+| „Sicherheit / Schutz" | `sicherheit.html` |
+| „Marktplatz (SBKIM)" | `markt.html` |
+
+Family-intern (relativ ab `werkzeuge/andock-werkzeug.html`):
+| Thema | Ziel |
+|---|---|
+| „Wirklich andocken (Netzwerk-Raum)" | `../netzwerk.html#andock` |
+| „Nach Bedeutung suchen (unser Tool)" | `such-werkzeug.html` |
+| „Selbst zum Knoten werden (unsere Seite)" | `knoten-werkzeug.html` |
+| „Marktplatz" | `../markt.html` |
+
+**Beispiel-Aufbau (nur Muster, Wortlaut frei):** „Neugierig, **wie das Mycel wirklich
+tickt**? → *Sieh die Mycel-Karte* [Sage]. Es geht um **KI-Browser-Agenten und schwarze
+Löcher**? → *Das Browser-Observatorium* [Sage]. **Willst du mitmachen**? → *Zur Einladung*.
+**Suchst du fertige Werkzeuge**? → *Werkzeugkiste* [SB-KIMTool-Point] · *unsere Werkzeuge*
+[Family]." — jede Fett-Aussage ist der klickbare Link.
+
 ### Knoten-Seite (`werkzeuge/knoten-werkzeug.html`)
 Ziel: **eigene Erklär-Anleitung mit Kopier-Bausteinen** (Entscheidung 4a), ehrlich als
 **Entwickler/Bastler-Thema** gekennzeichnet (1a):
@@ -122,6 +174,9 @@ Ziel: **eigene Erklär-Anleitung mit Kopier-Bausteinen** (Entscheidung 4a), ehrl
       Werkzeug-Seiten.
 - [ ] Andock-Seite: eigene Erklärung + sichtbares, selbst-ausfüllendes Siegel (nach Skill
       `status-leiste-siegel`) + Links zu Sage-Page & Einladung.
+- [ ] Kontextuelle Link-Landkarte umgesetzt: jede Kern-Aussage/Frage ist ein klickbarer Link
+      zum passenden Ziel (Sage + SB-KIMTool-Point, „die beiden Seiten") — **jeder Link live
+      geprüft (200/Anker), keiner ins Leere**.
 - [ ] Knoten-Seite: als Entwickler-Thema gekennzeichnet + Kopier-Bausteine + „mehr dazu"-Link.
 - [ ] Such-Werkzeug unverändert funktionsfähig (kein Regress).
 - [ ] `sw.js` `CACHE_VERSION` erhöht.
