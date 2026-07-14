@@ -10,6 +10,17 @@ Identität** kommt und sich **sauber** im gemeinsamen Raum anmeldet. Diese
 Reihenfolge ist verbindlich für **jedes** Werkzeug, das ans Netz andockt — sie
 wird eingebaut, nicht jedes Mal neu erfunden.
 
+> **Quelle der Wahrheit = Sage-Protokol (Klaus 2026-07-14).** Die kanonische
+> „Mit dem Knotennetz verbinden"-Umsetzung (Rendezvous + Identität) lebt in Sage:
+> `src/modules/23_rendezvous.js` + `src/modules/23_rendezvous_ui.js` (Knopf „Mit dem
+> Knotennetz verbinden" / „Wer ist im Raum?", `announce`/`discover`/`handshakeCard`,
+> lebende Identität, `dbSuffix`-Isolierung) — headless getestet
+> (`smoke_bau23_rendezvous_ui.mjs`, `smoke_bundle_connect.mjs`). **Erst in Sage richtig
+> bauen + dokumentieren, dann byte-genau in die Klone** (SB-KIMTool-Point als 2. Hub,
+> dann die Apps). Klone (Kim-Bell, Mixarium, …) sind Vergleich, **nie** Quelle — bei
+> Abweichung aus Sage neu bespielen. Der Identitäts-Wechsler + die eine saubere
+> Identität sind die Wurzel: ohne sie meldet sich der falsche Schlüssel im Raum an.
+
 ## Warum es das Problem gibt (der Browser als schwarzes Loch)
 
 Alle Endknoten-PWAs liegen unter **einer** Adresse: `lausiklauskn-png.github.io`.
