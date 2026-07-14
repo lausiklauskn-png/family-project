@@ -26,22 +26,35 @@ angepasst.
 - **Das Band füllt sich per `ribbonText`** (siehe TEIL 2b) — ohne den Wert bleibt
   es leer.
 
-## Referenz-Dateien (das Original — hier steht der echte Code)
+## Referenz-Dateien — **Sage ist die Quelle der Wahrheit** (Klaus 2026-07-14)
 
-- **`SB-KIMTool-Point/assets/sbkim-siegel.js`** (~506 Z.) — **self-contained**,
-  die sauberste Vorlage: lädt die Module, verdrahtet die Lampen, initt Membran +
-  Siegel, **injiziert das Andock-Werkzeug ins Modal** (🔑-Wizard mit 4 Schritten,
-  ✍ Semantik-Feld, 🛡 Schutz-Block, sicherheit.html-Overlay).
-- **`Sage-Protokol/index.html`** (~Z. 4006–4510) — der **Ursprung**:
-  `injectIdentityLinkIntoSiegel` / `buildSchutzInfoBlock` / `buildSemantikBlock` /
-  `openAndockWizard` / `andockStep1..4Identity/Spore/Backup/Restore` /
-  `refreshAndockIdentities` / `andockSwitchIdentity` + „⛨ Fremden Knoten andocken".
-- **`Mein-Mixarium/sbkim/sbkim-init.js`** (ab ~Z. 231) — **Host-Injektions-Variante**:
-  `watchForSiegelModal` (MutationObserver) → `injectIdentityLinkIntoSiegel`; der
-  🔑-Knopf öffnet hier den **Modul-18-Andock-Wizard** (`SbkimToolPwa.openAndockTab()`).
+**Regel:** `Sage-Protokol` ist der **Ausgangspunkt der Wahrheit**. Alles andere
+(SB-KIMTool-Point, Mixarium, Rezeptbuch, …) sind **Klone**, die **drift**en können —
+sie werden **NIE** als Vorlage genommen, nur zum Vergleich. Wer ein Siegel baut oder
+prüft: **schau in Sage nach.** Dort ist alles vollständig und dokumentiert; erst in
+Sage richtig bauen, **dann** byte-genau in die Klone übernehmen.
 
-Beim Bau eines Siegels: **eine** dieser drei als Vorlage nehmen (SB-KIMTool-Point
-ist am einfachsten zu kopieren) und die Config anpassen.
+- **`Sage-Protokol/index.html`** (~Z. 4006–4510) — **DAS ORIGINAL / die Vorlage.**
+  Vollständige Baustein-Kette: `injectIdentityLinkIntoSiegel` / `buildSchutzInfoBlock` /
+  `buildSemantikBlock` (✍ v0.2 + `embedSnippets`, Spore-Pflege) / `openAndockWizard` /
+  `andockStep1..4Identity/Spore/Backup/Restore` / **`refreshAndockIdentities` /
+  `andockSwitchIdentity` (Identitäts-Wechsler = Baustein 5)** + „⛨ Fremden Knoten andocken".
+  Modul-SVG/Ribbon: `Sage-Protokol/src/modules/16_siegel.js` (`WAPPEN_SVG`) + Quelle
+  `Sage-Protokol/assets/sbkim-siegel-wappen.svg`.
+- **`SB-KIMTool-Point/assets/sbkim-siegel.js`** — **Klon, NICHT als Vorlage nehmen.**
+  ⚠️ **Befund 2026-07-14 (Klaus' Browser):** diesem Klon **FEHLT der Identitäts-Wechsler
+  (Baustein 5)** — dadurch legte jeder „Identität erzeugen"-Klick eine neue an →
+  Doppel-/Dreifach-Identität. Beweis, warum man Klone nie als Quelle nimmt. Wird aus
+  Sage neu bespielt, nicht selbst gepflegt.
+- **`Mein-Mixarium/sbkim/sbkim-init.js`** — **Klon / Host-Injektions-Variante**:
+  `watchForSiegelModal` (MutationObserver) → `injectIdentityLinkIntoSiegel`; der 🔑-Knopf
+  öffnet hier den Modul-18-Andock-Wizard (`SbkimToolPwa.openAndockTab()`). Ebenfalls gegen
+  Sage prüfen, nicht als Vorlage.
+
+Beim Bau/Prüfen eines Siegels: **immer Sage als Vorlage** — die Config (Name, Domäne,
+`dbSuffix`, `ribbonText`) anpassen, die Bausteine **vollständig** übernehmen (inkl.
+Identitäts-Wechsler). Klone nur vergleichen; Abweichung = Klon aus Sage neu bespielen.
+**Und: Ergebnisse immer zurück in Sage dokumentieren.**
 
 ---
 
