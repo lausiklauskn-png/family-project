@@ -9,9 +9,9 @@
  * CACHE-BUST: bei jeder Shell-Änderung CACHE_VERSION erhöhen (oder beim
  * Deploy Hard-Reload), sonst liefert der SW alte Dateien.
  */
-var CACHE_VERSION = "family-projekt-v49";
+var CACHE_VERSION = "family-projekt-v50";
 var CORE = [
-  "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html",
+  "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   "assets/style.css", "assets/app.js", "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
   "manifest.json", "icon-192.png", "icon-512.png", "og-image.png"
 ];
