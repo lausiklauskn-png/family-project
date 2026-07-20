@@ -123,6 +123,7 @@
           </div>
           <div><label data-i18n="mk_f_cat">Kategorie</label><div class="field"><input id="sbCat" type="text" maxlength="40" data-i18n-ph="mk_ph_cat" placeholder="z. B. Rezepte, Werkzeug, Spiel" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
           <div><label data-i18n="mk_f_desc">Beschreibung (in eigenen Worten, mit Synonymen) *</label><div class="field"><textarea id="sbText" required maxlength="600" data-i18n-ph="mk_ph_desc" placeholder="Was macht deine App? Schreib frei und mit Synonymen — das hilft der Suche."></textarea><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_contact">Deine Kontakt-Adresse (E-Mail) *</label><div class="field"><input id="sbContact" type="email" required maxlength="120" placeholder="du@example.com" data-nomic /></div><p class="mk-fieldhint" data-i18n="mk_hint_contact">Nur für unsere Rückmeldung zur Freigabe — wird nicht veröffentlicht.</p></div>
           <div class="haftung">
             <!-- Interne Politik: die ersten 100 fremden Apps sind gratis — bewusst NICHT
                  sichtbar. Kein "X von 100 frei"-Zähler: leere Plätze wären ein schwaches
@@ -131,9 +132,8 @@
             <p style="margin:0 0 8px"><b data-i18n="mk_verkauf_h">Verkaufen?</b> <span data-i18n="mk_verkauf">Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store / dein eigenes Konto — wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.</span></p>
             <p style="margin:0" data-i18n="mk_haft"><b>Hinweis:</b> Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.</p>
           </div>
-          <button class="btn primary" type="submit" data-i18n="mk_f_btn">Eintrag vorbereiten</button>
+          <button class="btn primary" type="submit" data-i18n="mk_f_btn">Zur Prüfung einreichen</button>
           <pre id="sbOut" style="display:none"></pre>
-          <a id="sbPr" class="btn primary" style="display:none" target="_blank" rel="noopener" data-i18n="mk_pr_btn">Als Pull-Request einreichen →</a>
         </form>
       </div>
     </section>
@@ -205,14 +205,20 @@
         mk_img_local: "Vorschau vom Gerät. Zum Veröffentlichen brauchst du einen öffentlichen Bild-Link (https) — das Bild bleibt bei dir, wir speichern nur den Link.",
         mk_img_ok: "So erscheint dein Eintrag.",
         mk_img_bad: "Bild lädt nicht — prüfe den Link (https, JPG/PNG/WebP, kein SVG).",
-        mk_f_btn: "Eintrag vorbereiten",
+        mk_f_btn: "Zur Prüfung einreichen",
+        mk_f_contact: "Deine Kontakt-Adresse (E-Mail) *",
+        mk_hint_contact: "Nur für unsere Rückmeldung zur Freigabe — wird nicht veröffentlicht.",
+        mk_sub_needmail: "Bitte eine gültige Kontakt-E-Mail angeben (nur für die Rückmeldung).",
+        mk_sub_sending: "Wird gesendet …",
+        mk_sub_ok: "✓ Danke! Dein Eintrag ist zur Prüfung eingegangen. Nach der Freigabe erscheint er im Marktplatz — bei Fragen melden wir uns per E-Mail.",
+        mk_sub_err: "Senden hat nicht geklappt. Bitte später erneut versuchen — oder diesen Block kopieren und an uns schicken:",
+        mk_sub_setup: "Die Einreichung wird gerade eingerichtet. Bitte kopiere diesen Block und schick ihn an uns — er erscheint nach Prüfung im Marktplatz:",
         mk_angebot_h: "Gründer-Angebot:",
         mk_angebot: "Trag deine App jetzt kostenlos in den Marktplatz ein.",
         mk_verkauf_h: "Verkaufen?",
         mk_verkauf: "Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store / dein eigenes Konto — wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.",
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ zur Seite des Anbieters", search_btn: "Suchen",
-        mk_pr_btn: "Als Pull-Request einreichen →",
         sp_h: "Family Projekt unterstützen",
         sp_sub: "Family Projekt ist frei und werbefrei — ein privates Hobby-Projekt, kein Geschäft. Wer mag, kann es mit einer freiwilligen Spende unterstützen und hilft, die laufenden Kosten zu tragen.",
         sp_note: "Die Unterstützung erfolgt freiwillig und ohne Gegenleistung — sie begründet keinen Anspruch auf Funktionen, Updates oder Support und ist keine Garantie. Es ist eine private Spende, kein Kauf. Vielen Dank!",
@@ -241,14 +247,20 @@
         mk_img_local: "Preview from your device. To publish you need a public image link (https) — the image stays with you, we only store the link.",
         mk_img_ok: "This is how your entry looks.",
         mk_img_bad: "Image won't load — check the link (https, JPG/PNG/WebP, no SVG).",
-        mk_f_btn: "Prepare entry",
+        mk_f_btn: "Submit for review",
+        mk_f_contact: "Your contact address (email) *",
+        mk_hint_contact: "Only for our reply about approval — not published.",
+        mk_sub_needmail: "Please enter a valid contact email (only for our reply).",
+        mk_sub_sending: "Sending …",
+        mk_sub_ok: "✓ Thanks! Your entry has been received for review. Once approved it appears in the marketplace — we'll email you if there are questions.",
+        mk_sub_err: "Sending failed. Please try again later — or copy this block and send it to us:",
+        mk_sub_setup: "Submission is being set up. Please copy this block and send it to us — it appears in the marketplace after review:",
         mk_angebot_h: "Founder offer:",
         mk_angebot: "Add your app to the marketplace for free.",
         mk_verkauf_h: "Selling?",
         mk_verkauf: "Family Projekt is a showcase, not a payment service. You sell your app through your own store / your own account — we only list and link, no commission, no payment handling.",
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ to the provider's site", search_btn: "Search",
-        mk_pr_btn: "Submit as pull request →",
         sp_h: "Support Family Projekt",
         sp_sub: "Family Projekt is free and ad-free — a private hobby project, not a business. If you like, you can support it with a voluntary donation and help cover the running costs.",
         sp_note: "Support is voluntary and given without any return — it does not entitle you to features, updates or support and is no guarantee. It is a private donation, not a purchase. Thank you!",
@@ -387,15 +399,23 @@
       });
       input.addEventListener("input", function () { if (!sem.checked) wordSearch(input.value); });
 
-      // Einreich-Formular (Platzhalter — keine echte Abwicklung, Brief §5)
+      // Einreich-Formular → Formular-Dienst (Stufe 1, Klaus 2026-07-20): der
+      // Eintrag geht als E-Mail an Klaus (der Dienst versteckt die Adresse vor
+      // Spam-Bots). NICHTS wird automatisch veröffentlicht — Klaus prüft und gibt
+      // frei. Ohne konfigurierte Adresse (FP_MARKT_SUBMIT_ENDPOINT) fällt es
+      // fail-soft auf den kopierbaren Block zurück (kein Fehler, kein Datenverlust).
       var submit = document.getElementById("mkSubmit");
-      submit.addEventListener("submit", function (e) {
+      submit.addEventListener("submit", async function (e) {
         e.preventDefault();
+        var T = (window.FP && FP.t) ? FP.t : function (k) { return k; };
         var out = document.getElementById("sbOut");
         var img = document.getElementById("sbImg").value.trim();
         var url = document.getElementById("sbUrl").value.trim();
-        if (!safeUrl(url)) { out.style.display = "block"; out.textContent = "Bitte einen gültigen https-Link zur Seite angeben."; return; }
-        if (!safeImg(img)) { out.style.display = "block"; out.textContent = "Bild-Link fehlt oder ungültig: nur https und JPG/PNG/WebP (kein SVG)."; return; }
+        var contact = ((document.getElementById("sbContact") || {}).value || "").trim();
+        out.style.display = "block";
+        if (!safeUrl(url)) { out.textContent = "Bitte einen gültigen https-Link zur Seite angeben."; return; }
+        if (!safeImg(img)) { out.textContent = "Bild-Link fehlt oder ungültig: nur https und JPG/PNG/WebP (kein SVG)."; return; }
+        if (contact.indexOf("@") < 1) { out.textContent = T("mk_sub_needmail"); return; }
         var listing = {
           label: document.getElementById("sbTitle").value.trim(),
           anchorId: "markt-" + Date.now().toString(36),
@@ -405,26 +425,40 @@
           category: document.getElementById("sbCat").value.trim()
         };
         var json = JSON.stringify(listing, null, 2);
-        out.style.display = "block";
-        out.textContent =
-          "✓ Vorbereitet. Dieser Eintrag wird NICHT automatisch veröffentlicht —\n" +
-          "er wartet auf Freigabe per Pull-Request. Klick unten »Als Pull-Request\n" +
-          "einreichen« — GitHub öffnet die Datei listings.js, du fügst diesen Block\n" +
-          "ins Array ein und schlägst die Änderung vor. (Fallback: Block kopieren\n" +
-          "und an Klaus geben.)\n\n" + json;
-        // PR-Pfad (server-los, GitHub propose-changes wie Andock-Wizard Modul 19):
-        // öffnet den Editor von assets/config/listings.js mit vorbefülltem
-        // Commit-Titel + PR-Beschreibung (enthält den fertigen Eintrag).
-        var REPO = "https://github.com/lausiklauskn-png/family-project";
-        var body = "Neuer Marktplatz-Eintrag (bitte das Objekt unten ins `window.FP_LISTINGS`-Array " +
-          "in assets/config/listings.js einfügen):\n\n```js\n" + json + ",\n```\n\n" +
-          "Bild-Pflicht erfüllt, kein SVG. Wird nach Sichtung gemerged (keine Auto-Veröffentlichung).";
-        var prUrl = REPO + "/edit/main/assets/config/listings.js?quick_pull=1" +
-          "&message=" + encodeURIComponent("Marktplatz: Eintrag " + (listing.label || listing.anchorId)) +
-          "&description=" + encodeURIComponent(body);
-        var prLink = document.getElementById("sbPr");
-        prLink.href = prUrl;
-        prLink.style.display = "inline-block";
+        var endpoint = (window.FP_MARKT_SUBMIT_ENDPOINT || "").trim();
+        if (!endpoint) {
+          // Kein Formular-Dienst gesetzt → Block zum Kopieren (fail-soft).
+          out.textContent = T("mk_sub_setup") + "\n\n" + json;
+          return;
+        }
+        var btn = submit.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
+        out.textContent = T("mk_sub_sending");
+        try {
+          var res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+              _subject: "Marktplatz-Einreichung: " + (listing.label || listing.anchorId),
+              app: listing.label, kuerzel: listing.by, url: listing.url,
+              bild: listing.img, kategorie: listing.category,
+              beschreibung: listing.text, kontakt: contact,
+              eintrag_json: json
+            })
+          });
+          if (res && res.ok) {
+            out.textContent = T("mk_sub_ok");
+            submit.reset();
+            var prev = document.getElementById("sbImgPrev");
+            if (prev) prev.innerHTML = '<span class="mk-imgprev-empty">' + T("mk_img_empty") + "</span>";
+          } else {
+            out.textContent = T("mk_sub_err") + "\n\n" + json;
+          }
+        } catch (err) {
+          out.textContent = T("mk_sub_err") + "\n\n" + json;
+        } finally {
+          if (btn) btn.disabled = false;
+        }
       });
 
       // ── Bild-Feld: Live-Vorschau + „Bild vom Gerät wählen" ──────────────

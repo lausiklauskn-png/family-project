@@ -4,6 +4,32 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## 🔨 2026-07-20: Marktplatz — Einreichung ohne GitHub (Formular-Dienst) + „100-frei"-Zähler raus
+
+Zwei gemergte Schritte (Freibrief), family deployt automatisch:
+- **Sichtbaren „Noch {n} von 100 Gratis-Plätzen frei"-Zähler entfernt** (`#mkFreeCount` +
+  `renderFreeCount` + `mk_free`): leere Plätze wirkten wie „noch niemand gelistet". Die
+  100-gratis-Politik bleibt **intern** (Code-Kommentar). `mk_angebot` entschärft. sw v52→v53. (PR #92)
+- **Einreich-Formular von GitHub-PR auf Formular-Dienst umgestellt (Stufe 1):** Der frühere
+  „Als Pull-Request einreichen"-Weg (GitHub-Konto nötig = Hürde für Nicht-Entwickler) ist raus.
+  Neuer Knopf **„Zur Prüfung einreichen"** → POST an einen Formular-Dienst (Formspree), Eintrag
+  landet als **E-Mail bei Klaus** (Adresse via `window.FP_MARKT_SUBMIT_ENDPOINT` in
+  `assets/config/listings.js`, **Klaus trägt sie ein**). Neues **Kontakt-E-Mail-Feld** des
+  Einreichers (nur für Rückmeldung, nicht veröffentlicht). **Fail-soft:** ohne Endpoint zeigt
+  das Formular den kopierbaren Block (kein Fehler). Nichts wird automatisch veröffentlicht —
+  Klaus prüft + gibt frei. sw v53→v54.
+
+**Stand/offen:** Klaus legt eine Gratis-Formspree-Form an → Adresse in `listings.js` eintragen →
+Browser-Sichttest (Absenden landet als Mail). **Stufe 2** (Freigabe-Seite im Repo: Block
+einfügen → prüfen → „Freigeben" committet via Klaus' Token / „Ablehnen" mit Grund) folgt als
+eigene Sitzung. Prüfung der URL/App bleibt gemeinsamer Sitzungs-Schritt (keine „virenfrei"-Garantie).
+
+**Verifikation:** i18n 43/43 DE/EN paritätisch, Inline-JS parst, `listings.js` valide, keine
+PR-Reste. **Voll-Smoke nicht lauffähig** (playwright-core in Sandbox fehlt) — Klaus' Browser-
+Sichttest nach Deploy + Hard-Reload (SW v54) steht aus.
+
+---
+
 ## 🔨 2026-07-12: Netzwerk-Seite als zwei klare Wege umgebaut + Suche-Feinschliff
 
 Mehrere gemergte Schritte (Freibrief, Fast-Forward auf `main`, family deployt автоmatisch):
