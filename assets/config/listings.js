@@ -26,6 +26,12 @@
  * assets/apps/ (beides https, kein SVG). Fremde Einträge kommen über den
  * Einreich-Dienst + Freigabe darunter dazu.
  */
+// Einreich-Dienst (Marktplatz → Klaus' Postfach). Klaus trägt hier seine
+// Gratis-Formspree-Adresse ein, z.B. "https://formspree.io/f/xxxxxxx".
+// Solange leer, zeigt das Formular den fertigen Block zum Kopieren
+// (fail-soft, nichts geht verloren, kein Fehler). Klaus 2026-07-20.
+window.FP_MARKT_SUBMIT_ENDPOINT = "";
+
 window.FP_LISTINGS = [
   {
     label: "Mein Rezeptbuch",
