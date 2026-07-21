@@ -54,7 +54,7 @@ if (window.SbkimAnastomose && typeof SbkimAnastomose.listenNostr === "function" 
 - Produktion = Hetzner (nicht GitHub Pages); GitHub Pages bleibt Vorschau.
 
 ## Impressum-Daten (real, Quelle Mein-Rezeptbuch)
-`Klaus Nitzsche · Märchenweg 14 · 21077 Hamburg · Deutschland · klaus-nitzsche@t-online.de`
+`Klaus Nitzsche · Märchenweg 14 · 21077 Hamburg · Deutschland · info@family-projekt.de`
 - Optional **namenlos**: `info@family-projekt.de` (Klaus' Entscheidung, 1-Zeilen-Änderung). Rechtlich: **ladungsfähige Anschrift Pflicht**, E-Mail darf namenlos sein.
 
 ## Öffentliche Apps (family-project, freigegeben)
