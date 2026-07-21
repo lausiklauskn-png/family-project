@@ -4,6 +4,48 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## 🔨 2026-07-21: Marktplatz-Einreichung EU-eigen (PHP) + echtes Kontaktformular + Datenschutz
+
+Aufbauend auf dem 07-20-Schritt (Formular-Dienst) jetzt der **EU-eigene Weg ohne Dritt-Dienst**:
+Klaus' Hetzner-Webhosting bringt PHP mit → ein eigenes kleines Skript nimmt den POST an,
+schützt gegen Spam, legt den Eintrag in eine Warteschlange und mailt ihn **lokal** an info@
+(gleiche Maschine wie das Postfach → kein Reputations-Problem). Der frühere „nur Caddy
+statisch"-Blocker ist damit weg.
+
+- **`server/einreichung.php`** (Stufe 1, Pflicht): nimmt den Formular-POST von markt.html an.
+  **Vier Spam-Schutz-Schichten** (headless mit `php -S` bewiesen): Honigtopf-Feld · Mindest-
+  Ausfüllzeit (`fp_elapsed`) · Rate-Limit pro IP (6/Stunde, dateibasiert) · CORS-Herkunftsprüfung
+  (Allowlist family-projekt.de + Pages-Vorschau) + Feld-Validierung. Schreibt nach
+  `warteschlange.jsonl` (mit **gekürztem IP-Hash**, keine Klar-IP) + `mail()` an info@ (fail-soft).
+  Behandelt `zweck:"eintrag"` UND `zweck:"kontakt"`.
+- **`server/freigabe.php`** (Stufe 2, .htpasswd): listet die Warteschlange, „✓ Freigeben"
+  committet den Eintrag über einen **server-seitigen GitHub-Token** in `listings.js` (Einfüge-
+  Marke `// FP_LISTINGS_INSERT_HERE`), „Ablehnen" → vorausgefüllte Antwort-Mail. Token liegt NUR
+  in `freigabe-config.php` auf dem Server (Vorlage `.example`, .htaccess sperrt sie).
+- **Echtes Kontaktformular** in markt.html (Klaus-Entscheid): der alte „✉ Unverbindlich
+  anfragen"-**mailto-Knopf** ist jetzt ein Formular (Name/E-Mail/Nachricht, `zweck:"kontakt"`)
+  → derselbe Endpunkt. **Fail-soft ohne Endpunkt: mailto-Vordruck** an info@.
+- **Datenschutz** (`impressum.html`): neuer Punkt 7 „Marktplatz-Einreichung & Kontakt" (welche
+  Daten, Zweck, EU-Verarbeitung auf eigenem Hetzner, IP-Hash statt Klar-IP, Aufbewahrung); Punkt 2
+  („keine zentrale Speicherung") + Betroffenenrechte (Punkt 10) entsprechend angepasst.
+- **Bugfix:** `renderFreeCount()`-Aufruf in markt.html entfernt — war ein toter Rest aus PR #92
+  (Zähler-Ausbau) und warf beim Boot einen `ReferenceError` (brach die `?q=`-Übernahme).
+- `FP_MARKT_SUBMIT_ENDPOINT` bleibt **einziger Schaltpunkt** (leer = fail-soft). sw v55→**v56**.
+
+**Stand/offen (wenige Klicks für Klaus):** (1) Klaus' Mail-Test (Gmail↔info@) grün abwarten →
+(2) `einreichung.php` + `.htaccess` per WebFTP hochladen → (3) volle URL in `listings.js`
+`FP_MARKT_SUBMIT_ENDPOINT` eintragen → scharf. Anleitung: `server/README.md`. Stufe 2
+(freigabe.php + Token + .htpasswd) optional danach.
+
+**Verifikation:** `php -l` alle drei PHP grün; **einreichung.php funktional headless getestet**
+(`php -S`): OPTIONS 204, gültiger Eintrag/Kontakt → Queue+ok, Honigtopf/zu-schnell → still ok
+(nicht gespeichert), Fremd-Origin → 403, SVG-Bild → 400, Rate-Limit greift bei 6. Inline-JS parst,
+i18n 62/62 DE/EN paritätisch, listings.js valide, smoke_all-Assertions aktualisiert (sbPr-Rest
+raus, Honigtopf/Kontakt/Boot-Regression rein). **Voll-Smoke nicht lauffähig** (playwright-core in
+Sandbox fehlt) — **Klaus' Browser-Sichttest nach Deploy + Hard-Reload (SW v56) steht aus.**
+
+---
+
 ## 🔨 2026-07-20: Marktplatz — Einreichung ohne GitHub (Formular-Dienst) + „100-frei"-Zähler raus
 
 Zwei gemergte Schritte (Freibrief), family deployt automatisch:

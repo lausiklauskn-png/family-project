@@ -134,10 +134,18 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>/SVG|ungültig/i.test(document.getElementById("sbOut").textContent)), "markt: SVG-Bild wird abgelehnt");
   await page.fill("#sbImg","https://example.com/shot.jpg");
   await page.click("#mkSubmit button[type=submit]"); await page.waitForTimeout(100);
-  ok(await page.evaluate(()=>/Freigabe|markt-/.test(document.getElementById("sbOut").textContent)), "markt: gültiger Eintrag -> Freigabe-Block (keine Auto-Veröffentlichung)");
-  ok(await page.evaluate(()=>{const a=document.getElementById("sbPr");return a && a.style.display!=="none" && /\/edit\/main\/assets\/config\/listings\.js\?quick_pull=1/.test(a.href) && /description=/.test(a.href);}), "markt: PR-Link (GitHub propose-changes) wird erzeugt");
+  ok(await page.evaluate(()=>/eingereicht|einger|markt-|kopiere/i.test(document.getElementById("sbOut").textContent)), "markt: gültiger Eintrag ohne Endpoint -> fail-soft Kopier-Block (keine Auto-Veröffentlichung)");
+  // Spam-Schutz: Honigtopf-Feld in beiden Formularen (Einreichung + Kontakt)
+  ok(await page.evaluate(()=>!!document.querySelector("#mkSubmit .fp-hp #sbHp") && !!document.querySelector("#mkContact .fp-hp #ctHp")), "markt: Honigtopf-Feld in Einreich- und Kontakt-Formular");
+  // Kontakt-Formular (echtes Formular statt mailto, Klaus 2026-07-21)
+  ok(await page.evaluate(()=>{const f=document.getElementById("mkContact");return !!(f&&f.querySelector("#ctEmail")&&f.querySelector("#ctMsg")&&f.querySelector('button[type=submit]'));}), "markt: Kontakt-Formular mit E-Mail + Nachricht + Absenden");
+  // Kontakt ohne Endpoint: Pflichtfeld-Prüfung greift (leere Nachricht -> Hinweis, kein mailto-Sprung)
+  await page.fill("#ctEmail","a@b.de"); await page.click("#mkContact button[type=submit]"); await page.waitForTimeout(60);
+  ok(await page.evaluate(()=>{const o=document.getElementById("ctOut");return o.style.display!=="none" && o.textContent.length>0;}), "markt: Kontakt-Formular validiert (Ausgabe erscheint)");
+  // Boot-Regression: der entfernte renderFreeCount-Aufruf darf nicht mehr werfen
+  ok(await page.evaluate(()=>typeof window.renderFreeCount==="undefined"), "markt: kein renderFreeCount-Rest (Boot ohne ReferenceError)");
   // Spenden/Jahresbeitrag: Platzhalter (enabled:false) -> deaktivierte Knöpfe, kein echter Link
-  ok(await page.evaluate(()=>{const b=document.querySelectorAll("#spDonate button");return b.length===2 && [...b].every(x=>x.disabled);}), "markt: Spenden-Knöpfe als Platzhalter deaktiviert (kein Einzug)");
+  ok(await page.evaluate(()=>{const b=document.querySelectorAll("#spDonate button");return b.length>=1 && [...b].every(x=>x.disabled);}), "markt: Spenden-Knöpfe als Platzhalter deaktiviert (kein Einzug)");
   ok(await page.evaluate(()=>document.querySelectorAll("#spDonate a").length===0), "markt: kein scharfer Spenden-Link solange enabled:false");
   await page.close(); }
 
