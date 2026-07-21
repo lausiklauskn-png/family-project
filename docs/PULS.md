@@ -4,6 +4,30 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-21 (nachts): Marktplatz-Einreichung + Kontaktformular LIVE & Ende-zu-Ende getestet
+
+**Scharfgeschaltet** (PR #98). Endpunkt live: `https://formular.family-projekt.de/einreichung.php`
+(Hetzner-Webspace `public_html/formular`, Subdomain via CNAME `cjlb.your-vhost.de` bei INWX,
+gültiges Let's-Encrypt-SSL bis **2026-10-19**, `.htaccess` schützt `warteschlange.jsonl`).
+
+**Von Klaus im Browser bestätigt (beide Formulare):**
+- Kontaktformular → Mail „Kontakt-Anfrage …" bei **info@ + Gmail** angekommen.
+- Marktplatz-Einreichung → Mail „Marktplatz-Einreichung …" (App/Link/Bild/Kategorie/Kontakt/
+  Beschreibung vollständig) bei **info@ + Gmail** angekommen.
+- Doppelte Zustellung (info@ mit Kopie an Gmail + T-Online) funktioniert.
+
+**Einrichtung Server-Seite** (mit Klaus live durchgeführt, konsoleH + INWX + WebFTP):
+info@-Kopie an Gmail+T-Online · Subdomain `formular` + Ziel `/public_html/formular` ·
+CNAME bei INWX · Let's-Encrypt via SSL Manager · `einreichung.php` + `.htaccess` per WebFTP.
+Details/Zugänge: `docs/DEPLOY.md §4b`.
+
+**Offen / Folge:**
+- **SSL-Verlängerung** vor **2026-10-19** (INWX externe DNS → im SSL Manager einmal `↻` bei
+  `formular.family-projekt.de`). Erinnerung einrichten empfohlen.
+- **`freigabe.php` (Stufe 2)** optional: Freigabe-per-Klick statt von Hand (Token nur auf Server).
+
+---
+
 ## 🔨 2026-07-21: Marktplatz-Einreichung EU-eigen (PHP) + echtes Kontaktformular + Datenschutz
 
 Aufbauend auf dem 07-20-Schritt (Formular-Dienst) jetzt der **EU-eigene Weg ohne Dritt-Dienst**:
