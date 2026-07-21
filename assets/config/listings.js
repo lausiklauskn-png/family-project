@@ -148,6 +148,36 @@ window.FP_LISTINGS = [
     category: "Werkzeug",
     own: true
   },
+  {
+    label: "Kim-Bell",
+    anchorId: "markt-kim-bell",
+    text: "Kim-Bell — läute die Glocke und melde dich sauber im gemeinsamen Netz-Raum an. Installierbare App und kopierbare Vorlage für die server-lose SBKIM-Netz-Anmeldung (Rendezvous): eigene Identität direkt im Browser, privater Schlüssel bleibt lokal. Netzwerk, verbinden, anmelden, Knoten, Rendezvous, Vorlage. Läuft offline im Browser.",
+    by: "@klaus",
+    url: "https://lausiklauskn-png.github.io/Kim-Bell/",
+    img: "https://lausiklauskn-png.github.io/Kim-Bell/icon-512.png",
+    category: "Werkzeug",
+    own: true
+  },
+  {
+    label: "Kimseek",
+    anchorId: "markt-kimseek",
+    text: "Kimseek — semantische Bedeutungs-Suche als installierbare App: beschreib in eigenen Worten, was du suchst, und finde Treffer nach Sinn statt nach Stichwörtern. Optional Sprach- und Bild-Eingabe sowie eine KI-Brücke. Zugleich eigener Netz-Knoten. Suchen, finden, Bedeutung, Sprachsuche, semantisch, Wissen. Läuft im Browser, Schlüssel bleibt lokal.",
+    by: "@klaus",
+    url: "https://lausiklauskn-png.github.io/Kimseek/",
+    img: "https://lausiklauskn-png.github.io/Kimseek/icon-512.png",
+    category: "Werkzeug",
+    own: true
+  },
+  {
+    label: "Kimboard",
+    anchorId: "markt-kimboard",
+    text: "Kimboard — semantische Pinnwand als installierbare App: Fragen und Notizen an ein geteiltes Brett heften, Antworten kommen geräteübergreifend zurück und werden nach Bedeutung sortiert. Optional privates, verschlüsseltes Brett. Notizen, merken, Pinnwand, Ideen, Zettel, Fragen. Läuft server-los im Browser, Schlüssel bleibt lokal.",
+    by: "@klaus",
+    url: "https://lausiklauskn-png.github.io/Kimboard/",
+    img: "https://lausiklauskn-png.github.io/Kimboard/icon-512.png",
+    category: "Werkzeug",
+    own: true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
