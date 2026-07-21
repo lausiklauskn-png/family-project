@@ -3,3 +3,7 @@ tests/*.png
 tests/shot.png
 *.log
 tests/glass-demo.html
+# Server-Laufzeitdaten (nur auf dem Hetzner-Webhosting, NIE ins Repo):
+server/freigabe-config.php
+server/warteschlange.jsonl
+server/.ratelimit.json
