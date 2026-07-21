@@ -35,7 +35,7 @@
 // Anleitung: server/README.md. Einziger Schaltpunkt — solange leer, bleibt das
 // Formular fail-soft (Einreichung: kopierbarer Block; Kontakt: mailto-Vordruck),
 // nichts geht verloren, kein Fehler. Klaus 2026-07-21.
-window.FP_MARKT_SUBMIT_ENDPOINT = "";
+window.FP_MARKT_SUBMIT_ENDPOINT = "https://formular.family-projekt.de/einreichung.php";
 
 window.FP_LISTINGS = [
   {
