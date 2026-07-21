@@ -106,6 +106,32 @@ Hintergrund, Themen, Suche, drei Räume.
 
 ---
 
+## 4b. Hetzner-Webhosting (Mail + PHP-Endpunkt für die Marktplatz-Einreichung)
+
+Neben dem Caddy-Server gibt es das **Hetzner-Webhosting S** (konsoleH, Konto
+„Family Projekt"). Die Domain `family-projekt.de` ist dort als **„Ext"** (extern
+gehostet) eingetragen — der **Web-Teil läuft auf dem Caddy-Server**, das
+**Webhosting stellt Postfach + Webspace + PHP** bereit. Merkdaten für jede Sitzung:
+
+- **konsoleH:** `https://konsoleh.hetzner.com` (Konto Webhosting S).
+- **WebFTP (Datei-Manager im Browser):** `https://webftp.your-server.de/index.php#/`
+  (Login mit dem FTP-Zugang des Webhostings; in konsoleH unter
+  Domain → Einstellungen → WebFTP).
+- **Hosting-Server:** `www746.your-server.de` · **Webspace-Adresse (vhost, mit
+  eigenem SSL):** `cjlb.your-vhost.de` · **Web-Wurzel:** `public_html`.
+- **Verfügbar:** PHP-Konfiguration, Cronjob Manager, WebFTP, MariaDB/MySQL (1 DB) —
+  d. h. der EU-eigene Einreich-/Kontakt-Dienst braucht keinen Dritt-Anbieter.
+- **Postfach `info@family-projekt.de`:** DKIM/SPF/DMARC gesetzt (DNS bei INWX).
+  In konsoleH ist bei info@ eine **Kopie an Klaus' zwei private Adressen**
+  (Gmail + T-Online) hinterlegt → doppelte Zustellung als Redundanz, das Original
+  bleibt im Postfach (Adressen bewusst NICHT hier im Repo — nur in konsoleH).
+
+**Einreich-/Kontakt-Endpunkt:** Das Skript `server/einreichung.php` (dieses Repo,
+kopierbare Vorlage) wird per WebFTP nach `public_html/formular/` geladen →
+erreichbar unter `https://cjlb.your-vhost.de/formular/einreichung.php`. Diese URL
+kommt in `assets/config/listings.js` → `FP_MARKT_SUBMIT_ENDPOINT` (einziger
+Schaltpunkt, leer = fail-soft). Voll-Anleitung: `server/README.md`.
+
 ## 5. Spätere, eigene Sitzungen (nicht Teil dieses Bau-Schritts)
 
 - Auto-Handshake übers Relay (heute „in Vorbereitung").
