@@ -118,6 +118,36 @@ window.FP_LISTINGS = [
     category: "Druck & Design",
     own: true
   },
+  {
+    label: "Perfect Skin Beauty",
+    anchorId: "markt-perfect-skin-beauty",
+    text: "Kosmetikstudio in Hamburg von Alina: professionelle Haarentfernung mit Sugaring, Waxing und Zuckerpaste sowie Kosmetik-Behandlungen — dazu zertifizierte Depilations-Kurse zum Selberlernen. Beauty, Hautpflege, Enthaarung, Wachsen, Gesichtsbehandlung, Wellness. Zweisprachig Deutsch und Russisch, Termin online buchbar.",
+    by: "@alis",
+    url: "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/",
+    img: "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/assets/logo-192.png",
+    category: "Beauty & Kosmetik",
+    own: true
+  },
+  {
+    label: "Perfect Skin Fashion",
+    anchorId: "markt-perfect-skin-fashion",
+    text: "Mode- und Design-Studio zum Gestalten und Bestellen: eigene Designs im Design-Studio entwerfen, im Video-Shop stöbern und über die Warenwirtschaft verwalten. Mode, Kleidung, Fashion, Shop, Design gestalten, Motive, Lager. Läuft im Browser.",
+    by: "@alis",
+    url: "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/",
+    img: "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/assets/logo-512.png",
+    category: "Mode & Design",
+    own: true
+  },
+  {
+    label: "Mycel-Karte",
+    anchorId: "markt-mycel-karte",
+    text: "Lebende Netz-Karte des SBKIM-Mycels als installierbare Offline-App: zeigt die verbundenen Knoten als Kräfte-Graph und lässt echten Netz-Verkehr live aufleuchten — reine Anzeige, sendet nie (Empfangsmodus). Netzwerk, Visualisierung, Karte, Knoten, Graph, PWA. Läuft offline im Browser, ohne Konto.",
+    by: "@klaus",
+    url: "https://lausiklauskn-png.github.io/mycel-karte/",
+    img: "https://lausiklauskn-png.github.io/mycel-karte/icon-512.png",
+    category: "Werkzeug",
+    own: true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
