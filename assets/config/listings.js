@@ -178,6 +178,16 @@ window.FP_LISTINGS = [
     category: "Werkzeug",
     own: true
   },
+  {
+    label: "Private Brain",
+    anchorId: "markt-privat-brain",
+    text: "Private Brain — dein privates, offline betriebenes zweites Gehirn: lass einmal all deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) durchlaufen. Die App liest jede Datei nur einmal, merkt sich einen kleinen Bedeutungs-Katalog und lässt die Originale unberührt — liest nur, schlägt vor, bewegt nichts. Danach semantische, kombinierende Suche über gemischte Daten. Wissen, Archiv, Dokumente, Notizen, Suche, zweites Gehirn, privat, offline. Läuft im Browser, kein großes Unternehmen dahinter.",
+    by: "@klaus",
+    url: "https://lausiklauskn-png.github.io/Privat-Brain/",
+    img: "https://lausiklauskn-png.github.io/Privat-Brain/icon-512.png",
+    category: "Büro",
+    own: true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
