@@ -1,0 +1,28 @@
+# Family Projekt — Schutz der Server-Daten auf dem Hetzner-Webhosting.
+# Diese Datei in DENSELBEN Ordner legen wie einreichung.php.
+#
+# Sperrt den direkten Abruf der Warteschlange, der Rate-Datei und der
+# Freigabe-Konfiguration (Token!). Die PHP-Skripte selbst bleiben erreichbar.
+
+# Apache 2.4
+<FilesMatch "\.(jsonl|json|log)$">
+  Require all denied
+</FilesMatch>
+<Files "freigabe-config.php">
+  Require all denied
+</Files>
+
+# Apache 2.2 (Fallback, falls das Hosting noch alt ist)
+<IfModule !mod_authz_core.c>
+  <FilesMatch "\.(jsonl|json|log)$">
+    Order allow,deny
+    Deny from all
+  </FilesMatch>
+  <Files "freigabe-config.php">
+    Order allow,deny
+    Deny from all
+  </Files>
+</IfModule>
+
+# Verzeichnis-Listing aus.
+Options -Indexes

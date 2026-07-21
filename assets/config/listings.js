@@ -26,10 +26,15 @@
  * assets/apps/ (beides https, kein SVG). Fremde Einträge kommen über den
  * Einreich-Dienst + Freigabe darunter dazu.
  */
-// Einreich-Dienst (Marktplatz → Klaus' Postfach). Klaus trägt hier seine
-// Gratis-Formspree-Adresse ein, z.B. "https://formspree.io/f/xxxxxxx".
-// Solange leer, zeigt das Formular den fertigen Block zum Kopieren
-// (fail-soft, nichts geht verloren, kein Fehler). Klaus 2026-07-20.
+// Einreich-/Kontakt-Endpunkt (Marktplatz + Kontakt → Klaus' Postfach info@).
+// EU-eigen, ohne Dritt-Dienst: das PHP-Skript server/einreichung.php läuft auf
+// Klaus' Hetzner-Webhosting, nimmt den POST an, schützt gegen Spam, legt den
+// Eintrag in eine Warteschlange und mailt ihn lokal an info@. Klaus trägt hier
+// die volle URL des hochgeladenen Skripts ein, z.B.
+//   "https://DEIN-WEBHOSTING/formular/einreichung.php"
+// Anleitung: server/README.md. Einziger Schaltpunkt — solange leer, bleibt das
+// Formular fail-soft (Einreichung: kopierbarer Block; Kontakt: mailto-Vordruck),
+// nichts geht verloren, kein Fehler. Klaus 2026-07-21.
 window.FP_MARKT_SUBMIT_ENDPOINT = "";
 
 window.FP_LISTINGS = [
@@ -112,5 +117,7 @@ window.FP_LISTINGS = [
     img: "https://lausiklauskn-png.github.io/Tomys-Hub/icons/icon-512.png",
     category: "Druck & Design",
     own: true
-  }
+  },
+  // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
+  // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
