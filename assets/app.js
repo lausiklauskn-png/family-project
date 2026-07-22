@@ -427,6 +427,57 @@
   }
 
   // ---- Init ----------------------------------------------------------------
+  // „Frisch laden"-Knopf: löscht Service-Worker-Registrierung + alle Caches und
+  // lädt neu — so bekommt JEDER (auch am Handy, ohne Strg+Shift+R) die neueste
+  // Version. Fail-soft + Sicherheits-Timeout, damit der Knopf nie hängen bleibt.
+  function hardReload(btn) {
+    if (btn) { btn.classList.add("spinning"); btn.setAttribute("aria-busy", "true"); }
+    var reloaded = false;
+    var done = function () {
+      if (reloaded) return; reloaded = true;
+      try { location.reload(); } catch (_e) { location.href = location.href; }
+    };
+    var tasks = [];
+    try {
+      if ("serviceWorker" in navigator && navigator.serviceWorker.getRegistrations) {
+        tasks.push(navigator.serviceWorker.getRegistrations()
+          .then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+          .catch(function () {}));
+      }
+      if (global.caches && caches.keys) {
+        tasks.push(caches.keys()
+          .then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })
+          .catch(function () {}));
+      }
+    } catch (_e) {}
+    if (tasks.length) Promise.all(tasks).then(done, done); else done();
+    setTimeout(done, 2500); // Fallback: nie hängen bleiben
+  }
+
+  function mountReloadButton() {
+    var nav = document.querySelector("nav.top");
+    if (!nav || document.getElementById("fpReload")) return;
+    var pill = document.createElement("span");
+    pill.className = "pill pill-reload";
+    pill.id = "fpReload";
+    pill.setAttribute("role", "button");
+    pill.tabIndex = 0;
+    var setLabel = function () {
+      var de = getLang() === "de";
+      pill.innerHTML = '<span class="rl-ic" aria-hidden="true">↻</span> ' + (de ? "Aktualisieren" : "Refresh");
+      pill.title = de ? "Seite frisch laden — holt die neueste Version (Cache leeren)"
+                      : "Reload fresh — get the latest version (clear cache)";
+      pill.setAttribute("aria-label", de ? "Seite frisch laden" : "Reload page fresh");
+    };
+    setLabel();
+    global.addEventListener("fp:lang", setLabel);
+    var go = function () { hardReload(pill); };
+    pill.addEventListener("click", go);
+    pill.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    var lb = document.getElementById("langBtn");
+    if (lb && lb.parentNode === nav) nav.insertBefore(pill, lb); else nav.appendChild(pill);
+  }
+
   function init() {
     var lb = document.getElementById("langBtn");
     if (lb) lb.addEventListener("click", function () { applyLang(lang === "de" ? "en" : "de"); });
@@ -440,6 +491,7 @@
     renderAppLinks();
     renderPublicAppLinks();
     renderToolButtons();
+    mountReloadButton();
   }
 
   global.FP = {
