@@ -89,26 +89,6 @@ window.FP_LISTINGS = [
     own: true
   },
   {
-    label: "Such-Werkzeug",
-    anchorId: "markt-such-werkzeug",
-    text: "Semantische Suche als kleines, frei bewegliches Werkzeug: beschreib in eigenen Worten, was du suchst — es versteht die Bedeutung, nicht nur Stichwörter. Findet in deinen Sachen, im Knotennetz und im Internet. Suchen, finden, Bedeutung, Sprachsuche.",
-    by: "@klaus",
-    url: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
-    img: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/icon-512.png",
-    category: "Werkzeug",
-    own: true
-  },
-  {
-    label: "Pinnwand",
-    anchorId: "markt-pinnwand",
-    text: "Semantische Pinnwand für Notizen und Schnipsel: kleine Zettel anheften und nach Bedeutung wiederfinden. Ideen sammeln, merken, ordnen. Notizzettel, Memo, Gedanken festhalten. Läuft offline im Browser, ohne Konto.",
-    by: "@klaus",
-    url: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
-    img: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/icon-512.png",
-    category: "Werkzeug",
-    own: true
-  },
-  {
     label: "Tomys Hub",
     anchorId: "markt-tomys-hub",
     text: "Tomy — dein Werkzeugkasten für personalisierten Druck: Gestalte im Browser druckfertige Vorlagen für T-Shirts, Tassen, Aufkleber und Werbeartikel. Vom KI-Motiv bis zur fertigen Druckdatei mit 300 dpi, mit Schaufenster voller Beispiele und Werkstatt-Werkzeugen für Auftrag und Angebot. Ideal für Verein, Firma oder privat, um Logo und eigene Motive individuell drucken zu lassen. Stichworte: Digitaldruck, Textildruck, Sublimation, Siebdruck, Stickerei, Werbetechnik, T-Shirt bedrucken, Tasse bedrucken, Aufkleber und Flyer drucken, Werbegeschenke, Druckvorlage gestalten, Motiv erstellen. Läuft offline im Browser, ohne Konto. Du gestaltest — wir drucken.",
