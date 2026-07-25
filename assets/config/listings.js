@@ -168,6 +168,16 @@ window.FP_LISTINGS = [
     category: "Büro",
     own: true
   },
+  {
+    label: "WorkFloh",
+    anchorId: "markt-workfloh",
+    text: "WorkFloh — der digitale Auftragszettel für den Werbetechnik-Betrieb: von der Kundenannahme über die Produktion (Schilder, Folierung, Beschriftung, Druck) bis zur Übergabe, mit Zeiterfassung sowie Angebot und Rechnung. Installierbare Offline-PWA mit SBKIM-Siegel, eigener Netz-Knoten. Werbetechnik, Auftrag, Auftragszettel, Werkstatt, Handwerk, Schilder, Folierung, Beschriftung, Druck, Zeiterfassung, Angebot, Rechnung. Läuft server-los im Browser, Schlüssel bleibt lokal.",
+    by: "@klaus",
+    url: "https://lausiklauskn-png.github.io/Mein-WorkFloh/",
+    img: "https://lausiklauskn-png.github.io/Mein-WorkFloh/icon-512.png",
+    category: "Büro",
+    own: true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
