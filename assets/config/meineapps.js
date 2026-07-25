@@ -4,8 +4,9 @@
  *
  * Wechselbar ohne Code. Schema: { name, url }.
  * WICHTIG vor dem öffentlichen Launch: diese Leiste ausblenden oder dev-only
- * schalten (Bauphase). Sie enthält u.a. WorkFloh (Klaus' eigenes Repo, privat) — soll NICHT dauerhaft öffentlich
- * verlinkt bleiben. */
+ * schalten (Bauphase). (WorkFloh war früher privat; seit 2026-07-25 wird es von
+ * Klaus öffentlich angeboten und steht zusätzlich als Marktplatz-Eintrag in
+ * listings.js.) */
 window.FP_MYAPPS = {
   labelDe: "Meine Apps (Bauphase):",
   labelEn: "My apps (build phase):",

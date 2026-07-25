@@ -3,8 +3,9 @@
  * „Platzierung auf jeder Seite unten und auf der Werkzeugseite").
  *
  * Nur Apps mit eigenem Impressum sind hier gelistet. Bewusst NICHT dabei:
- * Mein Tresor / Jasons Tresor (noch kein Impressum), BookLedgerPro (später),
- * WorkFloh (privat).
+ * Mein Tresor / Jasons Tresor (noch kein Impressum), BookLedgerPro (später).
+ * WorkFloh war früher privat; seit 2026-07-25 wird es von Klaus öffentlich
+ * angeboten (eigenes, in der App enthaltenes Impressum) und ist jetzt gelistet.
  *
  * Wechselbar ohne weiteren Code. Schema: { name, url }. */
 window.FP_PUBLICAPPS = {
@@ -17,6 +18,7 @@ window.FP_PUBLICAPPS = {
     { name: "Sage-Einladung", url: "https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" },
     { name: "SB-KIMTool-Point", url: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/" },
     { name: "Pinnwand", url: "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/" },
-    { name: "Such-Werkzeug", url: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/" }
+    { name: "Such-Werkzeug", url: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/" },
+    { name: "WorkFloh", url: "https://lausiklauskn-png.github.io/Mein-WorkFloh/" }
   ]
 };
