@@ -320,7 +320,18 @@
     window.FP_LISTINGS = WORK;
     if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
     if (editIdx === idx) clearForm();
-    renderList(); markDirty(); toast(T("removed"));
+    renderList();
+    // Sofort server-seitig festschreiben, wenn ein Studio-Passwort vorliegt —
+    // sonst kaeme der Eintrag beim naechsten Laden aus der Live-Liste zurueck
+    // ("Loeschen ohne Wirkung"). Ohne Passwort: nur lokal + Hinweis.
+    if (srvKeyVal()) {
+      toast(T("publishing"));
+      publishViaServer()
+        .then(function () { markDirty(); toast(T("withdrawn")); })
+        .catch(function (err) { markDirty(); toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+    } else {
+      markDirty(); toast(T("removed"));
+    }
   }
   function renderList() {
     var box = panel.querySelector("[data-role=list]"); if (!box) return;
@@ -331,8 +342,7 @@
         (e.mycel ? ' <span class="fpst-myc">🧬</span>' : "") +
         '<small>' + esc((e.text || "").slice(0, 90)) + '</small></div>' +
         '<div class="fpst-item__a"><button data-edit="' + i + '">' + esc(T("edit")) + '</button>' +
-        '<button data-del="' + i + '" class="fpst-danger">' + esc(T("del")) + '</button>' +
-        '<button data-withdraw="' + i + '" class="fpst-danger" title="' + esc(T("withdraw")) + '">⤓ ' + esc(T("withdraw")) + '</button></div>' +
+        '<button data-del="' + i + '" class="fpst-danger">' + esc(T("del")) + '</button></div>' +
         '</div>';
     }).join("");
   }
@@ -657,8 +667,10 @@
     loadWork();
     capturePrefix();
     wireAccess();
-    // Persistenter Studio-Zustand (z.B. nach Reload)
-    try { if (localStorage.getItem(LS.studio) === "1") { document.body.classList.add("fpstudio"); openPanel(); } } catch (e) {}
+    // Studio startet IMMER geschlossen — nur der Lang-Druck (enterStudio) oeffnet
+    // es. KEIN Auto-Oeffnen nach Reload/Hard-Reload, damit Besucher das Panel nie
+    // offen vorfinden (Sicherheit: kein Fremdzugriff auf Freigeben/Loeschen).
+    try { localStorage.setItem(LS.studio, "0"); } catch (e) {}
   }
   // öffentliche Testfläche (headless-Smoke) — harmlos in Produktion
   window.FPStudio = {
