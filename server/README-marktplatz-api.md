@@ -1,54 +1,54 @@
-# Marktplatz-Prüf-/Freigabe-Warteschlange — Server-Einrichtung
+# Marktplatz-Studio-API (`marktplatz-api.php`) — Server-Einrichtung
 
-Diese **eine Datei** (`marktplatz-api.php`) macht aus eingereichten Apps eine
-**Warteschlange**, die du im Marktplatz-Studio prüfen und per Nummer freigeben kannst.
-Sie ist **frisch/eigenständig** und rührt deine bestehende `einreichung.php` (E-Mail)
-**nicht** an.
+Diese **eine Datei** bringt die Prüf-/Freigabe-**Warteschlange direkt ins Studio**
+(Langdruck aufs Copyright auf `markt.html`). Sie ist das **JSON-Geschwister von
+`freigabe.php`**: dieselbe `freigabe-config.php`, derselbe GitHub-Token auf dem
+Server, dieselbe Warteschlange `warteschlange.jsonl`. **`freigabe.php` bleibt
+unberührt** daneben nutzbar.
 
-## Was die Datei tut
-- **speichern:** jede Einreichung wird als kleine `.json`-Datei abgelegt + bekommt eine **Nummer**.
-- **auflisten / Status / erledigt:** das Studio holt die offenen Einreichungen ab — **nur mit deinem Passwort**.
-- **Quellcode holen:** (für die spätere KI-Prüfung, Phase 2) — ebenfalls passwortgeschützt.
+**Der Clou:** im Studio brauchst du **keinen GitHub-Token mehr im Browser** — nur
+**ein Studio-Passwort**. Der Server committet mit seinem Token. Nichts geht live
+ohne deinen Freigabe-Klick.
 
-Öffentliche Besucher können **nur** einreichen (kein Passwort, aber streng geprüft:
-nur https-Link, Bild als https-Link ohne SVG, Längen gedeckelt, Honigtopf gegen Bots).
-Alles andere verlangt **dein Passwort**.
+## Wohin gehört die Datei
+Auf dein **Hetzner-Webhosting per WebFTP**, in **denselben Ordner** wie
+`einreichung.php` / `freigabe.php` (erreichbar als
+`https://formular.family-projekt.de/marktplatz-api.php`).
+**Nicht** auf den Caddy-Server — der liefert nur die Website aus.
 
-## Einrichtung (einmalig — 4 Schritte)
+## Einrichtung (2 Schritte)
 
-1. **Öffne** `marktplatz-api.php` und trage oben im Block „KONFIG" ein:
-   - `$ADMIN_KEY` = ein **selbst gewähltes Passwort** (merkst nur du dir — kommt später ins Studio, **nicht** ins Repo).
-   - `$DATA_DIR` kannst du lassen (Standard: Ordner `marktplatz-data` neben der Datei — wird automatisch angelegt und per `.htaccess` gegen Fremd-Zugriff gesperrt).
-   - `$ALLOW_ORIGINS` passt für `family-projekt.de` schon.
-   - `$FORWARD_URL` **leer lassen** (deine `einreichung.php` verschickt die E-Mail bereits — sonst käme sie doppelt).
-
-2. **Lade** `marktplatz-api.php` auf deinen Server — **neben** `einreichung.php`
-   (also so erreichbar wie `https://formular.family-projekt.de/marktplatz-api.php`).
-
-3. **Prüfe die Adresse:** im Repo steht in `assets/config/listings.js`:
+1. **In `freigabe-config.php` eine Zeile ergänzen** (die Datei, die du für
+   `freigabe.php` schon angelegt hast — mit dem GitHub-Token). Neu:
+   ```php
+   'studio_key'   => 'DEIN-STUDIO-PASSWORT',   // frei wählen, nur hier auf dem Server
    ```
-   window.FP_MARKT_API = "https://formular.family-projekt.de/marktplatz-api.php";
-   ```
-   Stimmt die Adresse mit deinem Upload überein? Wenn nein → dort anpassen (oder mir sagen).
+   (Optional `allow_origins` — Standard passt für family-projekt.de. Vorlage:
+   `freigabe-config.example.php`.)
 
-4. **Im Studio** (Langdruck aufs Copyright) erscheint jetzt oben **„📥 Eingereicht (zur Prüfung)"**.
-   Trage dort **einmal dein Passwort** ein (Haken „Passwort merken") → **„Vom Server holen"**.
+2. **`marktplatz-api.php` per WebFTP** neben `einreichung.php` / `freigabe.php` laden.
 
-## So läuft die Prüfung danach
-1. **„Vom Server holen"** → alle offenen Einreichungen als 🟡 **Neu**.
+Fertig. Im Studio (Langdruck aufs Copyright) oben bei **„📥 Eingereicht"** dein
+Studio-Passwort eintragen (Haken „merken") → **„Vom Server holen"**.
+
+## So läuft die Prüfung
+1. **Vom Server holen** → alle offenen Einreichungen als 🟡 **Neu**.
 2. Jede App prüfen: **„↗ App öffnen"** anschauen (später: KI-Prüfung, Phase 2).
-3. Ist sie ok → **„🔵 Geprüft"** (Status). Faul → **„Verwerfen"**.
+3. Ist sie ok → **„🔵 Geprüft"**. Faul → **„Verwerfen"** (öffnet vorausgefüllte Absage-Mail).
 4. **„✓ Freigeben"** (einzeln) oder **„Alle 🔵 geprüften freigeben"** (Stapel) →
-   schreibt mit deinem GitHub-Token nach `main` → in ~1 Minute live.
-5. **„⤓ Zurückziehen"** an einem Live-Eintrag entfernt ihn wieder von der Seite (Token).
+   der **Server** committet in `listings.js` → in ~1 Minute live.
+5. **„⤓ Zurückziehen"** an einem Live-Eintrag entfernt ihn wieder (auch server-seitig).
 
-## Sicherheit (kurz)
-- **Kein GitHub-Token** liegt je auf dem Server oder in der öffentlichen Seite — nur bei dir im Studio.
-- Der Server ist der **sichere Puffer**: Besucher schicken dorthin (ohne Token), **du** gibst mit Token frei.
-- Die Warteschlange (mit Kontakt-Mails) ist **passwortgeschützt** — Fremde sehen sie nicht.
-- Der Datenordner ist per `.htaccess` gegen direktes Auflisten gesperrt.
+## Sicherheit
+- **Kein GitHub-Token** im Browser oder Repo — nur in `freigabe-config.php` auf dem Server.
+- **Jede** API-Aktion (Liste holen, Status, Freigeben, …) verlangt das **Studio-Passwort**
+  (`hash_equals`). Kontakt-Anfragen bleiben `freigabe.php` vorbehalten.
+- `commit_listings` schreibt nie eine leere/kaputte Datei (Schutz-Prüfung), `commit_image`
+  nur ins Depot `assets/apps/`.
+- Eine Warteschlange (`warteschlange.jsonl`) für Formular, `freigabe.php` und Studio —
+  keine Dopplung. Der `.htaccess`-Schutz (Warteschlange/Config) gilt wie gehabt.
 
 ## Ehrlich
-Diese Datei ist auf einem echten Server nur von **dir** testbar (Upload + echte Einreichung).
-Die Logik wurde headless geprüft (`php -l` + Funktionslauf submit/list/status/done); der
-Live-Lauf im Browser wartet auf dich.
+Nur **du** kannst den Live-Weg testen (Datei hochladen, echte Einreichung, Freigabe mit
+Passwort). Headless geprüft: `php -l` + Funktionslauf (list/setstatus/Schutz-Prüfungen) +
+`node tests/smoke_studio_markt.mjs`. Der Browser-/Server-Lauf wartet auf dich.

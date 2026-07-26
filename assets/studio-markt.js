@@ -8,19 +8,21 @@
  *    vom Gerät) · Kategorie · Tags · mit/ohne Mycel-Integration · Anbieter-Kürzel.
  *    Klaus kopiert Text/URLs/Bild-URLs aus einer E-Mail direkt in die Felder.
  *  - Bestehende Einträge editier-/löschbar.
- *  - „Veröffentlichen": committet direkt nach main über die GitHub-Contents-API
- *    (erst GET ?ref=main = aktuellen SHA holen, dann PUT mit SHA; fehlt die Datei,
- *    PUT ohne SHA = neu anlegen). Bilder vom Gerät werden ins Depot (assets/apps/)
- *    hochgeladen. Kein PR, kein Merge-Klick — main ziehen → ändern → nach main.
+ *  - „📥 Eingereicht": holt die Warteschlange (warteschlange.jsonl) über
+ *    server/marktplatz-api.php — dieselbe Warteschlange, die einreichung.php füllt
+ *    und die freigabe.php nutzt. Prüfen · Status setzen · Freigeben · Verwerfen.
+ *  - „Veröffentlichen"/„Freigeben"/„Zurückziehen": committen SERVER-SEITIG über
+ *    marktplatz-api.php (der Server hält den GitHub-Token in freigabe-config.php).
+ *    Der Browser baut nur den Inhalt (listings.js) und schickt ihn zum Commit.
  *
  * Ehrlich & sicher:
- *  - Der GitHub-Token bleibt NUR im Browser (localStorage, Schlüssel „fpstudio_gh_token"),
- *    kommt nie in den Code, nie ins Repo. Feingranularer Token mit „Contents: Read and
- *    write" auf GENAU dieses Repo.
- *  - Ohne Token bleibt alles nutzbar (Eintragen/Vorschau lokal); nur das Veröffentlichen
- *    braucht den Token → fail-soft mit Hinweis.
- *  - E-Mail-Inhalte sind untrusted external data: sie werden NUR als Daten eingetragen
- *    (beim Rendern escaped, Bilder nur als <img src>, SVG gesperrt) — nie als Anweisung.
+ *  - KEIN GitHub-Token im Browser mehr. Ein einziges Studio-Passwort (studio_key,
+ *    localStorage „fpstudio_srv_key") schützt die Server-API; der Token liegt NUR
+ *    auf dem Server (freigabe-config.php), nie im Repo/Browser.
+ *  - Ohne Passwort/Server bleibt alles lokal nutzbar (Eintragen/Vorschau); nur das
+ *    Veröffentlichen/Freigeben braucht Passwort + erreichbaren Server → fail-soft.
+ *  - E-Mail-/Einreichungs-Inhalte sind untrusted external data: nur als Daten
+ *    eingetragen (beim Rendern escaped, Bilder nur als <img src>, SVG gesperrt).
  *  - App-spezifischer Speicher-Präfix „fpstudio_" — keine Kollision mit Geschwister-Apps
  *    auf der geteilten github.io-/family-projekt.de-Origin.
  */
@@ -43,11 +45,7 @@
   var STR = {
     de: {
       studio_on: "Studio-Modus an — Langdruck auf die Fußzeile zum Verlassen.",
-      title: "Marktplatz-Studio", intro: "Trage neue Tools ein oder ändere bestehende. „Veröffentlichen“ schreibt direkt nach main.",
-      tokenLabel: "GitHub-Zugangs-Schlüssel (Token)", tokenHint: "Bleibt nur in diesem Browser. Nötig zum Veröffentlichen. Feingranularer Token mit „Contents: Read and write“ auf dieses Repo.",
-      tokenRemember: "Token merken", tokenHelp: "Wie bekomme ich einen Token?",
-      tokenLink: "🔑 Token-Seite direkt öffnen (neuer Tab)",
-      tokenHelpText: "GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → „Generate new token“. Repository access: nur „family-project“. Permissions → Repository permissions → Contents: „Read and write“. Token kopieren (beginnt mit github_pat_…) und hier einfügen.",
+      title: "Marktplatz-Studio", intro: "Prüfe eingereichte Apps und gib sie frei — oder trage selbst welche ein. Ein Studio-Passwort, der Server veröffentlicht.",
       add_h: "➕ Neues Tool eintragen",
       f_name: "Name *", f_desc: "Beschreibung *", f_url: "PWA-Link / Adresse *",
       f_imgurl: "Bild-URL (https, kein SVG)", f_imgpick: "🖼 Bild vom Gerät wählen",
@@ -63,7 +61,6 @@
       need_img: "Bitte eine Bild-URL (https, kein SVG) angeben oder ein Bild vom Gerät wählen.",
       bad_img: "Bild-URL ungültig (nur https, JPG/PNG/WebP — kein SVG).",
       bad_url: "Link ungültig (muss mit https:// beginnen).",
-      need_token: "Zum Veröffentlichen fehlt der GitHub-Token. Bitte oben eintragen.",
       publishing: "Wird veröffentlicht …", published: "Veröffentlicht — in ~1 Minute für alle live.",
       pub_err: "Veröffentlichen fehlgeschlagen: ", nothing: "Nichts geändert.",
       added: "Hinzugefügt (noch nicht veröffentlicht).", updated: "Geändert (noch nicht veröffentlicht).",
@@ -72,7 +69,8 @@
       q_h: "📥 Eingereicht (zur Prüfung)",
       q_intro: "Von Besuchern eingereichte Apps — nichts ist live, bis du „Freigeben“ klickst.",
       q_key: "Studio-Passwort (für den Server)", q_remember: "Passwort merken",
-      q_key_hint: "Schützt die Warteschlange (u. a. Kontakt-Mails). Bleibt nur in diesem Browser.",
+      q_key_hint: "Ein Passwort für alles: Warteschlange holen UND veröffentlichen (der Server committet mit seinem Token). Bleibt nur in diesem Browser.",
+      need_srvkey: "Bitte zuerst dein Studio-Passwort eintragen (oben bei „Eingereicht“).",
       q_fetch: "Vom Server holen", q_none: "Keine offenen Einreichungen.",
       q_noapi: "Server-Adresse (FP_MARKT_API) noch nicht gesetzt — siehe server/README-marktplatz-api.md.",
       q_loading: "Hole Einreichungen …", q_err: "Server-Abruf fehlgeschlagen: ",
@@ -86,11 +84,7 @@
     },
     en: {
       studio_on: "Studio mode on — long-press the footer to leave.",
-      title: "Marketplace Studio", intro: "Add new tools or edit existing ones. “Publish” writes straight to main.",
-      tokenLabel: "GitHub access token", tokenHint: "Stays in this browser only. Needed to publish. Fine-grained token with “Contents: Read and write” on this repo.",
-      tokenRemember: "Remember token", tokenHelp: "How do I get a token?",
-      tokenLink: "🔑 Open the token page directly (new tab)",
-      tokenHelpText: "GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → “Generate new token”. Repository access: only “family-project”. Permissions → Repository permissions → Contents: “Read and write”. Copy the token (starts with github_pat_…) and paste it here.",
+      title: "Marketplace Studio", intro: "Review submitted apps and release them — or add your own. One studio password, the server publishes.",
       add_h: "➕ Add a new tool",
       f_name: "Name *", f_desc: "Description *", f_url: "PWA link / address *",
       f_imgurl: "Image URL (https, no SVG)", f_imgpick: "🖼 Pick an image from your device",
@@ -106,7 +100,6 @@
       need_img: "Please provide an image URL (https, no SVG) or pick an image from your device.",
       bad_img: "Invalid image URL (https only, JPG/PNG/WebP — no SVG).",
       bad_url: "Invalid link (must start with https://).",
-      need_token: "The GitHub token is missing. Please enter it above to publish.",
       publishing: "Publishing …", published: "Published — live for everyone in ~1 minute.",
       pub_err: "Publishing failed: ", nothing: "Nothing changed.",
       added: "Added (not published yet).", updated: "Changed (not published yet).",
@@ -115,7 +108,8 @@
       q_h: "📥 Submitted (for review)",
       q_intro: "Apps submitted by visitors — nothing goes live until you click “Publish”.",
       q_key: "Studio password (for the server)", q_remember: "Remember password",
-      q_key_hint: "Protects the queue (incl. contact e-mails). Stays in this browser only.",
+      q_key_hint: "One password for everything: fetch the queue AND publish (the server commits with its token). Stays in this browser only.",
+      need_srvkey: "Please enter your studio password first (top, under “Submitted”).",
       q_fetch: "Fetch from server", q_none: "No open submissions.",
       q_noapi: "Server address (FP_MARKT_API) not set yet — see server/README-marktplatz-api.md.",
       q_loading: "Fetching submissions …", q_err: "Server request failed: ",
@@ -138,8 +132,6 @@
   function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[^\w]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "tool"; }
   function utf8ToB64(s) { return btoa(unescape(encodeURIComponent(String(s)))); }
   function extFromType(t) { t = String(t || "").toLowerCase(); if (t.indexOf("png") >= 0) return "png"; if (t.indexOf("webp") >= 0) return "webp"; if (t.indexOf("jpeg") >= 0 || t.indexOf("jpg") >= 0) return "jpg"; return "png"; }
-  function getToken() { try { return localStorage.getItem(LS.token) || ""; } catch (e) { return ""; } }
-  function setToken(v, remember) { try { if (remember && v) localStorage.setItem(LS.token, v); else localStorage.removeItem(LS.token); localStorage.setItem(LS.remember, remember ? "1" : "0"); } catch (e) {} }
 
   var toastBox = null;
   function toast(msg, ok) {
@@ -150,27 +142,8 @@
     setTimeout(function () { el.style.opacity = "0"; el.style.transform = "translateY(10px)"; setTimeout(function () { el.remove(); }, 300); }, 2600);
   }
 
-  /* --------------------------------------------------- GitHub Contents-API */
-  function ghHeaders(token) { return { "Authorization": "Bearer " + token, "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }; }
-  function apiUrl(path) { return "https://api.github.com/repos/" + CFG.owner + "/" + CFG.repo + "/contents/" + path.split("/").map(encodeURIComponent).join("/"); }
-  function getSha(path, token) {
-    return fetch(apiUrl(path) + "?ref=" + encodeURIComponent(CFG.branch), { headers: ghHeaders(token), cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json().then(function (j) { return j.sha || null; }) : null; })
-      .catch(function () { return null; });
-  }
-  // content = bereits base64 (Bild) ODER roher Text (wird hier base64-kodiert).
-  function putFile(path, contentB64, token, message) {
-    return getSha(path, token).then(function (sha) {
-      var body = { message: message || ("Studio: " + path + " aktualisiert"), content: contentB64, branch: CFG.branch };
-      if (sha) body.sha = sha;
-      return fetch(apiUrl(path), { method: "PUT", headers: ghHeaders(token), body: JSON.stringify(body) }).then(function (r) {
-        if (!r.ok) return r.text().then(function (t) { throw new Error("PUT " + path + " → HTTP " + r.status + " " + t.slice(0, 140)); });
-        return true;
-      });
-    });
-  }
-  function commitText(path, text, token) { return putFile(path, utf8ToB64(text), token, "Studio: " + path + " aktualisiert (Marktplatz)"); }
-  function commitImage(path, base64, token) { return putFile(path, base64, token, "Studio: Bild " + path + " hochgeladen (Marktplatz)"); }
+  /* --- Commits laufen server-seitig über marktplatz-api.php (Server-Token). --- */
+  /* Der Browser hält KEINEN GitHub-Token mehr; siehe publishViaServer(). */
 
   /* --------------------------------------------------- Arbeits-Liste + Serialisierung */
   var WORK = [];            // Arbeitskopie von window.FP_LISTINGS
@@ -368,43 +341,43 @@
     if (b) b.textContent = dirty ? T("dirty_badge") : "";
   }
 
-  function currentToken() {
-    var tokenEl = panel && panel.querySelector("[data-f=token]");
-    return tokenEl ? tokenEl.value.trim() : getToken();
-  }
-  // Kern: erst Geräte-Bilder ins Depot, dann listings.js schreiben. Gibt ein Promise zurück.
-  function publishListings(token) {
+  // Ein Studio-Passwort (studio_key) ist die einzige Zugangsdaten — der Server
+  // committet mit SEINEM GitHub-Token. Kein GitHub-Token mehr im Browser.
+  function publishViaServer() {
+    var key = srvKeyVal();
+    if (!key) return Promise.reject(new Error(T("need_srvkey")));
+    setSrvKey(key, true);
     var imgPaths = Object.keys(UPLOADS);
     var chain = Promise.resolve();
-    imgPaths.forEach(function (p) { chain = chain.then(function () { return commitImage(p, UPLOADS[p], token); }); });
-    return chain.then(function () { return commitText("assets/config/listings.js", serialize(), token); })
-      .then(function () { UPLOADS = {}; dirty = false; markDirty(); return true; });
+    imgPaths.forEach(function (p) {
+      chain = chain.then(function () {
+        return apiPost("commit_image", { path: p, base64: UPLOADS[p] }).then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "Bild"); });
+      });
+    });
+    return chain.then(function () { return apiPost("commit_listings", { content: serialize() }); })
+      .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_listings"); UPLOADS = {}; dirty = false; markDirty(); return true; });
   }
   function publish() {
-    var token = currentToken();
-    if (!token) { toast(T("need_token"), false); var te = panel.querySelector("[data-f=token]"); if (te) te.focus(); return; }
-    var remember = panel.querySelector("[data-f=remember]");
-    setToken(token, !remember || remember.checked);
+    if (!API) { toast(T("q_noapi"), false); return; }
+    if (!srvKeyVal()) { toast(T("need_srvkey"), false); var se = panel.querySelector("[data-f=srvkey]"); if (se) se.focus(); return; }
     if (!dirty && !Object.keys(UPLOADS).length) { toast(T("nothing")); return; }
     var btn = panel.querySelector("[data-role=publish]");
     if (btn) { btn.disabled = true; btn.textContent = T("publishing"); }
-    publishListings(token)
+    publishViaServer()
       .then(function () { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("published")); })
       .catch(function (err) { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("pub_err") + (err && err.message ? err.message : err), false); });
   }
 
-  // Live-Eintrag zurückziehen: aus WORK entfernen + sofort veröffentlichen (mit Token).
+  // Live-Eintrag zurückziehen: aus WORK entfernen + server-seitig neu schreiben.
   function withdrawEntry(idx) {
     if (!WORK[idx]) return;
     if (!window.confirm(T("withdraw_confirm"))) return;
-    var token = currentToken();
-    if (!token) { toast(T("need_token"), false); return; }
-    setToken(token, true);
+    if (!srvKeyVal()) { toast(T("need_srvkey"), false); return; }
     WORK.splice(idx, 1); dirty = true; window.FP_LISTINGS = WORK;
     if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
     if (editIdx === idx) clearForm();
     toast(T("publishing"));
-    publishListings(token)
+    publishViaServer()
       .then(function () { renderList(); markDirty(); toast(T("withdrawn")); })
       .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
   }
@@ -425,105 +398,110 @@
   }
   function statusLabel(st) { return st === "geprueft" ? T("q_status_geprueft") : st === "verdacht" ? T("q_status_verdacht") : T("q_status_neu"); }
   function statusClass(st) { return st === "geprueft" ? "is-geprueft" : st === "verdacht" ? "is-verdacht" : "is-neu"; }
-  function findQ(nummer) { for (var i = 0; i < QUEUE.length; i++) { if (String(QUEUE[i].nummer) === String(nummer)) return QUEUE[i]; } return null; }
-  function pad4(n) { return ("000" + n).slice(-4); }
+  function findQ(id) { for (var i = 0; i < QUEUE.length; i++) { if (String(QUEUE[i].id) === String(id)) return QUEUE[i]; } return null; }
   function entryFromRec(it) {
-    var tags = Array.isArray(it.tags) ? it.tags.slice() : [];
     return {
       label: String(it.label || "").trim(),
-      text: buildText(it.text, tags, it.mycel === true),
+      text: String(it.text || "").trim(),
       by: (String(it.by || "").trim() || T("by_default")),
       url: String(it.url || "").trim(),
       img: safeImg(it.img),
       category: String(it.category || "").trim(),
-      tags: tags, mycel: it.mycel === true,
-      anchorId: "markt-" + slugify(it.label) + "-" + it.nummer
+      tags: [], mycel: false,
+      anchorId: "markt-" + slugify(it.label) + "-" + String(it.id).slice(-6)
     };
   }
   function fetchQueue() {
     if (!API) { toast(T("q_noapi"), false); return; }
+    if (!srvKeyVal()) { toast(T("need_srvkey"), false); var se = panel.querySelector("[data-f=srvkey]"); if (se) se.focus(); return; }
     var box = panel.querySelector("[data-role=queue]"); if (box) box.innerHTML = '<div class="fpst-qempty">' + esc(T("q_loading")) + '</div>';
     var rem = panel.querySelector("[data-f=srvremember]");
     setSrvKey(srvKeyVal(), !rem || rem.checked);
     apiGet("list").then(function (j) {
       if (!j || !j.ok) throw new Error((j && j.error) || "?");
-      QUEUE = j.items || []; renderQueue();
+      QUEUE = (j.items || []).filter(function (x) { return ["freigegeben", "abgelehnt", "erledigt"].indexOf(x.status) < 0; });
+      renderQueue();
     }).catch(function (err) { toast(T("q_err") + (err && err.message ? err.message : err), false); if (box) box.innerHTML = ""; });
   }
   function renderQueue() {
     var box = panel.querySelector("[data-role=queue]"); if (!box) return;
     if (!QUEUE.length) { box.innerHTML = '<div class="fpst-qempty">' + esc(T("q_none")) + '</div>'; return; }
-    box.innerHTML = QUEUE.map(function (it) {
+    box.innerHTML = QUEUE.map(function (it, i) {
       return '<div class="fpst-qitem ' + statusClass(it.status) + '">' +
         '<img src="' + esc(safeImg(it.img) || "") + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
-        '<div class="fpst-qbody"><div class="fpst-qtop"><span class="fpst-qnum">FP-' + esc(pad4(it.nummer)) + '</span> <span class="fpst-qstatus">' + esc(statusLabel(it.status)) + '</span></div>' +
+        '<div class="fpst-qbody"><div class="fpst-qtop"><span class="fpst-qnum">#' + (i + 1) + '</span> <span class="fpst-qstatus">' + esc(statusLabel(it.status)) + '</span></div>' +
         '<b>' + esc(it.label) + '</b><small>' + esc((it.text || "").slice(0, 100)) + '</small>' +
         '<div class="fpst-qact">' +
           '<a href="' + esc(safeUrl(it.url) || "#") + '" target="_blank" rel="noopener" class="fpst-qbtn">' + esc(T("q_open")) + '</a>' +
-          '<button data-qtake="' + esc(it.nummer) + '" class="fpst-qbtn">' + esc(T("q_take")) + '</button>' +
-          '<button data-qcheck="' + esc(it.nummer) + '" class="fpst-qbtn">' + esc(T("q_checked")) + '</button>' +
-          '<button data-qok="' + esc(it.nummer) + '" class="fpst-qbtn fpst-qbtn--go">' + esc(T("q_approve")) + '</button>' +
-          '<button data-qno="' + esc(it.nummer) + '" class="fpst-qbtn fpst-danger">' + esc(T("q_reject")) + '</button>' +
+          '<button data-qtake="' + esc(it.id) + '" class="fpst-qbtn">' + esc(T("q_take")) + '</button>' +
+          '<button data-qcheck="' + esc(it.id) + '" class="fpst-qbtn">' + esc(T("q_checked")) + '</button>' +
+          '<button data-qok="' + esc(it.id) + '" class="fpst-qbtn fpst-qbtn--go">' + esc(T("q_approve")) + '</button>' +
+          '<button data-qno="' + esc(it.id) + '" class="fpst-qbtn fpst-danger">' + esc(T("q_reject")) + '</button>' +
         '</div></div></div>';
     }).join("") + '<div class="fpst-qfoot"><button data-role="qall" class="fpst-btn">' + esc(T("q_approveall")) + '</button></div>';
   }
-  function queueTakeOver(nummer) {
-    var it = findQ(nummer); if (!it) return;
+  function queueTakeOver(id) {
+    var it = findQ(id); if (!it) return;
     _pendingImg = null; editIdx = -1;
     panel.querySelector("[data-f=label]").value = it.label || "";
     panel.querySelector("[data-f=desc]").value = it.text || "";
     panel.querySelector("[data-f=url]").value = it.url || "";
     panel.querySelector("[data-f=imgurl]").value = safeImg(it.img) || "";
     panel.querySelector("[data-f=cat]").value = it.category || "";
-    panel.querySelector("[data-f=tags]").value = (Array.isArray(it.tags) ? it.tags : []).join(", ");
+    panel.querySelector("[data-f=tags]").value = "";
     panel.querySelector("[data-f=by]").value = it.by || "";
-    panel.querySelector("[data-f=mycel]").checked = it.mycel === true;
+    panel.querySelector("[data-f=mycel]").checked = false;
     setImgPreview(safeImg(it.img));
     panel.querySelector("[data-role=addbtn]").textContent = T("add_btn");
     panel.querySelector("[data-role=cancel]").style.display = "";
     panel.querySelector("[data-role=form]").scrollIntoView({ behavior: "smooth", block: "start" });
     toast(T("q_take"));
   }
-  function queueSetStatus(nummer, status) {
-    apiPost("setstatus", { nummer: nummer, status: status }).then(function (j) {
+  function queueSetStatus(id, status) {
+    apiPost("setstatus", { id: id, status: status }).then(function (j) {
       if (!j || !j.ok) throw new Error((j && j.error) || "?");
-      var it = findQ(nummer); if (it) it.status = status; renderQueue();
+      var it = findQ(id); if (it) it.status = status; renderQueue();
     }).catch(function (err) { toast(T("q_err") + (err && err.message ? err.message : err), false); });
   }
-  function queueApprove(nummer) {
-    var it = findQ(nummer); if (!it) return;
-    var token = currentToken(); if (!token) { toast(T("need_token"), false); return; }
+  function queueApprove(id) {
+    var it = findQ(id); if (!it) return;
+    if (!srvKeyVal()) { toast(T("need_srvkey"), false); return; }
     var entry = entryFromRec(it);
-    if (!entry.label || !entry.text || !safeUrl(entry.url)) { toast(T("need_name"), false); return; }
-    if (!entry.img) { toast(T("bad_img"), false); return; }
-    setToken(token, true);
+    if (!entry.label || !entry.text || !safeUrl(entry.url) || !entry.img) { toast(T("bad_img"), false); return; }
     WORK.push(entry); dirty = true; window.FP_LISTINGS = WORK;
     if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
     toast(T("publishing"));
-    publishListings(token)
-      .then(function () { return apiPost("done", { nummer: nummer, mode: "freigegeben" }); })
-      .then(function () { QUEUE = QUEUE.filter(function (x) { return String(x.nummer) !== String(nummer); }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
+    publishViaServer()
+      .then(function () { return apiPost("setstatus", { id: id, status: "freigegeben" }); })
+      .then(function () { QUEUE = QUEUE.filter(function (x) { return String(x.id) !== String(id); }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
       .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
   }
-  function queueReject(nummer) {
+  function rejectMail(it) {
+    if (!it.contact) return;
+    var body = "Hallo,\n\ndanke für deine Einreichung „" + it.label + "\" im Family-Projekt-Marktplatz.\n\nLeider können wir sie so nicht veröffentlichen.\n\nDu kannst sie gern angepasst erneut einreichen.\n\nViele Grüße\nFamily Projekt";
+    try { window.open("mailto:" + encodeURIComponent(it.contact) + "?subject=" + encodeURIComponent("Deine Marktplatz-Einreichung") + "&body=" + encodeURIComponent(body), "_blank"); } catch (e) {}
+  }
+  function queueReject(id) {
+    var it = findQ(id); if (!it) return;
     if (!window.confirm(T("q_reject_confirm"))) return;
-    apiPost("done", { nummer: nummer, mode: "verworfen" }).then(function (j) {
+    apiPost("setstatus", { id: id, status: "abgelehnt" }).then(function (j) {
       if (!j || !j.ok) throw new Error((j && j.error) || "?");
-      QUEUE = QUEUE.filter(function (x) { return String(x.nummer) !== String(nummer); }); renderQueue(); toast(T("q_rejected"));
+      QUEUE = QUEUE.filter(function (x) { return String(x.id) !== String(id); }); renderQueue(); toast(T("q_rejected"));
+      rejectMail(it);
     }).catch(function (err) { toast(T("q_err") + (err && err.message ? err.message : err), false); });
   }
   function approveAllChecked() {
     var checked = QUEUE.filter(function (it) { return it.status === "geprueft"; });
     if (!checked.length) { toast(T("q_none")); return; }
-    var token = currentToken(); if (!token) { toast(T("need_token"), false); return; }
+    if (!srvKeyVal()) { toast(T("need_srvkey"), false); return; }
     var good = [];
-    checked.forEach(function (it) { var e = entryFromRec(it); if (e.label && e.text && safeUrl(e.url) && e.img) { WORK.push(e); good.push(it.nummer); } });
+    checked.forEach(function (it) { var e = entryFromRec(it); if (e.label && e.text && safeUrl(e.url) && e.img) { WORK.push(e); good.push(it.id); } });
     if (!good.length) { toast(T("bad_img"), false); return; }
     dirty = true; window.FP_LISTINGS = WORK; if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
-    setToken(token, true); toast(T("publishing"));
-    publishListings(token)
-      .then(function () { return Promise.all(good.map(function (n) { return apiPost("done", { nummer: n, mode: "freigegeben" }); })); })
-      .then(function () { QUEUE = QUEUE.filter(function (x) { return good.indexOf(x.nummer) < 0; }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
+    toast(T("publishing"));
+    publishViaServer()
+      .then(function () { return Promise.all(good.map(function (id) { return apiPost("setstatus", { id: id, status: "freigegeben" }); })); })
+      .then(function () { QUEUE = QUEUE.filter(function (x) { return good.indexOf(x.id) < 0; }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
       .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
   }
 
@@ -538,14 +516,6 @@
         '<div class="fpst-head"><b>' + esc(T("title")) + ' <span data-role="dirty" class="fpst-dirty"></span></b>' +
           '<button data-role="x" class="fpst-x" title="' + esc(T("publish_close")) + '">✕</button></div>' +
         '<p class="fpst-intro">' + esc(T("intro")) + '</p>' +
-        '<div class="fpst-token">' +
-          '<label>' + esc(T("tokenLabel")) +
-            '<input type="password" data-f="token" placeholder="github_pat_…" autocomplete="off" value="' + esc(getToken()) + '"></label>' +
-          '<label class="fpst-chk"><input type="checkbox" data-f="remember"' + (remembered ? " checked" : "") + '> ' + esc(T("tokenRemember")) + '</label>' +
-          '<small>' + esc(T("tokenHint")) + '</small>' +
-          '<a class="fpst-tokenlink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">' + esc(T("tokenLink")) + '</a>' +
-          '<details class="fpst-help"><summary>' + esc(T("tokenHelp")) + '</summary><p>' + esc(T("tokenHelpText")) + '</p></details>' +
-        '</div>' +
         '<div class="fpst-queue">' +
           '<h4>' + esc(T("q_h")) + '</h4>' +
           '<p class="fpst-qintro">' + esc(T("q_intro")) + '</p>' +
@@ -692,8 +662,8 @@
   }
   // öffentliche Testfläche (headless-Smoke) — harmlos in Produktion
   window.FPStudio = {
-    _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64, apiUrl: apiUrl,
-          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, pad4: pad4,
+    _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64,
+          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass,
           setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; }, MARKER: MARKER, CFG: CFG },
     open: function () { document.body.classList.add("fpstudio"); openPanel(); },
     close: exitStudio

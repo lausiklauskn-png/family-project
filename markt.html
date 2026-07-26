@@ -459,17 +459,6 @@
           category: document.getElementById("sbCat").value.trim()
         };
         var json = JSON.stringify(listing, null, 2);
-        // Zusätzlich (best-effort) in die Prüf-Warteschlange auf dem Server speichern,
-        // damit Klaus die Einreichung im Studio per Nummer freigeben kann. Blockiert nie;
-        // die E-Mail unten läuft unabhängig weiter (kein Token im Browser — nur speichern).
-        var api = (window.FP_MARKT_API || "").trim();
-        if (api) {
-          try {
-            fetch(api + "?action=submit", { method: "POST", headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ label: listing.label, text: listing.text, by: listing.by, url: listing.url,
-                img: listing.img, category: listing.category, contact: contact, fp_hp_url: hp }) }).catch(function () {});
-          } catch (e) {}
-        }
         var endpoint = (window.FP_MARKT_SUBMIT_ENDPOINT || "").trim();
         if (!endpoint) {
           // Kein Formular-Dienst gesetzt → Block zum Kopieren (fail-soft).
