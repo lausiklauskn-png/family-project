@@ -625,7 +625,20 @@
       render();
       renderDonate();
       if (pq) { input.value = pq; wordSearch(pq); }
+
+      // Studio-Hook: erlaubt dem Selbst-Pflege-Studio, die Liste nach dem
+      // Hinzufügen/Ändern/Löschen neu zu zeichnen (arbeitet auf window.FP_LISTINGS).
+      window.FP_MARKT = {
+        rerender: function () {
+          ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img); });
+          view = ALL.slice(); render();
+        }
+      };
     })();
   </script>
+  <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
+       App-spezifischer Speicher-Präfix; Token nur im Browser. -->
+  <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
+  <script src="assets/studio-markt.js" defer></script>
 </body>
 </html>
