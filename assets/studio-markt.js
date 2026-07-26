@@ -42,6 +42,7 @@
       title: "Marktplatz-Studio", intro: "Trage neue Tools ein oder ändere bestehende. „Veröffentlichen“ schreibt direkt nach main.",
       tokenLabel: "GitHub-Zugangs-Schlüssel (Token)", tokenHint: "Bleibt nur in diesem Browser. Nötig zum Veröffentlichen. Feingranularer Token mit „Contents: Read and write“ auf dieses Repo.",
       tokenRemember: "Token merken", tokenHelp: "Wie bekomme ich einen Token?",
+      tokenLink: "🔑 Token-Seite direkt öffnen (neuer Tab)",
       tokenHelpText: "GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → „Generate new token“. Repository access: nur „family-project“. Permissions → Repository permissions → Contents: „Read and write“. Token kopieren (beginnt mit github_pat_…) und hier einfügen.",
       add_h: "➕ Neues Tool eintragen",
       f_name: "Name *", f_desc: "Beschreibung *", f_url: "PWA-Link / Adresse *",
@@ -70,6 +71,7 @@
       title: "Marketplace Studio", intro: "Add new tools or edit existing ones. “Publish” writes straight to main.",
       tokenLabel: "GitHub access token", tokenHint: "Stays in this browser only. Needed to publish. Fine-grained token with “Contents: Read and write” on this repo.",
       tokenRemember: "Remember token", tokenHelp: "How do I get a token?",
+      tokenLink: "🔑 Open the token page directly (new tab)",
       tokenHelpText: "GitHub → Settings → Developer settings → Personal access tokens → Fine-grained tokens → “Generate new token”. Repository access: only “family-project”. Permissions → Repository permissions → Contents: “Read and write”. Copy the token (starts with github_pat_…) and paste it here.",
       add_h: "➕ Add a new tool",
       f_name: "Name *", f_desc: "Description *", f_url: "PWA link / address *",
@@ -371,6 +373,7 @@
             '<input type="password" data-f="token" placeholder="github_pat_…" autocomplete="off" value="' + esc(getToken()) + '"></label>' +
           '<label class="fpst-chk"><input type="checkbox" data-f="remember"' + (remembered ? " checked" : "") + '> ' + esc(T("tokenRemember")) + '</label>' +
           '<small>' + esc(T("tokenHint")) + '</small>' +
+          '<a class="fpst-tokenlink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">' + esc(T("tokenLink")) + '</a>' +
           '<details class="fpst-help"><summary>' + esc(T("tokenHelp")) + '</summary><p>' + esc(T("tokenHelpText")) + '</p></details>' +
         '</div>' +
         '<div class="fpst-form" data-role="form">' +
@@ -448,6 +451,8 @@
       ".fpst-box textarea{resize:vertical}" +
       ".fpst-chk{display:flex;align-items:center;gap:7px;margin-top:.7rem}.fpst-chk input{width:auto;margin:0}" +
       ".fpst-box small{display:block;opacity:.6;font-size:.76rem;margin-top:4px}" +
+      ".fpst-tokenlink{display:inline-block;margin-top:8px;font-size:.82rem;font-weight:600;color:#8fb4ff;text-decoration:none;border:1px solid rgba(143,180,255,.35);border-radius:9px;padding:6px 11px}" +
+      ".fpst-tokenlink:hover{border-color:rgba(143,180,255,.7);background:rgba(143,180,255,.08)}" +
       ".fpst-help{margin-top:.5rem;font-size:.8rem}.fpst-help summary{cursor:pointer;opacity:.8}.fpst-help p{opacity:.75;line-height:1.4}" +
       ".fpst-token,.fpst-form{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
       ".fpst-form h4,.fpst-box>h4{margin:.4rem 0 .2rem;font-size:.95rem}" +

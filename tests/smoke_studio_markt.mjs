@@ -33,6 +33,8 @@ ok(/window\.FP_MARKT\s*=\s*\{[\s\S]*rerender/.test(markt), "markt.html: FP_MARKT
 /* 3) Studio-Verdrahtung + Sicherheit in studio-markt.js */
 ok(/footer\s+\.wrap/.test(studio) && /1500/.test(studio), "Langdruck-Zugang auf Footer-Copyright (1,5 s)");
 ok(/fpstudio_gh_token/.test(studio), "app-spezifischer Token-Schlüssel (fpstudio_)");
+ok(/href="https:\/\/github\.com\/settings\/personal-access-tokens\/new"/.test(studio), "Direktlink zur Token-Erstellung (wie Alis)");
+ok(/tokenLink:/.test(studio), "tokenLink-I18N vorhanden (de/en)");
 ok(/\?ref="\s*\+\s*encodeURIComponent\(CFG\.branch\)/.test(studio), "GitHub GET ?ref=<branch> (aktuellen SHA holen)");
 ok(/method:\s*"PUT"/.test(studio), "GitHub PUT (Commit nach main)");
 ok(/if\s*\(sha\)\s*body\.sha\s*=\s*sha/.test(studio), "PUT mit SHA (Update) bzw. ohne (neu anlegen)");
