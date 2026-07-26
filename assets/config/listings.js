@@ -183,15 +183,6 @@ window.FP_LISTINGS = [
     "category": "Büro",
     "own": true
   },
-  {
-    "label": "dieses Rezeptbuch",
-    "anchorId": "markt-dieses-rezeptbuch-473b65",
-    "text": "meine App ist in der Lage Rezepte zu erstellen aus Web Adressen aus Bildern",
-    "by": "lausi Klaus",
-    "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/",
-    "img": "https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png",
-    "category": "Rezepte ohne App oder auch Getränke App"
-  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
