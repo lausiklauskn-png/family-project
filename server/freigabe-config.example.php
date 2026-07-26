@@ -21,4 +21,11 @@ return [
   'mail_from'    => 'noreply@family-projekt.de',
   // Muss auf dieselbe Warteschlange zeigen wie einreichung.php.
   'queue_file'   => __DIR__ . '/warteschlange.jsonl',
+
+  // ── Für das Marktplatz-Studio (marktplatz-api.php) ──────────────────────
+  // Studio-Passwort: schützt die Warteschlangen-API. Frei wählen, NUR hier auf
+  // dem Server. Kommt später EINMAL ins Studio (bleibt dort nur im Browser).
+  'studio_key'   => 'HIER-EIN-STUDIO-PASSWORT-WAEHLEN',
+  // Erlaubte Herkünfte fürs Studio (CORS). Passt für family-projekt.de.
+  'allow_origins'=> ['https://family-projekt.de', 'https://www.family-projekt.de', 'https://lausiklauskn-png.github.io'],
 ];
