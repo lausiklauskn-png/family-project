@@ -37,6 +37,11 @@
 // nichts geht verloren, kein Fehler. Klaus 2026-07-21.
 window.FP_MARKT_SUBMIT_ENDPOINT = "https://formular.family-projekt.de/einreichung.php";
 
+// Prüf-/Freigabe-Warteschlange (Studio holt eingereichte Apps vom Server). Adresse der
+// marktplatz-api.php auf DEINEM Server. Leer = Warteschlange aus (Rest unverändert).
+// Einrichtung: server/README-marktplatz-api.md. Klaus 2026-07-26.
+window.FP_MARKT_API = "https://formular.family-projekt.de/marktplatz-api.php";
+
 window.FP_LISTINGS = [
   {
     label: "Mein Rezeptbuch",
