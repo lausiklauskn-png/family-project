@@ -30,10 +30,14 @@
   /* --------------------------------------------------------------- Konfig */
   var CFG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };
   try { var c = window.FP_STUDIO_CONFIG || {}; if (c.owner) CFG.owner = c.owner; if (c.repo) CFG.repo = c.repo; if (c.branch) CFG.branch = c.branch; } catch (e) {}
-  var LS = { token: "fpstudio_gh_token", remember: "fpstudio_remember", studio: "fpstudio_on" };
+  var LS = { token: "fpstudio_gh_token", remember: "fpstudio_remember", studio: "fpstudio_on",
+             srvKey: "fpstudio_srv_key", srvRemember: "fpstudio_srv_remember" };
   // Absolute Bild-Basis fürs Depot: von beiden Domains erreichbar (das Bild wird
   // ins Repo committet und auf beiden deployt). Wie die bestehenden own-Einträge.
   var IMG_BASE = "https://family-projekt.de/assets/apps/";
+  // Server-API für die Prüf-/Freigabe-Warteschlange (dein Server, siehe
+  // server/README-marktplatz-api.md). Leer = Warteschlange aus, Rest unverändert.
+  var API = ""; try { API = (window.FP_MARKT_API || "").trim(); } catch (e) {}
 
   /* --------------------------------------------------------------- Sprache */
   var STR = {
@@ -64,7 +68,21 @@
       pub_err: "Veröffentlichen fehlgeschlagen: ", nothing: "Nichts geändert.",
       added: "Hinzugefügt (noch nicht veröffentlicht).", updated: "Geändert (noch nicht veröffentlicht).",
       removed: "Entfernt (noch nicht veröffentlicht).", img_local: "Bild vom Gerät — wird beim Veröffentlichen hochgeladen.",
-      dirty_badge: "· ungespeichert", by_default: "@extern"
+      dirty_badge: "· ungespeichert", by_default: "@extern",
+      q_h: "📥 Eingereicht (zur Prüfung)",
+      q_intro: "Von Besuchern eingereichte Apps — nichts ist live, bis du „Freigeben“ klickst.",
+      q_key: "Studio-Passwort (für den Server)", q_remember: "Passwort merken",
+      q_key_hint: "Schützt die Warteschlange (u. a. Kontakt-Mails). Bleibt nur in diesem Browser.",
+      q_fetch: "Vom Server holen", q_none: "Keine offenen Einreichungen.",
+      q_noapi: "Server-Adresse (FP_MARKT_API) noch nicht gesetzt — siehe server/README-marktplatz-api.md.",
+      q_loading: "Hole Einreichungen …", q_err: "Server-Abruf fehlgeschlagen: ",
+      q_take: "Übernehmen (bearbeiten)", q_approve: "✓ Freigeben", q_checked: "🔵 Geprüft",
+      q_reject: "Verwerfen", q_reject_confirm: "Diese Einreichung verwerfen (aus der Liste entfernen)?",
+      q_open: "↗ App öffnen", q_approveall: "Alle 🔵 geprüften freigeben",
+      q_approved: "Freigegeben — in ~1 Minute live.", q_rejected: "Verworfen.",
+      q_status_neu: "🟡 Neu", q_status_geprueft: "🔵 Geprüft – zur Freigabe bereit", q_status_verdacht: "🔴 Verdacht",
+      withdraw: "Zurückziehen", withdraw_confirm: "Diesen Eintrag von der Live-Seite zurückziehen (mit Token entfernen)?",
+      withdrawn: "Zurückgezogen — in ~1 Minute von der Seite verschwunden."
     },
     en: {
       studio_on: "Studio mode on — long-press the footer to leave.",
@@ -93,7 +111,21 @@
       pub_err: "Publishing failed: ", nothing: "Nothing changed.",
       added: "Added (not published yet).", updated: "Changed (not published yet).",
       removed: "Removed (not published yet).", img_local: "Device image — uploaded on publish.",
-      dirty_badge: "· unsaved", by_default: "@extern"
+      dirty_badge: "· unsaved", by_default: "@extern",
+      q_h: "📥 Submitted (for review)",
+      q_intro: "Apps submitted by visitors — nothing goes live until you click “Publish”.",
+      q_key: "Studio password (for the server)", q_remember: "Remember password",
+      q_key_hint: "Protects the queue (incl. contact e-mails). Stays in this browser only.",
+      q_fetch: "Fetch from server", q_none: "No open submissions.",
+      q_noapi: "Server address (FP_MARKT_API) not set yet — see server/README-marktplatz-api.md.",
+      q_loading: "Fetching submissions …", q_err: "Server request failed: ",
+      q_take: "Take over (edit)", q_approve: "✓ Release", q_checked: "🔵 Checked",
+      q_reject: "Discard", q_reject_confirm: "Discard this submission (remove from the list)?",
+      q_open: "↗ Open app", q_approveall: "Release all 🔵 checked",
+      q_approved: "Released — live in ~1 minute.", q_rejected: "Discarded.",
+      q_status_neu: "🟡 New", q_status_geprueft: "🔵 Checked – ready to release", q_status_verdacht: "🔴 Suspicious",
+      withdraw: "Withdraw", withdraw_confirm: "Withdraw this entry from the live site (remove via token)?",
+      withdrawn: "Withdrawn — gone from the site in ~1 minute."
     }
   };
   function lang() { try { return (window.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de"; } catch (e) { return "de"; } }
@@ -164,10 +196,12 @@
       }).catch(function () { filePrefix = null; });
   }
   function fallbackPrefix() {
-    var ep = "";
+    var ep = "", api = "";
     try { ep = window.FP_MARKT_SUBMIT_ENDPOINT || ""; } catch (e) {}
+    try { api = window.FP_MARKT_API || ""; } catch (e) {}
     return "/* Marktplatz-Einträge (Apps/Seiten) = zugleich Such-Korpus. */\n" +
-      "window.FP_MARKT_SUBMIT_ENDPOINT = " + JSON.stringify(ep) + ";\n\n";
+      "window.FP_MARKT_SUBMIT_ENDPOINT = " + JSON.stringify(ep) + ";\n" +
+      "window.FP_MARKT_API = " + JSON.stringify(api) + ";\n\n";
   }
   // Eintrag in stabiler Feld-Reihenfolge, nur gesetzte Felder.
   function normEntry(e) {
@@ -324,7 +358,8 @@
         (e.mycel ? ' <span class="fpst-myc">🧬</span>' : "") +
         '<small>' + esc((e.text || "").slice(0, 90)) + '</small></div>' +
         '<div class="fpst-item__a"><button data-edit="' + i + '">' + esc(T("edit")) + '</button>' +
-        '<button data-del="' + i + '" class="fpst-danger">' + esc(T("del")) + '</button></div>' +
+        '<button data-del="' + i + '" class="fpst-danger">' + esc(T("del")) + '</button>' +
+        '<button data-withdraw="' + i + '" class="fpst-danger" title="' + esc(T("withdraw")) + '">⤓ ' + esc(T("withdraw")) + '</button></div>' +
         '</div>';
     }).join("");
   }
@@ -333,29 +368,163 @@
     if (b) b.textContent = dirty ? T("dirty_badge") : "";
   }
 
+  function currentToken() {
+    var tokenEl = panel && panel.querySelector("[data-f=token]");
+    return tokenEl ? tokenEl.value.trim() : getToken();
+  }
+  // Kern: erst Geräte-Bilder ins Depot, dann listings.js schreiben. Gibt ein Promise zurück.
+  function publishListings(token) {
+    var imgPaths = Object.keys(UPLOADS);
+    var chain = Promise.resolve();
+    imgPaths.forEach(function (p) { chain = chain.then(function () { return commitImage(p, UPLOADS[p], token); }); });
+    return chain.then(function () { return commitText("assets/config/listings.js", serialize(), token); })
+      .then(function () { UPLOADS = {}; dirty = false; markDirty(); return true; });
+  }
   function publish() {
-    var tokenEl = panel.querySelector("[data-f=token]");
-    var token = tokenEl ? tokenEl.value.trim() : getToken();
-    if (!token) { toast(T("need_token"), false); if (tokenEl) tokenEl.focus(); return; }
+    var token = currentToken();
+    if (!token) { toast(T("need_token"), false); var te = panel.querySelector("[data-f=token]"); if (te) te.focus(); return; }
     var remember = panel.querySelector("[data-f=remember]");
     setToken(token, !remember || remember.checked);
     if (!dirty && !Object.keys(UPLOADS).length) { toast(T("nothing")); return; }
     var btn = panel.querySelector("[data-role=publish]");
     if (btn) { btn.disabled = true; btn.textContent = T("publishing"); }
-    // erst Bilder ins Depot, dann listings.js
-    var imgPaths = Object.keys(UPLOADS);
-    var chain = Promise.resolve();
-    imgPaths.forEach(function (p) { chain = chain.then(function () { return commitImage(p, UPLOADS[p], token); }); });
-    chain.then(function () { return commitText("assets/config/listings.js", serialize(), token); })
-      .then(function () {
-        UPLOADS = {}; dirty = false; markDirty();
-        if (btn) { btn.disabled = false; btn.textContent = T("publish"); }
-        toast(T("published"));
-      })
-      .catch(function (err) {
-        if (btn) { btn.disabled = false; btn.textContent = T("publish"); }
-        toast(T("pub_err") + (err && err.message ? err.message : err), false);
-      });
+    publishListings(token)
+      .then(function () { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("published")); })
+      .catch(function (err) { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+  }
+
+  // Live-Eintrag zurückziehen: aus WORK entfernen + sofort veröffentlichen (mit Token).
+  function withdrawEntry(idx) {
+    if (!WORK[idx]) return;
+    if (!window.confirm(T("withdraw_confirm"))) return;
+    var token = currentToken();
+    if (!token) { toast(T("need_token"), false); return; }
+    setToken(token, true);
+    WORK.splice(idx, 1); dirty = true; window.FP_LISTINGS = WORK;
+    if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
+    if (editIdx === idx) clearForm();
+    toast(T("publishing"));
+    publishListings(token)
+      .then(function () { renderList(); markDirty(); toast(T("withdrawn")); })
+      .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+  }
+
+  /* --------------------------------------------- Warteschlange (Server-API) */
+  var QUEUE = [];
+  function srvKeyStored() { try { return localStorage.getItem(LS.srvKey) || ""; } catch (e) { return ""; } }
+  function srvKeyVal() { var el = panel && panel.querySelector("[data-f=srvkey]"); if (el && el.value.trim()) return el.value.trim(); return srvKeyStored(); }
+  function setSrvKey(v, remember) { try { if (remember && v) localStorage.setItem(LS.srvKey, v); else localStorage.removeItem(LS.srvKey); localStorage.setItem(LS.srvRemember, remember ? "1" : "0"); } catch (e) {} }
+  function apiGet(action, extra) {
+    var q = "?action=" + encodeURIComponent(action) + "&key=" + encodeURIComponent(srvKeyVal());
+    if (extra) Object.keys(extra).forEach(function (k) { q += "&" + encodeURIComponent(k) + "=" + encodeURIComponent(extra[k]); });
+    return fetch(API + q, { cache: "no-store" }).then(function (r) { return r.json(); });
+  }
+  function apiPost(action, bodyObj) {
+    var body = bodyObj || {}; body.key = srvKeyVal();
+    return fetch(API + "?action=" + encodeURIComponent(action), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+  }
+  function statusLabel(st) { return st === "geprueft" ? T("q_status_geprueft") : st === "verdacht" ? T("q_status_verdacht") : T("q_status_neu"); }
+  function statusClass(st) { return st === "geprueft" ? "is-geprueft" : st === "verdacht" ? "is-verdacht" : "is-neu"; }
+  function findQ(nummer) { for (var i = 0; i < QUEUE.length; i++) { if (String(QUEUE[i].nummer) === String(nummer)) return QUEUE[i]; } return null; }
+  function pad4(n) { return ("000" + n).slice(-4); }
+  function entryFromRec(it) {
+    var tags = Array.isArray(it.tags) ? it.tags.slice() : [];
+    return {
+      label: String(it.label || "").trim(),
+      text: buildText(it.text, tags, it.mycel === true),
+      by: (String(it.by || "").trim() || T("by_default")),
+      url: String(it.url || "").trim(),
+      img: safeImg(it.img),
+      category: String(it.category || "").trim(),
+      tags: tags, mycel: it.mycel === true,
+      anchorId: "markt-" + slugify(it.label) + "-" + it.nummer
+    };
+  }
+  function fetchQueue() {
+    if (!API) { toast(T("q_noapi"), false); return; }
+    var box = panel.querySelector("[data-role=queue]"); if (box) box.innerHTML = '<div class="fpst-qempty">' + esc(T("q_loading")) + '</div>';
+    var rem = panel.querySelector("[data-f=srvremember]");
+    setSrvKey(srvKeyVal(), !rem || rem.checked);
+    apiGet("list").then(function (j) {
+      if (!j || !j.ok) throw new Error((j && j.error) || "?");
+      QUEUE = j.items || []; renderQueue();
+    }).catch(function (err) { toast(T("q_err") + (err && err.message ? err.message : err), false); if (box) box.innerHTML = ""; });
+  }
+  function renderQueue() {
+    var box = panel.querySelector("[data-role=queue]"); if (!box) return;
+    if (!QUEUE.length) { box.innerHTML = '<div class="fpst-qempty">' + esc(T("q_none")) + '</div>'; return; }
+    box.innerHTML = QUEUE.map(function (it) {
+      return '<div class="fpst-qitem ' + statusClass(it.status) + '">' +
+        '<img src="' + esc(safeImg(it.img) || "") + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+        '<div class="fpst-qbody"><div class="fpst-qtop"><span class="fpst-qnum">FP-' + esc(pad4(it.nummer)) + '</span> <span class="fpst-qstatus">' + esc(statusLabel(it.status)) + '</span></div>' +
+        '<b>' + esc(it.label) + '</b><small>' + esc((it.text || "").slice(0, 100)) + '</small>' +
+        '<div class="fpst-qact">' +
+          '<a href="' + esc(safeUrl(it.url) || "#") + '" target="_blank" rel="noopener" class="fpst-qbtn">' + esc(T("q_open")) + '</a>' +
+          '<button data-qtake="' + esc(it.nummer) + '" class="fpst-qbtn">' + esc(T("q_take")) + '</button>' +
+          '<button data-qcheck="' + esc(it.nummer) + '" class="fpst-qbtn">' + esc(T("q_checked")) + '</button>' +
+          '<button data-qok="' + esc(it.nummer) + '" class="fpst-qbtn fpst-qbtn--go">' + esc(T("q_approve")) + '</button>' +
+          '<button data-qno="' + esc(it.nummer) + '" class="fpst-qbtn fpst-danger">' + esc(T("q_reject")) + '</button>' +
+        '</div></div></div>';
+    }).join("") + '<div class="fpst-qfoot"><button data-role="qall" class="fpst-btn">' + esc(T("q_approveall")) + '</button></div>';
+  }
+  function queueTakeOver(nummer) {
+    var it = findQ(nummer); if (!it) return;
+    _pendingImg = null; editIdx = -1;
+    panel.querySelector("[data-f=label]").value = it.label || "";
+    panel.querySelector("[data-f=desc]").value = it.text || "";
+    panel.querySelector("[data-f=url]").value = it.url || "";
+    panel.querySelector("[data-f=imgurl]").value = safeImg(it.img) || "";
+    panel.querySelector("[data-f=cat]").value = it.category || "";
+    panel.querySelector("[data-f=tags]").value = (Array.isArray(it.tags) ? it.tags : []).join(", ");
+    panel.querySelector("[data-f=by]").value = it.by || "";
+    panel.querySelector("[data-f=mycel]").checked = it.mycel === true;
+    setImgPreview(safeImg(it.img));
+    panel.querySelector("[data-role=addbtn]").textContent = T("add_btn");
+    panel.querySelector("[data-role=cancel]").style.display = "";
+    panel.querySelector("[data-role=form]").scrollIntoView({ behavior: "smooth", block: "start" });
+    toast(T("q_take"));
+  }
+  function queueSetStatus(nummer, status) {
+    apiPost("setstatus", { nummer: nummer, status: status }).then(function (j) {
+      if (!j || !j.ok) throw new Error((j && j.error) || "?");
+      var it = findQ(nummer); if (it) it.status = status; renderQueue();
+    }).catch(function (err) { toast(T("q_err") + (err && err.message ? err.message : err), false); });
+  }
+  function queueApprove(nummer) {
+    var it = findQ(nummer); if (!it) return;
+    var token = currentToken(); if (!token) { toast(T("need_token"), false); return; }
+    var entry = entryFromRec(it);
+    if (!entry.label || !entry.text || !safeUrl(entry.url)) { toast(T("need_name"), false); return; }
+    if (!entry.img) { toast(T("bad_img"), false); return; }
+    setToken(token, true);
+    WORK.push(entry); dirty = true; window.FP_LISTINGS = WORK;
+    if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
+    toast(T("publishing"));
+    publishListings(token)
+      .then(function () { return apiPost("done", { nummer: nummer, mode: "freigegeben" }); })
+      .then(function () { QUEUE = QUEUE.filter(function (x) { return String(x.nummer) !== String(nummer); }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
+      .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+  }
+  function queueReject(nummer) {
+    if (!window.confirm(T("q_reject_confirm"))) return;
+    apiPost("done", { nummer: nummer, mode: "verworfen" }).then(function (j) {
+      if (!j || !j.ok) throw new Error((j && j.error) || "?");
+      QUEUE = QUEUE.filter(function (x) { return String(x.nummer) !== String(nummer); }); renderQueue(); toast(T("q_rejected"));
+    }).catch(function (err) { toast(T("q_err") + (err && err.message ? err.message : err), false); });
+  }
+  function approveAllChecked() {
+    var checked = QUEUE.filter(function (it) { return it.status === "geprueft"; });
+    if (!checked.length) { toast(T("q_none")); return; }
+    var token = currentToken(); if (!token) { toast(T("need_token"), false); return; }
+    var good = [];
+    checked.forEach(function (it) { var e = entryFromRec(it); if (e.label && e.text && safeUrl(e.url) && e.img) { WORK.push(e); good.push(it.nummer); } });
+    if (!good.length) { toast(T("bad_img"), false); return; }
+    dirty = true; window.FP_LISTINGS = WORK; if (window.FP_MARKT && FP_MARKT.rerender) FP_MARKT.rerender();
+    setToken(token, true); toast(T("publishing"));
+    publishListings(token)
+      .then(function () { return Promise.all(good.map(function (n) { return apiPost("done", { nummer: n, mode: "freigegeben" }); })); })
+      .then(function () { QUEUE = QUEUE.filter(function (x) { return good.indexOf(x.nummer) < 0; }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
+      .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
   }
 
   function openPanel() {
@@ -363,6 +532,7 @@
     panel = document.createElement("div");
     panel.className = "fpst-modal";
     var remembered = false; try { remembered = localStorage.getItem(LS.remember) !== "0"; } catch (e) {}
+    var srvRemembered = false; try { srvRemembered = localStorage.getItem(LS.srvRemember) !== "0"; } catch (e) {}
     panel.innerHTML =
       '<div class="fpst-box" role="dialog" aria-modal="true">' +
         '<div class="fpst-head"><b>' + esc(T("title")) + ' <span data-role="dirty" class="fpst-dirty"></span></b>' +
@@ -375,6 +545,16 @@
           '<small>' + esc(T("tokenHint")) + '</small>' +
           '<a class="fpst-tokenlink" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">' + esc(T("tokenLink")) + '</a>' +
           '<details class="fpst-help"><summary>' + esc(T("tokenHelp")) + '</summary><p>' + esc(T("tokenHelpText")) + '</p></details>' +
+        '</div>' +
+        '<div class="fpst-queue">' +
+          '<h4>' + esc(T("q_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("q_intro")) + '</p>' +
+          '<label>' + esc(T("q_key")) +
+            '<input type="password" data-f="srvkey" autocomplete="off" value="' + esc(srvKeyStored()) + '"></label>' +
+          '<label class="fpst-chk"><input type="checkbox" data-f="srvremember"' + (srvRemembered ? " checked" : "") + '> ' + esc(T("q_remember")) + '</label>' +
+          '<small>' + esc(T("q_key_hint")) + '</small>' +
+          '<div class="fpst-qbtnrow"><button type="button" data-role="qfetch" class="fpst-btn">' + esc(T("q_fetch")) + '</button></div>' +
+          '<div class="fpst-qlist" data-role="queue"></div>' +
         '</div>' +
         '<div class="fpst-form" data-role="form">' +
           '<h4>' + esc(T("add_h")) + '</h4>' +
@@ -427,7 +607,18 @@
     });
     panel.querySelector("[data-role=list]").addEventListener("click", function (e) {
       var ed = e.target.closest("[data-edit]"); if (ed) { editEntry(+ed.getAttribute("data-edit")); return; }
+      var wd = e.target.closest("[data-withdraw]"); if (wd) { withdrawEntry(+wd.getAttribute("data-withdraw")); return; }
       var dl = e.target.closest("[data-del]"); if (dl) { delEntry(+dl.getAttribute("data-del")); return; }
+    });
+    var qf = panel.querySelector("[data-role=qfetch]"); if (qf) qf.addEventListener("click", fetchQueue);
+    var qbox = panel.querySelector("[data-role=queue]");
+    if (qbox) qbox.addEventListener("click", function (e) {
+      var t;
+      if ((t = e.target.closest("[data-qtake]"))) { queueTakeOver(t.getAttribute("data-qtake")); return; }
+      if ((t = e.target.closest("[data-qcheck]"))) { queueSetStatus(t.getAttribute("data-qcheck"), "geprueft"); return; }
+      if ((t = e.target.closest("[data-qok]"))) { queueApprove(t.getAttribute("data-qok")); return; }
+      if ((t = e.target.closest("[data-qno]"))) { queueReject(t.getAttribute("data-qno")); return; }
+      if (e.target.closest("[data-role=qall]")) { approveAllChecked(); return; }
     });
     renderList(); markDirty();
   }
@@ -470,7 +661,23 @@
       ".fpst-item img{width:40px;height:40px;border-radius:7px;object-fit:cover;background:#0e1119;flex:none}" +
       ".fpst-item__b{flex:1;min-width:0}.fpst-item__b b{font-size:.9rem}.fpst-item__b small{display:block;opacity:.6;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
       ".fpst-item__a{display:flex;gap:6px;flex:none}.fpst-item__a button{font-size:.78rem;border-radius:7px;padding:5px 8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#eef1f7;cursor:pointer}" +
-      ".fpst-own{font-size:.68rem;background:rgba(120,160,255,.25);border-radius:5px;padding:1px 5px}.fpst-myc{font-size:.8rem}";
+      ".fpst-own{font-size:.68rem;background:rgba(120,160,255,.25);border-radius:5px;padding:1px 5px}.fpst-myc{font-size:.8rem}" +
+      ".fpst-queue{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
+      ".fpst-qintro{opacity:.8;font-size:.82rem;margin:.2rem 0 .4rem}" +
+      ".fpst-qbtnrow{margin:.6rem 0}" +
+      ".fpst-qlist{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto}" +
+      ".fpst-qempty{opacity:.6;font-size:.85rem;padding:8px 2px}" +
+      ".fpst-qitem{display:flex;gap:10px;border:1px solid rgba(255,255,255,.1);border-left-width:3px;border-radius:10px;padding:8px}" +
+      ".fpst-qitem.is-neu{border-left-color:#ffcf6b}.fpst-qitem.is-geprueft{border-left-color:#6aa0ff}.fpst-qitem.is-verdacht{border-left-color:#ff8080}" +
+      ".fpst-qitem>img{width:44px;height:44px;border-radius:7px;object-fit:cover;background:#0e1119;flex:none}" +
+      ".fpst-qbody{flex:1;min-width:0}.fpst-qbody b{font-size:.9rem;display:block}.fpst-qbody small{display:block;opacity:.65;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+      ".fpst-qtop{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px}" +
+      ".fpst-qnum{font:600 .72rem ui-monospace,monospace;background:rgba(255,255,255,.08);border-radius:5px;padding:1px 6px}" +
+      ".fpst-qstatus{font-size:.72rem;opacity:.85}" +
+      ".fpst-qact{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}" +
+      ".fpst-qbtn{font-size:.76rem;border-radius:7px;padding:5px 9px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#eef1f7;cursor:pointer;text-decoration:none;display:inline-block}" +
+      ".fpst-qbtn:hover{border-color:rgba(255,255,255,.5)}.fpst-qbtn.fpst-qbtn--go{background:linear-gradient(180deg,#5fce8f,#2f9d64);border-color:transparent;color:#08160e}" +
+      ".fpst-qfoot{margin-top:8px}";
     document.head.appendChild(s);
   }
 
@@ -486,6 +693,7 @@
   // öffentliche Testfläche (headless-Smoke) — harmlos in Produktion
   window.FPStudio = {
     _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64, apiUrl: apiUrl,
+          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, pad4: pad4,
           setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; }, MARKER: MARKER, CFG: CFG },
     open: function () { document.body.classList.add("fpstudio"); openPanel(); },
     close: exitStudio
