@@ -8,8 +8,29 @@
 family-projekt.de {
 	root * /srv/family-project
 	encode zstd gzip
-	file_server
-	try_files {path} {path}/ /index.html
+
+	# ── /server/ sperren — WICHTIG, nicht entfernen ──────────────────────
+	# Diese Caddy führt KEIN PHP aus (kein php_fastcgi in diesem Block).
+	# Ohne die Sperre liefert der file_server jede Datei unter /server/ als
+	# KLARTEXT aus — also den Quelltext von freigabe.php, einreichung.php,
+	# marktplatz-api.php und, sobald sie dort angelegt wird, die echte
+	# freigabe-config.php MIT dem GitHub-Token.
+	#
+	# Das `server/.htaccess` im Repo schützt hier NICHT: .htaccess ist eine
+	# Apache-Datei und wird von Caddy ignoriert. Es bleibt im Repo, weil die
+	# PHP-Endpunkte auf dem separaten Hetzner-Webhosting (Apache) laufen —
+	# dort greift es. Auf DIESER Maschine ist der handle-Block der Schutz.
+	handle /server/* {
+		respond 404
+	}
+
+	# Alles Übrige normal ausliefern (bisheriges Verhalten, unverändert).
+	# handle-Blöcke greifen in der Reihenfolge, in der sie hier stehen, und
+	# schließen sich gegenseitig aus — deshalb steht die Sperre oben.
+	handle {
+		try_files {path} {path}/ /index.html
+		file_server
+	}
 
 	# OPTIONAL (empfohlen, nicht nötig): Das Embedding-Modell unter /models/…
 	# echt ausliefern und bei fehlender Datei mit 404 antworten — statt (wie
@@ -17,8 +38,9 @@ family-projekt.de {
 	# Modell-Bibliothek im Browser die HTML-Startseite als JSON lesen
 	# („Unexpected token '<'“). Die App fängt diesen Fall inzwischen selbst ab
 	# (Body-Probe in sbkim/03_embedding.js) — diese Zeilen sind reine
-	# Zusatz-Härtung. Zum Aktivieren einkommentieren (handle-Blöcke haben
-	# Vorrang vor dem globalen try_files):
+	# Zusatz-Härtung. Zum Aktivieren einkommentieren UND nach oben
+	# verschieben: der Block muss VOR dem `handle { … }`-Auffangblock
+	# stehen, sonst greift er nie (handle-Blöcke schließen sich aus).
 	# handle /models/* {
 	# 	file_server
 	# }

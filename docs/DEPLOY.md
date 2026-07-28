@@ -49,8 +49,17 @@ Kern-Block (Auto-TLS via Let's Encrypt, statisches Ausliefern):
 family-projekt.de, www.family-projekt.de {
     root * /srv/family-project
     encode zstd gzip
-    file_server
-    try_files {path} {path}/ /index.html
+
+    # /server/ sperren — NICHT weglassen (siehe § Warum die Sperre nötig ist)
+    handle /server/* {
+        respond 404
+    }
+
+    handle {
+        try_files {path} {path}/ /index.html
+        file_server
+    }
+
     # Korrekte MIME-Typen (ältere Caddy)
     @js path *.js
     header @js Content-Type "text/javascript; charset=utf-8"
@@ -65,6 +74,26 @@ family-projekt.com, www.family-projekt.com {
 > Willst du `.de` und `.com` **beide** gleichwertig ausliefern statt umzuleiten,
 > nimm denselben `root … file_server`-Block für beide Domänen. Empfehlung: eine
 > kanonische Adresse (besser für Suchmaschinen) → umleiten.
+
+### Warum die `/server/`-Sperre nötig ist (nicht weglassen)
+
+Diese Caddy führt **kein PHP aus** — es gibt keinen `php_fastcgi`-Block. Der
+`file_server` liefert eine `.php`-Datei deshalb **als Klartext** aus, statt sie
+auszuführen. `/srv/family-project` ist ein `git clone` des Repos, also liegen
+dort `server/freigabe.php`, `server/einreichung.php`, `server/marktplatz-api.php`
+und `server/freigabe-config.example.php` — ihr Quelltext wäre ohne die Sperre
+öffentlich lesbar. Legt jemand dort zusätzlich die **echte**
+`server/freigabe-config.php` an, stünde der **GitHub-Token im Klartext** im Netz.
+
+`server/.htaccess` schützt hier **nicht**: `.htaccess` ist eine Apache-Datei und
+wird von Caddy ignoriert. Sie bleibt im Repo, weil die PHP-Endpunkte auf dem
+separaten **Hetzner-Webhosting (Apache)** laufen — dort greift sie. Auf der
+Caddy-Maschine ist der `handle /server/*`-Block der Schutz.
+
+Bis zur Sperre war der Token nur deshalb nicht sichtbar, weil die echte
+`freigabe-config.php` auf dem Server gar nicht existiert (sie steht in
+`.gitignore` und kommt durch keinen `git pull` mit) — der `try_files`-Auffang
+lieferte stattdessen die Startseite aus. Das ist Zufall, kein Schutz.
 
 ---
 
@@ -83,6 +112,18 @@ Prüfen:
 curl -I https://family-projekt.de            # 200 + text/html
 curl -I https://family-projekt.de/assets/app.js   # 200 + text/javascript
 ```
+
+**Sperre nachweisen** (muss jeweils `404` liefern — nicht `200`):
+
+```bash
+curl -I https://family-projekt.de/server/freigabe-config.php
+curl -I https://family-projekt.de/server/freigabe-config.example.php
+curl -I https://family-projekt.de/server/freigabe.php
+```
+
+Im Browser sind dieselben drei Adressen der Test ohne Terminal: es darf **weder**
+PHP-Quelltext **noch** die Startseite erscheinen, sondern nur eine leere
+404-Seite.
 
 Dann im Chrome `https://family-projekt.de` öffnen — Startseite, three.js-
 Hintergrund, Themen, Suche, drei Räume.
