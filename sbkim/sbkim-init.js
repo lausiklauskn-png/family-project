@@ -680,7 +680,9 @@
         nodeName: displayNodeName(FP_NODE_NAME),
         dbSuffix: FP.dbSuffix,
         createIdentity: fpCreateIdentityShared,
-        ensureIdentity: true,
+        // ensureIdentity ABSICHTLICH NICHT (Stufe 0b, 2026-07-30): keine wortlose
+        // Neu-Anlage beim Seiten-Start — die Kennung entsteht nur auf ausdrueckliche
+        // Nutzer-Entscheidung im Netz-Panel (neu anlegen ODER Sicherung einspielen).
       });
     } catch (e) { console.warn("[FP-SBKIM] Rendezvous Modus A übersprungen:", e); }
     if (!window.SbkimRendezvousUI) { console.warn("[FP-SBKIM] SbkimRendezvousUI (sbkim/23_rendezvous_ui.js) nicht geladen."); return; }
