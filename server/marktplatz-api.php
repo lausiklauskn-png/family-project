@@ -143,6 +143,37 @@ if ($action === 'commit_listings') {
   out($ok ? array('ok' => true, 'info' => $info) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);
 }
 
+/* ============================ commit_vectors (Katalog-Spore Stufe 1) ============================ */
+/*
+ * Schwester von commit_listings, aber mit einem ANDEREN Schutz: dort genügt der
+ * Blick auf "window.FP_LISTINGS", weil eine JS-Datei ankommt. Hier kommt JSON,
+ * und ein leeres oder kaputtes Paket wäre besonders tückisch — die Leseseite in
+ * markt.html ist fail-soft und würde es klaglos schlucken, nur eben ohne Nutzen.
+ * Der Fehler fiele niemandem auf. Darum wird hier wirklich geprüft:
+ *   - gültiges JSON,
+ *   - ein Objekt "vectors" mit mindestens einem Eintrag,
+ *   - "model" gesetzt (ohne Kennung verwirft die Leseseite später nichts mehr,
+ *     auch wenn das Modell wechselt — der Wächter wäre still ausgehebelt).
+ * Ziel-Pfad ist frei konfigurierbar, mit sinnvollem Standard: eine bestehende
+ * freigabe-config.php funktioniert dadurch unverändert weiter.
+ */
+if ($action === 'commit_vectors') {
+  require_key($STUDIO_KEY, $B);
+  $content = (string) req($B, 'content', '');
+  $pack = json_decode($content, true);
+  if (!is_array($pack)) out(array('ok' => false, 'error' => 'content_not_json'), 422);
+  if (!isset($pack['vectors']) || !is_array($pack['vectors']) || count($pack['vectors']) === 0) {
+    out(array('ok' => false, 'error' => 'vectors_empty'), 422);
+  }
+  if (!isset($pack['model']) || !is_string($pack['model']) || $pack['model'] === '') {
+    out(array('ok' => false, 'error' => 'model_missing'), 422);
+  }
+  $vecPath = isset($CFG['vectors_path']) && $CFG['vectors_path'] !== ''
+    ? (string) $CFG['vectors_path'] : 'assets/config/listings-vec.json';
+  list($ok, $info) = gh_put_file($CFG, $vecPath, base64_encode($content), 'Studio: Marktplatz-Vektoren aktualisiert');
+  out($ok ? array('ok' => true, 'info' => $info, 'count' => count($pack['vectors'])) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);
+}
+
 /* ============================ commit_image (Bild ins Depot) ============================ */
 if ($action === 'commit_image') {
   require_key($STUDIO_KEY, $B);
