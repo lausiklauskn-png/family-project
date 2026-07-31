@@ -4,6 +4,13 @@
  *   install: Link/Hinweis zum Installieren (leer = nur öffnen)
  * Schema: { id, name, icon, de, en, page, open, install } */
 window.FP_WERKZEUGE = [
+  { id: "box", name: "Mycel-Geschenkbox", icon: "🎁",
+    badge: { kind: "node", de: "⭐ alle SBKIM-Werkzeuge · downloaden & installieren", en: "⭐ all SBKIM tools · download & install" },
+    de: "Die Geschenkbox: alle SBKIM-Bausteine fertig zum Auspacken — Verbinden, Siegel, Schutz, Andock-Wizard, Safe, Suche. Vier Wege sie zu holen, nach Können sortiert (vom KI-Einbau bis zum Ein-Befehl-Installer).",
+    en: "The gift box: all SBKIM blocks ready to unpack — connect, seal, protection, docking wizard, safe, search. Four routes to get it, sorted by skill (from AI install to a one-command installer).",
+    page: "werkzeuge/geschenkbox.html",
+    open: "werkzeuge/geschenkbox.html",
+    install: "" },
   { id: "such", name: "Such-Werkzeug", icon: "🔍", iconImg: "assets/appicons/such.png",
     badge: { kind: "app", de: "PWA-App · zum Installieren", en: "PWA app · to install" },
     de: "Findet nach Bedeutung statt nach Stichwörtern — komplett im Browser, ohne Server, ohne Konto. Die reine App zum Installieren (ohne Netz-Anmeldung).",
@@ -22,12 +29,6 @@ window.FP_WERKZEUGE = [
     en: "Step 2 — for developers: build the open SBKIM blocks into your own PWA file by file (identity, handshake, status, seal).",
     page: "werkzeuge/knoten-werkzeug.html",
     open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/web/tools/mycelknoten.html",
-    install: "" },
-  { id: "box", name: "SBKIM-Box holen", icon: "🎁",
-    de: "Die fertige Voll-Box (Verbinden + Siegel + Schutz + Suche) in deine eigene App holen — vier Wege nach Können sortiert, vom KI-Einbau bis zum Ein-Befehl-Installer.",
-    en: "Get the ready full box (connect + seal + protection + search) into your own app — four routes sorted by skill, from AI install to a one-command installer.",
-    page: "werkzeuge/box-holen.html",
-    open: "werkzeuge/box-holen.html",
     install: "" },
 
   /* Klaus' EIGENE, öffentliche Apps (2026-06-27 freigeschaltet). external:true →
