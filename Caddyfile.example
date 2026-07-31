@@ -51,7 +51,24 @@ family-projekt.de {
 
 	# Lange Cache-Zeit für statische Assets (schnellere Seite = besseres Ranking).
 	# HTML bleibt kurz, damit Änderungen schnell sichtbar werden.
-	@assets path *.css *.js *.png *.svg *.woff2 *.webp
+	#
+	# AUSGENOMMEN: /assets/config/*. Das sind DATEN-Dateien, keine Programm-
+	# Dateien — das Marktplatz-Studio schreibt sie jederzeit neu, ohne Deploy.
+	# Ein `?v=NN` im HTML hilft dagegen NICHT: die Zahl steigt nur beim Deploy,
+	# das Studio ändert die Datei zwischendurch. Sieben Tage Cache heißt hier
+	# also: eine freigegebene App erscheint bis zu eine Woche lang nicht.
+	#
+	# Gemessener Befund 2026-08-01: Klaus' Browser hielt eine listings.js vom
+	# 26.07. fest, während die Seite live die Texte vom 31.07. zeigte. Beim
+	# Vektor-Bau passten deshalb 10 von 14 Hashes nicht. Nichts stürzte ab, der
+	# Hash-Wächter verwarf still und rechnete nach — es funktionierte alles und
+	# brachte nichts. Genau diese Sorte Fehler findet man sonst nie.
+	@config path /assets/config/*
+	header @config Cache-Control "public, max-age=300, must-revalidate"
+	@assets {
+		path *.css *.js *.png *.svg *.woff2 *.webp
+		not path /assets/config/*
+	}
 	header @assets Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
 	@html path *.html /
 	header @html Cache-Control "public, max-age=300, must-revalidate"
