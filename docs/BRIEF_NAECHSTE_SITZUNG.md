@@ -144,7 +144,28 @@ sortiert hat nie etwas.)*
 
 `tests/smoke_studio_vectors.mjs` steht bei **26/26**, mit zwei neuen Gegenproben belegt:
 Balken ausgebaut → (14)(15)(16) rot; frisches Holen ausgebaut → (20)(21) rot.
-Cache-Version **v72**.
+Cache-Version **v73**.
+
+### Nachtrag: die Stand-Anzeige
+
+Klaus' zweiter Befund am selben Abend: *„Ich sehe noch keine Bestätigung, dass das
+aktualisiert wurde."* Er hatte recht — die Erfolgsmeldung verschwand nach 2,6 s als Toast.
+
+Die halbe Antwort wäre gewesen, sie stehen zu lassen. Eine Meldung sagt aber nur „ich habe
+etwas geschickt", nicht „es passt" — genau daran war der erste Lauf gescheitert. Also
+**misst** die Anzeige jetzt: sie holt die veröffentlichte Vektor-Datei UND die
+veröffentlichten Einträge und rechnet dieselbe Prüfung wie die Leseseite. Ergebnis steht
+sichtbar im Panel („Alles abgedeckt: 14 von 14 · gebaut am … · Modell …"), dazu ein Knopf
+„Stand prüfen" (Pages braucht ~1 Minute) und ein Knopf „📄 Bericht (PDF)" — über
+`window.print()`, **ohne PDF-Bibliothek**, damit die Offline-Regel unberührt bleibt.
+
+`smoke_studio_vectors.mjs` **33/33**. Gegenprobe: Anzeige auf reines Zählen zurückgebaut →
+behauptete „14/14" bei veraltetem Paket, (20)(21) rot.
+
+**Test-Falle, die hier Zeit gekostet hat:** Playwright-Globs vergleichen die **ganze**
+Adresse samt Query. `"**/…/listings-vec.json"` greift nicht, wenn der Code `?ts=…` anhängt
+— der Test bekam die echte Repo-Datei und maß etwas anderes, als er glaubte. Ein Stern am
+Ende behebt es.
 
 ---
 
