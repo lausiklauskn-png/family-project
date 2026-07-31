@@ -240,6 +240,19 @@
         mk_verkauf: "Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store oder dein eigenes Konto. Wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.",
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ zur Seite des Anbieters", search_btn: "Suchen",
+        mk_rep_t: "Diesen Eintrag melden",
+        mk_rep_h: "Eintrag melden",
+        mk_rep_sub: "Stimmt etwas nicht mit diesem Eintrag? Sag uns kurz Bescheid. Es geht um:",
+        mk_rep_r_broken: "Die Seite ist nicht erreichbar oder kaputt.",
+        mk_rep_r_mismatch: "Die Seite passt nicht zur Beschreibung.",
+        mk_rep_r_illegal: "Unerwünschte, gefährliche oder rechtswidrige Inhalte.",
+        mk_rep_r_other: "Etwas anderes.",
+        mk_rep_ph: "Was genau ist dir aufgefallen? (freiwillig)",
+        mk_rep_send: "Meldung senden", mk_rep_cancel: "Abbrechen",
+        mk_rep_sending: "Wird gesendet …",
+        mk_rep_ok: "✓ Danke! Wir sehen uns den Eintrag an.",
+        mk_rep_err: "Senden hat nicht geklappt. Bitte schreib uns direkt an info@family-projekt.de.",
+        mk_rep_setup: "Dein E-Mail-Programm öffnet sich mit der fertigen Meldung …",
         sp_h: "Family Projekt unterstützen",
         sp_sub: "Family Projekt ist frei und werbefrei, ein privates Hobby-Projekt, kein Geschäft. Wer mag, kann es mit einer freiwilligen Spende unterstützen und hilft, die laufenden Kosten zu tragen.",
         sp_note: "Die Unterstützung erfolgt freiwillig und ohne Gegenleistung. Sie begründet keinen Anspruch auf Funktionen, Updates oder Support und ist keine Garantie. Es ist eine private Spende, kein Kauf. Vielen Dank!",
@@ -292,6 +305,19 @@
         mk_verkauf: "Family Projekt is a showcase, not a payment service. You sell your app through your own store or your own account. We only list and link, no commission, no payment handling.",
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ to the provider's site", search_btn: "Search",
+        mk_rep_t: "Report this entry",
+        mk_rep_h: "Report entry",
+        mk_rep_sub: "Something wrong with this entry? Tell us briefly. It is about:",
+        mk_rep_r_broken: "The site is unreachable or broken.",
+        mk_rep_r_mismatch: "The site does not match its description.",
+        mk_rep_r_illegal: "Unwanted, dangerous or unlawful content.",
+        mk_rep_r_other: "Something else.",
+        mk_rep_ph: "What exactly did you notice? (optional)",
+        mk_rep_send: "Send report", mk_rep_cancel: "Cancel",
+        mk_rep_sending: "Sending …",
+        mk_rep_ok: "✓ Thanks! We will look at the entry.",
+        mk_rep_err: "Sending failed. Please email us directly at info@family-projekt.de.",
+        mk_rep_setup: "Your email app opens with the report ready to send …",
         sp_h: "Support Family Projekt",
         sp_sub: "Family Projekt is free and ad-free, a private hobby project, not a business. If you like, you can support it with a voluntary donation and help cover the running costs.",
         sp_note: "Support is voluntary and given without any return. It does not entitle you to features, updates or support and is no guarantee. It is a private donation, not a purchase. Thank you!",
@@ -331,7 +357,11 @@
           '<div class="body"><h3>' + esc(x.label) + '</h3>' +
           (x.by ? '<p class="by">' + esc(x.by) + '</p>' : '') +
           '<p>' + esc((x.text || "").slice(0, 160)) + '</p>' +
-          (url ? '<a class="btn ghost ext" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(FP.t("mk_open")) + '</a>' : '') +
+          '<div class="listing-foot">' +
+            (url ? '<a class="btn ghost ext" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(FP.t("mk_open")) + '</a>' : '<span></span>') +
+            '<button type="button" class="mk-report" data-id="' + esc(x.anchorId || "") + '" data-label="' + esc(x.label || "") +
+              '" title="' + esc(FP.t("mk_rep_t")) + '" aria-label="' + esc(FP.t("mk_rep_t")) + '">⚠</button>' +
+          '</div>' +
           '</div></div>';
       }
       function render() {
@@ -539,6 +569,119 @@
         } catch (err) {
           out.textContent = T("ct_err");
         } finally { if (btn) btn.disabled = false; }
+      });
+
+      // ── Melde-Knopf an jeder Karte ──────────────────────────────────────
+      // Rechtlich der wichtigste Teil: Klaus haftet für einen fremden Link nicht
+      // automatisch, muss aber handeln, sobald er von etwas weiß. Jeder Besucher
+      // wird hier zum Wächter und deckt das Zeitfenster ab, in dem keine Automatik
+      // hinsieht. Läuft über denselben Formular-Endpunkt (zweck:"meldung");
+      // fail-soft ohne Endpunkt auf einen mailto-Vordruck.
+      var REPORT_REASONS = ["r_broken", "r_mismatch", "r_illegal", "r_other"];
+
+      function closeReport() {
+        var ov = document.getElementById("mkRepOv");
+        if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+      }
+
+      function openReport(id, label) {
+        var T = (window.FP && FP.t) ? FP.t : function (k) { return k; };
+        closeReport();
+        var ov = document.createElement("div");
+        ov.className = "mk-rep-ov";
+        ov.id = "mkRepOv";
+        ov.setAttribute("role", "dialog");
+        ov.setAttribute("aria-modal", "true");
+        var opts = REPORT_REASONS.map(function (k, i) {
+          return '<label class="opt"><input type="radio" name="mkRepReason" value="' + esc(k) + '"' +
+            (i === 0 ? " checked" : "") + '> <span>' + esc(T("mk_rep_" + k)) + "</span></label>";
+        }).join("");
+        ov.innerHTML =
+          '<div class="glass mk-rep-box">' +
+            "<h3>" + esc(T("mk_rep_h")) + "</h3>" +
+            '<p class="sub">' + esc(T("mk_rep_sub")) + " <b>" + esc(label || "") + "</b></p>" +
+            opts +
+            '<div class="field" style="margin-top:10px"><textarea id="mkRepMsg" maxlength="600" rows="3" placeholder="' +
+              esc(T("mk_rep_ph")) + '"></textarea></div>' +
+            '<div class="fp-hp" aria-hidden="true"><input id="mkRepHp" name="fp_hp_url" type="text" tabindex="-1" autocomplete="off"></div>' +
+            '<div class="mk-rep-actions">' +
+              '<button class="btn primary" type="button" id="mkRepSend">' + esc(T("mk_rep_send")) + "</button>" +
+              '<button class="btn" type="button" id="mkRepCancel">' + esc(T("mk_rep_cancel")) + "</button>" +
+            "</div>" +
+            '<pre id="mkRepOut" style="display:none;margin-top:10px"></pre>' +
+          "</div>";
+        document.body.appendChild(ov);
+        // Schließen: Klick daneben, Abbrechen, Escape.
+        ov.addEventListener("click", function (e) { if (e.target === ov) closeReport(); });
+        document.getElementById("mkRepCancel").addEventListener("click", closeReport);
+        var onEsc = function (e) {
+          if (e.key === "Escape") { closeReport(); document.removeEventListener("keydown", onEsc); }
+        };
+        document.addEventListener("keydown", onEsc);
+        document.getElementById("mkRepSend").addEventListener("click", function () {
+          sendReport(id, label, this);
+        });
+      }
+
+      async function sendReport(id, label, btn) {
+        var T = (window.FP && FP.t) ? FP.t : function (k) { return k; };
+        var out = document.getElementById("mkRepOut");
+        var sel = document.querySelector('input[name="mkRepReason"]:checked');
+        var reason = sel ? sel.value : "r_other";
+        var msg = (document.getElementById("mkRepMsg").value || "").trim();
+        var hp = ((document.getElementById("mkRepHp") || {}).value || "").trim();
+        out.style.display = "block";
+        if (hp) { out.textContent = T("mk_rep_ok"); return; }   // Honigtopf gefüllt = Bot
+        var endpoint = (window.FP_MARKT_SUBMIT_ENDPOINT || "").trim();
+        var betreff = "Marktplatz-Meldung: " + (label || id);
+        var klartext = T("mk_rep_" + reason);
+        if (!endpoint) {
+          // Kein Formular-Dienst gesetzt → mailto-Vordruck (fail-soft, nichts geht
+          // verloren). Über einen unsichtbaren Link statt location.href: das lässt
+          // die Seite stehen, falls kein Mail-Programm eingerichtet ist.
+          out.textContent = T("mk_rep_setup");
+          var a = document.createElement("a");
+          a.href = "mailto:info@family-projekt.de?subject=" + encodeURIComponent(betreff) +
+            "&body=" + encodeURIComponent("Eintrag: " + (label || "") + " (" + (id || "") + ")\n" +
+              "Grund: " + klartext + "\n\n" + msg);
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(function () { if (a.parentNode) a.parentNode.removeChild(a); }, 0);
+          return;
+        }
+        if (btn) btn.disabled = true;
+        out.textContent = T("mk_rep_sending");
+        try {
+          var res = await fetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+              zweck: "meldung",
+              _subject: betreff,
+              eintrag_id: id || "", eintrag: label || "",
+              grund: reason, grund_text: klartext, nachricht: msg,
+              fp_hp_url: hp, fp_elapsed: Date.now() - FP_T0
+            })
+          });
+          if (res && res.ok) {
+            out.textContent = T("mk_rep_ok");
+            setTimeout(closeReport, 2200);
+          } else {
+            out.textContent = T("mk_rep_err");
+          }
+        } catch (err) {
+          out.textContent = T("mk_rep_err");
+        } finally {
+          if (btn) btn.disabled = false;
+        }
+      }
+
+      // Ein Zuhörer für alle Karten (die Liste wird neu gezeichnet).
+      document.getElementById("mkListings").addEventListener("click", function (e) {
+        var b = e.target.closest ? e.target.closest(".mk-report") : null;
+        if (!b) return;
+        openReport(b.getAttribute("data-id") || "", b.getAttribute("data-label") || "");
       });
 
       // ── Bild-Feld: Live-Vorschau + „Bild vom Gerät wählen" ──────────────

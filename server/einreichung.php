@@ -115,9 +115,38 @@ foreach ($rate as $k => $ts) {
 
 // ── Spam-Schutz 4: Feld-Validierung nach Zweck ───────────────────────────
 $zweck = field($data, 'zweck', 20);
-if ($zweck !== 'kontakt') $zweck = 'eintrag';
+if ($zweck !== 'kontakt' && $zweck !== 'meldung') $zweck = 'eintrag';
 
-if ($zweck === 'eintrag') {
+if ($zweck === 'meldung') {
+  // Missbrauchs-Meldung zu einem gelisteten Eintrag (Melde-Knopf an jeder Karte).
+  // Bewusst OHNE Pflicht-E-Mail: wer etwas Gefährliches sieht, soll melden können,
+  // ohne sich auszuweisen. Sonst meldet niemand. Der Spam-Schutz oben (Honigtopf,
+  // Mindest-Ausfüllzeit, Rate-Limit, IP-Kürzel) greift trotzdem.
+  $rec = [
+    'zweck'      => 'meldung',
+    'label'      => field($data, 'eintrag', 80),
+    'entry_id'   => field($data, 'eintrag_id', 80),
+    'grund'      => field($data, 'grund', 20),
+    'grund_text' => field($data, 'grund_text', 160),
+    'text'       => field($data, 'nachricht', 600),
+  ];
+  if ($rec['label'] === '' && $rec['entry_id'] === '') out(400, ['ok' => false, 'error' => 'felder']);
+  $subject = 'Marktplatz-MELDUNG: ' . ($rec['label'] !== '' ? $rec['label'] : $rec['entry_id']);
+  $replyTo = '';
+  $bodyLines = [
+    'Meldung zu einem Marktplatz-Eintrag über family-projekt.de',
+    '',
+    'Eintrag:  ' . $rec['label'],
+    'Kennung:  ' . $rec['entry_id'],
+    'Grund:    ' . $rec['grund_text'] . ' (' . $rec['grund'] . ')',
+    '',
+    'Hinweis des Melders:',
+    ($rec['text'] !== '' ? $rec['text'] : '(kein Freitext)'),
+    '',
+    'Bitte zeitnah prüfen. Bei rechtswidrigen Inhalten den Eintrag unverzüglich entfernen',
+    '(Impressum § Haftungsausschluss/Links).',
+  ];
+} elseif ($zweck === 'eintrag') {
   $rec = [
     'zweck'        => 'eintrag',
     'label'        => field($data, 'app', 80),
@@ -180,7 +209,8 @@ $rec['status'] = 'neu';
 // ── Lokal an info@ mailen (gleiche Maschine → kein Reputations-Problem) ──
 $body = implode("\n", $bodyLines) . "\n\n— family-projekt.de (Zeitpunkt " . $rec['ts'] . " UTC)\n";
 $headers = 'From: Family Projekt <' . $CFG['mail_from'] . ">\r\n"
-         . 'Reply-To: ' . $replyTo . "\r\n"
+         // Meldungen kommen ohne Absender-Adresse: dann keinen leeren Reply-To setzen.
+         . ($replyTo !== '' ? 'Reply-To: ' . $replyTo . "\r\n" : '')
          . "Content-Type: text/plain; charset=UTF-8\r\n"
          . "MIME-Version: 1.0\r\n";
 $encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
