@@ -63,7 +63,12 @@ const browser = await chromium.launch({ executablePath: exe, args: ["--no-sandbo
 const DIM = 384;
 const MODEL = "Xenova/multilingual-e5-small";
 const API_URL = "https://beispiel.invalid/marktplatz-api.php";
-const VEC_PFAD = "**/assets/config/listings-vec.json";
+/* Der Stern am Ende ist Pflicht, nicht Zierde: Playwright-Globs vergleichen die
+ * GANZE Adresse samt Query. Das Studio haengt beim Pruefen ein `?ts=…` an
+ * (Cache-Umgehung) — ohne den Stern greift die Umleitung dort nicht, der Test
+ * bekommt die echte Datei aus dem Repo und misst etwas ganz anderes, als er
+ * glaubt. Genau das ist beim Bauen passiert. */
+const VEC_PFAD = "**/assets/config/listings-vec.json*";
 
 /* Setzt den Modell-Stub. Identisch zu smoke_markt_vecpack.mjs — mit Absicht:
  * beide Seiten müssen an DEMSELBEN Modell zusammenpassen, sonst prüft der
@@ -286,9 +291,98 @@ let paket = null;
     return ids.some((id) => pack.vectors[id].h === C.textHash("VERALTETER CACHE " + id));
   }, { pack: p2 || { vectors: {} }, ids: proben }).catch(() => false);
 
-  ok(proben.length > 0, `(19) Paket trotz veraltetem Browser-Stand gebaut (${proben.length} Vektoren)`);
-  ok(hashServer, "(20) Hashes stammen vom SERVER-Stand — der Knopf holt frisch, statt dem Cache zu glauben");
-  ok(!hashCache, "(21) kein einziger Hash stammt aus der veralteten Browser-Liste");
+  ok(proben.length > 0, `(26) Paket trotz veraltetem Browser-Stand gebaut (${proben.length} Vektoren)`);
+  ok(hashServer, "(27) Hashes stammen vom SERVER-Stand — der Knopf holt frisch, statt dem Cache zu glauben");
+  ok(!hashCache, "(28) kein einziger Hash stammt aus der veralteten Browser-Liste");
+  await ctx.close();
+}
+
+/* ═══ Teil A3 — sagt die Stand-Anzeige die Wahrheit? ═══
+ *
+ * Klaus 2026-08-01: „Ich sehe noch keine Bestätigung, dass das aktualisiert
+ * wurde." Eine Anzeige, die nur meldet „ich habe etwas geschickt", wäre die
+ * falsche Antwort — genau daran scheiterte der erste Lauf (14 gebaut, 4
+ * brauchbar, niemand merkte es). Die Anzeige muss den WAHREN Zustand messen.
+ *
+ * Drei Lagen, jede mit einem anderen richtigen Ergebnis. Die mittlere ist die
+ * wichtige: ein vollständig aussehendes, aber veraltetes Paket. Eine Anzeige,
+ * die dort „alles abgedeckt" behauptet, ist schlimmer als keine. */
+async function standMessen(page, paket) {
+  await page.route(VEC_PFAD, (route) => {
+    const headers = { "cache-control": "no-store" };
+    if (!paket) return route.fulfill({ status: 404, body: "404", headers });
+    route.fulfill({ status: 200, contentType: "application/json", headers, body: JSON.stringify(paket) });
+  });
+  return await page.evaluate(() => window.FPStudio._t.vecPruefe());
+}
+{
+  const ctx = await browser.newContext({ serviceWorkers: "block" });
+  const page = await ctx.newPage();
+  await ctx.addInitScript(() => { try { localStorage.setItem("fpstudio_srv_key", "test-passwort"); } catch (e) {} });
+  await page.goto(base + "/markt.html", { waitUntil: "load" });
+  await page.waitForTimeout(800);
+  await stubSetzen(page);
+  const studioSrc3 = fs.readFileSync(path.join(ROOT, "assets/studio-markt.js"), "utf8");
+  await page.evaluate(({ api, src }) => { window.FP_MARKT_API = api; (0, eval)(src); }, { api: API_URL, src: studioSrc3 });
+
+  // (a) gar kein Paket
+  let st = await standMessen(page, null);
+  ok(st && st.keinPaket === true, "(19) ohne Vektor-Datei: Anzeige sagt ehrlich „noch keine\u201c");
+  await page.unroute(VEC_PFAD);
+
+  // (b) VERALTETES Paket — sieht vollständig aus, passt aber nicht mehr.
+  // Das ist Klaus' Lage vom ersten Lauf, nachgestellt.
+  const veraltet = await page.evaluate(() => {
+    const C = window.FPVecCodec;
+    const out = { version: 1, model: "Xenova/multilingual-e5-small", dim: 384, quant: "int8-sym-b64", built: "2026-07-26", vectors: {} };
+    for (const x of (window.FP_LISTINGS || [])) {
+      if (!x || !x.anchorId) continue;
+      const p = C.encode(window.__vecFor(x.text || x.label));
+      p.h = C.textHash("SO STAND DER TEXT FRUEHER " + x.anchorId);   // Text hat sich seither geändert
+      out.vectors[x.anchorId] = p;
+    }
+    return out;
+  });
+  st = await standMessen(page, veraltet);
+  ok(st && st.gesamt > 0 && st.abgedeckt === 0,
+    `(20) veraltetes Paket wird als veraltet erkannt, nicht als „fertig\u201c (${st && st.abgedeckt}/${st && st.gesamt} abgedeckt)`);
+  ok(st && st.zeilen && st.zeilen.every((z) => z.lage === "stale"),
+    "(21) jede Zeile ist als „veraltet\u201c ausgewiesen, nicht als fehlend");
+  ok(st && st.gebaut === "2026-07-26", `(22) Bau-Datum aus dem Paket wird gezeigt (${st && st.gebaut})`);
+  await page.unroute(VEC_PFAD);
+
+  // (c) passendes Paket
+  const passend = await page.evaluate(() => {
+    const C = window.FPVecCodec;
+    const out = { version: 1, model: "Xenova/multilingual-e5-small", dim: 384, quant: "int8-sym-b64", built: "2026-08-01", vectors: {} };
+    for (const x of (window.FP_LISTINGS || [])) {
+      if (!x || !x.anchorId) continue;
+      const t = x.text || x.label;
+      const p = C.encode(window.__vecFor(t));
+      p.h = C.textHash(t);
+      out.vectors[x.anchorId] = p;
+    }
+    return out;
+  });
+  st = await standMessen(page, passend);
+  ok(st && st.abgedeckt === st.gesamt && st.gesamt > 0,
+    `(23) passendes Paket: alles abgedeckt (${st && st.abgedeckt}/${st && st.gesamt})`);
+
+  // Die Anzeige selbst — nicht nur die Rechnung dahinter.
+  await page.evaluate(() => window.FPStudio.open());
+  await page.waitForFunction(() => {
+    const b = document.querySelector("[data-role=vecstand]");
+    return b && /is-(ok|warn|err)/.test(b.className);
+  }, null, { timeout: 15000 }).catch(() => {});
+  const sicht = await page.evaluate(() => {
+    const b = document.querySelector("[data-role=vecstand]");
+    return { klasse: b ? b.className : "", text: b ? (b.textContent || "").trim() : "",
+             knopfPruefen: !!document.querySelector("[data-role=vecrecheck]"),
+             knopfBericht: !!document.querySelector("[data-role=vecreport]") };
+  });
+  ok(/is-ok/.test(sicht.klasse) && /\d+/.test(sicht.text),
+    `(24) Stand steht sichtbar im Panel, nicht nur als Toast („${sicht.text.slice(0, 60)}\u201c)`);
+  ok(sicht.knopfPruefen && sicht.knopfBericht, "(25) Knöpfe „Stand prüfen\u201c und „Bericht (PDF)\u201c vorhanden");
   await ctx.close();
 }
 
@@ -327,11 +421,11 @@ if (paket) {
   const ohne = await leseseite(null);          // Referenz: heutiger Weg
   const mit = await leseseite(paket);          // mit dem Paket aus dem Studio
   ok(mit.eingebettet === 0,
-    `(22) Rundlauf: Paket aus dem Studio → 0 Passagen live eingebettet (${mit.eingebettet} von ${ohne.eingebettet})`);
+    `(29) Rundlauf: Paket aus dem Studio → 0 Passagen live eingebettet (${mit.eingebettet} von ${ohne.eingebettet})`);
   ok(JSON.stringify(mit.reihenfolge) === JSON.stringify(ohne.reihenfolge),
-    "(23) Rundlauf: Reihenfolge identisch zur Live-Berechnung");
+    "(30) Rundlauf: Reihenfolge identisch zur Live-Berechnung");
 } else {
-  ok(false, "(22) Rundlauf nicht möglich — kein Paket gebaut");
+  ok(false, "(29) Rundlauf nicht möglich — kein Paket gebaut");
 }
 
 await browser.close(); server.close();
@@ -376,20 +470,20 @@ if (!phpDa) {
   } else {
     let r;
     r = await frage({ key: "falsch", content: '{"model":"m","vectors":{"a":{}}}' });
-    ok(r.code === 401 && r.j && r.j.error === "unauthorized", "(24) ohne richtiges Studio-Passwort: 401");
+    ok(r.code === 401 && r.j && r.j.error === "unauthorized", "(31) ohne richtiges Studio-Passwort: 401");
 
     r = await frage({ key: KEY, content: "das ist kein json" });
-    ok(r.code === 422 && r.j && r.j.error === "content_not_json", "(25) kaputtes JSON wird abgelehnt (422)");
+    ok(r.code === 422 && r.j && r.j.error === "content_not_json", "(32) kaputtes JSON wird abgelehnt (422)");
 
     r = await frage({ key: KEY, content: '{"model":"m","vectors":{}}' });
-    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(26) LEERES Paket wird abgelehnt — nie über die gute Datei schreiben");
+    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(33) LEERES Paket wird abgelehnt — nie über die gute Datei schreiben");
 
     r = await frage({ key: KEY, content: '{"model":"m"}' });
-    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(27) Paket ganz ohne vectors wird abgelehnt");
+    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(34) Paket ganz ohne vectors wird abgelehnt");
 
     r = await frage({ key: KEY, content: '{"vectors":{"a":{"s":1,"v":"AA"}}}' });
     ok(r.code === 422 && r.j && r.j.error === "model_missing",
-      "(28) ohne Modell-Kennung abgelehnt — sonst wäre der Modell-Wächter der Leseseite still ausgehebelt");
+      "(35) ohne Modell-Kennung abgelehnt — sonst wäre der Modell-Wächter der Leseseite still ausgehebelt");
   }
   php.kill();
   try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}

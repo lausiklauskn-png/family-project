@@ -56,10 +56,45 @@ wofür er gebaut wurde. Falsch sortiert hat nie etwas.)*
 Balken ausgebaut → (14)(15)(16) rot; frisches Holen ausgebaut → (20)(21) rot.
 Cache-Version **v72**.
 
+### Nachtrag am selben Abend: „Ich sehe noch keine Bestätigung"
+
+Klaus' nächster Befund, und er traf einen Fehler, den diese Sitzung selbst eingebaut hatte:
+nach dem Erfolg wurde der Status-Bereich **geleert** und blieb nur ein Toast, der nach
+2,6 s verschwindet. Wer in dem Moment nicht hinsah, erfuhr nie, ob es geklappt hat.
+
+Die naheliegende Reparatur — Meldung stehen lassen — wäre die halbe Antwort gewesen. Eine
+Meldung sagt nur *„ich habe etwas geschickt"*, nicht *„es ist angekommen und es passt"*.
+Genau daran war der erste Lauf gescheitert. Also **misst** die Anzeige jetzt:
+
+- **Stand-Zeile im Vektor-Kasten**, geladen beim Öffnen des Studios und nach jedem Bau:
+  holt die veröffentlichte `listings-vec.json` UND die veröffentlichte `listings.js`,
+  rechnet dieselbe Prüfung wie die Leseseite (Hash über `x.text || x.label`, `decode`
+  über `dim`) und zeigt „**Alles abgedeckt: 14 von 14** · gebaut am … · Modell …" in Grün
+  bzw. „Nur teilweise abgedeckt: 4 von 14" in Orange mit Hinweis.
+- **Knopf „Stand prüfen"** — GitHub Pages braucht ~1 Minute; wer zu früh schaut, drückt
+  einfach nochmal, statt zu rätseln.
+- **Knopf „📄 Bericht (PDF)"** — Tabelle aller Einträge mit Zustand (abgedeckt / veraltet /
+  fehlt). **Ohne PDF-Bibliothek**: eigenes Fenster + `window.print()`, im Druck-Dialog
+  steht „Als PDF speichern". Bleibt offline-first (CLAUDE.md § Offline), keine CDNs, nur
+  öffentliche Katalog-Daten, kein PII.
+- Die Erfolgsmeldung **bleibt stehen**, Fehlermeldungen ohnehin.
+
+`smoke_studio_vectors.mjs` **33/33**. Gegenprobe: die Anzeige auf reines Zählen
+zurückgebaut (`rec ? "ok" : "missing"`) → sie behauptete „14/14 abgedeckt" bei einem
+veralteten Paket, Proben (20)(21) rot. Genau der Fehler, den sie verhindern soll.
+
+**Test-Falle nebenbei gelernt:** Playwright-Globs vergleichen die **ganze** Adresse samt
+Query. `"**/…/listings-vec.json"` greift nicht, wenn der Code `?ts=…` anhängt — der Test
+bekam die echte Datei aus dem Repo und maß etwas völlig anderes, als er glaubte. Ein Stern
+am Ende behebt es; im Test steht der Grund.
+
+Cache-Version **v73**.
+
 ### Was Klaus noch tun muss
 
 1. **Vektoren neu bauen** — der erste Lauf ist wegen des Cache-Befunds nur zu 4/14
-   brauchbar. Vorher Hard-Reload, damit der neue Studio-Code ankommt.
+   brauchbar. Vorher Hard-Reload, damit der neue Studio-Code ankommt. Ob es geklappt hat,
+   sagt jetzt die Stand-Zeile im Studio selbst; nachrechnen muss niemand mehr.
 2. **Caddy-Regel einspielen** (Punkt 3 oben), sonst wiederholt sich das Muster bei jeder
    Freigabe.
 

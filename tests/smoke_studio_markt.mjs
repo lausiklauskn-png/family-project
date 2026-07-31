@@ -59,6 +59,12 @@ ok(/FPVecCodec/.test(studio), "Studio packt mit FPVecCodec (dieselbe Datei wie d
 ok(/function frischeListings\b/.test(studio) && /cache:\s*"no-store"/.test(studio),
   "Eintraege werden frisch vom Server geholt, nicht aus dem Browser-Stand (Befund 2026-08-01)");
 ok(/vec_dirty/.test(studio), "ungespeicherte Aenderungen blockieren den Vektor-Bau");
+ok(/function vecPruefe\b/.test(studio) && /textHash/.test(studio),
+  "Stand-Anzeige MISST (Hash-Vergleich), statt nur Vektoren zu zaehlen");
+ok(/data-role=vecstand/.test(studio) && /data-role=vecrecheck/.test(studio),
+  "Stand steht sichtbar im Panel + Knopf zum Nachpruefen (Klaus 2026-08-01)");
+ok(/function vecBericht\b/.test(studio) && /w\.print\(\)/.test(studio) && !/jspdf|pdfkit|cdn/i.test(studio),
+  "PDF-Bericht ueber die Druckfunktion des Browsers — keine fremde Bibliothek (offline-first)");
 ok(/fpst-vecbar/.test(studio) && /sbkim:embedding-progress/.test(studio),
   "Ladebalken + Fortschritts-Listener fuer den Modell-Download (Klaus 2026-08-01)");
 ok(/src="assets\/studio-markt\.js\?v=\d+"/.test(markt),

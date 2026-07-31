@@ -95,7 +95,25 @@
       vec_err: "Vektoren bauen fehlgeschlagen: ",
       vec_fresh: "Hole den veröffentlichten Stand …",
       vec_local: "Server nicht erreichbar — rechne über den lokalen Stand.",
-      vec_dirty: "Erst \u201eVer\u00f6ffentlichen\u201c dr\u00fccken \u2014 sonst passen die Vektoren nicht zu den Eintr\u00e4gen."
+      vec_dirty: "Erst \u201eVer\u00f6ffentlichen\u201c dr\u00fccken \u2014 sonst passen die Vektoren nicht zu den Eintr\u00e4gen.",
+      vec_stand_h: "Stand auf dem Server",
+      vec_stand_load: "Pr\u00fcfe den Stand auf dem Server \u2026",
+      vec_stand_none: "Noch keine Vektor-Datei auf dem Server \u2014 die Suche rechnet alles selbst.",
+      vec_stand_err: "Stand nicht pr\u00fcfbar (Server nicht erreichbar).",
+      vec_stand_ok: "Alles abgedeckt: ",
+      vec_stand_part: "Nur teilweise abgedeckt: ",
+      vec_stand_of: " von ",
+      vec_stand_entries: " Eintr\u00e4gen",
+      vec_stand_built: " \u00b7 gebaut am ",
+      vec_stand_model: " \u00b7 Modell ",
+      vec_stand_hint: "Nicht abgedeckte Eintr\u00e4ge rechnet die Suche bei jedem Besuch selbst \u2014 einmal neu bauen behebt das.",
+      vec_recheck: "Stand pr\u00fcfen",
+      vec_report: "\ud83d\udcc4 Bericht (PDF)",
+      vec_report_h: "Vektor-Bericht \u2014 family-projekt.de Marktplatz",
+      vec_report_covered: "abgedeckt",
+      vec_report_missing: "fehlt \u2014 wird live gerechnet",
+      vec_report_stale: "veraltet \u2014 Text hat sich ge\u00e4ndert",
+      vec_report_none: "Kein Bericht m\u00f6glich \u2014 erst den Stand pr\u00fcfen."
     },
     en: {
       studio_on: "Studio mode on — long-press the footer to leave.",
@@ -149,7 +167,25 @@
       vec_err: "Building vectors failed: ",
       vec_fresh: "Fetching the published state …",
       vec_local: "Server unreachable — computing from the local state.",
-      vec_dirty: "Press “Publish” first — otherwise the vectors won\u2019t match the entries."
+      vec_dirty: "Press “Publish” first — otherwise the vectors won\u2019t match the entries.",
+      vec_stand_h: "State on the server",
+      vec_stand_load: "Checking the state on the server \u2026",
+      vec_stand_none: "No vector file on the server yet \u2014 search computes everything itself.",
+      vec_stand_err: "State not checkable (server unreachable).",
+      vec_stand_ok: "Fully covered: ",
+      vec_stand_part: "Only partly covered: ",
+      vec_stand_of: " of ",
+      vec_stand_entries: " entries",
+      vec_stand_built: " \u00b7 built on ",
+      vec_stand_model: " \u00b7 model ",
+      vec_stand_hint: "Uncovered entries are computed on every visit \u2014 rebuilding once fixes that.",
+      vec_recheck: "Check state",
+      vec_report: "\ud83d\udcc4 Report (PDF)",
+      vec_report_h: "Vector report \u2014 family-projekt.de marketplace",
+      vec_report_covered: "covered",
+      vec_report_missing: "missing \u2014 computed live",
+      vec_report_stale: "stale \u2014 text has changed",
+      vec_report_none: "No report possible \u2014 check the state first."
     }
   };
   function lang() { try { return (window.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de"; } catch (e) { return "de"; } }
@@ -491,6 +527,120 @@
    *
    * pct === null heißt „läuft, Länge unbekannt" und zeigt einen wandernden
    * Balken; das ist ehrlicher als ein Balken, der bei 0 % steht. */
+  /* Der Stand auf dem SERVER — die eigentliche Antwort auf „ist das aktualisiert?"
+   *
+   * Klaus' Befund 2026-08-01: „Ich sehe noch keine Bestätigung, dass das
+   * aktualisiert wurde." Er hatte recht, gleich doppelt. Erstens verschwand die
+   * Erfolgsmeldung nach 2,6 s als Toast und der Status-Bereich wurde geleert.
+   * Zweitens — und das wiegt schwerer — hätte selbst eine bleibende Meldung nur
+   * gesagt „ich habe etwas geschickt", nicht „es ist angekommen und es passt".
+   * Genau daran war der erste Lauf gescheitert: 14 gebaut, 4 brauchbar.
+   *
+   * Deshalb wird hier nicht gemerkt, sondern GEMESSEN: die veröffentlichte
+   * Vektor-Datei und die veröffentlichten Einträge werden beide frisch geholt
+   * und gegeneinander gerechnet — dieselbe Prüfung, die die Leseseite in
+   * markt.html macht (Hash über `x.text || x.label`, decode über `dim`). Was
+   * dabei herauskommt, ist der wahre Zustand, kein Protokoll einer Absicht. */
+  var STAND = null;   // letzter Prüf-Befund, auch fürs Berichts-Fenster
+  function vecPruefe() {
+    var codec = window.FPVecCodec;
+    return Promise.all([
+      fetch("assets/config/listings-vec.json?ts=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+      frischeListings()
+    ]).then(function (beide) {
+      var pack = beide[0], liste = beide[1] || WORK;
+      if (!liste || !liste.length) return { fehler: true };
+      var eintraege = liste.filter(function (x) { return x && x.anchorId && safeImg(x.img); });
+      if (!pack || !pack.vectors) return { keinPaket: true, gesamt: eintraege.length };
+      var zeilen = [], abgedeckt = 0;
+      for (var i = 0; i < eintraege.length; i++) {
+        var x = eintraege[i], text = x.text || x.label;
+        var rec = pack.vectors[x.anchorId];
+        var lage = "missing";
+        if (rec) {
+          var hashOk = !rec.h || (codec && rec.h === codec.textHash(text));
+          var v = hashOk && codec ? codec.decode(rec, pack.dim || 384) : null;
+          lage = v ? "ok" : "stale";
+        }
+        if (lage === "ok") abgedeckt++;
+        zeilen.push({ label: x.label, id: x.anchorId, lage: lage });
+      }
+      return { gebaut: pack.built || "?", model: pack.model || "?", dim: pack.dim || 0,
+               abgedeckt: abgedeckt, gesamt: eintraege.length, zeilen: zeilen };
+    });
+  }
+  function renderStand(st) {
+    STAND = st || null;
+    var box = panel && panel.querySelector("[data-role=vecstand]");
+    if (!box) return;
+    if (!st) { box.textContent = T("vec_stand_load"); box.className = "fpst-vecstand"; return; }
+    if (st.fehler) { box.textContent = T("vec_stand_err"); box.className = "fpst-vecstand is-err"; return; }
+    if (st.keinPaket) { box.textContent = T("vec_stand_none"); box.className = "fpst-vecstand is-err"; return; }
+    var voll = st.abgedeckt === st.gesamt && st.gesamt > 0;
+    box.className = "fpst-vecstand " + (voll ? "is-ok" : "is-warn");
+    // textContent: die Werte kommen aus einer Server-Datei, nie als HTML einsetzen.
+    var t1 = document.createElement("b");
+    t1.textContent = (voll ? T("vec_stand_ok") : T("vec_stand_part")) +
+      st.abgedeckt + T("vec_stand_of") + st.gesamt + T("vec_stand_entries");
+    var t2 = document.createElement("span");
+    t2.textContent = T("vec_stand_built") + st.gebaut + T("vec_stand_model") + st.model;
+    box.innerHTML = "";
+    box.appendChild(t1); box.appendChild(t2);
+    if (!voll) {
+      var t3 = document.createElement("small");
+      t3.textContent = T("vec_stand_hint");
+      box.appendChild(t3);
+    }
+  }
+  function standLaden() {
+    renderStand(null);
+    return vecPruefe().then(renderStand).catch(function () { renderStand({ fehler: true }); });
+  }
+
+  /* Bericht zum Ausdrucken bzw. als PDF sichern.
+   *
+   * Bewusst OHNE PDF-Bibliothek: die Seite ist offline-first und lädt keine
+   * fremden Skripte (CLAUDE.md § Offline). Der Browser kann das von Haus aus —
+   * im Druck-Dialog steht „Als PDF speichern", auch auf dem Tablet. Ein eigenes
+   * Fenster, damit die Marktplatz-Seite dahinter unberührt bleibt.
+   * Enthält nur öffentliche Katalog-Daten, keine Schlüssel, kein PII. */
+  function vecBericht() {
+    if (!STAND || STAND.fehler || STAND.keinPaket || !STAND.zeilen) { toast(T("vec_report_none"), false); return; }
+    var esc2 = esc;
+    var beschriftung = { ok: T("vec_report_covered"), missing: T("vec_report_missing"), stale: T("vec_report_stale") };
+    var reihen = STAND.zeilen.map(function (z) {
+      return "<tr class=\"" + z.lage + "\"><td>" + esc2(z.label) + "</td><td class=\"id\">" + esc2(z.id) +
+        "</td><td>" + esc2(beschriftung[z.lage] || z.lage) + "</td></tr>";
+    }).join("");
+    var w = window.open("", "_blank");
+    if (!w) { toast(T("vec_report_none"), false); return; }
+    w.document.write(
+      "<!doctype html><html lang=\"de\"><head><meta charset=\"utf-8\">" +
+      "<title>" + esc2(T("vec_report_h")) + "</title><style>" +
+      "body{font:14px/1.5 system-ui,sans-serif;margin:28px;color:#111}" +
+      "h1{font-size:1.25rem;margin:0 0 4px}" +
+      ".kopf{color:#555;font-size:.9rem;margin-bottom:18px}" +
+      "table{border-collapse:collapse;width:100%}" +
+      "th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #ddd;vertical-align:top}" +
+      "th{background:#f4f4f6}" +
+      ".id{font:12px ui-monospace,monospace;color:#666}" +
+      "tr.ok td{color:#0a6b2e}tr.missing td,tr.stale td{color:#a3421a;font-weight:600}" +
+      "@media print{body{margin:0}}" +
+      "</style></head><body>" +
+      "<h1>" + esc2(T("vec_report_h")) + "</h1><div class=\"kopf\">" +
+      esc2(STAND.abgedeckt + T("vec_stand_of") + STAND.gesamt + T("vec_stand_entries") +
+           T("vec_stand_built") + STAND.gebaut + T("vec_stand_model") + STAND.model + " · dim " + STAND.dim) +
+      "</div><table><thead><tr><th>App</th><th>Kennung</th><th>Zustand</th></tr></thead><tbody>" +
+      reihen + "</tbody></table></body></html>");
+    w.document.close();
+    // Auf das fertige Dokument warten, nicht auf die Uhr — sonst druckt der
+    // Dialog eine halb aufgebaute Seite.
+    var drucken = function () { try { w.focus(); w.print(); } catch (_e) {} };
+    if (w.document.readyState === "complete") drucken();
+    else w.addEventListener("load", drucken);
+  }
+
   function vecStatus(msg, pct) {
     var el = panel && panel.querySelector("[data-role=vecstatus]");
     if (!el) return;
@@ -586,8 +736,16 @@
         if (!j || !j.ok) throw new Error((j && j.error) || "commit_vectors");
         stopProg();
         if (btn) btn.disabled = false;
-        vecStatus("");
+        // Die Bestätigung BLEIBT stehen (Klaus 2026-08-01: „ich sehe noch keine
+        // Bestätigung, dass das aktualisiert wurde"). Ein Toast ist nach 2,6 s
+        // weg; wer in dem Moment nicht hinsieht, erfährt nie, ob es geklappt hat.
+        vecStatus(T("vec_done") + items.length + T("vec_done2"), 100);
         toast(T("vec_done") + items.length + T("vec_done2"));
+        // Und gleich nachmessen statt behaupten: GitHub Pages braucht ~1 Minute,
+        // bis die neue Datei ausgeliefert wird — die Prüfung sagt ehrlich, was
+        // JETZT auf dem Server liegt. Wer zu früh schaut, sieht den alten Stand
+        // und drückt einfach nochmal auf „Stand prüfen".
+        standLaden();
       })
       .catch(function (err) {
         stopProg();
@@ -779,8 +937,11 @@
         '<div class="fpst-vec">' +
           '<h4>' + esc(T("vec_h")) + '</h4>' +
           '<p class="fpst-qintro">' + esc(T("vec_intro")) + '</p>' +
-          '<div class="fpst-qbtnrow"><button type="button" data-role="vecbtn" class="fpst-btn">' + esc(T("vec_btn")) + '</button>' +
-            '<span class="fpst-vecstatus" data-role="vecstatus"></span></div>' +
+          '<div class="fpst-vecstand" data-role="vecstand"></div>' +
+          '<div class="fpst-qbtnrow"><button type="button" data-role="vecbtn" class="fpst-btn fpst-btn--go">' + esc(T("vec_btn")) + '</button>' +
+            '<button type="button" data-role="vecrecheck" class="fpst-btn">' + esc(T("vec_recheck")) + '</button>' +
+            '<button type="button" data-role="vecreport" class="fpst-btn">' + esc(T("vec_report")) + '</button></div>' +
+          '<div class="fpst-vecstatus" data-role="vecstatus"></div>' +
           '<small>' + esc(T("vec_hint")) + '</small>' +
         '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
@@ -797,6 +958,8 @@
     panel.querySelector("[data-role=cancel]").addEventListener("click", clearForm);
     panel.querySelector("[data-role=publish]").addEventListener("click", publish);
     var vb = panel.querySelector("[data-role=vecbtn]"); if (vb) vb.addEventListener("click", buildVectors);
+    var vr = panel.querySelector("[data-role=vecrecheck]"); if (vr) vr.addEventListener("click", standLaden);
+    var vp = panel.querySelector("[data-role=vecreport]"); if (vp) vp.addEventListener("click", vecBericht);
     panel.querySelector("[data-role=imgpick]").addEventListener("click", function () {
       var fi = ensureFileInput(); fi.value = "";
       fi.onchange = function () {
@@ -830,6 +993,9 @@
       if (e.target.closest("[data-role=qall]")) { approveAllChecked(); return; }
     });
     renderList(); markDirty();
+    // Beim Öffnen sofort messen — die Frage „ist das aktualisiert?" soll man
+    // nicht erst stellen müssen.
+    standLaden();
   }
   function closePanel() { if (panel) panel.style.display = "none"; }
 
@@ -873,7 +1039,14 @@
       ".fpst-own{font-size:.68rem;background:rgba(120,160,255,.25);border-radius:5px;padding:1px 5px}.fpst-myc{font-size:.8rem}" +
       ".fpst-queue,.fpst-vec{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
       ".fpst-vec .fpst-qbtnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}" +
-      ".fpst-vecstatus{font-size:.8rem;opacity:.85;flex:1;min-width:150px}" +
+      ".fpst-vecstatus{font-size:.8rem;opacity:.85;margin-top:.6rem}" +
+      ".fpst-vecstand{font-size:.82rem;border-radius:9px;padding:8px 10px;margin:.5rem 0;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04)}" +
+      ".fpst-vecstand b{display:block;font-size:.86rem}" +
+      ".fpst-vecstand span{opacity:.75}" +
+      ".fpst-vecstand small{display:block;opacity:.7;margin-top:4px}" +
+      ".fpst-vecstand.is-ok{border-color:rgba(95,206,143,.5);background:rgba(95,206,143,.10)}" +
+      ".fpst-vecstand.is-warn{border-color:rgba(255,178,107,.55);background:rgba(255,178,107,.10)}" +
+      ".fpst-vecstand.is-err{border-color:rgba(255,140,140,.45);background:rgba(255,140,140,.08)}" +
       ".fpst-vectext{display:block;margin-bottom:4px}" +
       ".fpst-vecbar{display:block;height:6px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}" +
       ".fpst-vecbar-fill{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#6aa0ff,#5fce8f);transition:width .25s}" +
@@ -912,7 +1085,7 @@
   // öffentliche Testfläche (headless-Smoke) — harmlos in Produktion
   window.FPStudio = {
     _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64,
-          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, vecEntries: vecEntries,
+          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, vecEntries: vecEntries, vecPruefe: vecPruefe,
           setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; }, MARKER: MARKER, CFG: CFG },
     open: function () { document.body.classList.add("fpstudio"); openPanel(); },
     close: exitStudio
