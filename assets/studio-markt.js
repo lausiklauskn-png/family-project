@@ -80,7 +80,19 @@
       q_approved: "Freigegeben — in ~1 Minute live.", q_rejected: "Verworfen.",
       q_status_neu: "🟡 Neu", q_status_geprueft: "🔵 Geprüft – zur Freigabe bereit", q_status_verdacht: "🔴 Verdacht",
       withdraw: "Zurückziehen", withdraw_confirm: "Diesen Eintrag von der Live-Seite zurückziehen (mit Token entfernen)?",
-      withdrawn: "Zurückgezogen — in ~1 Minute von der Seite verschwunden."
+      withdrawn: "Zurückgezogen — in ~1 Minute von der Seite verschwunden.",
+      vec_h: "🧠 Vektoren bauen",
+      vec_intro: "Rechnet die Bedeutungs-Vektoren aller Einträge EINMAL aus und legt sie als Datei ab. Danach muss kein Besucher sie mehr selbst rechnen — die Suche startet sofort.",
+      vec_btn: "Vektoren bauen",
+      vec_hint: "Nach jeder Änderung an Name, Beschreibung oder Tags neu bauen. Solange das nicht passiert, rechnet die Seite die geänderten Einträge selbst nach — es geht nichts kaputt, es dauert nur länger.",
+      vec_noembed: "Sprachmodell nicht verfügbar — Vektoren können hier nicht gebaut werden.",
+      vec_noentries: "Keine Einträge mit Bild — nichts zu rechnen.",
+      vec_loading: "Lade Sprachmodell (~30 MB einmalig) …",
+      vec_working: "Rechne Vektoren … ",
+      vec_committing: "Schreibe die Datei …",
+      vec_done: "Vektoren gebaut: ",
+      vec_done2: " Einträge — in ~1 Minute live.",
+      vec_err: "Vektoren bauen fehlgeschlagen: "
     },
     en: {
       studio_on: "Studio mode on — long-press the footer to leave.",
@@ -119,7 +131,19 @@
       q_approved: "Released — live in ~1 minute.", q_rejected: "Discarded.",
       q_status_neu: "🟡 New", q_status_geprueft: "🔵 Checked – ready to release", q_status_verdacht: "🔴 Suspicious",
       withdraw: "Withdraw", withdraw_confirm: "Withdraw this entry from the live site (remove via token)?",
-      withdrawn: "Withdrawn — gone from the site in ~1 minute."
+      withdrawn: "Withdrawn — gone from the site in ~1 minute.",
+      vec_h: "🧠 Build vectors",
+      vec_intro: "Computes the meaning vectors of all entries ONCE and stores them as a file. After that no visitor has to compute them — search starts right away.",
+      vec_btn: "Build vectors",
+      vec_hint: "Rebuild after every change to name, description or tags. Until then the page recomputes the changed entries itself — nothing breaks, it just takes longer.",
+      vec_noembed: "Language model unavailable — vectors cannot be built here.",
+      vec_noentries: "No entries with an image — nothing to compute.",
+      vec_loading: "Loading language model (~30 MB once) …",
+      vec_working: "Computing vectors … ",
+      vec_committing: "Writing the file …",
+      vec_done: "Vectors built: ",
+      vec_done2: " entries — live in ~1 minute.",
+      vec_err: "Building vectors failed: "
     }
   };
   function lang() { try { return (window.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de"; } catch (e) { return "de"; } }
@@ -378,6 +402,114 @@
       .catch(function (err) { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("pub_err") + (err && err.message ? err.message : err), false); });
   }
 
+  /* ------------------------------------------- Vektoren bauen (Katalog-Spore Stufe 1)
+   *
+   * Gegenstück zur Leseseite in markt.html (§ „Vorberechnete Vektoren"). Dort
+   * wird das Paket gelesen; hier entsteht es. Vier Punkte, an denen die beiden
+   * Seiten zusammenpassen MÜSSEN — weicht einer ab, ist das Paket still
+   * wertlos (die Seite rechnet dann klaglos alles selbst nach, man merkt es
+   * nur an der Zeit):
+   *
+   *   1. Der Text je Eintrag ist `x.text || x.label` — exakt dieselbe Regel.
+   *      Aus ihm entsteht der Vektor UND der Hash; jede Abweichung lässt jeden
+   *      Hash-Vergleich scheitern.
+   *   2. `model` und `dim` kommen aus SbkimEmbedding._meta, nicht aus einer
+   *      Konstante hier. Wechselt das Modell, verwirft die Leseseite das ganze
+   *      Paket — das geht nur, wenn hier die WAHRE Kennung eingetragen wird.
+   *      Der Feldname ist `_meta`, nicht `info()`.
+   *   3. Gepackt wird mit FPVecCodec (assets/vec-codec.js) — dieselbe Datei,
+   *      die die Leseseite lädt. Kein Nachbau.
+   *   4. Aufgenommen wird JEDER Eintrag mit anchorId und Text, auch einer ohne
+   *      gültiges Bild. Die Leseseite zeigt nur Einträge MIT Bild und schlägt
+   *      pro anchorId nach; überzählige Einträge im Paket kosten ~550 Bytes und
+   *      stören nicht, ein fehlender kostet eine Live-Berechnung. Also lieber
+   *      zu viel als zu wenig — so kann eine abweichende Bild-Regel zwischen
+   *      den beiden Dateien nie zu einer Lücke führen.
+   *
+   * Niemals ein halbes Paket schreiben: erst wird alles gerechnet, und nur bei
+   * vollständigem Erfolg geht der Commit raus. Bricht etwas ab, bleibt die alte
+   * Datei stehen — schlimmster Fall ist damit der heutige Zustand.
+   */
+  function vecEntries() {
+    var out = [];
+    for (var i = 0; i < WORK.length; i++) {
+      var x = WORK[i];
+      if (!x || !x.anchorId) continue;
+      var text = x.text || x.label;
+      if (!text) continue;
+      out.push({ id: x.anchorId, text: String(text) });
+    }
+    return out;
+  }
+  function vecStatus(msg) {
+    var el = panel && panel.querySelector("[data-role=vecstatus]");
+    if (el) el.textContent = msg || "";
+  }
+  function buildVectors() {
+    var codec = window.FPVecCodec;
+    var emb = window.SbkimEmbedding;
+    if (!codec || !emb || typeof emb.embedPassageBatch !== "function") { toast(T("vec_noembed"), false); return; }
+    if (!API) { toast(T("q_noapi"), false); return; }
+    if (!srvKeyVal()) { toast(T("need_srvkey"), false); var se = panel.querySelector("[data-f=srvkey]"); if (se) se.focus(); return; }
+    var items = vecEntries();
+    if (!items.length) { toast(T("vec_noentries"), false); return; }
+
+    var btn = panel.querySelector("[data-role=vecbtn]");
+    if (btn) btn.disabled = true;
+    vecStatus(T("vec_loading"));
+
+    // In Häppchen rechnen, damit der Fortschritt sichtbar ist. embedPassageBatch
+    // ist dieselbe Funktion, die die Leseseite nutzt — die Aufteilung ändert am
+    // Ergebnis nichts, nur an der Rückmeldung.
+    var CHUNK = 8;
+    var vecs = [];
+    function schritt(k) {
+      if (k >= items.length) return Promise.resolve();
+      vecStatus(T("vec_working") + Math.min(k + CHUNK, items.length) + "/" + items.length);
+      var teil = items.slice(k, k + CHUNK).map(function (it) { return it.text; });
+      return emb.embedPassageBatch(teil).then(function (res) {
+        if (!res || res.length !== teil.length) throw new Error("embedPassageBatch: " + teil.length + " erwartet, " + ((res && res.length) || 0) + " bekommen");
+        for (var j = 0; j < res.length; j++) vecs.push(res[j]);
+        return schritt(k + CHUNK);
+      });
+    }
+
+    Promise.resolve()
+      .then(function () { return emb.init ? emb.init() : null; })
+      .then(function () { return schritt(0); })
+      .then(function () {
+        var meta = emb._meta || {};
+        if (!meta.model || !meta.dim) throw new Error("SbkimEmbedding._meta ohne model/dim");
+        var pack = {
+          version: 1,
+          model: meta.model,
+          dim: meta.dim,
+          quant: (codec._meta && codec._meta.quant) || "int8-sym-b64",
+          built: new Date().toISOString().slice(0, 10),
+          vectors: {}
+        };
+        for (var i = 0; i < items.length; i++) {
+          var p = codec.encode(vecs[i]);
+          p.h = codec.textHash(items[i].text);
+          pack.vectors[items[i].id] = p;
+        }
+        if (!Object.keys(pack.vectors).length) throw new Error("leeres Paket");
+        vecStatus(T("vec_committing"));
+        return apiPost("commit_vectors", { content: JSON.stringify(pack) });
+      })
+      .then(function (j) {
+        if (!j || !j.ok) throw new Error((j && j.error) || "commit_vectors");
+        if (btn) btn.disabled = false;
+        vecStatus("");
+        toast(T("vec_done") + items.length + T("vec_done2"));
+      })
+      .catch(function (err) {
+        if (btn) btn.disabled = false;
+        vecStatus("");
+        toast(T("vec_err") + (err && err.message ? err.message : err), false);
+      });
+  }
+
   // Live-Eintrag zurückziehen: aus WORK entfernen + server-seitig neu schreiben.
   function withdrawEntry(idx) {
     if (!WORK[idx]) return;
@@ -555,6 +687,13 @@
             '<button type="button" data-role="cancel" class="fpst-btn" style="display:none">' + esc(T("cancel_btn")) + '</button>' +
           '</div>' +
         '</div>' +
+        '<div class="fpst-vec">' +
+          '<h4>' + esc(T("vec_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("vec_intro")) + '</p>' +
+          '<div class="fpst-qbtnrow"><button type="button" data-role="vecbtn" class="fpst-btn">' + esc(T("vec_btn")) + '</button>' +
+            '<span class="fpst-vecstatus" data-role="vecstatus"></span></div>' +
+          '<small>' + esc(T("vec_hint")) + '</small>' +
+        '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
         '<div class="fpst-list" data-role="list"></div>' +
         '<div class="fpst-foot">' +
@@ -568,6 +707,7 @@
     panel.querySelector("[data-role=addbtn]").addEventListener("click", saveEntry);
     panel.querySelector("[data-role=cancel]").addEventListener("click", clearForm);
     panel.querySelector("[data-role=publish]").addEventListener("click", publish);
+    var vb = panel.querySelector("[data-role=vecbtn]"); if (vb) vb.addEventListener("click", buildVectors);
     panel.querySelector("[data-role=imgpick]").addEventListener("click", function () {
       var fi = ensureFileInput(); fi.value = "";
       fi.onchange = function () {
@@ -642,7 +782,9 @@
       ".fpst-item__b{flex:1;min-width:0}.fpst-item__b b{font-size:.9rem}.fpst-item__b small{display:block;opacity:.6;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
       ".fpst-item__a{display:flex;gap:6px;flex:none}.fpst-item__a button{font-size:.78rem;border-radius:7px;padding:5px 8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#eef1f7;cursor:pointer}" +
       ".fpst-own{font-size:.68rem;background:rgba(120,160,255,.25);border-radius:5px;padding:1px 5px}.fpst-myc{font-size:.8rem}" +
-      ".fpst-queue{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
+      ".fpst-queue,.fpst-vec{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
+      ".fpst-vec .fpst-qbtnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}" +
+      ".fpst-vecstatus{font-size:.8rem;opacity:.75}" +
       ".fpst-qintro{opacity:.8;font-size:.82rem;margin:.2rem 0 .4rem}" +
       ".fpst-qbtnrow{margin:.6rem 0}" +
       ".fpst-qlist{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto}" +
@@ -675,7 +817,7 @@
   // öffentliche Testfläche (headless-Smoke) — harmlos in Produktion
   window.FPStudio = {
     _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64,
-          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass,
+          entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, vecEntries: vecEntries,
           setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; }, MARKER: MARKER, CFG: CFG },
     open: function () { document.body.classList.add("fpstudio"); openPanel(); },
     close: exitStudio

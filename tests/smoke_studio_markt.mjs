@@ -24,8 +24,11 @@ try { execFileSync("node", ["--check", join(ROOT, "assets/studio-markt.js")]); o
 catch (e) { ok(false, "Syntaxfehler studio-markt.js: " + e.message); }
 
 /* 2) Einhängepunkte in markt.html */
-ok(/src="assets\/studio-markt\.js"/.test(markt), "markt.html lädt studio-markt.js");
-ok(/FP_STUDIO_CONFIG/.test(markt) && markt.indexOf("FP_STUDIO_CONFIG") < markt.indexOf('src="assets/studio-markt.js"'), "FP_STUDIO_CONFIG vor studio-markt.js");
+/* Die Adresse trägt ein ?v=NN (Cache-Bust, siehe 4b) — der Vergleich darf nicht
+ * am fehlenden Anhang scheitern, sonst bricht er bei jedem Versions-Sprung. */
+const studioTag = /src="assets\/studio-markt\.js(\?v=\d+)?"/.exec(markt);
+ok(!!studioTag, "markt.html lädt studio-markt.js");
+ok(/FP_STUDIO_CONFIG/.test(markt) && studioTag && markt.indexOf("FP_STUDIO_CONFIG") < studioTag.index, "FP_STUDIO_CONFIG vor studio-markt.js");
 ok(/window\.FP_MARKT\s*=\s*\{[\s\S]*rerender/.test(markt), "markt.html: FP_MARKT.rerender-Hook exportiert");
 
 /* 3) Studio-Grundgerüst + Sicherheit */
@@ -44,6 +47,17 @@ ok(/function publishViaServer\b/.test(studio), "publishViaServer vorhanden (Serv
 ok(/"commit_listings"/.test(studio), "Studio ruft commit_listings (ganze Datei) auf");
 ok(/"commit_image"/.test(studio), "Studio ruft commit_image (Depot-Bild) auf");
 ok(/need_srvkey/.test(studio), "Fehlermeldung ohne Studio-Passwort (need_srvkey)");
+
+/* 4b) Vektoren bauen (Katalog-Spore Stufe 1, Schreibseite).
+ * Die WIRKUNG prüft tests/smoke_studio_vectors.mjs (Rundlauf Studio → Leseseite).
+ * Hier nur die zwei Stellen, an denen ein stiller Fehler entstehen könnte. */
+ok(/function buildVectors\b/.test(studio), "buildVectors vorhanden (Knopf „Vektoren bauen“)");
+ok(/"commit_vectors"/.test(studio), "Studio ruft commit_vectors auf");
+ok(/x\.text \|\| x\.label/.test(studio), "Text-Regel (text || label) — identisch zur Leseseite");
+ok(/emb\._meta/.test(studio) && !/model:\s*"Xenova/.test(studio), "model/dim aus SbkimEmbedding._meta, nicht hartcodiert");
+ok(/FPVecCodec/.test(studio), "Studio packt mit FPVecCodec (dieselbe Datei wie die Leseseite)");
+ok(/src="assets\/studio-markt\.js\?v=\d+"/.test(markt),
+  "markt.html lädt studio-markt.js MIT ?v= — sonst hält Caddys 7-Tage-Cache die alte Fassung fest");
 
 /* 5) Prüf-/Freigabe-Warteschlange (Studio-Seite) */
 ok(/window\.FP_MARKT_API/.test(studio), "Studio liest FP_MARKT_API");
@@ -78,7 +92,9 @@ let api = "";
 try { api = readFileSync(join(ROOT, "server/marktplatz-api.php"), "utf8"); ok(true, "server/marktplatz-api.php vorhanden"); }
 catch (e) { ok(false, "server/marktplatz-api.php fehlt: " + e.message); }
 if (api) {
-  ["list", "setstatus", "commit_listings", "commit_image", "fetch"].forEach((a) => ok(new RegExp("action === '" + a + "'").test(api), "API-Aktion: " + a));
+  ["list", "setstatus", "commit_listings", "commit_vectors", "commit_image", "fetch"].forEach((a) => ok(new RegExp("action === '" + a + "'").test(api), "API-Aktion: " + a));
+  ok(/vectors_empty/.test(api) && /model_missing/.test(api), "API: commit_vectors lehnt leeres/modellloses Paket ab");
+  ok(/listings-vec\.json/.test(api), "API: commit_vectors schreibt nach assets/config/listings-vec.json");
   ok(!/action === 'submit'/.test(api), "API hat KEIN eigenes submit (einreichung.php füllt die Warteschlange)");
   ok(/require_key\(/.test(api) && /hash_equals\(/.test(api), "API: jede Aktion passwortgeschützt (studio_key, hash_equals)");
   ok(/freigabe-config\.php/.test(api), "API teilt sich freigabe-config.php (Token + warteschlange.jsonl)");
