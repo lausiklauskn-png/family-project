@@ -80,26 +80,78 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
   ok(counts.cards > 0, `Marktplatz zeigt Karten (${counts.cards})`);
   ok(counts.cards === counts.buttons, `jede Karte hat einen Melde-Knopf (${counts.buttons}/${counts.cards})`);
 
-  const hasData = await page.evaluate(() => {
+  const btn = await page.evaluate(() => {
     const b = document.querySelector("#mkListings .mk-report");
-    return !!(b && b.getAttribute("data-label"));
+    if (!b) return null;
+    const cs = getComputedStyle(b);
+    const r = b.getBoundingClientRect();
+    return {
+      hasData: !!b.getAttribute("data-label"),
+      // Klaus 2026-07-31: am Tablet gibt es kein Hover, also KEINEN Tooltip.
+      // Der Knopf muss sein Wort selbst zeigen, nicht nur im title führen.
+      visibleText: (b.innerText || "").trim(),
+      isBtn: b.classList.contains("btn"),
+      clip: cs.clipPath,
+      shadow: cs.filter,
+      w: Math.round(r.width), h: Math.round(r.height),
+    };
   });
-  ok(hasData, "Melde-Knopf trägt die Kennung des Eintrags");
+  ok(btn && btn.hasData, "Melde-Knopf trägt die Kennung des Eintrags");
+  ok(btn && /melden|report/i.test(btn.visibleText),
+    `Knopf zeigt sichtbaren Text, nicht nur einen Tooltip ("${btn && btn.visibleText}")`);
+  ok(btn && btn.isBtn, "Knopf trägt die .btn-Klasse (erbt Schliff, Neigung, Holo-Schimmer)");
+  ok(btn && /path\(/.test(btn.clip || ""), "dreieckige Form über clip-path: path() aktiv");
+  ok(btn && /drop-shadow/.test(btn.shadow || ""), "Schweben über drop-shadow (folgt der Dreiecksform)");
+  ok(btn && btn.w >= 44 && btn.h >= 44, `Klickfläche mindestens 44×44 (${btn && btn.w}×${btn && btn.h})`);
 
   await page.click("#mkListings .mk-report");
+  await page.waitForTimeout(200);
   const dlg = await page.evaluate(() => {
-    const ov = document.getElementById("mkRepOv");
-    return ov ? { open: true, reasons: ov.querySelectorAll('input[name="mkRepReason"]').length,
-                  hasSend: !!ov.querySelector("#mkRepSend"), modal: ov.getAttribute("aria-modal") } : { open: false };
+    const d = document.getElementById("mkRepOv");
+    if (!d) return { open: false };
+    const r = d.getBoundingClientRect();
+    return {
+      open: true,
+      tag: d.tagName,
+      isOpen: d.hasAttribute("open"),
+      reasons: d.querySelectorAll('input[name="mkRepReason"]').length,
+      hasSend: !!d.querySelector("#mkRepSend"),
+      labelled: d.getAttribute("aria-labelledby"),
+      // DIE Prüfung, die gefehlt hat: liegt das Fenster im sichtbaren Bereich?
+      // Am 2026-07-31 hing es unterhalb des Footers, weil altes CSS ausgeliefert
+      // wurde. "Element existiert" war grün, der Nutzer sah es trotzdem nicht.
+      inView: r.top >= 0 && r.left >= 0 && r.bottom <= innerHeight + 1 && r.right <= innerWidth + 1 && r.height > 0,
+      rect: { top: Math.round(r.top), bottom: Math.round(r.bottom), vh: innerHeight },
+      focusInside: d.contains(document.activeElement),
+    };
   });
   ok(dlg.open, "Klick öffnet das Melde-Fenster");
+  ok(dlg.tag === "DIALOG" && dlg.isOpen, `natives <dialog>, geöffnet (${dlg.tag})`);
   ok(dlg.reasons === 4, `vier Melde-Gründe zur Auswahl (${dlg.reasons})`);
-  ok(dlg.hasSend && dlg.modal === "true", "Fenster hat Absende-Knopf und ist als Dialog ausgezeichnet");
+  ok(dlg.hasSend && dlg.labelled === "mkRepH", "Absende-Knopf da, Fenster über seine Überschrift benannt");
+  ok(dlg.inView,
+    `Fenster liegt im sichtbaren Bereich (oben ${dlg.rect.top}, unten ${dlg.rect.bottom}, Bild ${dlg.rect.vh})`);
+  ok(dlg.focusInside, "Fokus steht nach dem Öffnen IM Fenster (man landet dort, wo es weitergeht)");
 
-  // 6: Escape schließt
+  // Hintergrund darf nicht mitscrollen, solange das Fenster offen ist.
+  const bgLocked = await page.evaluate(async () => {
+    const before = scrollY;
+    scrollBy(0, 400);
+    await new Promise((r) => setTimeout(r, 120));
+    return { moved: Math.abs(scrollY - before) > 5 };
+  });
+  ok(!bgLocked.moved, "Hintergrund scrollt nicht, solange das Fenster offen ist");
+
+  // 6: Escape schließt UND gibt den Fokus zurück
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(150);
-  ok(await page.evaluate(() => !document.getElementById("mkRepOv")), "Escape schließt das Fenster");
+  await page.waitForTimeout(200);
+  const afterEsc = await page.evaluate(() => ({
+    gone: !document.getElementById("mkRepOv"),
+    focusBack: !!(document.activeElement && document.activeElement.classList
+      && document.activeElement.classList.contains("mk-report")),
+  }));
+  ok(afterEsc.gone, "Escape schließt das Fenster");
+  ok(afterEsc.focusBack, "Fokus kehrt auf den Melde-Knopf zurück");
   await page.close();
 }
 

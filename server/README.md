@@ -9,6 +9,25 @@ Diese Dateien gehören **aufs Hetzner-Webhosting** (per WebFTP), **nicht** auf d
 Caddy-Server, der die Website ausliefert. Sie sind hier im Repo nur als kopierbare
 Vorlage abgelegt.
 
+> ### ⚠ Offen: `einreichung.php` muss hochgeladen werden (Stand 2026-07-31)
+>
+> Der Marktplatz hat seit heute einen **Melde-Knopf** an jeder Karte. Er schickt
+> `zweck: "meldung"`, und dieser Zweig existiert **nur in der Fassung hier im Repo**.
+> Auf dem Webhosting läuft noch die ältere Datei, die den Zweck nicht kennt: Sie
+> deutet ihn als `eintrag`, vermisst dann die Pflichtfelder und antwortet mit
+> HTTP 400. Im Browser erscheint dann „Das Senden hat gerade nicht geklappt".
+>
+> **Zu tun:** `server/einreichung.php` per WebFTP in denselben Ordner laden, in dem
+> sie schon liegt (der Ordner hinter `window.FP_MARKT_SUBMIT_ENDPOINT`, siehe
+> `assets/config/listings.js`). Nichts umbenennen, nichts weiter einstellen.
+>
+> **Bis dahin geht nichts verloren:** Der Marktplatz weist den Melder auf
+> `info@family-projekt.de` hin, und ohne konfigurierten Endpunkt öffnet er sogar
+> einen fertigen E-Mail-Vordruck.
+>
+> **Merkregel:** Alles unter `server/` wird **nie** durch einen Merge oder Deploy
+> aktualisiert. Wer hier etwas ändert, muss es von Hand hochladen.
+
 ```
 server/
   einreichung.php               ← Stufe 1: nimmt den POST an (Pflicht)
