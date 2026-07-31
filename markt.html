@@ -36,7 +36,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=68" />
+  <link rel="stylesheet" href="assets/style.css?v=69" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -329,7 +329,8 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/app.js?v=68"></script>
+  <script src="assets/app.js?v=69"></script>
+  <script src="assets/vec-codec.js?v=69"></script>
   <script src="assets/status-widget.js"></script>
   <script>
     (function () {
@@ -404,6 +405,67 @@
         if (lbl) lbl.textContent = label;
       }
 
+      // ── Vorberechnete Vektoren (Katalog-Spore Stufe 1) ──────────────────
+      // Ohne Paket rechnet der Browser die Vektoren ALLER Einträge bei jedem
+      // Besuch neu — bei 100 Apps grob 3–8 Sekunden. Mit Paket entfällt das
+      // ganz; nur die FRAGE muss noch eingebettet werden (dafür bleibt das
+      // Modell nötig, daran ändert sich nichts).
+      //
+      // Fail-soft in Stufen, der schlimmste Fall ist genau das heutige
+      // Verhalten: Datei fehlt → alles live. Modell passt nicht → alles live.
+      // Einzelner Eintrag fehlt oder sein Text hat sich geändert → nur dieser
+      // eine live. So kann ein veraltetes Paket nie falsch sortieren.
+      var VEC_URL = "assets/config/listings-vec.json";
+      var vecPack = undefined;                 // undefined = noch nicht geholt
+
+      async function loadVecPack() {
+        if (vecPack !== undefined) return vecPack;
+        vecPack = null;
+        try {
+          var res = await fetch(VEC_URL, { cache: "no-cache" });
+          if (!res || !res.ok) return null;
+          var p = await res.json();
+          if (!p || !p.vectors || typeof p.vectors !== "object") return null;
+          // Modell-Kennung AUSLESEN, nicht hartcodieren: wechselt das Modell,
+          // sind alle gespeicherten Vektoren wertlos und das Paket fliegt raus.
+          // Quelle ist SbkimEmbedding._meta (03_embedding.js) — Feldnamen dort
+          // geprüft, nicht geraten: ein Tippfehler hier würde die Prüfung still
+          // wirkungslos machen, und das fiele erst bei falschen Treffern auf.
+          var meta = window.SbkimEmbedding && SbkimEmbedding._meta;
+          if (meta && meta.model && p.model && p.model !== meta.model) return null;
+          if (meta && meta.dim && p.dim && p.dim !== meta.dim) return null;
+          vecPack = p;
+        } catch (_e) { vecPack = null; }
+        return vecPack;
+      }
+
+      // Baut die Vektor-Liste für ALL: aus dem Paket, wo möglich; der Rest live.
+      async function buildVecs() {
+        var texts = ALL.map(function (x) { return x.text || x.label; });
+        var pack = await loadVecPack();
+        var codec = window.FPVecCodec;
+        if (!pack || !codec) {
+          return await SbkimEmbedding.embedPassageBatch(texts);   // heutiger Weg
+        }
+        var out = new Array(ALL.length);
+        var fehlend = [];                       // Positionen, die live müssen
+        for (var i = 0; i < ALL.length; i++) {
+          var rec = pack.vectors[ALL[i].anchorId];
+          var v = null;
+          // Hash-Wächter: hat sich der Text seit dem Vorberechnen geändert,
+          // ist der gespeicherte Vektor falsch — dann lieber neu rechnen.
+          if (rec && (!rec.h || rec.h === codec.textHash(texts[i]))) {
+            v = codec.decode(rec, pack.dim || 384);
+          }
+          if (v) out[i] = v; else fehlend.push(i);
+        }
+        if (fehlend.length) {
+          var frisch = await SbkimEmbedding.embedPassageBatch(fehlend.map(function (k) { return texts[k]; }));
+          for (var j = 0; j < fehlend.length; j++) out[fehlend[j]] = frisch[j];
+        }
+        return out;
+      }
+
       // Semantische Suche (lazy Modul 03 + 04) — greift, sobald Einträge da sind.
       async function semanticSearch(q) {
         var note = document.getElementById("mkSearchNote");
@@ -426,9 +488,7 @@
           stopProg();
           if (!ALL._vecs) note.textContent = "Sortiere Einträge nach Bedeutung …";
           // Vektoren der Einträge einmal bauen + cachen.
-          if (!ALL._vecs) {
-            ALL._vecs = await SbkimEmbedding.embedPassageBatch(ALL.map(function (x) { return x.text || x.label; }));
-          }
+          if (!ALL._vecs) ALL._vecs = await buildVecs();
           // A5: Multi-Query als reine SORTIER-Verbesserung — die Frage über
           // MK_SYN auffächern, jede Variante einbetten, und jeden Eintrag mit
           // dem BESTEN Cosinus über alle Varianten bewerten. So versteht die
@@ -793,6 +853,9 @@
       window.FP_MARKT = {
         rerender: function () {
           ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img); });
+          // ALL ist neu — der alte Vektor-Zwischenspeicher hing am alten ALL und
+          // würde nach einer Studio-Änderung falsch sortieren. Er baut sich bei
+          // der nächsten Bedeutungs-Suche von selbst wieder auf.
           view = ALL.slice(); render();
         }
       };
