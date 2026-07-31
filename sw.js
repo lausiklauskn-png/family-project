@@ -15,7 +15,7 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v69";
+var CACHE_VERSION = "family-projekt-v70";
 // Versions-Anhang der Asset-Adressen (?v=NN) — MUSS zur Zahl in CACHE_VERSION
 // passen und in ALLEN HTML-Seiten identisch stehen. Grund (Befund 2026-07-31):
 // Caddy liefert CSS/JS mit `max-age=604800` aus, also SIEBEN TAGE Browser-Cache
@@ -24,11 +24,11 @@ var CACHE_VERSION = "family-projekt-v69";
 // Melde-Knopf blieb eckig. Ein Service-Worker hilft dagegen nicht, weil der
 // HTTP-Cache VOR ihm greift. Nur eine geänderte Adresse hilft.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "69";
+var ASSET_V = "70";
 var CORE = [
   "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=69", "assets/app.js?v=69",
+  "assets/style.css?v=70", "assets/app.js?v=70",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
   "manifest.json", "icon-192.png", "icon-512.png", "og-image.png"
 ];
