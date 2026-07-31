@@ -56,6 +56,11 @@ ok(/"commit_vectors"/.test(studio), "Studio ruft commit_vectors auf");
 ok(/x\.text \|\| x\.label/.test(studio), "Text-Regel (text || label) — identisch zur Leseseite");
 ok(/emb\._meta/.test(studio) && !/model:\s*"Xenova/.test(studio), "model/dim aus SbkimEmbedding._meta, nicht hartcodiert");
 ok(/FPVecCodec/.test(studio), "Studio packt mit FPVecCodec (dieselbe Datei wie die Leseseite)");
+ok(/function frischeListings\b/.test(studio) && /cache:\s*"no-store"/.test(studio),
+  "Eintraege werden frisch vom Server geholt, nicht aus dem Browser-Stand (Befund 2026-08-01)");
+ok(/vec_dirty/.test(studio), "ungespeicherte Aenderungen blockieren den Vektor-Bau");
+ok(/fpst-vecbar/.test(studio) && /sbkim:embedding-progress/.test(studio),
+  "Ladebalken + Fortschritts-Listener fuer den Modell-Download (Klaus 2026-08-01)");
 ok(/src="assets\/studio-markt\.js\?v=\d+"/.test(markt),
   "markt.html lädt studio-markt.js MIT ?v= — sonst hält Caddys 7-Tage-Cache die alte Fassung fest");
 

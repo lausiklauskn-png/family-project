@@ -92,7 +92,10 @@
       vec_committing: "Schreibe die Datei …",
       vec_done: "Vektoren gebaut: ",
       vec_done2: " Einträge — in ~1 Minute live.",
-      vec_err: "Vektoren bauen fehlgeschlagen: "
+      vec_err: "Vektoren bauen fehlgeschlagen: ",
+      vec_fresh: "Hole den veröffentlichten Stand …",
+      vec_local: "Server nicht erreichbar — rechne über den lokalen Stand.",
+      vec_dirty: "Erst \u201eVer\u00f6ffentlichen\u201c dr\u00fccken \u2014 sonst passen die Vektoren nicht zu den Eintr\u00e4gen."
     },
     en: {
       studio_on: "Studio mode on — long-press the footer to leave.",
@@ -143,7 +146,10 @@
       vec_committing: "Writing the file …",
       vec_done: "Vectors built: ",
       vec_done2: " entries — live in ~1 minute.",
-      vec_err: "Building vectors failed: "
+      vec_err: "Building vectors failed: ",
+      vec_fresh: "Fetching the published state …",
+      vec_local: "Server unreachable — computing from the local state.",
+      vec_dirty: "Press “Publish” first — otherwise the vectors won\u2019t match the entries."
     }
   };
   function lang() { try { return (window.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de"; } catch (e) { return "de"; } }
@@ -430,10 +436,43 @@
    * vollständigem Erfolg geht der Commit raus. Bricht etwas ab, bleibt die alte
    * Datei stehen — schlimmster Fall ist damit der heutige Zustand.
    */
-  function vecEntries() {
+  /* Die Eintraege IMMER frisch vom Server holen, nie aus window.FP_LISTINGS.
+   *
+   * Befund 2026-08-01, gemessen und belegt: Klaus' erster Lauf baute 14 saubere
+   * Vektoren — von denen die Leseseite nur 4 nutzen konnte. Die Hashes passten
+   * 14/14 zur listings.js vom 26.07. und 4/14 zur aktuellen. Grund: markt.html
+   * laedt `assets/config/listings.js` OHNE `?v=`, und Caddy cacht *.js sieben
+   * Tage (Caddyfile.example). Im Browser lag also eine Monat-alte Liste,
+   * waehrend die Seite live die neuen Texte vom 31.07. zeigte (PR #135 hat sie
+   * umformuliert). Der Knopf rechnete brav ueber die alten Texte.
+   *
+   * Das ist die tueckischste Sorte Fehler: nichts stuerzte ab, die Meldung sagte
+   * „14 Eintraege", der Hash-Waechter der Leseseite verwarf die falschen still
+   * und rechnete nach. Alles funktionierte — es brachte nur nichts.
+   *
+   * `capturePrefix` holt die Datei ohnehin schon mit cache:"no-store". Genau
+   * diese frische Fassung ist der richtige Bezugspunkt: die Vektoren gehoeren
+   * zum VEROEFFENTLICHTEN Stand, nicht zu dem, was zufaellig im Cache liegt.
+   * Fail-soft: geht der Abruf schief, wird mit WORK gerechnet und gesagt, dass
+   * es der lokale Stand ist. */
+  function frischeListings() {
+    return fetch("assets/config/listings.js?ts=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.text() : null; })
+      .then(function (txt) {
+        if (!txt) return null;
+        var sand = {};
+        // Eigener Code vom eigenen Server — dieselbe Datei, die die Seite ohnehin
+        // als <script> laedt. Die Sandbox haelt sie nur von window fern.
+        new Function("window", txt)(sand);
+        return Array.isArray(sand.FP_LISTINGS) ? sand.FP_LISTINGS : null;
+      })
+      .catch(function () { return null; });
+  }
+  function vecEntries(liste) {
+    var quelle = liste || WORK;
     var out = [];
-    for (var i = 0; i < WORK.length; i++) {
-      var x = WORK[i];
+    for (var i = 0; i < quelle.length; i++) {
+      var x = quelle[i];
       if (!x || !x.anchorId) continue;
       var text = x.text || x.label;
       if (!text) continue;
@@ -441,9 +480,29 @@
     }
     return out;
   }
-  function vecStatus(msg) {
+  /* Fortschritt zeigen — Text UND Balken.
+   *
+   * Klaus' Befund 2026-08-01: „Das Sprachmodell hat wieder keinen Ladebalken
+   * und ich sehe nicht, wie weit es ist oder ob gerade etwas hakt." Genau so
+   * war es: hier stand nur ein starrer Satz. Der Modell-Download sind ~30 MB,
+   * das dauert spürbar, und ohne Balken ist „lädt" von „hängt" nicht zu
+   * unterscheiden. Die Suchseite (markt.html, renderBar) macht es richtig —
+   * dasselbe jetzt auch hier.
+   *
+   * pct === null heißt „läuft, Länge unbekannt" und zeigt einen wandernden
+   * Balken; das ist ehrlicher als ein Balken, der bei 0 % steht. */
+  function vecStatus(msg, pct) {
     var el = panel && panel.querySelector("[data-role=vecstatus]");
-    if (el) el.textContent = msg || "";
+    if (!el) return;
+    if (!msg) { el.innerHTML = ""; return; }
+    var unbekannt = (pct == null);
+    var w = unbekannt ? 40 : Math.max(0, Math.min(100, Math.round(pct)));
+    el.innerHTML = '<span class="fpst-vectext"></span>' +
+      '<span class="fpst-vecbar"><span class="fpst-vecbar-fill' +
+      (unbekannt ? " is-unbekannt" : "") + '" style="width:' + w + '%"></span></span>';
+    // textContent, nicht innerHTML: der Text kann aus einer Fehlermeldung kommen.
+    var t = el.querySelector(".fpst-vectext");
+    if (t) t.textContent = msg;
   }
   function buildVectors() {
     var codec = window.FPVecCodec;
@@ -451,12 +510,28 @@
     if (!codec || !emb || typeof emb.embedPassageBatch !== "function") { toast(T("vec_noembed"), false); return; }
     if (!API) { toast(T("q_noapi"), false); return; }
     if (!srvKeyVal()) { toast(T("need_srvkey"), false); var se = panel.querySelector("[data-f=srvkey]"); if (se) se.focus(); return; }
-    var items = vecEntries();
-    if (!items.length) { toast(T("vec_noentries"), false); return; }
+    // Ungespeicherte Aenderungen zuerst veroeffentlichen: sonst rechnet der Knopf
+    // ueber den Server-Stand und laesst genau die Eintraege aus, die gerade
+    // bearbeitet wurden — wieder ein Paket, das aussieht wie fertig und keins ist.
+    if (dirty) { toast(T("vec_dirty"), false); return; }
 
     var btn = panel.querySelector("[data-role=vecbtn]");
     if (btn) btn.disabled = true;
-    vecStatus(T("vec_loading"));
+    vecStatus(T("vec_loading"), null);
+
+    // Modul 03 meldet den Modell-Download als window-Event
+    // (03_embedding.js emitProgress: {status, file, progress 0-100, loaded, total}).
+    // Der Listener gilt NUR für die Lade-Phase und wird in JEDEM Ausgang wieder
+    // entfernt — auch im Fehlerfall, sonst hängt er beim nächsten Druck doppelt.
+    var onProg = function (ev) {
+      var d = (ev && ev.detail) || {};
+      if (d.status === "progress" && d.file) {
+        var pct = (d.progress != null) ? d.progress : null;
+        vecStatus(T("vec_loading") + (pct != null ? " " + Math.round(pct) + "%" : ""), pct);
+      }
+    };
+    var stopProg = function () { try { window.removeEventListener("sbkim:embedding-progress", onProg); } catch (_e) {} };
+    window.addEventListener("sbkim:embedding-progress", onProg);
 
     // In Häppchen rechnen, damit der Fortschritt sichtbar ist. embedPassageBatch
     // ist dieselbe Funktion, die die Leseseite nutzt — die Aufteilung ändert am
@@ -465,7 +540,8 @@
     var vecs = [];
     function schritt(k) {
       if (k >= items.length) return Promise.resolve();
-      vecStatus(T("vec_working") + Math.min(k + CHUNK, items.length) + "/" + items.length);
+      var fertig = Math.min(k + CHUNK, items.length);
+      vecStatus(T("vec_working") + fertig + "/" + items.length, (k / items.length) * 100);
       var teil = items.slice(k, k + CHUNK).map(function (it) { return it.text; });
       return emb.embedPassageBatch(teil).then(function (res) {
         if (!res || res.length !== teil.length) throw new Error("embedPassageBatch: " + teil.length + " erwartet, " + ((res && res.length) || 0) + " bekommen");
@@ -474,9 +550,18 @@
       });
     }
 
+    var items = [];
     Promise.resolve()
+      .then(function () { return frischeListings(); })
+      .then(function (liste) {
+        // Ehrlich benennen, WORUEBER gerechnet wird — der Unterschied ist der
+        // ganze Befund von oben.
+        vecStatus(liste ? T("vec_fresh") : T("vec_local"), null);
+        items = vecEntries(liste);
+        if (!items.length) throw new Error(T("vec_noentries"));
+      })
       .then(function () { return emb.init ? emb.init() : null; })
-      .then(function () { return schritt(0); })
+      .then(function () { stopProg(); return schritt(0); })
       .then(function () {
         var meta = emb._meta || {};
         if (!meta.model || !meta.dim) throw new Error("SbkimEmbedding._meta ohne model/dim");
@@ -494,18 +579,22 @@
           pack.vectors[items[i].id] = p;
         }
         if (!Object.keys(pack.vectors).length) throw new Error("leeres Paket");
-        vecStatus(T("vec_committing"));
+        vecStatus(T("vec_committing"), 100);
         return apiPost("commit_vectors", { content: JSON.stringify(pack) });
       })
       .then(function (j) {
         if (!j || !j.ok) throw new Error((j && j.error) || "commit_vectors");
+        stopProg();
         if (btn) btn.disabled = false;
         vecStatus("");
         toast(T("vec_done") + items.length + T("vec_done2"));
       })
       .catch(function (err) {
+        stopProg();
         if (btn) btn.disabled = false;
-        vecStatus("");
+        // Die Fehlermeldung BLEIBT stehen. Ein Toast verschwindet nach 2,6 s —
+        // wer gerade nicht hinsieht, bekommt sonst nie zu lesen, woran es lag.
+        vecStatus(T("vec_err") + (err && err.message ? err.message : err), 0);
         toast(T("vec_err") + (err && err.message ? err.message : err), false);
       });
   }
@@ -784,7 +873,13 @@
       ".fpst-own{font-size:.68rem;background:rgba(120,160,255,.25);border-radius:5px;padding:1px 5px}.fpst-myc{font-size:.8rem}" +
       ".fpst-queue,.fpst-vec{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
       ".fpst-vec .fpst-qbtnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}" +
-      ".fpst-vecstatus{font-size:.8rem;opacity:.75}" +
+      ".fpst-vecstatus{font-size:.8rem;opacity:.85;flex:1;min-width:150px}" +
+      ".fpst-vectext{display:block;margin-bottom:4px}" +
+      ".fpst-vecbar{display:block;height:6px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}" +
+      ".fpst-vecbar-fill{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#6aa0ff,#5fce8f);transition:width .25s}" +
+      "@keyframes fpst-vecwander{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}" +
+      ".fpst-vecbar-fill.is-unbekannt{animation:fpst-vecwander 1.1s ease-in-out infinite}" +
+      "@media (prefers-reduced-motion:reduce){.fpst-vecbar-fill.is-unbekannt{animation:none}}" +
       ".fpst-qintro{opacity:.8;font-size:.82rem;margin:.2rem 0 .4rem}" +
       ".fpst-qbtnrow{margin:.6rem 0}" +
       ".fpst-qlist{display:flex;flex-direction:column;gap:8px;max-height:50vh;overflow:auto}" +

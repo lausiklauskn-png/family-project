@@ -4,6 +4,67 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01: Erster echter Vektor-Lauf — und der Befund, den er zutage brachte
+
+**Klaus hat den Knopf gedrückt, und er hat funktioniert.** Commit `4e16ec2` „Studio:
+Marktplatz-Vektoren aktualisiert" liegt auf `main`, `assets/config/listings-vec.json`
+existiert: 14 Vektoren, 8,1 KB, echtes Modell `Xenova/multilingual-e5-small`, dim 384,
+alle vollständig. Die Kette Studio → Server → GitHub trägt.
+
+### Der Befund: es funktionierte, und es brachte nichts
+
+Nachgemessen mit dem echten Codec gegen die echten Einträge: **nur 4 von 14 Vektoren
+hätte die Leseseite genutzt.** Bei 10 passte der Hash nicht.
+
+Die Ursache ist belegt, nicht vermutet — Gegenprobe gegen den alten Dateistand:
+
+| Vergleich gegen | passende Hashes |
+|---|---|
+| `listings.js` **aktuell** (nach PR #135, 31.07.) | 4/14 |
+| `listings.js` **alt** (vor #135, 26.07.) | **14/14** |
+
+Klaus' Browser hielt eine `listings.js` vom **26.07.** fest. `markt.html` lädt sie
+**ohne `?v=`**, und Caddy cacht `*.js` sieben Tage. Am 31.07. wurden die Marktplatz-Texte
+umformuliert (#135). Der Knopf rechnete also brav über Texte, die live gar nicht mehr
+standen.
+
+**Das ist die tückischste Sorte Fehler:** nichts stürzte ab, die Meldung sagte „14
+Einträge", der Hash-Wächter der Leseseite verwarf die falschen Vektoren still und rechnete
+nach. Alles funktionierte — es brachte nur nichts. Ohne Nachmessen wäre das nie
+aufgefallen. *(Die gute Nachricht: der Hash-Wächter hat im Echtbetrieb genau das getan,
+wofür er gebaut wurde. Falsch sortiert hat nie etwas.)*
+
+### Drei Reparaturen
+
+1. **Der Knopf holt die Einträge jetzt frisch vom Server** (`frischeListings()`,
+   `cache: "no-store"`) statt aus `window.FP_LISTINGS`. Der veröffentlichte Stand ist der
+   richtige Bezugspunkt, nicht das, was zufällig im Cache liegt. Ungespeicherte Änderungen
+   blockieren den Bau mit einem klaren Hinweis („erst Veröffentlichen").
+2. **Ladebalken im Studio** — Klaus' Befund: *„Das Sprachmodell hat wieder keinen
+   Ladebalken, ich sehe nicht, wie weit es ist oder ob gerade etwas hakt."* Bei ~30 MB
+   Download ist das der Unterschied zwischen „läuft" und „hängt". Jetzt echter Balken für
+   beide Phasen (Modell laden mit Prozent, Rechnen mit Zähler), wandernder Balken solange
+   die Länge unbekannt ist, und Fehlermeldungen bleiben stehen statt als Toast zu
+   verschwinden.
+3. **Caddy-Regel für `/assets/config/*`** (in `Caddyfile.example`): 300 s statt 7 Tage.
+   Das sind **Daten**-Dateien, die das Studio jederzeit ohne Deploy neu schreibt — ein
+   `?v=NN` hilft dort grundsätzlich nicht, weil die Zahl nur beim Deploy steigt.
+   **Klaus muss diese Regel am Server einspielen** (Hetzner Cloud, `/opt/relay/Caddyfile`),
+   sonst erscheint eine freigegebene App bis zu eine Woche lang nicht.
+
+`tests/smoke_studio_vectors.mjs` steht bei **26/26**. Zwei neue Gegenproben, beide belegt:
+Balken ausgebaut → (14)(15)(16) rot; frisches Holen ausgebaut → (20)(21) rot.
+Cache-Version **v72**.
+
+### Was Klaus noch tun muss
+
+1. **Vektoren neu bauen** — der erste Lauf ist wegen des Cache-Befunds nur zu 4/14
+   brauchbar. Vorher Hard-Reload, damit der neue Studio-Code ankommt.
+2. **Caddy-Regel einspielen** (Punkt 3 oben), sonst wiederholt sich das Muster bei jeder
+   Freigabe.
+
+---
+
 ## ✅ 2026-07-31 (später Abend): Katalog-Spore Stufe 1 — Schreibseite gebaut
 
 Die Leseseite lag seit dem Nachmittag (PR #141), aber niemand erzeugte die Datei, die sie

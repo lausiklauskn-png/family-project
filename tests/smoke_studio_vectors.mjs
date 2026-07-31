@@ -20,6 +20,16 @@
  * `_meta` gelesen — Fall (4) fiel durch. Der Test fängt also genau die zwei
  * Fehler, für die er da ist.
  *
+ * Teil A2 prüft den Befund vom 2026-08-01 aus Klaus' erstem echten Lauf: Er
+ * baute 14 saubere Vektoren, von denen die Leseseite nur 4 nutzen konnte. Sein
+ * Browser hatte eine gecachte listings.js vom 26.07. (Caddy: sieben Tage für
+ * *.js, und die Datei wird ohne ?v= geladen), während die Seite live die Texte
+ * vom 31.07. zeigte. Nichts stürzte ab, die Meldung sagte „14 Einträge", der
+ * Hash-Wächter verwarf still und rechnete nach — alles funktionierte, es
+ * brachte nur nichts. Der Test setzt genau diese Lage nach: window.FP_LISTINGS
+ * bekommt veraltete Texte, der Server liefert die richtigen. Das Paket muss die
+ * SERVER-Texte tragen.
+ *
  * Teil B prüft die Server-Seite mit ECHTEN Anfragen (php -S, kein Netz nach
  * außen): commit_vectors muss ein leeres oder kaputtes Paket ablehnen, BEVOR es
  * committet wird. Ohne php im System wird Teil B ehrlich übersprungen.
@@ -76,11 +86,46 @@ async function stubSetzen(page) {
     window.__vecFor = vecFor;
     window.SbkimEmbedding = {
       _meta: { model, dim },
-      init: async () => {},
+      // init() meldet Fortschritt wie das echte Modul 03 (emitProgress:
+      // {status, file, progress 0-100}). Ohne diese Meldungen liesse sich der
+      // Ladebalken des Studios nicht pruefen.
+      init: async () => {
+        for (const p of [25, 60, 90]) {
+          window.dispatchEvent(new CustomEvent("sbkim:embedding-progress", {
+            detail: { status: "progress", file: "model.onnx", progress: p },
+          }));
+          await new Promise((r) => setTimeout(r, 20));
+        }
+      },
       embedQuery: async (t) => vecFor("q:" + t),
       embedPassageBatch: async (texts) => { window.__embedCount += texts.length; return texts.map(vecFor); },
     };
   }, { dim: DIM, model: MODEL });
+}
+
+/* Schreibt jede angezeigte Balken-Breite mit.
+ *
+ * Nachsehen reicht hier nicht: das Studio raeumt die Anzeige am Ende selbst auf
+ * (vecStatus("")), und der Lauf dauert im Test Millisekunden. Wer erst hinterher
+ * hinsieht, findet ein leeres Feld und kann nicht unterscheiden, ob der Balken
+ * nie da war oder schon wieder weg ist. Dieselbe Lehre wie in
+ * smoke_markt_melden.mjs. An `document` haengen, nicht an documentElement — das
+ * Skript laeuft vor dem Seitenaufbau. */
+async function balkenMitschreiben(page) {
+  await page.evaluate(() => {
+    window.__balken = [];
+    window.__statusTexte = [];
+    new MutationObserver(() => {
+      const f = document.querySelector("[data-role=vecstatus] .fpst-vecbar-fill");
+      if (f) {
+        const b = f.style.width + (f.classList.contains("is-unbekannt") ? " (unbekannt)" : "");
+        if (window.__balken[window.__balken.length - 1] !== b) window.__balken.push(b);
+      }
+      const t = document.querySelector("[data-role=vecstatus] .fpst-vectext");
+      const txt = t ? (t.textContent || "").trim() : "";
+      if (txt && window.__statusTexte[window.__statusTexte.length - 1] !== txt) window.__statusTexte.push(txt);
+    }).observe(document, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["style", "class"] });
+  });
 }
 
 /* ═════════════════ Teil A — Schreibseite baut, Leseseite nimmt an ═════════════════ */
@@ -118,6 +163,7 @@ let paket = null;
   });
 
   await page.evaluate(() => window.FPStudio.open());
+  await balkenMitschreiben(page);
   const knopf = await page.$("[data-role=vecbtn]");
   ok(!!knopf, "(1) Knopf „Vektoren bauen“ ist im Studio-Panel");
   if (knopf) await knopf.click();
@@ -175,6 +221,74 @@ let paket = null;
     ok(cosMin > 0.9999, `(12) zurückgerechnete Vektoren treffen das Original (schlechtester Cosinus ${cosMin.toFixed(6)})`);
   }
   ok(fehler.length === 0, "(13) keine JS-Fehler beim Bauen" + (fehler.length ? ": " + fehler[0] : ""));
+
+  /* Klaus' Befund 2026-08-01: „kein Ladebalken, ich sehe nicht, wie weit es ist
+   * oder ob gerade etwas hakt." Beim Modell-Download (~30 MB) ist das der
+   * Unterschied zwischen „laeuft" und „haengt". */
+  const gesehen2 = await page.evaluate(() => ({ balken: window.__balken || [], texte: window.__statusTexte || [] }));
+  ok(gesehen2.balken.length >= 2,
+    `(14) Ladebalken wird angezeigt und bewegt sich (${gesehen2.balken.length} Stufen: ${gesehen2.balken.slice(0, 5).join(" → ")})`);
+  const zwischen = gesehen2.balken.filter((b) => { const n = parseFloat(b); return n > 0 && n < 100; });
+  ok(zwischen.length > 0, `(15) Balken zeigt echte Zwischenstaende, nicht nur 0 % und fertig (${zwischen.join(", ")})`);
+  ok(gesehen2.texte.some((t) => /Sprachmodell/i.test(t)) && gesehen2.texte.some((t) => /\d+\/\d+/.test(t)),
+    `(16) beide Phasen benannt: Modell laden UND Rechnen mit Zaehler (${gesehen2.texte.slice(0, 4).join(" | ")})`);
+  await ctx.close();
+}
+
+/* ═══ Teil A2 — rechnet der Knopf über den SERVER-Stand oder den gecachten? ═══
+ *
+ * Die Lage aus Klaus' echtem Lauf: im Browser eine veraltete Liste, auf dem
+ * Server die richtige. Ein Knopf, der window.FP_LISTINGS nimmt, baut hier ein
+ * Paket, das aussieht wie fertig und von der Leseseite verworfen wird. */
+{
+  const ctx = await browser.newContext({ serviceWorkers: "block" });
+  const page = await ctx.newPage();
+  await ctx.addInitScript(() => { try { localStorage.setItem("fpstudio_srv_key", "test-passwort"); } catch (e) {} });
+  await page.goto(base + "/markt.html", { waitUntil: "load" });
+  await page.waitForTimeout(800);
+  await stubSetzen(page);
+
+  // Der Server liefert die RICHTIGEN Texte — hier eindeutig markiert.
+  const echteListe = await page.evaluate(() =>
+    (window.FP_LISTINGS || []).map((x) => ({ label: x.label, anchorId: x.anchorId, img: x.img, text: "SERVER-STAND " + x.anchorId })));
+  await page.route("**/assets/config/listings.js*", (route) => route.fulfill({
+    status: 200, contentType: "text/javascript", headers: { "cache-control": "no-store" },
+    body: "window.FP_LISTINGS = " + JSON.stringify(echteListe) + ";",
+  }));
+  // Im Browser liegt die VERALTETE Liste — so wie bei Klaus aus dem Cache.
+  await page.evaluate(() => {
+    (window.FP_LISTINGS || []).forEach((x) => { x.text = "VERALTETER CACHE " + x.anchorId; });
+  });
+
+  const studioSrc2 = fs.readFileSync(path.join(ROOT, "assets/studio-markt.js"), "utf8");
+  await page.evaluate(({ api, src }) => { window.FP_MARKT_API = api; (0, eval)(src); }, { api: API_URL, src: studioSrc2 });
+
+  let gesehen2 = null;
+  await page.route("**/marktplatz-api.php*", (route) => {
+    try { gesehen2 = JSON.parse(route.request().postData() || "{}"); } catch (_e) { gesehen2 = {}; }
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+  });
+
+  await page.evaluate(() => window.FPStudio.open());
+  const k2 = await page.$("[data-role=vecbtn]");
+  if (k2) await k2.click();
+  for (let i = 0; i < 200 && !gesehen2; i++) await page.waitForTimeout(50);
+
+  let p2 = null;
+  try { p2 = JSON.parse((gesehen2 || {}).content || "null"); } catch (_e) { p2 = null; }
+  const proben = p2 ? Object.keys(p2.vectors || {}) : [];
+  const hashServer = await page.evaluate(({ pack, ids }) => {
+    const C = window.FPVecCodec;
+    return ids.every((id) => pack.vectors[id].h === C.textHash("SERVER-STAND " + id));
+  }, { pack: p2 || { vectors: {} }, ids: proben }).catch(() => false);
+  const hashCache = await page.evaluate(({ pack, ids }) => {
+    const C = window.FPVecCodec;
+    return ids.some((id) => pack.vectors[id].h === C.textHash("VERALTETER CACHE " + id));
+  }, { pack: p2 || { vectors: {} }, ids: proben }).catch(() => false);
+
+  ok(proben.length > 0, `(19) Paket trotz veraltetem Browser-Stand gebaut (${proben.length} Vektoren)`);
+  ok(hashServer, "(20) Hashes stammen vom SERVER-Stand — der Knopf holt frisch, statt dem Cache zu glauben");
+  ok(!hashCache, "(21) kein einziger Hash stammt aus der veralteten Browser-Liste");
   await ctx.close();
 }
 
@@ -213,11 +327,11 @@ if (paket) {
   const ohne = await leseseite(null);          // Referenz: heutiger Weg
   const mit = await leseseite(paket);          // mit dem Paket aus dem Studio
   ok(mit.eingebettet === 0,
-    `(14) Rundlauf: Paket aus dem Studio → 0 Passagen live eingebettet (${mit.eingebettet} von ${ohne.eingebettet})`);
+    `(22) Rundlauf: Paket aus dem Studio → 0 Passagen live eingebettet (${mit.eingebettet} von ${ohne.eingebettet})`);
   ok(JSON.stringify(mit.reihenfolge) === JSON.stringify(ohne.reihenfolge),
-    "(15) Rundlauf: Reihenfolge identisch zur Live-Berechnung");
+    "(23) Rundlauf: Reihenfolge identisch zur Live-Berechnung");
 } else {
-  ok(false, "(14) Rundlauf nicht möglich — kein Paket gebaut");
+  ok(false, "(22) Rundlauf nicht möglich — kein Paket gebaut");
 }
 
 await browser.close(); server.close();
@@ -262,20 +376,20 @@ if (!phpDa) {
   } else {
     let r;
     r = await frage({ key: "falsch", content: '{"model":"m","vectors":{"a":{}}}' });
-    ok(r.code === 401 && r.j && r.j.error === "unauthorized", "(16) ohne richtiges Studio-Passwort: 401");
+    ok(r.code === 401 && r.j && r.j.error === "unauthorized", "(24) ohne richtiges Studio-Passwort: 401");
 
     r = await frage({ key: KEY, content: "das ist kein json" });
-    ok(r.code === 422 && r.j && r.j.error === "content_not_json", "(17) kaputtes JSON wird abgelehnt (422)");
+    ok(r.code === 422 && r.j && r.j.error === "content_not_json", "(25) kaputtes JSON wird abgelehnt (422)");
 
     r = await frage({ key: KEY, content: '{"model":"m","vectors":{}}' });
-    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(18) LEERES Paket wird abgelehnt — nie über die gute Datei schreiben");
+    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(26) LEERES Paket wird abgelehnt — nie über die gute Datei schreiben");
 
     r = await frage({ key: KEY, content: '{"model":"m"}' });
-    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(19) Paket ganz ohne vectors wird abgelehnt");
+    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(27) Paket ganz ohne vectors wird abgelehnt");
 
     r = await frage({ key: KEY, content: '{"vectors":{"a":{"s":1,"v":"AA"}}}' });
     ok(r.code === 422 && r.j && r.j.error === "model_missing",
-      "(20) ohne Modell-Kennung abgelehnt — sonst wäre der Modell-Wächter der Leseseite still ausgehebelt");
+      "(28) ohne Modell-Kennung abgelehnt — sonst wäre der Modell-Wächter der Leseseite still ausgehebelt");
   }
   php.kill();
   try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}

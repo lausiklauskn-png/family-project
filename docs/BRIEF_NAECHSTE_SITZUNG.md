@@ -1,4 +1,4 @@
-# Brief für die nächste Sitzung — family-project (Stand 2026-07-31, später Abend)
+# Brief für die nächste Sitzung — family-project (Stand 2026-08-01)
 
 Klaus, dieser Brief ist der vollständige Übergabestand. Alles Offene steht drin,
 Schritt für Schritt, mit dem Grund dahinter.
@@ -100,6 +100,54 @@ gegen `php -S` durchspielt (kein Netz nach außen).
 
 ---
 
+## 1b. Der erste echte Lauf (2026-08-01) — und was er zutage brachte
+
+**Der Knopf funktioniert.** Klaus hat ihn gedrückt, Commit `4e16ec2` liegt auf `main`,
+`assets/config/listings-vec.json` existiert: 14 Vektoren, 8,1 KB, echtes Modell
+`Xenova/multilingual-e5-small`, dim 384, alle vollständig. Die Kette Studio → Server →
+GitHub trägt.
+
+**Und trotzdem brachte er nichts.** Nachgemessen mit dem echten Codec gegen die echten
+Einträge: nur **4 von 14** Vektoren hätte die Leseseite genutzt. Gegenprobe gegen den
+alten Dateistand macht die Ursache eindeutig:
+
+| Vergleich gegen | passende Hashes |
+|---|---|
+| `listings.js` **aktuell** (nach #135, 31.07.) | 4/14 |
+| `listings.js` **alt** (vor #135, 26.07.) | **14/14** |
+
+Klaus' Browser hielt eine `listings.js` vom 26.07. fest. `markt.html` lädt sie **ohne
+`?v=`**, Caddy cacht `*.js` sieben Tage, und am 31.07. wurden die Marktplatz-Texte
+umformuliert. Der Knopf rechnete über Texte, die live nicht mehr standen.
+
+**Merk dir die Form dieses Fehlers, sie kommt wieder:** nichts stürzte ab, die Meldung
+sagte „14 Einträge", der Hash-Wächter verwarf die falschen still und rechnete nach. Alles
+funktionierte — es brachte nur nichts. Ohne Nachmessen wäre es nie aufgefallen. *(Positiv:
+der Hash-Wächter hat im Echtbetrieb genau das getan, wofür er gebaut wurde. Falsch
+sortiert hat nie etwas.)*
+
+### Drei Reparaturen
+
+1. **Der Knopf holt die Einträge frisch vom Server** (`frischeListings()`,
+   `cache: "no-store"`) statt aus `window.FP_LISTINGS`. Der veröffentlichte Stand ist der
+   richtige Bezugspunkt. Ungespeicherte Änderungen blockieren den Bau („erst
+   Veröffentlichen") — sonst entstünde dasselbe Problem von der anderen Seite.
+2. **Ladebalken im Studio.** Klaus' Befund: *„keinen Ladebalken, ich sehe nicht, wie weit
+   es ist oder ob gerade etwas hakt."* Bei ~30 MB Download ist das der Unterschied
+   zwischen „läuft" und „hängt". Jetzt beide Phasen mit Balken, wandernder Balken bei
+   unbekannter Länge, Fehlermeldungen bleiben stehen statt als Toast zu verschwinden.
+3. **Caddy-Regel für `/assets/config/*`** in `Caddyfile.example`: 300 s statt 7 Tage. Das
+   sind **Daten**-Dateien, die das Studio ohne Deploy neu schreibt — ein `?v=NN` hilft dort
+   grundsätzlich nicht, weil die Zahl nur beim Deploy steigt. **Muss Klaus am Server
+   einspielen** (Hetzner Cloud, `/opt/relay/Caddyfile`), sonst erscheint eine freigegebene
+   App bis zu eine Woche lang nicht. Im Repo geändert, am Server **ungeprüft**.
+
+`tests/smoke_studio_vectors.mjs` steht bei **26/26**, mit zwei neuen Gegenproben belegt:
+Balken ausgebaut → (14)(15)(16) rot; frisches Holen ausgebaut → (20)(21) rot.
+Cache-Version **v72**.
+
+---
+
 ## 2. Was du tun musst, damit es wirkt
 
 **Schritt 1 — `server/marktplatz-api.php` per WebFTP hochladen.**
@@ -120,11 +168,18 @@ Fassung vorkommt.**
 diesen Schritt läuft weiter die alte Fassung, der Knopf meldet `unknown_action`, und man
 sucht den Fehler im Browser.
 
-**Schritt 2 — im Studio einmal „Vektoren bauen" drücken.**
-Langdruck auf das Copyright unten in `markt.html`, Studio-Passwort eintragen, Knopf drücken.
-Erst danach existiert `assets/config/listings-vec.json`. Vorher greift die Leseseite ins
-Leere — und die Seite verhält sich exakt wie heute, es geht also nichts kaputt, solange du
-das nicht gemacht hast.
+**Schritt 1 ist erledigt** (2026-08-01, Datei liegt oben, `commit_vectors` antwortet).
+
+**Schritt 2 — Vektoren NEU bauen.** Der erste Lauf ist wegen des Cache-Befunds (Abschnitt
+1b) nur zu 4/14 brauchbar. **Vorher Hard-Reload**, sonst läuft noch der alte Studio-Code
+und der Fehler wiederholt sich. Dann Langdruck auf das Copyright, Passwort, Knopf.
+Erfolgsmerkmal jetzt sichtbar: Balken für „Hole den veröffentlichten Stand" → „Lade
+Sprachmodell … NN %" → „Rechne Vektoren … 14/14" → „Vektoren gebaut: 14 Einträge".
+
+**Schritt 2b — Caddy-Regel am Server einspielen** (Abschnitt 1b, Punkt 3). Ohne sie
+erscheint jede künftige Freigabe bis zu eine Woche verzögert. Die Regel steht in
+`Caddyfile.example`; auf dem Hetzner-Cloud-Server liegt die echte unter
+`/opt/relay/Caddyfile`, danach Caddy neu laden.
 
 **Schritt 3 — nachmessen und die Zahl ehrlich aufschreiben.**
 Wie lange dauert die erste Bedeutungs-Suche vorher, wie lange nachher? Nicht „fühlt sich
@@ -152,7 +207,7 @@ legt das Lesefenster in Stufe 6 fest. Heute liest Modul 23 mit `since: now - 180
 (30 Minuten). Ob das zu kurz oder zu lang ist, weiß niemand — es ist geraten, nicht gemessen.
 Blockiert nichts, sollte aber vor Stufe 6 vorliegen.
 
-### Stufe 1 — vorberechnete Vektoren ✅ **gebaut, beide Seiten**
+### Stufe 1 — vorberechnete Vektoren ✅ **gebaut und im Echtbetrieb gelaufen**
 
 Leseseite #141, Schreibseite diese Sitzung. Rückfall in Stufen, schlimmster Fall ist genau
 das heutige Verhalten:
@@ -164,7 +219,13 @@ das heutige Verhalten:
 | einzelner Eintrag fehlt | nur dieser eine live |
 | Text seit dem Vorberechnen geändert (Hash) | nur dieser eine live |
 
-**Offen bleibt nur:** dein WebFTP-Schritt, dein Knopfdruck, deine Messung (Abschnitt 2).
+**Offen bleibt:** ein zweiter Knopfdruck nach Hard-Reload (der erste war nur zu 4/14
+brauchbar, siehe 1b), die Caddy-Regel am Server, und deine Messung (Abschnitt 2).
+
+**Wie man prüft, ob ein Paket wirklich wirkt** — nicht raten, nachrechnen: den echten Codec
+(`assets/vec-codec.js`) und die echte `listings.js` in Node laden, für jeden Eintrag
+`textHash(x.text || x.label)` gegen das `h` im Paket halten und zählen. Passen nicht alle,
+ist das Paket veraltet, egal wie vollständig es aussieht.
 
 ### Stufe 2 — `sporeUrl` + tägliche Aktualisierung
 
@@ -305,7 +366,13 @@ solange es nicht stimmt.
 
 ## 5. Wie hier gearbeitet wird
 
-- **Messen statt schätzen.**
+- **Messen statt schätzen.** Am 2026-08-01 sah ein Paket vollständig aus (14/14 Vektoren,
+  richtiges Modell) und war zu zwei Dritteln wertlos. Sichtbar wurde das erst durch
+  Nachrechnen der Hashes. „Sieht fertig aus" ist kein Befund.
+- **Cache ist die häufigste Ursache hier, nicht der seltene Sonderfall.** Drei von vier
+  Befunden dieser Sitzungen kamen daher: alte `style.css`, alte `studio-markt.js`, alte
+  `listings.js`. Bei jedem „das kann doch nicht sein" zuerst fragen: welche Fassung hat der
+  Browser wirklich?
 - **Gegenprobe zu jedem neuen Wächter.** Den bekannten Fehler absichtlich wieder einbauen
   und prüfen, dass der Test rot wird. Ein Test, der den Fehler nicht fängt, ist wertlos —
   und man merkt es sonst nie.
