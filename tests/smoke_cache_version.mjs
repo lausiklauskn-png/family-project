@@ -14,7 +14,7 @@
  * Grenze, ehrlich: Der Test greift nur, solange origin/main erreichbar ist.
  * Ohne git-Vergleich meldet er das und hält nicht auf (fail-soft).
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -48,7 +48,37 @@ const core = coreListOf(swNow);
 
 ok(!!verNow, `CACHE_VERSION lesbar (${verNow})`);
 ok(core.length > 0, `CORE-Liste gelesen (${core.length} Dateien)`);
-ok(core.includes("assets/style.css"), "assets/style.css steht in CORE (wird gecacht)");
+ok(core.some((p) => p.startsWith("assets/style.css")), "assets/style.css steht in CORE (wird gecacht)");
+
+/* ---- Versions-Anhang der Assets (?v=NN) -------------------------------------
+ * Caddy liefert CSS/JS mit sieben Tagen Browser-Cache aus (Caddyfile.example:55),
+ * HTML nur mit 300 s. Ohne geänderte Adresse sieht ein Besucher nach einem Deploy
+ * also die neue Seite mit dem ALTEN Aussehen — genau das ist am 2026-07-31
+ * passiert. Ein Service-Worker hilft nicht, weil der HTTP-Cache vor ihm greift.
+ * Darum: ?v=NN an jeder Asset-Adresse, überall dieselbe Zahl. */
+const assetV = (/var\s+ASSET_V\s*=\s*"(\d+)"/.exec(swNow) || [])[1];
+const verNum = (/(\d+)\s*$/.exec(verNow || "") || [])[1];
+ok(!!assetV, `ASSET_V lesbar (${assetV})`);
+ok(assetV === verNum, `ASSET_V passt zur CACHE_VERSION (${assetV} = ${verNum})`);
+
+const htmlFiles = [];
+for (const dir of [repoRoot, resolve(repoRoot, "werkzeuge")]) {
+  for (const f of readdirSync(dir)) if (f.endsWith(".html")) htmlFiles.push(resolve(dir, f));
+}
+const wrong = [];
+let refs = 0;
+for (const f of htmlFiles) {
+  const t = readFileSync(f, "utf8");
+  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js)(\?v=(\d+))?"/g)) {
+    refs++;
+    if (m[3] !== assetV) wrong.push(`${f.replace(repoRoot + "/", "")}: assets/${m[1]}${m[2] || " (ohne ?v=)"}`);
+  }
+}
+ok(refs > 0, `Asset-Verweise in HTML gefunden (${refs})`);
+ok(wrong.length === 0,
+  wrong.length === 0
+    ? `alle ${refs} Verweise tragen ?v=${assetV}`
+    : `Verweise mit falscher/fehlender Version: ${wrong.slice(0, 4).join(" · ")}`);
 
 let base = null;
 try { git("rev-parse", "--verify", "origin/main"); base = "origin/main"; }
