@@ -23,6 +23,12 @@ window.FP_WERKZEUGE = [
     page: "werkzeuge/knoten-werkzeug.html",
     open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/web/tools/mycelknoten.html",
     install: "" },
+  { id: "box", name: "SBKIM-Box holen", icon: "🎁",
+    de: "Die fertige Voll-Box (Verbinden + Siegel + Schutz + Suche) in deine eigene App holen — vier Wege nach Können sortiert, vom KI-Einbau bis zum Ein-Befehl-Installer.",
+    en: "Get the ready full box (connect + seal + protection + search) into your own app — four routes sorted by skill, from AI install to a one-command installer.",
+    page: "werkzeuge/box-holen.html",
+    open: "werkzeuge/box-holen.html",
+    install: "" },
 
   /* Klaus' EIGENE, öffentliche Apps (2026-06-27 freigeschaltet). external:true →
    * die Karte öffnet die LIVE-App direkt in einem neuen Tab (keine eigene

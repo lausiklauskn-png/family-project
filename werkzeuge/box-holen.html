@@ -1,0 +1,167 @@
+<!doctype html>
+<!-- Family Projekt — Werkzeug-Seite: SBKIM-Box holen. Vier Wege nach Koennen sortiert. -->
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>SBKIM-Box holen — Family Projekt</title>
+  <meta name="description" content="Die fertige SBKIM-Voll-Box in deine eigene App holen — vier Wege nach Können sortiert: KI-Einbau, Vorlage, ZIP-Download, Ein-Befehl-Installer. Mit Voraussetzungen und Ergebnis pro Weg." />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../assets/style.css" />
+  <style>
+    .bx-lead{ max-width:64ch; }
+    .bx-note{ border-left:3px solid var(--accent,#7c9cff); padding:.3rem 0 .3rem .9rem; margin:1rem 0; opacity:.95; }
+    .bx-card{ margin:1rem 0; padding:1.1rem 1.2rem; }
+    .bx-card h2{ font-size:1.12rem; margin:0 0 .2rem; }
+    .bx-lvl{ font-size:.82rem; font-weight:600; opacity:.9; display:block; margin:.15rem 0 .5rem; }
+    .bx-req{ font-size:.95rem; margin:.4rem 0; }
+    .bx-req > div{ padding:.12rem 0; }
+    .bx-req b{ opacity:.7; font-weight:600; }
+    .bx-hero{ box-shadow:0 0 0 2px rgba(110,231,211,.55) inset; }
+    .bx-soon{ display:inline-block; font-size:.72rem; padding:.05rem .5rem; border:1px solid currentColor; border-radius:99px; opacity:.75; }
+    pre.bx-prompt{ white-space:pre-wrap; word-break:break-word; background:rgba(127,127,127,.14);
+      border:1px solid rgba(127,127,127,.3); border-radius:10px; padding:.7rem .8rem; font-size:.9rem; position:relative; }
+    .bx-copy{ position:absolute; top:.45rem; right:.45rem; font:inherit; font-size:.75rem; padding:.15rem .55rem;
+      border-radius:7px; border:1px solid rgba(127,127,127,.4); background:rgba(127,127,127,.15); color:inherit; cursor:pointer; }
+    .bx-actions{ margin-top:.6rem; display:flex; flex-wrap:wrap; gap:.5rem; }
+    .bx-actions a.btn{ text-decoration:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset=".5" stop-color="#7c9cff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#hg)"/><g fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M20 42 L32 22 L44 42"/><path d="M20 42 L44 42"/></g><circle cx="32" cy="22" r="5" fill="white"/><circle cx="20" cy="42" r="5" fill="white"/><circle cx="44" cy="42" r="5" fill="white"/></svg>
+        <a href="../index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="../index.html" data-i18n="nav_start">Start</a>
+        <a href="../werkzeuge.html" class="active" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="../markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="bxMain">
+    <p><a href="../werkzeuge.html" data-de="← zurück zu den Werkzeugen" data-en="← back to the tools">← zurück zu den Werkzeugen</a></p>
+    <span class="eyebrow">🎁 <span data-de="SBKIM-Box holen" data-en="Get the SBKIM box">SBKIM-Box holen</span></span>
+    <h1 data-de="Die fertige Box in deine App holen" data-en="Get the ready box into your app">Die fertige Box in deine App holen</h1>
+    <p class="sub bx-lead" data-de="Die Voll-Box macht aus deiner Seite einen vollen Mycel-Knoten: Verbinden + Vertrauens-Siegel + Schutz-Lampen + Andock-Wizard + Suche. Vier Wege — nach Können sortiert. Wähle den, der zu dir passt."
+       data-en="The full box turns your site into a complete mycelium node: connect + trust seal + protection lamps + docking wizard + search. Four routes — sorted by skill. Pick the one that fits you.">Die Voll-Box macht aus deiner Seite einen vollen Mycel-Knoten: Verbinden + Vertrauens-Siegel + Schutz-Lampen + Andock-Wizard + Suche. Vier Wege — nach Können sortiert. Wähle den, der zu dir passt.</p>
+
+    <div class="bx-note">
+      <b data-de="Für alle gilt zuerst:" data-en="For everyone first:">Für alle gilt zuerst:</b>
+      <span data-de="Du baust die Box in ein eigenes Repo ein — die App, die dir gehört. Hast du nur eine lose Datei ohne Repo, ist ein eigenes Repo anzulegen der erste Schritt (das kann dir eine KI abnehmen). Gerät egal: PC und Tablet gehen beide. Nichts kostet etwas, kein Konto zum bloßen Ansehen."
+            data-en="You build the box into your own repo — the app that belongs to you. If you only have a loose file without a repo, creating a repo is the first step (an AI can do that for you). Device doesn't matter: PC and tablet both work. Nothing costs anything, no account just to look.">Du baust die Box in ein eigenes Repo ein — die App, die dir gehört. Hast du nur eine lose Datei ohne Repo, ist ein eigenes Repo anzulegen der erste Schritt (das kann dir eine KI abnehmen). Gerät egal: PC und Tablet gehen beide. Nichts kostet etwas, kein Konto zum bloßen Ansehen.</span>
+    </div>
+
+    <!-- 1) Einsteiger — KI -->
+    <section class="glass bx-card bx-hero">
+      <h2>🤖 <span data-de="Meine KI baut es ein" data-en="My AI builds it in">Meine KI baut es ein</span></h2>
+      <span class="bx-lvl" data-de="🟢 Für Einsteiger — am einfachsten (die KI macht die Arbeit)" data-en="🟢 For beginners — easiest (the AI does the work)">🟢 Für Einsteiger — am einfachsten (die KI macht die Arbeit)</span>
+      <div class="bx-req">
+        <div><b data-de="Deine Voraussetzung:" data-en="You need:">Deine Voraussetzung:</b> <span data-de="eine kleine App in einem eigenen Repo und einen KI-Chat bedienen können. Programmieren nicht nötig." data-en="a small app in your own repo and the ability to use an AI chat. No coding needed.">eine kleine App in einem eigenen Repo und einen KI-Chat bedienen können. Programmieren nicht nötig.</span></div>
+        <div><b data-de="Technisch:" data-en="Technical:">Technisch:</b> <span data-de="eine KI, die an dein Repo kommt (z. B. Claude Code / KI mit GitHub-Anbindung) — oder eine KI, die dir die Schritte hinlegt." data-en="an AI that can reach your repo (e.g. Claude Code / an AI with GitHub access) — or an AI that hands you the steps.">eine KI, die an dein Repo kommt (z. B. Claude Code / KI mit GitHub-Anbindung) — oder eine KI, die dir die Schritte hinlegt.</span></div>
+        <div><b data-de="Am Ende:" data-en="Result:">Am Ende:</b> <span data-de="die Box vollständig eingebaut — du hast nur beauftragt." data-en="the box fully built in — you only gave the order.">die Box vollständig eingebaut — du hast nur beauftragt.</span></div>
+      </div>
+      <p style="margin:.6rem 0 .3rem"><b data-de="Diesen Text deiner KI geben:" data-en="Give your AI this text:">Diesen Text deiner KI geben:</b></p>
+      <pre class="bx-prompt" id="bx-ai-prompt"><button class="bx-copy" type="button" data-de="Kopieren" data-en="Copy">Kopieren</button>Bitte baue die SBKIM-Voll-Box in mein Repo ein: Kopiere alle Dateien aus
+https://github.com/lausiklauskn-png/Sage-Protokol/tree/main/sbkim-bundle-voll
+byte-genau in meinen Ordner sbkim-bundle-voll/ und trage die &lt;script&gt;-Zeilen
+aus deren README in meine index.html ein (Reihenfolge: 17 vor 15 vor 16).
+Ändere die Modul-Dateien NICHT. Alles bleibt fail-soft und offline.</pre>
+      <div class="bx-actions">
+        <a class="btn" href="https://github.com/lausiklauskn-png/Sage-Protokol/tree/main/sbkim-bundle-voll" target="_blank" rel="noopener noreferrer" data-de="Box ansehen ↗" data-en="View box ↗">Box ansehen ↗</a>
+      </div>
+    </section>
+
+    <!-- 2) Neustarter — Vorlage -->
+    <section class="glass bx-card">
+      <h2>🍴 <span data-de="Als Vorlage / neu anfangen" data-en="As a template / start fresh">Als Vorlage / neu anfangen</span></h2>
+      <span class="bx-lvl" data-de="🟢 Für Neustarter — ein Klick, aber neues Repo" data-en="🟢 For fresh starters — one click, but a new repo">🟢 Für Neustarter — ein Klick, aber neues Repo</span>
+      <div class="bx-req">
+        <div><b data-de="Deine Voraussetzung:" data-en="You need:">Deine Voraussetzung:</b> <span data-de="du hast noch KEINE App und willst mit fertigem Grundgerüst starten." data-en="you have NO app yet and want to start from a ready skeleton.">du hast noch KEINE App und willst mit fertigem Grundgerüst starten.</span></div>
+        <div><b data-de="Technisch:" data-en="Technical:">Technisch:</b> <span data-de="GitHub-Konto · ein Klick · kein Terminal." data-en="GitHub account · one click · no terminal.">GitHub-Konto · ein Klick · kein Terminal.</span></div>
+        <div><b data-de="Am Ende:" data-en="Result:">Am Ende:</b> <span data-de="ein NEUES Repo mit Box drin. Nicht für „ich habe schon eine App" — das würde ein zweites, leeres Repo erzeugen." data-en="a NEW repo with the box inside. Not for “I already have an app” — that would create a second, empty repo.">ein NEUES Repo mit Box drin. Nicht für „ich habe schon eine App" — das würde ein zweites, leeres Repo erzeugen.</span></div>
+      </div>
+      <p><span class="bx-soon" data-de="in Vorbereitung" data-en="coming soon">in Vorbereitung</span> <small data-de="— das Ein-Klick-Template wird als nächstes gebaut." data-en="— the one-click template is being built next.">— das Ein-Klick-Template wird als nächstes gebaut.</small></p>
+    </section>
+
+    <!-- 3) Ohne KI & ohne Terminal — ZIP -->
+    <section class="glass bx-card">
+      <h2>⬇️ <span data-de="Als ZIP herunterladen &amp; hochladen" data-en="Download as ZIP &amp; upload">Als ZIP herunterladen &amp; hochladen</span></h2>
+      <span class="bx-lvl" data-de="🟡 Ohne KI &amp; ohne Terminal — dafür etwas Handarbeit" data-en="🟡 Without AI &amp; without terminal — but some handwork">🟡 Ohne KI &amp; ohne Terminal — dafür etwas Handarbeit</span>
+      <div class="bx-req">
+        <div><b data-de="Deine Voraussetzung:" data-en="You need:">Deine Voraussetzung:</b> <span data-de="eine App in einem eigenen Repo; du magst Dateien laden/hochladen und in GitHub klicken." data-en="an app in your own repo; you're fine downloading/uploading files and clicking in GitHub.">eine App in einem eigenen Repo; du magst Dateien laden/hochladen und in GitHub klicken.</span></div>
+        <div><b data-de="Technisch:" data-en="Technical:">Technisch:</b> <span data-de="GitHub-Konto (deins) · dein Repo · Browser (PC oder Tablet) · kein Terminal, kein Node." data-en="GitHub account (yours) · your repo · browser (PC or tablet) · no terminal, no Node.">GitHub-Konto (deins) · dein Repo · Browser (PC oder Tablet) · kein Terminal, kein Node.</span></div>
+        <div><b data-de="So läuft's:" data-en="How it goes:">So läuft's:</b> <span data-de="ZIP laden → Ordner sbkim-bundle-voll heraussuchen → in deinem Repo „Add file → Upload files"." data-en="download ZIP → pick the sbkim-bundle-voll folder → in your repo “Add file → Upload files”.">ZIP laden → Ordner sbkim-bundle-voll heraussuchen → in deinem Repo „Add file → Upload files".</span></div>
+        <div><b data-de="Am Ende:" data-en="Result:">Am Ende:</b> <span data-de="die Box im Repo; die Script-Zeilen trägst du danach ein (README oder KI)." data-en="the box in your repo; you add the script lines afterwards (README or AI).">die Box im Repo; die Script-Zeilen trägst du danach ein (README oder KI).</span></div>
+      </div>
+      <div class="bx-actions">
+        <a class="btn" href="https://github.com/lausiklauskn-png/Sage-Protokol/archive/refs/heads/main.zip" data-de="Sage als ZIP laden ↓" data-en="Download Sage as ZIP ↓">Sage als ZIP laden ↓</a>
+        <a class="btn" href="https://github.com/lausiklauskn-png/Sage-Protokol/tree/main/sbkim-bundle-voll" target="_blank" rel="noopener noreferrer" data-de="Was drin ist ↗" data-en="What's inside ↗">Was drin ist ↗</a>
+      </div>
+      <p><small data-de="Hinweis: der Browser lädt am Tablet oft nur Datei-für-Datei — Ordnerstruktur (modules/…) beibehalten. Das ist der mühsame Teil; wer eine KI hat, nimmt lieber den obersten Weg." data-en="Note: on a tablet the browser often uploads file-by-file — keep the folder structure (modules/…). That's the tedious part; if you have an AI, the top route is easier.">Hinweis: der Browser lädt am Tablet oft nur Datei-für-Datei — Ordnerstruktur (modules/…) beibehalten. Das ist der mühsame Teil; wer eine KI hat, nimmt lieber den obersten Weg.</small></p>
+    </section>
+
+    <!-- 4) Versierte, am schnellsten — Installer -->
+    <section class="glass bx-card">
+      <h2>⚡ <span data-de="Mit einem Befehl (Installer)" data-en="With one command (installer)">Mit einem Befehl (Installer)</span></h2>
+      <span class="bx-lvl" data-de="🔴 Für Versierte — dafür am schnellsten (ein Befehl)" data-en="🔴 For the experienced — but fastest (one command)">🔴 Für Versierte — dafür am schnellsten (ein Befehl)</span>
+      <div class="bx-req">
+        <div><b data-de="Deine Voraussetzung:" data-en="You need:">Deine Voraussetzung:</b> <span data-de="du traust dir einen Terminal-Befehl zu." data-en="you're comfortable running a terminal command.">du traust dir einen Terminal-Befehl zu.</span></div>
+        <div><b data-de="Technisch:" data-en="Technical:">Technisch:</b> <span data-de="Node installiert · Terminal (PC oder Termux) · dein Repo lokal geklont · GitHub-Konto zum Hochladen." data-en="Node installed · terminal (PC or Termux) · your repo cloned locally · GitHub account to push.">Node installiert · Terminal (PC oder Termux) · dein Repo lokal geklont · GitHub-Konto zum Hochladen.</span></div>
+        <div><b data-de="Am Ende:" data-en="Result:">Am Ende:</b> <span data-de="ein Befehl → Box drin + Script-Zeilen automatisch eingetragen." data-en="one command → box in + script lines inserted automatically.">ein Befehl → Box drin + Script-Zeilen automatisch eingetragen.</span></div>
+      </div>
+      <p><span class="bx-soon" data-de="in Vorbereitung" data-en="coming soon">in Vorbereitung</span> <small data-de="— der Node-Installer (ein Befehl, ohne Fremdpakete, plattformübergreifend) wird als nächstes gebaut." data-en="— the Node installer (one command, no third-party packages, cross-platform) is being built next.">— der Node-Installer (ein Befehl, ohne Fremdpakete, plattformübergreifend) wird als nächstes gebaut.</small></p>
+    </section>
+
+    <div class="bx-note">
+      <b data-de="Schnell-Entscheidung:" data-en="Quick decision:">Schnell-Entscheidung:</b>
+      <span data-de="Kleine App im Repo + kaum Programmier-Kenntnisse → „Meine KI baut es ein" (oben). Terminal-fit + schnell → Installer. Bei null anfangen → Vorlage."
+            data-en="Small app in a repo + little coding knowledge → “My AI builds it in” (top). Terminal-savvy + fast → installer. Starting from zero → template.">Kleine App im Repo + kaum Programmier-Kenntnisse → „Meine KI baut es ein" (oben). Terminal-fit + schnell → Installer. Bei null anfangen → Vorlage.</span>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="holo">Family Projekt</span></span>
+      <a href="../werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="../markt.html" data-i18n="nav_market">Marktplatz</a>
+      <a href="../impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+  </footer>
+
+  <script src="../assets/app.js"></script>
+  <script>
+    // Seiten-eigener DE/EN-Text-Swap: hört auf den globalen fp:lang-Schalter (app.js).
+    (function () {
+      function apply(lang) {
+        var en = (lang === "en");
+        document.querySelectorAll("[data-de]").forEach(function (el) {
+          var v = en ? el.getAttribute("data-en") : el.getAttribute("data-de");
+          if (v != null) el.innerHTML = v;
+        });
+      }
+      var start = "de";
+      try { var s = localStorage.getItem("fp_lang"); if (s === "en" || s === "de") start = s; } catch (e) {}
+      apply(start);
+      window.addEventListener("fp:lang", function (ev) { apply(ev && ev.detail ? ev.detail.lang : "de"); });
+    })();
+    // Kopier-Knopf für den KI-Auftrag.
+    document.querySelectorAll(".bx-prompt .bx-copy").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var pre = btn.parentNode.cloneNode(true);
+        var c = pre.querySelector(".bx-copy"); if (c) c.remove();
+        var txt = pre.textContent.trim();
+        if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () {
+          var old = btn.textContent; btn.textContent = "✓"; setTimeout(function () { btn.textContent = old; }, 1200);
+        });
+      });
+    });
+  </script>
+</body>
+</html>
