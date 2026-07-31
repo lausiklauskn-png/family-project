@@ -66,18 +66,23 @@ mitziehen.** Der Test sagt es, wenn man es vergisst.
 
 ---
 
-## 2. Der Schritt, den nur Klaus tun kann — bitte zuerst
+## 2. Erledigt am 2026-07-31: Melde-Weg ist scharf
 
-**`server/einreichung.php` per WebFTP hochladen.**
+`server/einreichung.php` liegt auf dem **Hetzner Webhosting S** (konsoleH, Apache) in
+`Heim / public_html / formular` — dort, wo auch `marktplatz-api.php`, `.htaccess` und
+`warteschlange.jsonl` liegen. **Live bewiesen:** eine Testmeldung zu „Jasons Tresor"
+kam als Mail an `info@family-projekt.de` an. Damit ist **Stufe 4 vollständig
+abgeschlossen**, nicht nur gebaut.
 
-- Ziel: **Hetzner Webhosting S** (konsoleH, Apache) — dort läuft PHP.
-- **Nicht** auf den Hetzner Cloud-Server (Caddy im Docker, liefert nur statisch aus).
-- **Nicht** aufs Tablet.
+Drei Dinge daraus, die bei jeder künftigen Server-Datei gelten:
 
-Ohne diesen Schritt bleibt beim Absenden einer Meldung „Das Senden hat gerade nicht
-geklappt" stehen, weil der Server den Zweck `meldung` noch nicht kennt. Der Hinweis
-steht als auffälliger Block in `server/README.md`. Bis dahin geht nichts verloren:
-Der Marktplatz nennt daneben `info@family-projekt.de`.
+- **Alles unter `server/` wird nie durch einen Merge oder Deploy aktualisiert.** Wer
+  dort etwas ändert, muss es von Hand hochladen — sonst läuft weiter die alte Fassung,
+  und man sucht den Fehler im Browser.
+- **Die Dateigröße ist die verlässliche Kontrolle.** Alt 6,13 KB, neu 10,54 KB. Sie
+  verrät sofort, ob die richtige Datei oben liegt und ob ein Kopieren vollständig war.
+- **Die drei Maschinen nicht verwechseln** (Tabelle in Abschnitt 5). PHP läuft nur auf
+  dem Webhosting, nicht auf dem Cloud-Server, der nur statisch ausliefert.
 
 ---
 
@@ -197,9 +202,10 @@ Bausteine:
 **Wichtig:** Ein Eintrag darf nie stillschweigend verschwinden. Wer gesperrt wird, muss
 es erfahren, und der Grund muss nachlesbar sein.
 
-### Stufe 4 — Melde-Knopf ✅ fertig (#136, #137, #142)
+### Stufe 4 — Melde-Knopf ✅ vollständig fertig (#136, #137, #142)
 
-Fehlt nur noch der WebFTP-Schritt aus Abschnitt 2.
+Gebaut **und** live bewiesen: der Server nimmt Meldungen an, die Mail kommt an.
+Siehe Abschnitt 2.
 
 ### Stufe 5 — Bewertung: Lighthouse + Ja/Nein-Stimmen
 
@@ -340,19 +346,18 @@ Wer einen Befehl gibt, sagt immer dazu, wohin er gehört.
 
 ## 6. Vorschlag für die Reihenfolge
 
-1. **`einreichung.php` per WebFTP hochladen** (Klaus) — schließt Stufe 4 ab.
-2. **Stufe 1 Schreibseite** (Studio-Knopf + `commit_vectors`) — die Leseseite wartet
+1. **Stufe 1 Schreibseite** (Studio-Knopf + `commit_vectors`) — die Leseseite wartet
    darauf, vorher bringt sie nichts.
-3. **Die neun roten Tests aufräumen** — je länger sie rot sind, desto weniger sagt jede
+2. **Die neun roten Tests aufräumen** — je länger sie rot sind, desto weniger sagt jede
    spätere Prüfung aus.
-4. **Fokus-Markierung richten** — muss vor Stufe 5 stehen, sonst misst Lighthouse einen
+3. **Fokus-Markierung richten** — muss vor Stufe 5 stehen, sonst misst Lighthouse einen
    Mangel, den wir schon kennen.
-5. **Stufe 2** (`sporeUrl` + tägliche Aktion) — setzt Stufe 1 vollständig voraus.
-6. **Stufe 3** (Wächter) — sicherheitsrelevant, vorher mit Klaus über Safe Browsing
+4. **Stufe 2** (`sporeUrl` + tägliche Aktion) — setzt Stufe 1 vollständig voraus.
+5. **Stufe 3** (Wächter) — sicherheitsrelevant, vorher mit Klaus über Safe Browsing
    sprechen.
-7. **Stufe 5** (Lighthouse + Stimmen) — vorher die offene Frage aus Abschnitt 3 klären.
-8. **Stufe 0** (Relais-Messung, Klaus im Browser), dann **Stufe 6**.
-9. **Stufen 7 und 8** zum Schluss.
+6. **Stufe 5** (Lighthouse + Stimmen) — vorher die offene Frage aus Abschnitt 3 klären.
+7. **Stufe 0** (Relais-Messung, Klaus im Browser), dann **Stufe 6**.
+8. **Stufen 7 und 8** zum Schluss.
 
 ---
 
