@@ -59,14 +59,46 @@ async function open(setEndpoint) {
       return realClick.apply(this, arguments);
     };
     window.__useEndpoint = useEp;
+    // Mitschrift statt Momentaufnahme. Das Melde-Fenster schließt sich 2,2 s
+    // nach dem Erfolg SELBST (markt.html, setTimeout(closeReport, 2200)) — und
+    // auf einer beschäftigten Maschine kostet jeder Zugriff des Tests leicht
+    // eine halbe Sekunde. Die letzte Prüfzeile las den Bildschirm deshalb, wenn
+    // die Seite ihn längst aufgeräumt hatte: "Cannot read properties of null".
+    // Ein Beobachter hält jeden angezeigten Text fest; geprüft wird dann, was
+    // der Nutzer WIRKLICH gesehen hat, unabhängig davon, wann der Test hinsieht.
+    window.__outSeen = [];
+    new MutationObserver(() => {
+      const o = document.getElementById("mkRepOut");
+      const t = o ? (o.textContent || "").trim() : "";
+      if (t && window.__outSeen[window.__outSeen.length - 1] !== t) window.__outSeen.push(t);
+      // An `document` hängen, nicht an `document.documentElement`: dieses Skript
+      // läuft VOR dem Seiten-Aufbau, da gibt es noch kein <html> — observe()
+      // warf dann still eine Ausnahme und der Beobachter zeichnete nie etwas auf.
+    }).observe(document, { childList: true, subtree: true, characterData: true });
   }, setEndpoint);
   await page.goto(base + "/markt.html", { waitUntil: "load" });
   await page.evaluate(() => {
     window.FP_MARKT_SUBMIT_ENDPOINT = window.__useEndpoint ? "https://formular.example/einreichung.php" : "";
   });
-  await page.waitForTimeout(700);
+  // Auf das ERGEBNIS warten, nicht auf die Uhr (2026-07-31): die festen
+  // Wartezeiten in dieser Datei ließen den Test unter Last durchfallen — einmal
+  // mit „Cannot read properties of null", weil das Melde-Fenster noch nicht
+  // stand. Grün auf einer ruhigen Maschine, rot auf einer beschäftigten: das
+  // ist schlimmer als dauerhaft rot, weil man dem Test dann nicht mehr glaubt.
+  await page.waitForSelector("#mkListings .mk-report", { timeout: 15000 });
   return page;
 }
+// Das Melde-Fenster wird erst beim Klick gebaut.
+const warteFenster = (page) => page.waitForSelector("#mkRepOv #mkRepSend", { timeout: 15000 });
+// Warten, bis die Bestätigung ANGEZEIGT wurde. Welcher Text das ist, sagt die
+// Seite selbst (FP.t) — kein fest verdrahteter deutscher Satz, der bei der
+// nächsten Umformulierung stillschweigend nie mehr zutrifft.
+const warteBestaetigung = (page) => page.waitForFunction(() => {
+  const soll = (window.FP && FP.t) ? FP.t("mk_rep_ok") : null;
+  return soll ? (window.__outSeen || []).indexOf(soll) >= 0 : (window.__outSeen || []).length > 0;
+}, null, { timeout: 15000 });
+// Ohne Endpunkt ist der mailto-Vordruck das Ergebnis.
+const warteMailto = (page) => page.waitForFunction(() => !!window.__mailto, null, { timeout: 15000 });
 
 console.log("Marktplatz — Melde-Knopf (Stufe 4)");
 
@@ -105,7 +137,7 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
   ok(btn && btn.w >= 44 && btn.h >= 44, `Klickfläche mindestens 44×44 (${btn && btn.w}×${btn && btn.h})`);
 
   await page.click("#mkListings .mk-report");
-  await page.waitForTimeout(200);
+  await warteFenster(page);
   const dlg = await page.evaluate(() => {
     const d = document.getElementById("mkRepOv");
     if (!d) return { open: false };
@@ -144,7 +176,7 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
 
   // 6: Escape schließt UND gibt den Fokus zurück
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(200);
+  await page.waitForFunction(() => !document.getElementById("mkRepOv"), null, { timeout: 15000 });
   const afterEsc = await page.evaluate(() => ({
     gone: !document.getElementById("mkRepOv"),
     focusBack: !!(document.activeElement && document.activeElement.classList
@@ -159,13 +191,14 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
 {
   const page = await open(true);
   await page.click("#mkListings .mk-report");
+  await warteFenster(page);
   const label = await page.evaluate(() => document.querySelector("#mkListings .mk-report").getAttribute("data-label"));
   await page.evaluate(() => {
     document.querySelectorAll('input[name="mkRepReason"]')[2].checked = true;  // „rechtswidrige Inhalte"
     document.getElementById("mkRepMsg").value = "Leitet auf eine fremde Seite weiter.";
   });
   await page.click("#mkRepSend");
-  await page.waitForTimeout(400);
+  await warteBestaetigung(page);
   const sent = await page.evaluate(() => window.__sent);
   ok(sent.length === 1, `genau ein Netz-Aufruf abgesetzt (${sent.length})`);
   const b = sent[0] ? sent[0].body : {};
@@ -174,7 +207,7 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
   ok(b.grund === "r_illegal", `gewählter Grund wird übertragen (${b.grund})`);
   ok(/fremde Seite/.test(b.nachricht || ""), "Freitext des Melders wird übertragen");
   ok(typeof b.fp_elapsed === "number" && "fp_hp_url" in b, "Spam-Schutz-Felder (Zeit + Honigtopf) mitgesendet");
-  ok(await page.evaluate(() => /Danke/i.test(document.getElementById("mkRepOut").textContent)), "Nutzer sieht eine Bestätigung");
+  ok(await page.evaluate(() => (window.__outSeen || []).some((t) => /Danke/i.test(t))), "Nutzer sieht eine Bestätigung");
   await page.close();
 }
 
@@ -182,8 +215,9 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
 {
   const page = await open(false);
   await page.click("#mkListings .mk-report");
+  await warteFenster(page);
   await page.click("#mkRepSend");
-  await page.waitForTimeout(300);
+  await warteMailto(page);
   const r = await page.evaluate(() => ({ sent: window.__sent.length, mailto: window.__mailto }));
   ok(r.sent === 0, "ohne Endpunkt kein Netz-Aufruf");
   ok(/^mailto:info@family-projekt\.de/.test(r.mailto || ""), "fail-soft: mailto-Vordruck an info@ (nichts geht verloren)");
@@ -195,10 +229,11 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
 {
   const page = await open(true);
   await page.click("#mkListings .mk-report");
+  await warteFenster(page);
   await page.evaluate(() => { document.getElementById("mkRepHp").value = "http://spam.example"; });
   await page.click("#mkRepSend");
-  await page.waitForTimeout(300);
-  const r = await page.evaluate(() => ({ sent: window.__sent.length, out: document.getElementById("mkRepOut").textContent }));
+  await warteBestaetigung(page);
+  const r = await page.evaluate(() => ({ sent: window.__sent.length, out: (window.__outSeen || []).join(" ") }));
   ok(r.sent === 0, "Honigtopf gefüllt → kein Netz-Aufruf (Bot läuft ins Leere)");
   ok(/Danke/i.test(r.out), "Bot sieht dieselbe Bestätigung wie ein Mensch (kein Hinweis auf die Falle)");
   await page.close();
