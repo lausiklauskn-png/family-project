@@ -48,7 +48,14 @@ alle 22 Verweise mitgezogen.
 
 1. **`server/marktplatz-api.php` per WebFTP hochladen** (Hetzner Webhosting, konsoleH,
    `Heim / public_html / formular`). Server-Dateien wandern **nie** über Merge oder Deploy.
-   Kontrollgröße: **10,59 KB** (10.844 Bytes; vorher 8,76 KB / 8.975 Bytes).
+   **Erfolgsmerkmal ist das Wort `commit_vectors` im Inhalt der hochgeladenen
+   Datei, NICHT die Dateigröße.** Befund 2026-08-01 (Klaus stutzte zu Recht): im
+   selben Ordner liegt `einreichung.php` mit 10.798 Bytes = 10,54 KB, die neue
+   `marktplatz-api.php` hat 10.844 Bytes = 10,59 KB. **46 Bytes Unterschied** —
+   an der Größe sind die beiden nicht auseinanderzuhalten, und wer die falsche
+   Datei ansieht, hält sie für die richtige. Die Größe taugt hier also nicht als
+   Kontrolle; ein Wort, das nur in der neuen Fassung vorkommt, schon
+   (`commit_vectors`: 2x in `marktplatz-api.php`, 0x in `einreichung.php`).
 2. Danach im Studio einmal „Vektoren bauen" drücken. Erst dann existiert
    `assets/config/listings-vec.json` — vorher greift die Leseseite ins Leere und die Seite
    verhält sich genau wie heute.
