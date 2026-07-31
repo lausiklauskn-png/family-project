@@ -4,6 +4,62 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-07-31 (später Abend): Katalog-Spore Stufe 1 — Schreibseite gebaut
+
+Die Leseseite lag seit dem Nachmittag (PR #141), aber niemand erzeugte die Datei, die sie
+liest. Jetzt gibt es beides.
+
+**Was gebaut wurde**
+
+- **Knopf „🧠 Vektoren bauen" im Marktplatz-Studio** (`assets/studio-markt.js`; Studio öffnet
+  über 1,5 s Langdruck auf das Copyright im Fuß von `markt.html`). Er rechnet die
+  Bedeutungs-Vektoren aller Einträge einmal aus, packt sie mit `FPVecCodec` und schickt das
+  Paket über `commit_vectors` an den Server. Fortschritt in Achter-Häppchen sichtbar;
+  **niemals ein halbes Paket** — erst wenn alles gerechnet ist, geht der Commit raus.
+- **`commit_vectors` in `server/marktplatz-api.php`.** Schwester von `commit_listings`, aber
+  mit echter Prüfung: gültiges JSON · nicht-leeres `vectors` · gesetzte `model`-Kennung. Ziel
+  `assets/config/listings-vec.json`, über `vectors_path` konfigurierbar (Standard passt, eine
+  bestehende `freigabe-config.php` läuft unverändert weiter).
+
+**Der springende Punkt: die vier Stellen, an denen Schreib- und Leseseite zusammenpassen
+müssen** — Text-Regel `x.text || x.label`, `model`, `dim`, Codec. Weicht eine ab, stürzt
+nichts ab: die Leseseite ist fail-soft und rechnet klaglos alles selbst nach. Das Paket läge
+dann nutzlos herum, und niemandem fiele es auf. Deshalb prüft der neue Test nicht die *Form*
+des Pakets, sondern seine *Wirkung*.
+
+**`tests/smoke_studio_vectors.mjs` — 20/20 grün.** Zwei Teile:
+Rundlauf im Browser (Studio baut → Leseseite bekommt genau dieses Paket → **0 Passagen live
+eingebettet**, statt 14) und die Server-Prüfung mit echten Anfragen gegen `php -S`.
+
+**Gegenprobe gemacht, dreimal** (der Test ist sonst wertlos):
+
+| absichtlicher Fehler | Test |
+|---|---|
+| Text-Regel `x.label` statt `x.text \|\| x.label` | rot — (11), (12), (14): 14 statt 0 eingebettet |
+| `model` hartcodiert statt aus `_meta` | rot — (6), (14) |
+| Leer-Schutz aus dem PHP entfernt | rot — (18), (19) |
+
+**Cache-Version auf v71.** `assets/studio-markt.js` wurde bisher **ohne** `?v=` geladen, und
+Caddy cacht `*.js` sieben Tage (`Caddyfile.example:55`). Der neue Knopf wäre bei Klaus
+schlicht nicht aufgetaucht. Die Adresse trägt jetzt `?v=71`, `CACHE_VERSION` + `ASSET_V` +
+alle 22 Verweise mitgezogen.
+
+**Offen / was Klaus tun muss**
+
+1. **`server/marktplatz-api.php` per WebFTP hochladen** (Hetzner Webhosting, konsoleH,
+   `Heim / public_html / formular`). Server-Dateien wandern **nie** über Merge oder Deploy.
+   Kontrollgröße: **10,59 KB** (10.844 Bytes; vorher 8,76 KB / 8.975 Bytes).
+2. Danach im Studio einmal „Vektoren bauen" drücken. Erst dann existiert
+   `assets/config/listings-vec.json` — vorher greift die Leseseite ins Leere und die Seite
+   verhält sich genau wie heute.
+3. **Nicht headless prüfbar:** der echte Lauf mit dem 30-MB-Sprachmodell und dem echten
+   Studio-Passwort. Der Test fährt mit einem Modell-Stub. → wartet auf Klaus' Browser-Lauf.
+
+**Unverändert rot:** `smoke_all.mjs` steht weiter bei 94/103. Die neun sind alt und veraltet
+(Befund 4.1 im Brief), nicht durch diese Sitzung verursacht — vorher wie nachher gemessen.
+
+---
+
 ## ✅ 2026-07-21 (nachts): Marktplatz-Einreichung + Kontaktformular LIVE & Ende-zu-Ende getestet
 
 **Scharfgeschaltet** (PR #98). Endpunkt live: `https://formular.family-projekt.de/einreichung.php`
