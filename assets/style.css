@@ -333,15 +333,47 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .listing .by{font-family:var(--mono);font-size:.74rem;color:var(--accent);margin:0 0 8px}
 .listing p{margin:0 0 12px;color:var(--muted);font-size:.9rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:calc(1.4em * 3)}
 .listing .ext{font-family:var(--mono);font-size:.82rem;align-self:flex-start}
-/* Fußzeile der Marktplatz-Karte: Öffnen links, Melde-Knopf rechts. */
-.listing-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.mk-report{flex:0 0 auto;background:none;border:1px solid var(--line);color:var(--muted);
-  border-radius:8px;padding:4px 8px;font-size:.8rem;cursor:pointer;line-height:1;opacity:.55}
-.mk-report:hover,.mk-report:focus-visible{opacity:1;color:var(--gold);border-color:var(--gold)}
-/* Melde-Fenster */
-.mk-rep-ov{position:fixed;inset:0;z-index:9998;display:flex;align-items:center;justify-content:center;
-  background:rgba(0,0,0,.55);padding:16px}
-.mk-rep-box{max-width:440px;width:100%;padding:20px;max-height:88vh;overflow:auto}
+/* Fußzeile der Marktplatz-Karte: Öffnen links, Melde-Knopf rechtsbündig mit Abstand. */
+.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+
+/* Melde-Knopf — DREIECKIG mit abgerundeten Ecken (Klaus 2026-07-31).
+   Trägt bewusst die echte .btn-Klasse und erbt damit unverändert alles:
+   Schliffkante, 3D-Neigung zum Finger (--rx/--ry aus app.js), den
+   maus-folgenden Holo-Schimmer (::before) und die zweite Lichtbrechung
+   (::after). Zwei Besonderheiten gegenüber den eckigen Knöpfen:
+     1. border-radius kann keine Dreiecke → clip-path: path() mit einer
+        quadratischen Bezier je Ecke (Kontrollpunkt = die spitze Ecke).
+        Maße fest 78×68, weil path() in absoluten Pixeln rechnet.
+     2. clip-path schneidet den ÄUSSEREN box-shadow weg → das Schweben
+        kommt aus filter: drop-shadow(), das der echten Form folgt.
+        Die inneren Schliff-Kanten (inset) bleiben unberührt. */
+.mk-report{
+  width:78px;height:68px;flex:0 0 auto;
+  padding:27px 9px 8px;border-radius:0;border-color:transparent;
+  flex-direction:column;justify-content:flex-end;gap:3px;
+  font-size:.58rem;font-weight:700;line-height:1;text-align:center;
+  color:var(--muted);
+  clip-path:path("M 44.22 9.11 L 72.78 58.89 Q 78 68 67.5 68 L 10.5 68 Q 0 68 5.22 58.89 L 33.78 9.11 Q 39 0 44.22 9.11 Z");
+  filter:drop-shadow(0 7px 13px rgba(0,0,0,.46));
+  box-shadow:
+    inset 0 2px 1px rgba(255,255,255,.42),
+    inset 0 -6px 10px rgba(0,0,0,.5),
+    inset 0 0 0 1px rgba(255,255,255,.09)}
+.mk-report .ic{font-size:1rem;line-height:1}
+.mk-report:hover,.mk-report:focus-visible{
+  color:var(--gold);
+  filter:drop-shadow(0 10px 18px rgba(0,0,0,.5)) drop-shadow(0 0 9px color-mix(in srgb,var(--gold) 60%,transparent))}
+/* Ohne clip-path-Unterstützung bleibt ein normaler eckiger Knopf (fail-soft). */
+@supports not (clip-path: path("M 0 0 L 1 1 Z")){
+  .mk-report{clip-path:none;border-radius:12px;padding:10px 9px 9px;height:auto;filter:none;
+    border-color:var(--line)}
+}
+/* Melde-Fenster — natives <dialog>. showModal() legt es in die Top-Layer, es
+   schwebt also über allem, auch ohne diese Regeln (Schutz gegen alten Cache). */
+.mk-rep-dlg{border:1px solid var(--line);border-radius:16px;padding:0;max-width:440px;width:calc(100% - 32px);
+  background:var(--bg2);color:var(--text);box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.mk-rep-dlg::backdrop{background:rgba(0,0,0,.62)}
+.mk-rep-box{padding:20px;max-height:80vh;overflow:auto}
 .mk-rep-box h3{margin:0 0 6px;font-size:1.05rem}
 .mk-rep-box .sub{margin:0 0 14px}
 .mk-rep-box label.opt{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:.9rem;color:var(--fg)}

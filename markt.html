@@ -241,6 +241,7 @@
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ zur Seite des Anbieters", search_btn: "Suchen",
         mk_rep_t: "Diesen Eintrag melden",
+        mk_rep_btn: "Melden",
         mk_rep_h: "Eintrag melden",
         mk_rep_sub: "Stimmt etwas nicht mit diesem Eintrag? Sag uns kurz Bescheid. Es geht um:",
         mk_rep_r_broken: "Die Seite ist nicht erreichbar oder kaputt.",
@@ -251,7 +252,7 @@
         mk_rep_send: "Meldung senden", mk_rep_cancel: "Abbrechen",
         mk_rep_sending: "Wird gesendet …",
         mk_rep_ok: "✓ Danke! Wir sehen uns den Eintrag an.",
-        mk_rep_err: "Senden hat nicht geklappt. Bitte schreib uns direkt an info@family-projekt.de.",
+        mk_rep_err: "Das Senden hat gerade nicht geklappt. Schreib uns die Meldung bitte kurz an info@family-projekt.de, wir kümmern uns genauso darum.",
         mk_rep_setup: "Dein E-Mail-Programm öffnet sich mit der fertigen Meldung …",
         sp_h: "Family Projekt unterstützen",
         sp_sub: "Family Projekt ist frei und werbefrei, ein privates Hobby-Projekt, kein Geschäft. Wer mag, kann es mit einer freiwilligen Spende unterstützen und hilft, die laufenden Kosten zu tragen.",
@@ -306,6 +307,7 @@
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ to the provider's site", search_btn: "Search",
         mk_rep_t: "Report this entry",
+        mk_rep_btn: "Report",
         mk_rep_h: "Report entry",
         mk_rep_sub: "Something wrong with this entry? Tell us briefly. It is about:",
         mk_rep_r_broken: "The site is unreachable or broken.",
@@ -316,7 +318,7 @@
         mk_rep_send: "Send report", mk_rep_cancel: "Cancel",
         mk_rep_sending: "Sending …",
         mk_rep_ok: "✓ Thanks! We will look at the entry.",
-        mk_rep_err: "Sending failed. Please email us directly at info@family-projekt.de.",
+        mk_rep_err: "Sending did not work just now. Please email the report to info@family-projekt.de, we will look into it just the same.",
         mk_rep_setup: "Your email app opens with the report ready to send …",
         sp_h: "Support Family Projekt",
         sp_sub: "Family Projekt is free and ad-free, a private hobby project, not a business. If you like, you can support it with a voluntary donation and help cover the running costs.",
@@ -359,8 +361,10 @@
           '<p>' + esc((x.text || "").slice(0, 160)) + '</p>' +
           '<div class="listing-foot">' +
             (url ? '<a class="btn ghost ext" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(FP.t("mk_open")) + '</a>' : '<span></span>') +
-            '<button type="button" class="mk-report" data-id="' + esc(x.anchorId || "") + '" data-label="' + esc(x.label || "") +
-              '" title="' + esc(FP.t("mk_rep_t")) + '" aria-label="' + esc(FP.t("mk_rep_t")) + '">⚠</button>' +
+            '<button type="button" class="btn ghost mk-report" data-id="' + esc(x.anchorId || "") + '" data-label="' + esc(x.label || "") +
+              '" title="' + esc(FP.t("mk_rep_t")) + '">' +
+              '<span class="ic" aria-hidden="true">⚠</span>' + esc(FP.t("mk_rep_btn")) +
+            '</button>' +
           '</div>' +
           '</div></div>';
       }
@@ -579,26 +583,39 @@
       // fail-soft ohne Endpunkt auf einen mailto-Vordruck.
       var REPORT_REASONS = ["r_broken", "r_mismatch", "r_illegal", "r_other"];
 
+      // Der Melder ist ein NATIVES <dialog> mit showModal() — dasselbe Muster wie
+      // der Andock-Wizard im Siegel (sbkim/siegel-inhalt.js). Der Browser schenkt
+      // uns damit: Fokus springt hinein, Tab bleibt drin, Escape schließt, der
+      // Rest der Seite wird inaktiv, kein Scrollen dahinter. Und der Dialog liegt
+      // in der Top-Layer, schwebt also selbst dann über der Seite, wenn das CSS
+      // fehlt (genau der Fehler vom 2026-07-31, als der Cache-Bump ausblieb).
+      var repOpener = null;   // Knopf, der geöffnet hat — dorthin kehrt der Fokus zurück
+
       function closeReport() {
-        var ov = document.getElementById("mkRepOv");
-        if (ov && ov.parentNode) ov.parentNode.removeChild(ov);
+        var d = document.getElementById("mkRepOv");
+        if (!d) return;
+        try { if (d.close) d.close(); else d.removeAttribute("open"); } catch (_e) {}
+        if (d.parentNode) d.parentNode.removeChild(d);
+        // Fokus zurück auf den auslösenden Knopf: man landet dort, wo man war.
+        if (repOpener && document.contains(repOpener)) { try { repOpener.focus(); } catch (_e) {} }
+        repOpener = null;
       }
 
-      function openReport(id, label) {
+      function openReport(id, label, opener) {
         var T = (window.FP && FP.t) ? FP.t : function (k) { return k; };
         closeReport();
-        var ov = document.createElement("div");
-        ov.className = "mk-rep-ov";
-        ov.id = "mkRepOv";
-        ov.setAttribute("role", "dialog");
-        ov.setAttribute("aria-modal", "true");
+        repOpener = opener || null;
+        var d = document.createElement("dialog");
+        d.className = "mk-rep-dlg";
+        d.id = "mkRepOv";
+        d.setAttribute("aria-labelledby", "mkRepH");
         var opts = REPORT_REASONS.map(function (k, i) {
           return '<label class="opt"><input type="radio" name="mkRepReason" value="' + esc(k) + '"' +
             (i === 0 ? " checked" : "") + '> <span>' + esc(T("mk_rep_" + k)) + "</span></label>";
         }).join("");
-        ov.innerHTML =
-          '<div class="glass mk-rep-box">' +
-            "<h3>" + esc(T("mk_rep_h")) + "</h3>" +
+        d.innerHTML =
+          '<div class="mk-rep-box">' +
+            '<h3 id="mkRepH">' + esc(T("mk_rep_h")) + "</h3>" +
             '<p class="sub">' + esc(T("mk_rep_sub")) + " <b>" + esc(label || "") + "</b></p>" +
             opts +
             '<div class="field" style="margin-top:10px"><textarea id="mkRepMsg" maxlength="600" rows="3" placeholder="' +
@@ -606,18 +623,20 @@
             '<div class="fp-hp" aria-hidden="true"><input id="mkRepHp" name="fp_hp_url" type="text" tabindex="-1" autocomplete="off"></div>' +
             '<div class="mk-rep-actions">' +
               '<button class="btn primary" type="button" id="mkRepSend">' + esc(T("mk_rep_send")) + "</button>" +
-              '<button class="btn" type="button" id="mkRepCancel">' + esc(T("mk_rep_cancel")) + "</button>" +
+              '<button class="btn ghost" type="button" id="mkRepCancel">' + esc(T("mk_rep_cancel")) + "</button>" +
             "</div>" +
             '<pre id="mkRepOut" style="display:none;margin-top:10px"></pre>' +
           "</div>";
-        document.body.appendChild(ov);
-        // Schließen: Klick daneben, Abbrechen, Escape.
-        ov.addEventListener("click", function (e) { if (e.target === ov) closeReport(); });
+        document.body.appendChild(d);
+        // showModal() bringt Fokus + Escape + Hintergrund-Sperre mit; ältere
+        // Browser bekommen wenigstens ein offenes, sichtbares Fenster.
+        try { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); } catch (_e) { d.setAttribute("open", ""); }
+        // Escape löst "cancel"/"close" aus — dabei sauber aufräumen.
+        d.addEventListener("close", closeReport);
+        d.addEventListener("cancel", function () { closeReport(); });
+        // Klick auf den Hintergrund (nicht auf den Kasten) schließt.
+        d.addEventListener("click", function (e) { if (e.target === d) closeReport(); });
         document.getElementById("mkRepCancel").addEventListener("click", closeReport);
-        var onEsc = function (e) {
-          if (e.key === "Escape") { closeReport(); document.removeEventListener("keydown", onEsc); }
-        };
-        document.addEventListener("keydown", onEsc);
         document.getElementById("mkRepSend").addEventListener("click", function () {
           sendReport(id, label, this);
         });
@@ -681,7 +700,7 @@
       document.getElementById("mkListings").addEventListener("click", function (e) {
         var b = e.target.closest ? e.target.closest(".mk-report") : null;
         if (!b) return;
-        openReport(b.getAttribute("data-id") || "", b.getAttribute("data-label") || "");
+        openReport(b.getAttribute("data-id") || "", b.getAttribute("data-label") || "", b);
       });
 
       // ── Bild-Feld: Live-Vorschau + „Bild vom Gerät wählen" ──────────────

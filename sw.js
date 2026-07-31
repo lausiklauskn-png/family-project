@@ -8,8 +8,14 @@
  *
  * CACHE-BUST: bei jeder Shell-Änderung CACHE_VERSION erhöhen (oder beim
  * Deploy Hard-Reload), sonst liefert der SW alte Dateien.
+ *
+ * „Shell-Änderung" heißt JEDE Datei aus CORE — auch reines CSS. Real passiert
+ * (2026-07-31): der Melde-Knopf bekam neue Regeln in assets/style.css, die
+ * Version blieb auf v65, und im Browser erschien das Melde-Fenster unten im
+ * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
+ * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v65";
+var CACHE_VERSION = "family-projekt-v66";
 var CORE = [
   "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   "assets/style.css", "assets/app.js", "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
