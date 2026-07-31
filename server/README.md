@@ -9,24 +9,27 @@ Diese Dateien gehören **aufs Hetzner-Webhosting** (per WebFTP), **nicht** auf d
 Caddy-Server, der die Website ausliefert. Sie sind hier im Repo nur als kopierbare
 Vorlage abgelegt.
 
-> ### ⚠ Offen: `einreichung.php` muss hochgeladen werden (Stand 2026-07-31)
+> ### ✅ Erledigt: `einreichung.php` ist hochgeladen (2026-07-31)
 >
-> Der Marktplatz hat seit heute einen **Melde-Knopf** an jeder Karte. Er schickt
-> `zweck: "meldung"`, und dieser Zweig existiert **nur in der Fassung hier im Repo**.
-> Auf dem Webhosting läuft noch die ältere Datei, die den Zweck nicht kennt: Sie
-> deutet ihn als `eintrag`, vermisst dann die Pflichtfelder und antwortet mit
-> HTTP 400. Im Browser erscheint dann „Das Senden hat gerade nicht geklappt".
+> Der Marktplatz hat seit dem 2026-07-31 einen **Melde-Knopf** an jeder Karte. Er
+> schickt `zweck: "meldung"` — ein Zweig, den nur die Fassung aus diesem Repo kennt.
+> Auf dem Webhosting lag bis dahin die ältere Datei vom 21.07., die den Zweck als
+> `eintrag` deutete, dann Pflichtfelder vermisste und mit HTTP 400 antwortete; im
+> Browser erschien „Das Senden hat gerade nicht geklappt".
 >
-> **Zu tun:** `server/einreichung.php` per WebFTP in denselben Ordner laden, in dem
-> sie schon liegt (der Ordner hinter `window.FP_MARKT_SUBMIT_ENDPOINT`, siehe
-> `assets/config/listings.js`). Nichts umbenennen, nichts weiter einstellen.
+> Klaus hat die neue Fassung am 2026-07-31 per WebFTP nach
+> `Heim / public_html / formular` gespielt (dort liegen auch `marktplatz-api.php`,
+> `.htaccess` und `warteschlange.jsonl`). **Live bewiesen:** eine Testmeldung zu
+> „Jasons Tresor" kam als Mail an `info@family-projekt.de` an, mit Eintrag,
+> Kennung, Grund und Zeitstempel.
 >
-> **Bis dahin geht nichts verloren:** Der Marktplatz weist den Melder auf
-> `info@family-projekt.de` hin, und ohne konfigurierten Endpunkt öffnet er sogar
-> einen fertigen E-Mail-Vordruck.
+> **Kontrolle bei künftigen Änderungen:** Die Dateigröße im WebFTP vergleichen.
+> Die alte Fassung hatte 6,13 KB, die neue 10,54 KB — die Größe verrät sofort,
+> ob wirklich die neue Datei oben liegt und ob ein Kopieren vollständig war.
 >
 > **Merkregel:** Alles unter `server/` wird **nie** durch einen Merge oder Deploy
-> aktualisiert. Wer hier etwas ändert, muss es von Hand hochladen.
+> aktualisiert. Wer hier etwas ändert, muss es von Hand hochladen. Wer es vergisst,
+> merkt es erst am Fehlverhalten im Browser.
 
 ```
 server/
