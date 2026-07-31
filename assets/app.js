@@ -166,12 +166,12 @@
     box.style.cssText = "max-width:420px;width:100%;background:#12151c;color:#e7ecf3;border:1px solid #2a3140;border-radius:14px;padding:20px;font:15px/1.5 system-ui,sans-serif;box-shadow:0 20px 60px rgba(0,0,0,.5);";
     box.innerHTML =
       '<div style="font-size:17px;font-weight:600;margin-bottom:10px;">📷 ' +
-      (en ? "Text from photo — one-time setup" : "Text aus Foto — einmalig einrichten") + "</div>" +
+      (en ? "Text from photo: one-time setup" : "Text aus Foto: einmalig einrichten") + "</div>" +
       '<ol style="margin:0 0 12px;padding-left:20px;">' +
       "<li>" + (en ? "Open " : "Öffne ") +
       '<a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener" style="color:#7fb2ff;">console.mistral.ai/api-keys</a></li>' +
       "<li>" + (en ? "Create a key and copy it." : "Schlüssel erstellen und kopieren.") + "</li>" +
-      "<li>" + (en ? "Paste it here — stays only on this device." : "Hier einfügen — bleibt nur auf diesem Gerät.") + "</li>" +
+      "<li>" + (en ? "Paste it here. It stays only on this device." : "Hier einfügen. Bleibt nur auf diesem Gerät.") + "</li>" +
       "</ol>";
     var inp = document.createElement("input");
     inp.type = "password"; inp.placeholder = en ? "Mistral API key" : "Mistral-API-Schlüssel";
@@ -235,11 +235,11 @@
           input.value = cur + String(res.text).replace(/\s+/g, " ").trim();
           try { input.dispatchEvent(new Event("input", { bubbles: true })); } catch (_e) {}
         } else {
-          alert(res && res.reason ? res.reason : (en ? "Text recognition not available — please type." : "Texterkennung nicht möglich — bitte tippen."));
+          alert(res && res.reason ? res.reason : (en ? "Text recognition not available, please type." : "Texterkennung nicht möglich, bitte tippen."));
         }
         done();
       }).catch(function (e) {
-        alert(global.SbkimOcr ? global.SbkimOcr.ocrErrorHint(e) : (en ? "Not available — please type." : "Nicht möglich — bitte tippen."));
+        alert(global.SbkimOcr ? global.SbkimOcr.ocrErrorHint(e) : (en ? "Not available, please type." : "Nicht möglich, bitte tippen."));
         done();
       });
     };
@@ -465,8 +465,8 @@
     var setLabel = function () {
       var de = getLang() === "de";
       pill.innerHTML = '<span class="rl-ic" aria-hidden="true">↻</span> ' + (de ? "Aktualisieren" : "Refresh");
-      pill.title = de ? "Seite frisch laden — holt die neueste Version (Cache leeren)"
-                      : "Reload fresh — get the latest version (clear cache)";
+      pill.title = de ? "Seite frisch laden, holt die neueste Version (Cache leeren)"
+                      : "Reload fresh, get the latest version (clear cache)";
       pill.setAttribute("aria-label", de ? "Seite frisch laden" : "Reload page fresh");
     };
     setLabel();
