@@ -105,8 +105,16 @@ gegen `php -S` durchspielt (kein Netz nach außen).
 **Schritt 1 — `server/marktplatz-api.php` per WebFTP hochladen.**
 Hetzner **Webhosting S** (konsoleH), Ordner `Heim / public_html / formular` — dorthin, wo
 `einreichung.php`, `freigabe-config.php` und `warteschlange.jsonl` schon liegen.
-Kontrollgröße nach dem Hochladen: **10,59 KB** (10.844 Bytes). Vorher waren es 8,76 KB.
-Stimmt die Zahl, ist die richtige Datei oben und das Kopieren war vollständig.
+**Kontrolle ist das Wort `commit_vectors` im Inhalt, nicht die Dateigröße.** Steht es
+drin, ist die neue Fassung oben (2x in `marktplatz-api.php`, 0x in `einreichung.php`).
+
+Warum nicht die Größe: Im selben Ordner liegt `einreichung.php` mit 10.798 Bytes =
+**10,54 KB**, die neue `marktplatz-api.php` hat 10.844 Bytes = **10,59 KB**. 46 Bytes
+Unterschied. Am 2026-08-01 sah Klaus die falsche Datei an und hielt sie an der Größe für
+die richtige — verständlich, die Zahlen sind praktisch gleich. **Lehre für jede künftige
+Server-Datei: eine Größenangabe taugt nur als Kontrolle, wenn vorher gemessen ist, dass
+die Nachbardateien nicht ähnlich groß sind. Sonst ein Wort nennen, das nur in der neuen
+Fassung vorkommt.**
 
 **Alles unter `server/` wird nie durch einen Merge oder ein Deploy aktualisiert.** Ohne
 diesen Schritt läuft weiter die alte Fassung, der Knopf meldet `unknown_action`, und man
