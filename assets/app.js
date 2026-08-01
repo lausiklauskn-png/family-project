@@ -482,11 +482,42 @@
     if (lb && lb.parentNode === nav) nav.insertBefore(pill, lb); else nav.appendChild(pill);
   }
 
+  /* Macht aus einem <span> ein richtiges Bedien-Element (Befund 5.1, 2026-08-01).
+   *
+   * Sprache und Thema waren <span>-Elemente mit einem Klick-Handler. Ein <span>
+   * bekommt keinen Tabulator-Halt — wer die Seite mit der Tastatur bedient, kam
+   * an die beiden Funktionen GAR NICHT heran. Gemessen, nicht vermutet:
+   * tests/smoke_knoepfe.mjs meldete es auf allen sechs Seiten.
+   *
+   * Warum kein echtes <button>: die Pillen stehen in jeder Seiten-Navleiste als
+   * <span> im HTML. Sie umzuschreiben hieße, sechs Dateien anzufassen und das
+   * gewachsene Aussehen der Leiste zu riskieren. `role` + `tabindex` + Tasten
+   * geben dasselbe Verhalten, ohne die Optik anzurühren — dasselbe Muster, das
+   * der Aktualisieren-Knopf (.pill-reload) schon fährt.
+   *
+   * Die Leertaste braucht `preventDefault`, sonst scrollt der Browser die Seite
+   * weg, während er den Knopf bedient. */
+  function alsKnopf(el, aktion, label) {
+    if (!el) return;
+    el.setAttribute("role", "button");
+    el.tabIndex = 0;
+    if (label) el.setAttribute("aria-label", label());
+    el.addEventListener("click", aktion);
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); aktion(); }
+    });
+    // Der Name muss die Sprache mitmachen, sonst ist er nach dem ersten
+    // Umschalten falsch — schlimmer als keiner.
+    if (label) global.addEventListener("fp:lang", function () { el.setAttribute("aria-label", label()); });
+  }
+
   function init() {
     var lb = document.getElementById("langBtn");
-    if (lb) lb.addEventListener("click", function () { applyLang(lang === "de" ? "en" : "de"); });
+    alsKnopf(lb, function () { applyLang(lang === "de" ? "en" : "de"); },
+      function () { return getLang() === "de" ? "Sprache umschalten, Deutsch oder Englisch" : "Switch language, German or English"; });
     var tb = document.getElementById("themeBtn");
-    if (tb) tb.addEventListener("click", function () { applyTheme(ti + 1); });
+    alsKnopf(tb, function () { applyTheme(ti + 1); },
+      function () { return getLang() === "de" ? "Farbthema wechseln" : "Switch colour theme"; });
     applyTheme(ti);
     applyLang(lang);
     wireAllMics();
