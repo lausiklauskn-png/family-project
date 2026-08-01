@@ -4,6 +4,89 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01 (später): Stufe 5 gebaut — und die FREMD-Lampe redet jetzt
+
+### Stufe 5: Lighthouse misst in der eigenen Aktion (Weg A)
+
+Klaus' Entscheidung umgesetzt: Lighthouse läuft auf **GitHubs Rechnern**, nicht
+über Googles PageSpeed-API. Kein Schlüssel, keine Adressliste an Google.
+
+Die Form gibt der Wächter vor — **nichts Neues daneben gebaut**: dieselbe
+Aktion, derselbe Bericht (`assets/config/spore-stand.json`), neben `wache` ein
+Block `messung` mit den vier Zahlen. Ohne Lighthouse sagt der Steckplatz
+ehrlich `nicht_gemessen`, genau wie `safebrowsing` heute `nicht_geprueft` sagt.
+
+**Keine Gesamtnote, an keiner Stelle.** 100/100/100/20 ist nicht „80 gut", und
+der schwächste Wert ist genau der, den man wissen will — deshalb steht er im
+Ein-Satz-Befund. Es gibt auch keinen Platz, an dem sich später Ja/Nein-Stimmen
+hineinrechnen ließen; die kommen daneben, nie hinein (Klaus' Vorgabe).
+
+**„Es soll mehr zu lesen sein"** — an der Karte vier Zahlen und ein Satz, im
+Aufklapper zu jeder Kategorie: was gemessen wurde, was die Zahl bedeutet, und
+was ein niedriger Wert für einen Besucher **konkret** heißt. Im Studio die volle
+Tabelle, schwächste zuerst.
+
+**Der Schieberegler** stellt einmalig ein, ab welchem Leistungswert gelistet
+wird. Zwei Sicherungen dagegen, dass daraus ein stilles Verschwinden wird: 0
+heißt aus, und ein Eintrag **ohne** Messwert wird nie ausgeblendet — sonst wäre
+der Marktplatz vor der ersten Messung leer und „noch nicht gemessen" sähe aus
+wie „durchgefallen". Was der Regler wegnimmt, bleibt im Studio mit Grund sichtbar.
+
+Dazu ein **Deckel von zehn Messungen je Lauf** (ältestes Datum zuerst), im
+Protokoll genannt statt still angewandt. Schlägt eine Messung fehl, bleibt der
+letzte Befund mit **seinem eigenen Datum** stehen statt zu verschwinden.
+
+Beweis: `tests/smoke_stufe5_messung.mjs`, **56 Proben** in vier Teilen (Regel ·
+Verbund als echtes Programm · Anzeige im Browser · Rundlauf des Reglers). Sechs
+Gegenproben einzeln rot bekommen. Cache-Version **v79 → v80**.
+
+*Beim Bauen gelernt:* ohne installiertes Lighthouse startete das Werkzeug für
+JEDEN Eintrag einen eigenen Prozess, der einzeln scheiterte. Gemerkt wurde es
+nicht am eigenen Test, sondern daran, dass `smoke_stufe2_sporen` — der mit
+Stufe 5 gar nichts zu tun hat — plötzlich in seine Zeitgrenze lief. **Ein neuer
+Schritt im gemeinsamen Lauf gehört gegen die BESTEHENDEN Tests gemessen.**
+
+### Modul 15: die FREMD-Lampe sagt jetzt, WER geklopft hat
+
+Klaus' Fund vom selben Tag: rote Lampe im DuckDuckGo-Browser, und im Fenster
+stand nur `membrane-postmessage · origin: — · decision: ignored`. Die Membran
+hatte etwas gefangen und richtig abgewiesen — aber wer gesendet hat, war nicht
+zu erkennen, und „ignored" deckt **vier** verschiedene Sachlagen ab.
+
+Jeder Eintrag führt jetzt mit: welcher Abweis-Grund zutraf, wer abgeschickt hat
+(Fenster / eingebetteter Rahmen / öffnendes Fenster), wofür sich die Nachricht
+ausgab, wie lange nach dem Laden sie kam, und ob der Tab dabei vorn war. Das
+Fenster erklärt das in ganzen Sätzen — auch den Strich bei der Herkunft, der
+keine Panne ist, sondern eine echte Auskunft: *nicht feststellbar, typisch für
+Skripte des Browsers selbst und für Erweiterungen.*
+
+**PII-Grenze hart:** nie Werte aus fremden Objekten, nur Feld-NAMEN (gekappt,
+gezählt, gefiltert), Text-Auszug auf 48 Zeichen gekappt und jede Ziffernfolge
+maskiert. RAM-only. `ZERTIFIKAT_ASPEKTE` in Modul 16 mitgezogen (Pflicht).
+
+Gebaut im **Sage-Kanon** (`src/modules/15_membran.js`, 27 Proben, vier
+Gegenproben rot bekommen), von dort hierher geholt. **Wichtig:** dieses Repo
+trägt Modul 15 **nicht** byte-1:1, sondern als bewussten Fork (eigener
+A5-Antwortpfad, kein `queryJudge`). Die Pflege wurde deshalb als **Delta**
+aufgesetzt statt überschrieben — Diff gelesen vor dem Überschreiben. Nachgezählt:
+Eigenpflege steht, nichts Fremdes eingeschleppt.
+
+### ⚠ Gemessen und offen: Modul 15 steht netzweit in VIER Fassungen
+
+`sbkim/15_membran.js` auf `origin/main`, nachgezählt am 2026-08-01:
+
+| Fassung | Repos |
+|---|---|
+| `0d037cd2` (= Sage-Kanon vor dieser Pflege) | Jasons-Tresor · Mein-Tresor · Tomys-Hub |
+| `e2ed570d` | Mein-Mixarium |
+| `b0287e73` | Mein-Rezeptbuch · Muttis-Rezeptbuch |
+| `82b7022f` (Fork mit A5-Pfad) | family-project |
+
+Der netzweite Rollout dieser Pflege ist damit **kein** byte-1:1-Kopieren,
+sondern dieselbe Delta-Arbeit je Fassung. Das ist ein eigener Schritt.
+
+---
+
 ## ✅ 2026-08-01 (nachts): Befund 5.1, ein Loch im Cache-Wächter, und die Lighthouse-Modul-Runde
 
 ### Zuerst nachgesehen: der Wächter-Bericht

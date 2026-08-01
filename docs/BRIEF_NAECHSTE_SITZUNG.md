@@ -1,4 +1,4 @@
-# Brief für die nächste Sitzung — family-project (Stand 2026-08-01, nachts)
+# Brief für die nächste Sitzung — family-project (Stand 2026-08-01, spät)
 
 Klaus, das ist der vollständige Übergabestand. Alles Offene steht drin, mit dem
 Grund dahinter.
@@ -9,10 +9,10 @@ Grund dahinter.
 
 1. `CLAUDE.md` in `Sage-Protokol` — § Sitzungsstart-Pflicht (immer frisch von `origin/main`)
 2. Diesen Brief
-3. `tools/waechter.mjs` — der Kopf erklärt Stufe 3 in einer Bildschirmseite
-4. `tests/smoke_knoepfe.mjs` — der Kopf erklärt Befund 5.1 und die drei
-   Gegenproben, darunter die, die nur schien zu greifen
-5. `tests/smoke_stufe3_waechter.mjs` — der Kopf nennt die sieben Gegenproben
+3. `tools/messung.mjs` — der Kopf erklärt Stufe 5 in einer Bildschirmseite
+4. `tools/waechter.mjs` — der Kopf erklärt Stufe 3 ebenso
+5. `tests/smoke_stufe5_messung.mjs` — der Kopf nennt die sechs Gegenproben und
+   die Lehre, die dieser Test beim Bauen gekostet hat
 
 **Vor jeder Arbeit an einem Repo:**
 
@@ -23,8 +23,7 @@ git -C <repo> checkout -B <branch> origin/main
 
 Nach einem Squash-Merge zeigt `git log origin/main..branch` noch Commits, obwohl
 der Inhalt in `main` ist. Immer zusätzlich `git diff origin/main origin/<branch>
---stat` prüfen. Ist der leer, ist ein `push --force-with-lease` gefahrlos — das
-kam in dieser Sitzung real vor.
+--stat` prüfen.
 
 **Vor dem ersten Test:** `npm install playwright-core --no-save`. Es gibt keine
 `package.json`; ohne diesen Schritt bricht jeder Browser-Test mit
@@ -34,8 +33,8 @@ kam in dieser Sitzung real vor.
 
 **Von dieser Maschine NICHT erreichbar:** `cdn.jsdelivr.net`, `huggingface.co`,
 `*.github.io` (Proxy 403). Erreichbar ist `raw.githubusercontent.com`.
-**Workflows von Hand starten geht aus einer Sitzung heraus nicht** (403, in
-dieser Sitzung erneut gemessen). Das bleibt Klaus' Schritt.
+**Workflows von Hand starten geht aus einer Sitzung heraus nicht** (403). Das
+bleibt Klaus' Schritt.
 
 ---
 
@@ -43,315 +42,179 @@ dieser Sitzung erneut gemessen). Das bleibt Klaus' Schritt.
 
 | Was | Wo |
 |---|---|
-| Wächter-Bericht nachgesehen — Antwort: es gibt noch keinen | (Befund, siehe unten) |
-| **Befund 5.1** — vier Bedien-Elemente waren per Tastatur unerreichbar | PR #157 |
-| **Loch im Cache-Wächter** — `?v=` brach den Vergleich | PR #157 |
-| **Lighthouse-Modul-Runde** — Modul 17 + 23 UI an der Quelle geheilt | Sage PR #777 |
-| **Netzweiter Rollout** in 14 Repos, 20/20 verifiziert | 14 PRs, alle gemergt |
+| **Stufe 5 — Lighthouse in der eigenen Aktion (Weg A)** | family-project |
+| **Modul 15 — das Fremdzugriff-Protokoll sagt jetzt, wer geklopft hat** | Sage-Kanon + family-project |
 
-Cache-Version steht auf **v78**. `smoke_knoepfe` **59/59**, `smoke_all` 107/107,
-`smoke_fokus` 15/15, `smoke_cache_version` 10/10, `smoke_stufe3_waechter` 64/64,
-`smoke_stufe2_sporen` 38/38, `smoke_markt_melden` 32/32, `smoke_studio_markt` 62/62.
+Cache-Version steht auf **v80**. `smoke_stufe5_messung` 56/56,
+`smoke_membran_protokoll` 27/27, `smoke_all` 107/107, `smoke_knoepfe` 64/64,
+`smoke_stufe3_waechter` 64/64, `smoke_stufe2_sporen` 38/38,
+`smoke_cache_version` 10/10, `smoke_studio_markt` 62/62,
+`smoke_studio_vectors` 41/41. In Sage: `smoke_bau15c_protokoll` 27/27,
+`smoke_bau15b_membran` 35/35, die drei Siegel-Suiten unverändert grün.
 
-### Der Wächter-Bericht: es gibt noch keinen
+### Stufe 5 — was gebaut wurde
 
-`assets/config/spore-stand.json` steht auf `geprueft: null`. Kein Rot, kein Gelb
-— es gibt schlicht nichts. Über die API nachgezählt: die Aktion hat **null
-Läufe** (`total_count: 0`). Der Merge war um 10:32 UTC, der Zeitplan steht auf
-02:40 UTC. **Die erste Nacht liegt noch vor uns.**
+`tools/messung.mjs` hängt sich an denselben Lauf wie der Wächter und schreibt in
+denselben Bericht: neben `wache` je Eintrag ein Block `messung` mit den vier
+Zahlen (Leistung, Bedienbarkeit, gute Praxis, Auffindbarkeit).
 
-### Befund 5.1 war größer als notiert
+- **Keine Gesamtnote, an keiner Stelle.** 100/100/100/20 ist nicht „80 gut".
+  Der Ein-Satz-Befund auf der Karte nennt stattdessen den **schwächsten** Wert —
+  genau den will man wissen. Es gibt auch keinen Platz, an dem sich später
+  Ja/Nein-Stimmen hineinrechnen ließen.
+- **„Es soll mehr zu lesen sein":** an der Karte vier Zahlen und ein Satz, im
+  Aufklapper zu jeder Kategorie was gemessen wurde, was die Zahl bedeutet, und
+  was ein niedriger Wert für einen Besucher **konkret** heißt. Dazu der ehrliche
+  Zusatz, dass es eine Maschinen-Messung ist und nichts darüber sagt, ob die App
+  gut oder nützlich ist.
+- **Der Schieberegler** sitzt im Studio und wird mit den Einträgen
+  veröffentlicht (`window.FP_MARKT_MIN_LEISTUNG` in `assets/config/listings.js`
+  — kein neuer Server-Pfad, keine Datei zum Hochladen). 0 heißt aus. Ein Eintrag
+  **ohne** Messwert wird nie ausgeblendet.
+- **Deckel:** zehn Messungen je Lauf, ältestes Datum zuerst, im Protokoll
+  genannt. Ein Fehlschlag löscht den alten Befund nicht, sondern lässt ihn als
+  `veraltet` mit **seinem eigenen Datum** stehen.
 
-Der Brief sagte, die Symbol-Knöpfe trügen ihren Zweck nur in einem `title`, der
-auf Touch nie erscheint. Das stimmt — aber daneben lag etwas Schwereres.
+**Was NICHT geprüft ist und auf dich wartet:** ob Lighthouse in der echten
+Aktion durchläuft. Der Test fährt einen Doppelgänger über `LIGHTHOUSE_CMD` —
+derselbe Spawn, dieselbe Bericht-Datei, nur ein anderes Programm am Ende. Ob
+`npm install lighthouse` auf GitHubs Rechnern klappt und ob Chrome dort gefunden
+wird, sagt erst der erste nächtliche Lauf. Schlägt es fehl, ist das **kein**
+Schaden: die Aktion läuft weiter (`continue-on-error`), und der Bericht sagt
+ehrlich `nicht_gemessen`.
 
-**Sprache (DE/EN), Thema (◐), die SIEGEL-Lampe und der ⊕-Status-Chip waren
-`<span>`-Elemente mit einem Klick-Handler.** Ein `<span>` bekommt keinen
-Tabulator-Halt. Wer die Seite mit der Tastatur bedient, kam an diese vier
-Funktionen **gar nicht heran** — nicht schwer erreichbar, sondern unerreichbar.
-Auf allen sechs Seiten.
+### Modul 15 — was gebaut wurde
 
-Das Muster dagegen stand längst im Repo: `.pill-reload` macht es seit dem
-Hard-Reload-Knopf richtig (`role` + `tabindex` + `aria-label` + `keydown`). Es
-wird jetzt geteilt genutzt, ohne die Optik der Navleiste anzurühren.
+Dein Fund vom 2026-08-01: rote FREMD-Lampe im DuckDuckGo-Browser, und im Fenster
+stand nur `membrane-postmessage · origin: — · decision: ignored`.
 
-Neuer Wächter `tests/smoke_knoepfe.mjs`, **59 Proben**, drei Teile — weil es
-drei Arten gibt, das falsch zu machen:
+Jeder Eintrag führt jetzt mit: welcher der Abweis-Gründe zutraf, wer
+abgeschickt hat, wofür sich die Nachricht ausgab, wie lange nach dem Laden sie
+kam und ob der Tab dabei vorn war. Das Fenster erklärt das in ganzen Sätzen —
+auch den Strich bei der Herkunft, der keine Panne ist, sondern eine echte
+Auskunft: *nicht feststellbar, typisch für Skripte des Browsers selbst und für
+Erweiterungen.*
 
-- **A Erreichbarkeit** — hat das Element einen Tabulator-Halt?
-- **B Name** — nennt ein `aria-label`, WAS der Druck tut? Sichtbarer Text zählt
-  hier bewusst nicht: „DE / EN" ist ein Zustand, keine Handlung.
-- **C Wirkung** — tut die Enter-Taste wirklich etwas? Das ist die eigentliche
-  Falle: `role` und `tabindex` ohne Tasten-Handler bestehen A und B und bedienen
-  nichts.
-
-### Nebenbefund: der Cache-Wächter übersah `app.js` und `style.css`
-
-Nach der Änderung an `assets/app.js` meldete `smoke_cache_version` brav „keine
-CORE-Datei geändert — nichts zu prüfen". Falsch. In der CORE-Liste des
-Service-Workers steht `"assets/app.js?v=77"`, git meldet `assets/app.js` — **der
-Versions-Anhang brach den Vergleich.**
-
-Folge: die beiden meistgeänderten Dateien des Projekts waren seit Einführung des
-Wächters von seiner Prüfung ausgenommen. Er stand grün daneben. Derselbe
-Fehlertyp wie bei den Playwright-Umleitungen, die an einem angehängten `?ts=`
-zerbrechen.
-
-Zweiter Fund an derselben Stelle: `assets/status-widget.js` stand weder in CORE
-noch trug es ein `?v=` — es hing frei am HTTP-Cache, den niemand bustet.
-
-**Noch offen, bewusst nicht angefasst:** `assets/mycel-bg.js` (10 Verweise)
-hängt ebenso ohne `?v=` und ohne CORE-Eintrag frei am HTTP-Cache.
+PII-Grenze hart: nie Werte aus fremden Objekten, nur Feld-NAMEN, Text-Auszug
+gekappt und jede Ziffernfolge maskiert, alles RAM-only.
+`ZERTIFIKAT_ASPEKTE` in Modul 16 mitgezogen.
 
 ---
 
-## 2. Die Lighthouse-Modul-Runde — was lief, und was bewusst offen blieb
+## 2. Was du tun kannst — der Reihe nach
 
-Klaus' Übergabe-Brief, Teil 4. Zwei Befunde an den **geteilten** Modulen.
+**a) Ins Fremdzugriff-Fenster schauen, sobald `main` deployt ist.** Öffne
+family-projekt.de im **DuckDuckGo-Browser**, warte bis die FREMD-Lampe rot wird,
+klick sie an. Unter dem Eintrag steht jetzt ein Satz, der sagt, wer geklopft hat.
+**Das ist der Beleg, auf den es ankommt** — die Frage „war es DuckDuckGos KI?"
+lässt sich damit zum ersten Mal beantworten, statt sie zu vermuten.
 
-**Modul 17:** `--sbkim-widget-bg` stand auf `rgba(0, 0, 0, 0.45)`, dem Wert der
-**dunklen** Sage-Page. In einer hellen PWA kippt die Rechnung. Selbst
-nachgerechnet statt übernommen — und über heller Seite **schlimmer** als im
-Brief notiert:
+**b) Nach der nächsten Nacht in den Marktplatz schauen.** Unter jeder Karte
+sollten vier Zahlen stehen. Stehen dort stattdessen „Noch nicht gemessen." —
+auch gut, dann hat Lighthouse in der Aktion nicht durchgezogen, und der Grund
+steht im Studio in der Messungs-Tabelle.
 
-| | Untergrund | helle Schrift | abgeblendete |
-|---|---|---|---|
-| vorher | helle Seite | **3,09:1** | **1,97:1** |
-| nachher | helle Seite | 11,57:1 | 7,27:1 |
-| nachher | dunkle Seite | 17,33:1 | 9,96:1 |
+**c) Den Schieberegler einstellen, wenn du magst.** Studio (Langdruck auf die
+Copyright-Zeile) → Block „📈 Messung (Lighthouse)". Darunter steht live, wie
+viele Einträge bei diesem Wert herausfielen. Wirksam wird er erst mit
+„Veröffentlichen".
 
-**Modul 23 UI:** der „Schlüssel holen"-Link wurde ohne Adresse erzeugt.
-
-Beides in Sage geheilt (PR #777) mit neuem Wächter
-`tests/smoke_lighthouse_module.mjs` (17 Proben, liest die Farben aus dem Modul
-und rechnet damit). **Neuer Kanon `6017e263bb7f` (17) · `00a6920535d3` (23 UI).**
-
-Ausgerollt in **14 Repos**, **20/20 Dateien auf `origin/main` verifiziert, 0
-abweichend.** sha-Pins in fünf Repos mitgezogen; netzweite Gegenprobe: keine alte
-sha blieb stehen.
-
-### ⚠ Der wichtigste offene Punkt: vier Repos tragen eine Gabelung
-
-`sbkim/17_floating_widget.js` ist in **Mein-Rezeptbuch, Muttis-Rezeptbuch,
-Mein-Mixarium und BookLedgerPro** *nicht* überschrieben worden. Mit Absicht.
-
-Sie tragen eine **repo-eigene Pflege, die der Sage-Kanon nicht hat:**
-
-- **Rezeptbuch / Muttis / Mixarium** — dein Pro-App-Namensraum-Fix vom
-  2026-06-28: die localStorage-Schlüssel tragen den App-Pfad, damit
-  Geschwister-Apps auf derselben `github.io`-Adresse sich nicht denselben
-  Widget-Zustand teilen. *Vorher führte ein Schließen in einer App zum
-  Verschwinden in allen.*
-- **BookLedgerPro** — der Proxy-ID-Guard: keine Kollision mit dem statischen
-  `#sbkim-siegel-badge` dieses Endknotens.
-
-Gleichzeitig **fehlt** allen vieren der Stufen-Render von 2026-05-26 aus dem
-Kanon. Sie sind also weder Vorgänger noch Nachfolger, sondern eine **Gabelung**.
-Byte-1:1-Überschreiben hätte deine Fixes zurückgedreht — genau das, wovor der
-Rollout-Skill warnt.
-
-**Der saubere Weg** (nächster Schritt, siehe Abschnitt 5): die beiden
-Eigenpflegen **in den Sage-Kanon holen**. Dann sind alle wieder byte-1:1, und
-der Lesbarkeits-Fix kommt automatisch mit. Das ist ein eigener Schritt mit
-eigenen Gegenproben, kein Nebenher im Rollout.
-
-Bis dahin: **in diesen vier Apps ist die Widget-Beschriftung über einer hellen
-Seite weiterhin schwer lesbar.** Das ist der ehrliche Stand.
-
----
-
-## 3. Was du noch tun musst
-
-**a) Die Aktion einmal von Hand starten.** Actions → „Sporen lesen und Vektoren
-fortschreiben (täglich)" → *Run workflow*. Danach steht schwarz auf weiß, welche
-der neun Sporen antworten und ob der Lauf mit dem echten Modell durchgeht.
-**Eine Sitzung kann das nicht für dich tun** (403, zweimal gemessen).
-
-**b) Zwei Dateien per WebFTP hochladen** — unverändert offen:
+**d) Zwei Dateien per WebFTP hochladen** — unverändert offen:
 `server/einreichung.php` und `server/marktplatz-api.php`. **Kontrolle:** in
 beiden neuen Fassungen kommt das Wort **`sporeUrl`** vor, in den alten kein
 einziges Mal. Nicht auf die Dateigröße schauen.
 
-Ohne den Upload bleibt alles heil — es fehlt nur der freiwillige Spore-Link aus
-dem Einreich-Formular im Studio.
-
-**c) Danach Safe Browsing scharf schalten**, wenn du magst. Erst **nach** dem
-ersten Wächter-Lauf: wenn Aktion und Google-Abfrage gleichzeitig neu sind und
-etwas rot wird, weiß niemand, welcher Teil schuld war. Weg: Google-Projekt →
-Safe Browsing API aktivieren → API-Schlüssel → Repo Settings → Secrets and
-variables → Actions → *New repository secret*, Name genau **`SAFE_BROWSING_KEY`**.
-Der Workflow reicht ihn bereits durch; es braucht keinen weiteren Bau.
+**e) Safe Browsing scharf schalten.** Der Wächter läuft nachweislich allein,
+der Moment ist jetzt richtig: Google-Projekt → Safe Browsing API aktivieren →
+API-Schlüssel → Repo Settings → Secrets and variables → Actions → *New
+repository secret*, Name genau **`SAFE_BROWSING_KEY`**. Der Workflow reicht ihn
+bereits durch; es braucht keinen weiteren Bau.
 
 ---
 
-## 3b. ENTSCHIEDEN und BESTÄTIGT am 2026-08-01 (Klaus, im Browser)
+## 3. Die offenen Punkte, mit Grund
 
-**Der erste Wächter-Lauf ist gelaufen und war grün.** Alle 14 Einträge `gruen`,
-HTTP 200 durchweg — auch die fünf Adressen auf `*.github.io`, über die vorher
-nichts feststand. Modell echt (`Xenova/multilingual-e5-small`, 14 Vektoren). Der
-Lauf schrieb nur den Bericht, keine Vektoren neu — die Spar-Logik greift.
+### ⚠ Modul 15 steht netzweit in VIER Fassungen (neu gemessen)
 
-*Nebenbefund zum Ansehen bei Gelegenheit:* bei neun Anbietern steht
-`"lage": "geaendert"` — ihre Spore beschreibt sich anders als ihr
-Marktplatz-Eintrag. Gemeldet, nicht übernommen (richtig so, `sporeAuto` ist aus).
-Klaus kann entscheiden, ob ihm die Selbstbeschreibungen besser gefallen.
+`sbkim/15_membran.js` auf `origin/main`, am 2026-08-01 nachgezählt:
 
-**Klaus' Browser-Sichttest, beide grün:**
+| Fassung | Repos |
+|---|---|
+| `0d037cd2` (= Sage-Kanon vor dieser Pflege) | Jasons-Tresor · Mein-Tresor · Tomys-Hub |
+| `e2ed570d` | Mein-Mixarium |
+| `b0287e73` | Mein-Rezeptbuch · Muttis-Rezeptbuch |
+| `82b7022f` (Fork mit A5-Antwortpfad) | family-project — **jetzt mit der Pflege** |
 
-- **Modul 17** in Private Brain (helles Thema): die schwebende Pille sitzt auf
-  sattem, fast schwarzem Grund, alle vier Wörter klar lesbar — auch die grauen.
-  Der Kontrast-Fix ist damit nicht nur gerechnet, sondern **gesehen**.
-- **Der ⊕-Status-Chip** auf family-projekt.de holt das Widget zurück. Das war
-  einer der vier Knöpfe, die vorher per Tastatur unerreichbar waren.
+Der Rollout ist damit **kein** byte-1:1-Kopieren, sondern dieselbe Delta-Arbeit
+je Fassung. Der Weg ist erprobt: das Delta als Patch aus dem Sage-Commit ziehen,
+mit `patch` aufsetzen, danach nachzählen, dass die Eigenpflege des Repos noch
+steht und nichts Fremdes eingeschleppt wurde. Genau so ist family-project
+versorgt worden. **Eigener Schritt, eigene Gegenprobe je Repo.**
 
-*Klarstellung für die nächste Sitzung, damit der Irrtum sich nicht wiederholt:*
-family-projekt.de zeigt **nicht** das Modul-17-Widget. Es hat ein eigenes,
-angedocktes (`assets/status-widget.js`); Modul 17 läuft dort versteckt als
-Zulieferer. Wer Modul 17 sichtbar prüfen will, nimmt eine App mit
-`SbkimWidget.show()` — Privat-Brain, Kimboard, Kimseek, Mein-Tresor,
-Jasons-Tresor.
+### ⚠ Modul 17 trägt in vier Repos eine Gabelung (unverändert)
 
-**Offener Befund von Klaus, wert nachzugehen:** im **DuckDuckGo-Browser** steht
-die **FREMD-Lampe auf Rot**, während sie in Chrome auf derselben Seite grün ist.
-Klaus' Deutung: die eingebaute KI des Browsers. Plausibel, aber noch **nicht
-belegt** — die Lampe meldet „etwas greift von außen zu", nicht *was*. Ein Klick
-auf die Lampe öffnet das Fremdzugriff-Fenster und nennt den Grund. **Das gehört
-nachgelesen und festgehalten**, es wäre der erste Live-Beleg dafür, dass Modul 15
-im Feld etwas Echtes fängt.
+`sbkim/17_floating_widget.js` ist in **Mein-Rezeptbuch, Muttis-Rezeptbuch,
+Mein-Mixarium und BookLedgerPro** bewusst nicht überschrieben: sie tragen deine
+eigenen Fixes (Pro-App-Namensraum, Proxy-ID-Guard), die der Sage-Kanon nicht
+hat, und ihnen fehlt gleichzeitig der Stufen-Render von 2026-05-26. Weder
+Vorgänger noch Nachfolger, sondern eine Gabelung.
 
-**STUFE 5 — Klaus hat entschieden: WEG A.** Lighthouse läuft in der **eigenen
-Aktion** auf GitHubs Rechnern, **nicht** über Googles PageSpeed-API. Kein
-Schlüssel, keine Adressliste an Google. Die zusätzliche Laufzeit (grob eine
-halbe bis eine Minute je Eintrag) ist in einem nächtlichen Lauf ohne Belang.
+Der saubere Weg bleibt: die beiden Eigenpflegen **in den Sage-Kanon holen**,
+dann sind alle wieder byte-1:1 und der Lesbarkeits-Fix kommt mit. Bis dahin: in
+diesen vier Apps ist die Widget-Beschriftung über heller Seite weiterhin schwer
+lesbar. Das ist der ehrliche Stand.
 
-Die Form ist vom Wächter vorgegeben — **nichts Neues daneben bauen:**
+### Kleinere Reste
 
-1. **Dieselbe Aktion**, derselbe Lauf.
-2. **Derselbe Bericht:** neben `wache` je Eintrag ein Block `messung` mit den
-   vier Zahlen (Leistung, Bedienbarkeit, gute Praxis, Auffindbarkeit).
-3. **Zwei Anzeige-Orte:** an jeder Marktplatz-Karte eine kleine Zeile dort, wo
-   heute das Warnband des Wächters sitzt · im Studio die volle Tabelle.
-4. **Der Schieberegler** stellt einmalig ein, ab welchem Wert gelistet wird.
-5. **Ja/Nein-Stimmen kommen daneben, NICHT hineingerechnet.** Eine
-   Durchschnittsnote aus Messwert und Menschenmeinung bedeutet nichts mehr —
-   das ist Klaus' ausdrückliche Vorgabe.
-6. Ein **Steckplatz, der ohne Messung ehrlich „nicht gemessen" meldet**, genau
-   wie Safe Browsing heute `nicht_geprueft` sagt.
+- **`assets/mycel-bg.js`** (10 Verweise) hängt weiter ohne `?v=` und ohne
+  CORE-Eintrag frei am HTTP-Cache.
+- **Node-20-Deprecation:** `actions/checkout@v4` + `setup-node@v4` in allen
+  Repos. Warnung, kein Fehler. Vor dem Hochziehen die richtige Fassung
+  nachsehen, nicht die Nummer raten.
+- **Ja/Nein-Stimmen** sind noch nicht gebaut. Sie brauchen einen Zähler auf
+  deinem Server (also wieder eine PHP-Datei zum Hochladen) — deshalb wurde in
+  dieser Sitzung nur der **Platz** dafür freigehalten, nicht die Funktion. Die
+  Regel steht: sie kommen **daneben**, nie in die Messwerte hinein.
+- **Die zweite Hälfte von Befund 5.1** ist weiter offen: verstehen sehende
+  Nutzer die Symbole 🎤 und 📷 im Eingabefeld? Mein Vorschlag bleibt eine Zeile
+  unter dem Formular („🎤 sprechen statt tippen · 📷 Text aus einem Foto") —
+  keine Mechanik, erklärt beide auf einmal.
 
 ---
 
-## 3c. ERSTER LIVE-BELEG: die Membran hat im Feld etwas gefangen (2026-08-01)
+## 4. Wie hier gearbeitet wird
 
-Klaus hat im **DuckDuckGo-Browser** die rote FREMD-Lampe geklickt, nachdem der
-Zugang dazu gebaut war (PR #161). Das Fremdzugriff-Fenster ging auf und zeigte:
-
-```
-2026-08-01T13:54:14.130Z   membrane-postmessage   origin: —   decision: ignored
-```
-
-**Was belegt ist:** Etwas im Browser hat der Seite ein `postMessage` geschickt,
-und Modul 15 hat es **abgewiesen** (`ignored`) und protokolliert. Nicht im Test,
-nicht headless — in Klaus' Browser, auf der echten Seite, beim normalen Laden.
-Das ist der **erste Live-Beleg, dass die Membran im Feld etwas Echtes fängt.**
-
-**Was NICHT belegt ist, und das muss so stehen bleiben:** dass es DuckDuckGos KI
-war. Bei `origin` steht ein Strich — die Herkunft war nicht feststellbar
-(typisch für Browser-eigene Skripte und Erweiterungen, deren Origin leer oder
-`null` ist). Klaus' Deutung ist plausibel, auch weil in Chrome auf derselben
-Seite **nichts** kam. Aber ein Strich ist ein Strich. **Nicht als Tatsache
-weiterschreiben.**
-
-**Vorschlag für eine eigene Sitzung — Modul 15 protokolliert zu wortkarg.**
-Um solche Fälle künftig benennen zu können, müsste der Eintrag mehr mitführen:
-was gesendet hat (Fenster, Erweiterung, Worker), und die ersten Zeichen der
-Nachricht. Das ist ein Eingriff in ein **Sicherheits-Modul, das alle Apps
-teilen** — also:
-
-- geplant, nicht nebenbei; mit eigener Gegenprobe;
-- **KEIN PII ins Protokoll** (Nachrichteninhalt nur gekürzt und gefiltert);
-- Aspekt in `ZERTIFIKAT_ASPEKTE` (Modul 16) mitziehen, Pflicht laut CLAUDE.md;
-- netzweiter Rollout danach, byte-1:1.
-
----
-
-## 4. Die offene Frage aus dieser Sitzung
-
-Du hast auf die Symbol-Frage „keine Präferenz" geantwortet — die zweite Hälfte
-von Befund 5.1 ist damit **weiterhin offen**, und ich habe sie bewusst nicht
-selbst entschieden, weil sie jede Formularzeile der Seite berührt.
-
-Die Lage: 🎤 und 📷 sitzen als 38-Pixel-Knopf **im** Eingabefeld. Sichtbarer
-Text passt dort nicht hinein wie beim Melde-Knopf. Der Zugänglichkeits-Teil ist
-gerichtet (Vorlesehilfen kennen den Zweck über `aria-label`) — offen ist nur, ob
-ein **sehender** Nutzer am Tablet die Symbole versteht.
-
-Drei Wege, wenn du magst:
-
-1. **Eine Zeile unter dem Formular** — „🎤 sprechen statt tippen · 📷 Text aus
-   einem Foto". Kostet keine Mechanik, erklärt beide Symbole auf einmal, ändert
-   an den Feldern nichts. *Das wäre mein Vorschlag.*
-2. **Sprechblase beim Antippen** — näher am gewohnten Tooltip, aber sie
-   verzögert den Knopf, und wer schnell tippt, sieht sie nie.
-3. **Nichts ändern** — die Symbole sind verbreitet genug.
-
----
-
-## 5. Vorschlag für die Reihenfolge
-
-1. **Die Aktion von Hand starten** (3a) — alles Weitere baut darauf auf.
-2. **Den ersten Bericht ansehen** — im Studio, Block „Sporen der Anbieter". Jede
-   Zeile trägt eine Ampel.
-3. **Die Gabelung bei Modul 17 auflösen** (Abschnitt 2) — deine zwei Fixes in
-   den Sage-Kanon holen, dann die vier Apps wieder byte-1:1 versorgen. Solange
-   das aussteht, tragen ausgerechnet die vier meistgenutzten Apps den
-   Lesbarkeits-Befund weiter.
-4. **Safe Browsing scharf schalten** (3c) — erst nach Schritt 1.
-5. **Die zwei PHP-Dateien hochladen** (3b) — unabhängig von allem anderen.
-6. **Stufe 5** (Lighthouse + Ja/Nein-Stimmen) — die Frage nach dem Lighthouse-Weg
-   (eigener Lauf in der Action ↔ PageSpeed-API mit Schlüssel) ist noch offen.
-   Der Wächter hat die Form vorgegeben: dieselbe Aktion, derselbe Bericht, ein
-   Steckplatz der ohne Schlüssel ehrlich „nicht geprüft" meldet.
-7. **`assets/mycel-bg.js`** in den Cache-Bust-Pfad holen (Abschnitt 1) — klein.
-8. **Stufe 0** (Relais-Messung, du im Browser), dann **Stufe 6**. **Stufen 7/8**
-   zum Schluss.
-
----
-
-## 6. Wie hier gearbeitet wird
-
-- **Messen statt schätzen.** „Sieht fertig aus" ist kein Befund. In dieser
-  Sitzung viermal: die Aktion war nie gelaufen, Befund 5.1 war größer als
-  notiert, der Cache-Wächter übersah seine wichtigsten Dateien, und die
-  Kontrast-Zahlen aus dem Brief waren über heller Seite zu günstig.
-- **Zu jedem neuen Wächter eine Gegenprobe — und sie muss scharf sein.** Wenn
-  eine Funktion **zwei** Fehler-Zweige hat, braucht sie **zwei** Gegenproben.
-- **NEU aus dieser Sitzung: nachzählen, dass der eingebaute Fehler wirklich im
-  Code landet.** Eine Gegenprobe blieb grün — nicht weil die Probe stumpf war,
-  sondern weil die Änderung gar nicht gegriffen hatte (die gesuchte Zeile war
-  anders eingerückt als angenommen). *Ein Fehler, der nicht ankommt, beweist
-  nichts über den Test.*
-- **Am richtigen Merkmal messen.** Eine Probe las `data-theme` ab, obwohl die
-  App CSS-Variablen und einen sichtbaren Namen setzt — sie blieb rot, obwohl der
-  Knopf längst tat, was er sollte.
-- **Nicht das eigene Zutun messen.** `page.focus()` scrollt das Element selbst in
-  den Blick; weiches Scrollen läuft nach. Beides verfälschte eine Scroll-Probe.
+- **Messen statt schätzen.** „Sieht fertig aus" ist kein Befund.
+- **Zu jedem neuen Wächter eine Gegenprobe — und sie muss scharf sein.** Hat
+  eine Funktion **zwei** Fehler-Zweige, braucht sie **zwei** Gegenproben.
+- **Nachzählen, dass der eingebaute Fehler wirklich im Code landet.** Ein
+  Fehler, der nicht ankommt, beweist nichts über den Test.
+- **NEU aus dieser Sitzung: einen neuen Schritt im gemeinsamen Lauf gegen die
+  BESTEHENDEN Tests messen, nicht nur gegen den eigenen.** Die Messung startete
+  ohne installiertes Lighthouse für jeden Eintrag einen eigenen Prozess. Gemerkt
+  wurde es nicht am neuen Test — der war grün — sondern daran, dass
+  `smoke_stufe2_sporen` plötzlich in seine Zeitgrenze lief.
+- **Am richtigen Merkmal messen.** Eine Probe las `data-theme`, obwohl die App
+  CSS-Variablen setzt.
+- **Nicht das eigene Zutun messen.** `page.focus()` scrollt selbst.
+- **Kopieren, nicht klonen — aber Diff LESEN vor Überschreiben.** Findet sich
+  eine repo-eigene Zeile: nicht überschreiben, sondern das Delta aufsetzen und
+  danach nachzählen, dass die Eigenpflege noch steht.
+- **Ein Beleg aus dem Repo ist kein Beleg über die Wirklichkeit.**
 - **Cache ist hier die häufigste Ursache, nicht der Sonderfall.**
 - **Wer eine CORE-Datei ändert, erhöht `CACHE_VERSION` und `ASSET_V`** und zieht
-  alle `?v=`-Verweise mit. Steht auf **v78**.
-- **Ein Beleg aus dem Repo ist kein Beleg über die Wirklichkeit.**
-  Server → `curl -sI <url>` · Test → Fehler absichtlich einbauen · Upload → ein
-  Wort suchen, das nur die neue Fassung enthält.
-- **Kopieren, nicht klonen — aber Diff lesen vor Überschreiben.** Findet sich
-  eine repo-eigene Zeile: nicht überschreiben, sondern an der Quelle
-  zusammenführen. In dieser Sitzung hat das vier von Klaus' eigenen Fixes
-  gerettet.
+  alle `?v=`-Verweise mit. Steht auf **v80**.
 - **`raw.githubusercontent.com` liefert für PRIVATE Repos immer 404.**
-- **Der `domainVector` aus einer Spore gehört NICHT sicher zum selben Text.**
 - **Alles unter `server/` wird nie durch Merge oder Deploy aktualisiert.**
 - **Erst mergen, dann prüft Klaus.** GitHub Pages deployt von `main`.
 - **Selbst-Merge-Freibrief gilt** (Klaus 2026-06-28, netzweit).
-- **Einzelschritte für Klaus.** Ein Schritt pro Antwort mit klarem Erfolgsmerkmal,
-  keine Terminal-Befehle ohne Angabe, auf welche Maschine sie gehören.
+- **Einzelschritte für Klaus.** Ein Schritt pro Antwort mit klarem
+  Erfolgsmerkmal, keine Terminal-Befehle ohne Angabe, auf welche Maschine sie
+  gehören.
+- **family-projekt.de zeigt NICHT Modul 17**, sondern sein eigenes angedocktes
+  Widget (`assets/status-widget.js`); Modul 17 läuft dort als Zulieferer. Wer
+  Modul 17 sichtbar prüfen will, nimmt Privat-Brain, Kimboard, Kimseek,
+  Mein-Tresor oder Jasons-Tresor.
 
 ### Die drei Maschinen nicht verwechseln
 
@@ -366,12 +229,13 @@ auf dem Tablet landen.
 
 ---
 
-## 7. Sitzungsende, jedes Mal
+## 5. Sitzungsende, jedes Mal
 
 1. `docs/PULS.md` fortschreiben (Datum, was getan, was offen, was als Nächstes).
 2. Bei Andock-Bezug `sbkim/SIGNAL.json` pflegen — das Pushen ist das Signal.
-   *(Diese Sitzung: der Modul-Rollout berührt geteilte Module, aber keinen
-   Briefkasten-Vertrag; `SIGNAL.json` blieb unangetastet, und das gehört gesagt.)*
+   *(Diese Sitzung: die Modul-15-Pflege berührt ein geteiltes Sicherheits-Modul,
+   aber keinen Briefkasten-Vertrag; `SIGNAL.json` blieb unangetastet, und das
+   gehört gesagt.)*
 3. Einen **„Nächste Schritte"-Block direkt in die Chat-Antwort** (2–4 Punkte).
 4. Einen **neuen Brief wie diesen** schreiben und **vollständig als Codeblock im
    Chat** ausgeben.
