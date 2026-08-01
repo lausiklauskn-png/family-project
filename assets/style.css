@@ -374,6 +374,42 @@ h2{font-size:1.55rem;margin:0 0 6px}
 :root[data-theme="dark"] .listing p.mk-wache.is-rot,
 :root[data-theme="neon"] .listing p.mk-wache.is-rot{color:#ff7a6b}
 
+/* Messband auf der Marktplatz-Karte (Stufe 5).
+   Wie beim Wächter-Band muss die Drei-Zeilen-Klemmung von `.listing p`
+   ausdrücklich aufgehoben werden — halb sichtbare Erklärtexte waren genau der
+   Befund, den Klaus an der FREMD-Lampe hatte: „es soll mehr zu lesen sein."
+   Die Farbe sagt nur, wie der Wert einzuordnen ist; die Zahl steht immer
+   daneben, damit niemand auf die Farbe allein angewiesen ist. */
+.listing .mk-mess{margin:0 0 12px}
+.listing p.mk-mess--leer,
+.listing .mk-mess p{display:block;-webkit-line-clamp:none;overflow:visible;min-height:0;
+  font-size:.82rem;line-height:1.5;margin:0 0 6px}
+.listing p.mk-mess--leer{color:var(--muted);opacity:.85}
+.mk-ms-zeile{display:flex;flex-wrap:wrap;gap:6px}
+.mk-ms-w{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;
+  border:1px solid currentColor;font-size:.78rem;white-space:nowrap}
+.mk-ms-w b{font-variant-numeric:tabular-nums}
+.mk-ms-w.is-gut{color:#1e7a4b;background:rgba(30,122,75,.10)}
+.mk-ms-w.is-mittel{color:#b8860b;background:rgba(218,165,32,.10)}
+.mk-ms-w.is-schwach{color:#c0392b;background:rgba(192,57,43,.10)}
+:root[data-theme="dark"] .mk-ms-w.is-gut,
+:root[data-theme="neon"] .mk-ms-w.is-gut{color:#6fd39b}
+:root[data-theme="dark"] .mk-ms-w.is-mittel,
+:root[data-theme="neon"] .mk-ms-w.is-mittel{color:#e8c14a}
+:root[data-theme="dark"] .mk-ms-w.is-schwach,
+:root[data-theme="neon"] .mk-ms-w.is-schwach{color:#ff7a6b}
+.listing .mk-ms-sum{color:var(--text)}
+.listing .mk-ms-sum small{opacity:.7}
+.listing .mk-ms-alt{color:#b8860b}
+:root[data-theme="dark"] .listing .mk-ms-alt,
+:root[data-theme="neon"] .listing .mk-ms-alt{color:#e8c14a}
+.mk-ms-mehr summary{cursor:pointer;font-size:.8rem;color:var(--muted);padding:2px 0}
+.mk-ms-mehr summary:hover{color:var(--text)}
+.mk-ms-mehr[open]{border-left:2px solid var(--line,rgba(128,128,128,.35));padding-left:10px;margin-top:4px}
+.listing .mk-ms-mehr p{color:var(--muted);margin:0 0 8px}
+.listing .mk-ms-mehr p b{color:var(--text)}
+.listing .mk-ms-fuss{opacity:.85}
+
 /* align-self bewusst NICHT flex-start: sonst haengt der Oeffnen-Knopf oben,
    waehrend der Melde-Knopf unten sitzt (Befund 2026-07-31). Beide unten buendig. */
 .listing .ext{font-family:var(--mono);font-size:.82rem}
@@ -425,7 +461,7 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .mk-rep-box{padding:20px;max-height:80vh;overflow:auto}
 .mk-rep-box h3{margin:0 0 6px;font-size:1.05rem}
 .mk-rep-box .sub{margin:0 0 14px}
-.mk-rep-box label.opt{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:.9rem;color:var(--fg)}
+.mk-rep-box label.opt{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:.9rem;color:var(--text)}
 .mk-rep-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
 .form-grid{display:grid;gap:14px;max-width:560px}
 .form-grid label{font-size:.86rem;color:var(--muted);display:block;margin-bottom:6px}

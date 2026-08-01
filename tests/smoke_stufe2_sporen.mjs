@@ -114,6 +114,9 @@ function baueRepo(eintraege, paket) {
   // Der Wächter (Stufe 3) hängt am selben Lauf und wird importiert — ohne ihn
   // startet das Werkzeug gar nicht.
   fs.copyFileSync(path.join(ROOT, "tools/waechter.mjs"), path.join(dir, "tools/waechter.mjs"));
+  // Stufe 5 gehört seit 2026-08-01 in denselben Lauf — ohne diese Datei
+  // findet vektoren-bauen.mjs sein Modul nicht und der Test bricht ab.
+  fs.copyFileSync(path.join(ROOT, "tools/messung.mjs"), path.join(dir, "tools/messung.mjs"));
   fs.writeFileSync(path.join(dir, "sbkim/03_embedding.js"), STUB);
   // Playwright wird aus dem echten Repo geliehen — das Werkzeug soll unverändert laufen.
   try { fs.symlinkSync(path.join(ROOT, "node_modules"), path.join(dir, "node_modules"), "dir"); } catch (_e) {}

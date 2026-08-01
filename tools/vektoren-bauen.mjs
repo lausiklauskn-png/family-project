@@ -1,4 +1,6 @@
 /* Katalog-Spore Stufe 2 — Sporen holen und die Vektoren fortschreiben.
+ * (Und der Sammelpunkt für den Wächter aus Stufe 3 und die Messung aus
+ *  Stufe 5: EIN Lauf, EIN Bericht — assets/config/spore-stand.json.)
  *
  *   node tools/vektoren-bauen.mjs              # nur nachsehen und berichten
  *   node tools/vektoren-bauen.mjs --schreiben  # Dateien wirklich ändern
@@ -55,6 +57,7 @@ import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { wacheLaufen, handLesen } from "./waechter.mjs";
+import { messungLaufen } from "./messung.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P_LISTINGS = path.join(ROOT, "assets/config/listings.js");
@@ -213,7 +216,7 @@ async function imBrowserRechnen(texte) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
-log("Katalog-Spore Stufe 2 — Sporen lesen, Vektoren fortschreiben");
+log("Katalog-Spore Stufe 2+3+5 — Sporen lesen, bewachen, messen, Vektoren fortschreiben");
 log(SCHREIBEN ? "  Betriebsart: SCHREIBEN" : "  Betriebsart: nur nachsehen (--schreiben zum Ändern)");
 
 const ERW = erwartetesModell();
@@ -230,14 +233,16 @@ log(paket ? `  bestehendes Paket: ${Object.keys(paket.vectors || {}).length} Vek
  * überhaupt beantworten zu können. Fehlt er (erster Lauf), fängt alles bei
  * null an — das ist kein Fehler, sondern der Anfang. */
 let vorherigeWachen = {};
+let vorherigeMessungen = {};
 try {
   const alt = JSON.parse(fs.readFileSync(P_STAND, "utf8"));
   for (const k of Object.keys((alt && alt.eintraege) || {})) {
     if (alt.eintraege[k] && alt.eintraege[k].wache) vorherigeWachen[k] = alt.eintraege[k].wache;
+    if (alt.eintraege[k] && alt.eintraege[k].messung) vorherigeMessungen[k] = alt.eintraege[k].messung;
   }
-  log(`  vorheriger Bericht: ${Object.keys(vorherigeWachen).length} Wächter-Einträge`);
+  log(`  vorheriger Bericht: ${Object.keys(vorherigeWachen).length} Wächter-Einträge, ${Object.keys(vorherigeMessungen).length} Messungen`);
 } catch (_e) {
-  log("  kein vorheriger Bericht — der Wächter fängt bei null an");
+  log("  kein vorheriger Bericht — Wächter und Messung fangen bei null an");
 }
 
 /* Der Hinweis reist mit: die Datei wird maschinell überschrieben, und wer sie
@@ -304,6 +309,39 @@ for (const x of liste) {
   stand.wacheZaehler = z;
   log(`  ${z.gruen} grün, ${z.gelb} gelb, ${z.rot} rot`
     + (OHNE_NETZ ? "  (übersprungen: --ohne-netz)" : ""));
+}
+
+/* ── 1c. Die Messung (Stufe 5) ─────────────────────────────────────────────
+ * Wieder derselbe Lauf, derselbe Bericht — neben `wache` steht `messung`.
+ *
+ * NUR IM SCHREIB-LAUF. Der Probelauf davor ändert nichts und würde die teuerste
+ * Arbeit des Abends ein zweites Mal tun; die Aktion liefe in ihre Zeitgrenze,
+ * ohne dass irgendjemand etwas davon hätte. Der Probelauf sagt stattdessen
+ * hin, dass er sie ausgelassen hat — still übergehen wäre wieder eine
+ * unsichtbare Kürzung.
+ *
+ * Ohne Netz und ohne Lighthouse bleibt der vorige Befund unverändert stehen.
+ * Ein Testlauf darf dem Bericht sein Gedächtnis nicht nehmen — dieselbe Regel
+ * wie beim Wächter. */
+log("\nMessung — Lighthouse (Stufe 5)");
+let messung = vorherigeMessungen;
+if (OHNE_NETZ) {
+  log("  übersprungen: --ohne-netz (voriger Befund bleibt stehen)");
+} else if (!SCHREIBEN) {
+  log("  übersprungen: nur im Schreib-Lauf (--schreiben) — der Probelauf misst nicht doppelt");
+} else {
+  messung = await messungLaufen(liste, { vorher: vorherigeMessungen, log });
+}
+for (const x of liste) {
+  if (!x || !x.anchorId) continue;
+  if (!stand.eintraege[x.anchorId]) stand.eintraege[x.anchorId] = { lage: "ohne_spore" };
+  if (messung[x.anchorId]) stand.eintraege[x.anchorId].messung = messung[x.anchorId];
+}
+{
+  const z = { gemessen: 0, veraltet: 0, nicht_gemessen: 0 };
+  for (const k of Object.keys(messung)) z[messung[k].stand] = (z[messung[k].stand] || 0) + 1;
+  stand.messungZaehler = z;
+  log(`  ${z.gemessen} gemessen, ${z.veraltet} veraltet, ${z.nicht_gemessen} nicht gemessen`);
 }
 
 /* Übernahmen in die Quelle einarbeiten (im Speicher; geschrieben wird später). */

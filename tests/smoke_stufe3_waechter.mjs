@@ -137,6 +137,9 @@ function baueRepo(eintraege, opts) {
   fs.copyFileSync(path.join(ROOT, "assets/vec-codec.js"), path.join(dir, "assets/vec-codec.js"));
   fs.copyFileSync(path.join(ROOT, "tools/vektoren-bauen.mjs"), path.join(dir, "tools/vektoren-bauen.mjs"));
   fs.copyFileSync(path.join(ROOT, "tools/waechter.mjs"), path.join(dir, "tools/waechter.mjs"));
+  // Stufe 5 gehört seit 2026-08-01 in denselben Lauf — ohne diese Datei
+  // findet vektoren-bauen.mjs sein Modul nicht und der Test bricht ab.
+  fs.copyFileSync(path.join(ROOT, "tools/messung.mjs"), path.join(dir, "tools/messung.mjs"));
   fs.writeFileSync(path.join(dir, "sbkim/03_embedding.js"), STUB);
   try { fs.symlinkSync(path.join(ROOT, "node_modules"), path.join(dir, "node_modules"), "dir"); } catch (_e) {}
   fs.writeFileSync(path.join(dir, "assets/config/listings.js"),

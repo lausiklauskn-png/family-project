@@ -14,6 +14,13 @@
  *   Sub (e) Fremdzugriff-Detektor + Navleisten-Lampe — Ringbuffer RAM-
  *     only, Listener-Liste, Lampen-Toggle, Modal-Mount, Click-Handler,
  *     BroadcastChannel-Subscription für SW-endpoint-probes.
+ *     Pflege 2026-08-01 (Klaus' Live-Befund im DuckDuckGo-Browser): jeder
+ *     postMessage-Eintrag führt jetzt mit, WER gesendet hat, WOFÜR sich die
+ *     Nachricht ausgab, WANN nach dem Laden sie kam und unter welchen
+ *     Umständen — und welcher der vier gleich aussehenden „ignored"-Fälle
+ *     zutraf (`details.grund`). Das Fenster zeigt das als Klartext-Zeile.
+ *     PII-Tabu bleibt hart: nie Werte aus fremden Objekten, nur Feld-NAMEN,
+ *     Text-Auszug gekappt und mit maskierten Ziffern, alles RAM-only.
  *
  * Modul 15 ist NICHT protokoll-aktiv: kein Netz, keine Signatur, kein
  * Embedding, keine Spore-Erzeugung. Sub (b) ist Empfänger-Schicht (keine
@@ -63,6 +70,17 @@
 
   var VALID_KINDS = { "membrane-read": 1, "membrane-postmessage": 1, "endpoint-probe": 1 };
   var VALID_DECISIONS = { "accepted": 1, "ignored": 1, "rejected-allowlist": 1 };
+  // Sub (e), Pflege 2026-08-01: die feineren Gründe hinter `decision`. „ignored"
+  // allein deckt vier verschiedene Sachlagen ab — in Klaus' Live-Befund war
+  // nicht zu erkennen, welche davon zutraf. Whitelist statt Freitext: hier soll
+  // nie ein fremder String ins Protokoll wandern.
+  var VALID_GRUENDE = {
+    "fremder-typ": 1,        // die Nachricht gab sich nicht als SBKIM aus
+    "nicht-erlaubt": 1,      // Herkunft steht nicht auf der Allowlist
+    "kein-nonce": 1,         // Pflicht-Feld fehlte
+    "unbekannte-op": 1,      // op fehlt oder ist nicht in der Whitelist
+    "gedrosselt": 1          // Modul 11 hat abgeriegelt
+  };
 
   // ---- Modul-Zustand (Closure) ----
 
@@ -220,6 +238,143 @@
   function isHttpOrigin(s) {
     if (typeof s !== "string" || s.length === 0) return false;
     return s.indexOf("http://") === 0 || s.indexOf("https://") === 0;
+  }
+
+  // ---- Sub (e) Herkunfts-Analyse (Pflege 2026-08-01, Klaus' Live-Befund) ----
+  //
+  // WOZU. Am 2026-08-01 stand im DuckDuckGo-Browser die FREMD-Lampe auf Rot.
+  // Klaus klickte sie an und las:
+  //
+  //     membrane-postmessage   origin: —   decision: ignored
+  //
+  // Die Membran hatte also etwas gefangen und richtig abgewiesen — aber WER
+  // gesendet hat, stand nicht da, und „ignored" deckt vier verschiedene Gründe
+  // ab, die alle gleich aussehen. Ein Wächter, dessen Meldung man nicht deuten
+  // kann, ist nur halb ein Wächter. Klaus' Wort: „es soll mehr zu lesen sein —
+  // wer hat zugegriffen, wann, unter welchen Umständen."
+  //
+  // WAS AUFGENOMMEN WIRD, UND WARUM GERADE DAS:
+  //   grund       welcher der vier ignored-Fälle es war — die häufigste Frage
+  //   absender    Fenster, eingebetteter Rahmen, öffnendes Fenster, Worker
+  //   typ         wofür sich die Nachricht ausgibt (data.type), gekappt
+  //   felder      NUR die NAMEN der obersten Ebene, nie die Werte
+  //   text        bei einer reinen Text-Nachricht ein kurzer Auszug
+  //   nachLadenMs wie lange nach dem Laden — trennt Erweiterungen (sofort)
+  //               von späterem Zutun
+  //   sichtbar    war der Tab vorn? Ein Zugriff im Hintergrund ist ein anderer
+  //               Befund als einer, während man hinsieht
+  //
+  // PII-DISZIPLIN, HART. Werte aus fremden Objekten werden NIE protokolliert —
+  // nur Feld-NAMEN, und die gekappt, gezählt und auf ein enges Zeichen-Alphabet
+  // gefiltert. Der Text-Auszug ist auf MESSAGE_TEXT_MAX Zeichen gekappt, von
+  // Steuerzeichen befreit, und JEDE Ziffernfolge wird durch `#` ersetzt: eine
+  // Kontonummer, ein Geburtsdatum oder eine Telefonnummer kommt so gar nicht
+  // erst ins Protokoll, der wiedererkennbare Wortlaut aber schon. Das Protokoll
+  // bleibt RAM-only und verlässt den Browser nicht.
+  var MESSAGE_TEXT_MAX = 48;                 // Auszug einer Text-Nachricht
+  var MESSAGE_FIELDS_MAX = 8;                // so viele Feld-Namen, dann "…"
+  var MESSAGE_FIELD_LEN = 32;                // je Name
+  var MESSAGE_TYPE_MAX = 64;                 // data.type
+
+  function kurzText(s, max) {
+    if (typeof s !== "string" || s.length === 0) return null;
+    var sauber = s
+      .replace(/[\u0000-\u001f\u007f]/g, " ")   // Steuerzeichen raus
+      .replace(/\d+/g, "#")                     // Ziffernfolgen maskieren (PII)
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!sauber) return null;
+    return sauber.length > max ? sauber.slice(0, max) + "…" : sauber;
+  }
+
+  // Nur der Name, nie der Wert. Namen mit ungewöhnlichen Zeichen werden nicht
+  // durchgereicht, sondern als "?" gezählt — ein Feld-Name ist ein Hinweis,
+  // kein Freitext-Kanal ins Protokoll.
+  function feldNamen(o) {
+    var raus = [], mehr = 0, i, k;
+    var keys;
+    try { keys = Object.keys(o); } catch (_e) { return null; }
+    for (i = 0; i < keys.length; i++) {
+      k = keys[i];
+      if (raus.length >= MESSAGE_FIELDS_MAX) { mehr++; continue; }
+      raus.push(/^[A-Za-z0-9_.$-]{1,32}$/.test(k) ? k : "?");
+    }
+    if (!raus.length && !mehr) return null;
+    return { namen: raus, mehr: mehr };
+  }
+
+  // WER hat gesendet — ohne je in ein fremdes Fenster hineinzusehen. Verglichen
+  // wird nur mit Referenzen, die wir ohnehin haben; jeder Zugriff ist in
+  // try/catch, weil ein Cross-Origin-Fenster beim bloßen Vergleich werfen kann.
+  function absenderArt(event) {
+    try {
+      var q = event && event.source;
+      if (!q) return "unbekannt";
+      if (q === global) return "eigenes-fenster";
+      try { if (global.opener && q === global.opener) return "oeffnendes-fenster"; } catch (_e) { /* nb */ }
+      try {
+        var f = global.frames;
+        if (f && typeof f.length === "number") {
+          for (var i = 0; i < f.length && i < 32; i++) {
+            try { if (f[i] === q) return "eingebetteter-rahmen"; } catch (_e2) { /* nb */ }
+          }
+        }
+      } catch (_e3) { /* nb */ }
+      if (q === event.target) return "eigenes-fenster";
+      return "anderes-fenster";
+    } catch (_e4) {
+      return "unbekannt";
+    }
+  }
+
+  // Die Umstände. Beide Werte sind fail-soft: fehlt die Uhr oder die
+  // Sichtbarkeits-Auskunft, steht das Feld einfach nicht im Eintrag.
+  function nachLadenMs() {
+    try {
+      var p = global.performance;
+      if (p && typeof p.now === "function") return Math.round(p.now());
+    } catch (_e) { /* nb */ }
+    return null;
+  }
+  function tabSichtbar() {
+    try {
+      var d = global.document;
+      if (d && typeof d.visibilityState === "string") return d.visibilityState === "visible";
+    } catch (_e) { /* nb */ }
+    return null;
+  }
+
+  // Alles zusammen, gedeckelt. Wird an `details` gehängt, nicht an die
+  // Kopf-Felder — der Draht-Vertrag des Eintrags (kind/origin/decision) bleibt
+  // damit unverändert, und ältere Anzeigen zeigen einfach weiter, was sie
+  // kennen.
+  function herkunftDetails(event) {
+    var d = {};
+    try {
+      var art = absenderArt(event);
+      if (art) d.absender = art;
+      var roh = event ? event.data : null;
+      if (typeof roh === "string") {
+        d.form = "text";
+        var t = kurzText(roh, MESSAGE_TEXT_MAX);
+        if (t) d.text = t;
+      } else if (roh && typeof roh === "object") {
+        d.form = Array.isArray(roh) ? "liste" : "objekt";
+        var typ = kurzText(roh.type, MESSAGE_TYPE_MAX);
+        if (typ) d.typ = typ;
+        var f = feldNamen(roh);
+        if (f) { d.felder = f.namen; if (f.mehr) d.felderMehr = f.mehr; }
+      } else if (roh !== undefined && roh !== null) {
+        d.form = typeof roh;
+      } else {
+        d.form = "leer";
+      }
+      var ms = nachLadenMs();
+      if (ms !== null) d.nachLadenMs = ms;
+      var sicht = tabSichtbar();
+      if (sicht !== null) d.sichtbar = sicht;
+    } catch (_e) { /* nb — ein Protokoll darf nie der Grund für einen Fehler sein */ }
+    return d;
   }
 
   function safeUserAgentHint() {
@@ -398,6 +553,19 @@
     if (extraDetails && typeof extraDetails === "object") {
       // Defensive Kopie der Extra-Felder (KEIN voller Payload — PII-Tabu).
       if (extraDetails.throttled === true) details.throttled = true;
+      // `grund` sagt, WELCHER der gleich aussehenden Fälle es war. Genau das
+      // fehlte in Klaus' Befund vom 2026-08-01: „ignored" allein deckt vier
+      // verschiedene Sachlagen ab. Whitelist, damit hier nie fremder Text
+      // durchrutscht.
+      if (typeof extraDetails.grund === "string" && VALID_GRUENDE[extraDetails.grund]) {
+        details.grund = extraDetails.grund;
+      }
+    }
+    // Herkunfts-Analyse (Pflege 2026-08-01): wer, wann, unter welchen
+    // Umständen. Gedeckelt und ohne Werte aus fremden Objekten.
+    var herkunft = herkunftDetails(event);
+    for (var hk in herkunft) {
+      if (Object.prototype.hasOwnProperty.call(herkunft, hk)) details[hk] = herkunft[hk];
     }
     recordEntry({
       kind: "membrane-postmessage",
@@ -571,7 +739,7 @@
     }
 
     // Unbekannte op (insbesondere "handshake" — explizites Tabu).
-    recordPostMessageEntry(event, op, nonce, "ignored");
+    recordPostMessageEntry(event, op, nonce, "ignored", { grund: "unbekannte-op" });
   }
 
   function handlePostMessage(event) {
@@ -592,19 +760,19 @@
 
       // 2. Type-Check.
       if (type !== MEMBRANE_MESSAGE_TYPE) {
-        recordPostMessageEntry(event, op, nonce, "ignored");
+        recordPostMessageEntry(event, op, nonce, "ignored", { grund: "fremder-typ" });
         return;
       }
 
       // 3. Allowlist-Check.
       if (allowedOrigins.indexOf(event.origin) < 0) {
-        recordPostMessageEntry(event, op, nonce, "rejected-allowlist");
+        recordPostMessageEntry(event, op, nonce, "rejected-allowlist", { grund: "nicht-erlaubt" });
         return;
       }
 
       // 4. Nonce-Pflicht.
       if (!nonce) {
-        recordPostMessageEntry(event, op, nonce, "ignored");
+        recordPostMessageEntry(event, op, nonce, "ignored", { grund: "kein-nonce" });
         return;
       }
 
@@ -624,7 +792,7 @@
         if (rateLimit && typeof rateLimit.checkOrigin === "function") {
           var verdict = rateLimit.checkOrigin(event.origin);
           if (verdict === "throttled") {
-            recordPostMessageEntry(event, op, nonce, "ignored", { throttled: true });
+            recordPostMessageEntry(event, op, nonce, "ignored", { throttled: true, grund: "gedrosselt" });
             return;
           }
         }
@@ -635,7 +803,7 @@
 
       // 7. Op-Validierung (whitelist).
       if (!op || !VALID_OPS[op]) {
-        recordPostMessageEntry(event, op, nonce, "ignored");
+        recordPostMessageEntry(event, op, nonce, "ignored", { grund: "unbekannte-op" });
         return;
       }
 
@@ -855,6 +1023,64 @@
     modalMounted = true;
   }
 
+  // ---- Sub (e) Klartext zum Eintrag (Pflege 2026-08-01) --------------------
+  //
+  // Die Tabelle sagt WAS. Diese Zeile sagt WER, WANN und UNTER WELCHEN
+  // UMSTÄNDEN — in ganzen Sätzen, weil das Fenster für Klaus gebaut ist und
+  // nicht für eine Sitzung. Sie steht als zweite Zeile unter dem Eintrag,
+  // damit die Tabelle auf einem Tablet schmal bleibt.
+  var GRUND_TEXT = {
+    "fremder-typ": "Die Nachricht war nicht für SBKIM bestimmt",
+    "nicht-erlaubt": "Die Herkunft steht nicht auf der Erlaubnis-Liste",
+    "kein-nonce": "Der Nachricht fehlte die Pflicht-Kennung",
+    "unbekannte-op": "Die Nachricht wollte etwas, das die Membran nicht anbietet",
+    "gedrosselt": "Es kam zu viel auf einmal von dieser Herkunft"
+  };
+  var ABSENDER_TEXT = {
+    "eigenes-fenster": "dieses Fenster selbst",
+    "eingebetteter-rahmen": "ein eingebetteter Rahmen auf dieser Seite",
+    "oeffnendes-fenster": "das Fenster, das diese Seite geöffnet hat",
+    "anderes-fenster": "ein anderes Fenster",
+    "unbekannt": "nicht feststellbar"
+  };
+
+  function entryErklaerung(entry) {
+    var d = (entry && entry.details) || {};
+    var teile = [];
+
+    if (d.grund && GRUND_TEXT[d.grund]) {
+      teile.push(GRUND_TEXT[d.grund] + (d.typ ? " (sie gab sich aus als „" + d.typ + "“)" : "") + ".");
+    } else if (d.typ) {
+      teile.push("Sie gab sich aus als „" + d.typ + "“.");
+    }
+
+    if (d.absender) teile.push("Abgeschickt hat sie: " + (ABSENDER_TEXT[d.absender] || d.absender) + ".");
+
+    if (entry && entry.origin) {
+      teile.push("Herkunft: " + entry.origin + ".");
+    } else if (entry && entry.kind === "membrane-postmessage") {
+      // Der Strich in Klaus' Befund. Er ist kein Fehler der Membran, sondern
+      // eine echte Auskunft — und die gehört ausgeschrieben, statt dass jeder
+      // sie neu erraten muss.
+      teile.push("Herkunft: nicht feststellbar — typisch für Skripte des Browsers selbst und für Erweiterungen.");
+    }
+
+    if (typeof d.nachLadenMs === "number") {
+      var s = d.nachLadenMs / 1000;
+      teile.push("Kam " + (s < 10 ? s.toFixed(1) : String(Math.round(s))) + " s nach dem Laden der Seite" +
+        (d.sichtbar === true ? ", während der Tab vorn war." : d.sichtbar === false ? ", während der Tab im Hintergrund lag." : "."));
+    }
+
+    if (d.form === "text" && d.text) {
+      teile.push("Inhalt (gekürzt, Ziffern ersetzt): „" + d.text + "“");
+    } else if (Array.isArray(d.felder) && d.felder.length) {
+      teile.push("Felder der Nachricht: " + d.felder.join(", ") +
+        (d.felderMehr ? " und " + d.felderMehr + " weitere" : "") + ". (Nur die Namen — Inhalte werden nicht protokolliert.)");
+    }
+
+    return teile.join(" ");
+  }
+
   function renderModalRow(entry) {
     var doc = global.document;
     var tr = doc.createElement("tr");
@@ -877,6 +1103,21 @@
     return tr;
   }
 
+  // Die Erklär-Zeile. Eigene <tr> über die volle Breite, damit sie umbrechen
+  // darf statt eine Spalte zu sprengen. textContent, wie jede Zeile hier —
+  // in `details` stehen zwar nur gefilterte Werte, aber eine Regel, die eine
+  // Ausnahme kennt, ist keine.
+  function renderModalNote(entry) {
+    var text = entryErklaerung(entry);
+    if (!text) return null;
+    var doc = global.document;
+    var tr = doc.createElement("tr");
+    tr.innerHTML = "<td colspan=\"5\" style=\"padding:0 0.4rem 0.55rem;border-bottom:1px solid rgba(255,255,255,0.06);" +
+      "font-family:system-ui,sans-serif;font-size:0.78rem;line-height:1.5;color:rgba(245,245,255,0.72);\"></td>";
+    tr.children[0].textContent = text;
+    return tr;
+  }
+
   function renderModalContents() {
     if (!modalRoot) return;
     var tbody = modalRoot.querySelector("[data-membran-tbody]");
@@ -886,6 +1127,8 @@
     var snapshot = listFremdzugriff();
     for (var i = 0; i < snapshot.length; i++) {
       tbody.appendChild(renderModalRow(snapshot[i]));
+      var note = renderModalNote(snapshot[i]);
+      if (note) tbody.appendChild(note);
     }
     countEl.textContent = snapshot.length + " Einträge im Ringbuffer (max " + bufferMax + ")";
     // Auto-Scroll nach unten — chronologische Lesart (Karte 15
@@ -906,6 +1149,8 @@
     var countEl = modalRoot.querySelector("[data-membran-count]");
     if (!tbody || !countEl) return;
     tbody.appendChild(renderModalRow(entry));
+    var note = renderModalNote(entry);
+    if (note) tbody.appendChild(note);
     countEl.textContent = buffer.length + " Einträge im Ringbuffer (max " + bufferMax + ")";
   }
 
@@ -1272,6 +1517,10 @@
       // § Sender-Mechanismus). Für Sichttest registrieren wir einen
       // Pending-Eintrag und liefern das Promise zurück, das bei einer
       // passenden queryResult-Message resolved.
+      // Sub (e), Pflege 2026-08-01: der Klartext zu einem Eintrag. Offen
+      // gelegt, damit eine Anzeige ihn übernehmen kann statt ihn nachzubauen —
+      // und damit prüfbar ist, dass er wirklich sagt, wer wann was wollte.
+      erklaerung: entryErklaerung,
       _registerPendingQueryForTest: function (nonce, origin) {
         var resolveFn = null;
         var p = new Promise(function (resolve) { resolveFn = resolve; });
