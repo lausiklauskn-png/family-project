@@ -4,6 +4,98 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01 (nachts): Befund 5.1, ein Loch im Cache-Wächter, und die Lighthouse-Modul-Runde
+
+### Zuerst nachgesehen: der Wächter-Bericht
+
+`assets/config/spore-stand.json` steht weiterhin auf `geprueft: null`. Kein Rot,
+kein Gelb — es gibt schlicht noch nichts. Über die API nachgezählt: die Aktion
+„Sporen lesen und Vektoren fortschreiben" hat **null Läufe** (`total_count: 0`).
+Der Merge war um 10:32 UTC, der Zeitplan steht auf 02:40 UTC; die erste Nacht
+liegt noch vor uns. Von Hand auslösen ging wieder nicht (403, erneut gemessen,
+nicht angenommen) — **das bleibt Klaus' Schritt.**
+
+### Befund 5.1 war größer als notiert (PR #157)
+
+Der Brief notierte, die Symbol-Knöpfe trügen ihren Zweck nur in einem `title`.
+Nachgemessen: **Sprache (DE/EN), Thema (◐), die SIEGEL-Lampe und der ⊕-Chip
+waren `<span>`-Elemente mit einem Klick-Handler.** Ein `<span>` bekommt keinen
+Tabulator-Halt — wer die Seite mit der Tastatur bedient, kam an diese vier
+Funktionen **gar nicht heran.** Auf allen sechs Seiten. Nicht schwer erreichbar,
+sondern unerreichbar.
+
+Das Muster dagegen stand längst im Repo: `.pill-reload` macht es seit dem
+Hard-Reload-Knopf richtig. Es wird jetzt geteilt genutzt (`alsKnopf`).
+
+Neuer Wächter `tests/smoke_knoepfe.mjs`, **59 Proben**, drei Teile:
+Erreichbarkeit · Name · **Wirkung**. Teil C ist der wichtige — ein Element mit
+`role` und `tabindex`, dem der Tasten-Handler fehlt, besteht die ersten beiden
+und bedient nichts.
+
+### Nebenbefund: der Cache-Wächter übersah `app.js` und `style.css`
+
+Nach der Änderung an `assets/app.js` meldete `smoke_cache_version` brav „keine
+CORE-Datei geändert". Falsch. In der CORE-Liste steht `"assets/app.js?v=77"`,
+git meldet `assets/app.js` — **der `?v=` brach den Vergleich.** Die beiden
+meistgeänderten Dateien des Projekts waren seit Einführung des Wächters von
+seiner Prüfung ausgenommen, und er stand grün daneben.
+
+Zweiter Fund an derselben Stelle: `assets/status-widget.js` stand weder in CORE
+noch trug es ein `?v=` — es hing frei am HTTP-Cache. Jetzt beides behoben,
+Cache-Version **v77 → v78**, alle 28 Verweise mitgezogen.
+
+### Lighthouse-Modul-Runde (Klaus' Übergabe-Brief, Teil 4)
+
+Zwei Befunde an den **geteilten** Modulen, an der Quelle geheilt
+(Sage-Protokol PR #777) und netzweit ausgerollt.
+
+- **Modul 17:** `--sbkim-widget-bg` stand auf dem Wert der dunklen Sage-Page.
+  Über heller Seite: helle Schrift **3,09:1**, abgeblendete **1,97:1** — beide
+  unter der Norm. Selbst nachgerechnet, nicht übernommen; über heller Seite ist
+  es schlimmer als im Brief notiert. Jetzt 11,57:1 und 7,27:1.
+- **Modul 23 UI:** der „Schlüssel holen"-Link wurde ohne Adresse erzeugt.
+
+Neuer Kanon **`6017e263bb7f`** (17) · **`00a6920535d3`** (23 UI). Ausgerollt in
+14 Repos, **20/20 Dateien auf `origin/main` verifiziert, 0 abweichend.**
+sha-Pins in fünf Repos mitgezogen (Kim-Bell, Kimboard, Kimseek, Mein-WorkFloh,
+Privat-Brain) — netzweite Gegenprobe: keine alte sha blieb stehen.
+
+### ⚠ OFFEN: vier Repos tragen eine Gabelung bei Modul 17
+
+`sbkim/17_floating_widget.js` ist in **Mein-Rezeptbuch, Muttis-Rezeptbuch,
+Mein-Mixarium und BookLedgerPro** nicht überschrieben worden — mit Absicht. Sie
+tragen eine **repo-eigene Pflege, die der Sage-Kanon nicht hat:**
+
+- Rezeptbuch/Muttis/Mixarium: Klaus' **Pro-App-Namensraum-Fix** vom 2026-06-28
+  (localStorage-Schlüssel mit App-Pfad, damit Geschwister-Apps auf derselben
+  `github.io`-Adresse sich nicht denselben Widget-Zustand teilen).
+- BookLedgerPro: der **Proxy-ID-Guard** (keine Kollision mit dem statischen
+  `#sbkim-siegel-badge`).
+
+Gleichzeitig fehlt allen vieren der Stufen-Render von 2026-05-26 aus dem Kanon.
+Sie sind also **weder Vorgänger noch Nachfolger, sondern eine Gabelung.**
+Byte-1:1-Überschreiben hätte Klaus' Fixes zurückgedreht.
+
+**Der saubere Weg:** die beiden Eigenpflegen in den Sage-Kanon holen, dann sind
+alle wieder byte-1:1 und der Lesbarkeits-Fix kommt automatisch mit. Das ist ein
+eigener Schritt mit eigenen Gegenproben, kein Nebenher im Rollout.
+
+### Die Lehre dieser Sitzung
+
+**Ein Fehler, der nicht wirklich im Code landet, beweist nichts über den Test.**
+Eine Gegenprobe blieb grün — nicht weil die Probe stumpf war, sondern weil die
+eingebaute Änderung gar nicht gegriffen hatte (die gesuchte Zeile war anders
+eingerückt als angenommen). Seitdem wird bei jeder Gegenprobe **nachgezählt**,
+dass der Eingriff stattgefunden hat. Das ist die Lehre vom 2026-08-01 eine
+Ebene höher: nicht nur „fängt die Probe den Fehler", sondern erst „ist der
+Fehler überhaupt da".
+
+Dazu zweimal die alte Lehre: eine Probe, die am **falschen Merkmal** misst
+(`data-theme` statt des sichtbaren Namens), und eine, die ihr **eigenes Zutun**
+misst (`page.focus()` scrollt selbst; weiches Scrollen läuft nach).
+
+---
+
 ## ✅ 2026-08-01 (abends): Katalog-Spore Stufe 3 — der Wächter
 
 ### Warum es zur ersten Nacht keinen Bericht gab
