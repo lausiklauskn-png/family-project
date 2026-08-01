@@ -16,9 +16,33 @@
   --holo-border:conic-gradient(from var(--rot),#7fe9d8,#9fb8ff,#c6a9ff,#7fe9d8,#bdeede,#7fe9d8);
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  /* Farbe der Tastatur-Markierung. Wird je Thema überschrieben (app.js THEMES),
+     weil Gold auf dem hellen Thema nicht mehr zu sehen wäre. */
+  --focus:#ffd166;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
+
+/* ── Tastatur-Fokus sichtbar machen ───────────────────────────────────────────
+ * Befund 2026-08-01: An drei Stellen wurde der Fokusring mit `outline:none`
+ * entfernt (Eingabefelder, Andock-Wizard, Siegel-Feld). Wer die Seite mit der
+ * Tabulator-Taste bedient, sah danach nicht mehr, wo er steht — und das ist
+ * nicht nur eine Frage der Höflichkeit: Lighthouse misst es, und Stufe 5 des
+ * Marktplatz-Fahrplans soll genau damit Apps bewerten. Einen Mangel messen, den
+ * man selbst hat, wäre albern.
+ *
+ * `:focus-visible` statt `:focus`: Der Ring erscheint bei Tastatur- und
+ * Stift-Bedienung, nicht wenn jemand mit der Maus auf einen Knopf klickt. Die
+ * gewohnte Optik bleibt also unverändert. Textfelder sind die Ausnahme — die
+ * zählen laut Norm immer als „focus-visible", weil dort auch nach einem Klick
+ * getippt wird; genau dort ist der Ring also auch mit der Maus zu sehen, und
+ * das ist richtig so.
+ *
+ * `outline` und nicht `box-shadow`: Ein Schatten würde die vorhandenen
+ * `box-shadow`-Regeln (Glas-Knöpfe, --glow) überschreiben und dabei die Optik
+ * zerlegen. Ein Outline liegt außerhalb des Elements, klemmt kein Layout und
+ * überschreibt nichts.                                                        */
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;overflow-x:hidden;transition:background .35s,color .35s;min-height:100vh}
 a{color:var(--accent);text-decoration:none}
 .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
@@ -172,7 +196,9 @@ header.fp-dock-hot .fp-dock{box-shadow:0 0 0 2px var(--accent) inset;border-radi
 .field{position:relative;display:flex;align-items:center}
 .field input,.field textarea{width:100%;background:rgba(127,127,127,.10);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:13px 50px 13px 15px;font-size:1rem;font-family:var(--sans)}
 .field textarea{resize:vertical;min-height:96px;line-height:1.5}
-.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
+/* Kein `outline:none` mehr (Befund 2026-08-01): Rand und Schein bleiben als
+   gewohnte Rückmeldung, der Ring aus :focus-visible kommt dazu. */
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:var(--glow)}
 .mic{position:absolute;right:7px;top:50%;width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:rgba(127,127,127,.10);color:var(--accent);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;overflow:hidden;
   transform:translateY(-50%) perspective(280px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
   transition:transform .14s ease,border-color .15s,box-shadow .15s;
@@ -399,7 +425,7 @@ h2{font-size:1.55rem;margin:0 0 6px}
    mittig (Klaus 2026-07-12). */
 .sbkim-aw-grid .field{margin-top:6px}
 .sbkim-aw-grid .field input{margin-top:0}
-.sbkim-aw-grid input:focus,.sbkim-aw-grid select:focus{outline:none;border-color:var(--accent);box-shadow:var(--glow)}
+.sbkim-aw-grid input:focus,.sbkim-aw-grid select:focus{border-color:var(--accent);box-shadow:var(--glow)}
 #andockWizard button#sbkim-aw-go{display:inline-flex;align-items:center;gap:8px;font-weight:700;border-radius:12px;padding:11px 18px;font-size:.94rem;cursor:pointer;border:1px solid transparent;background:linear-gradient(135deg,var(--accent),var(--accent3) 60%,var(--accent2));color:#08121a;box-shadow:var(--shadow)}
 #andockWizard #sbkim-aw-status{margin-left:12px;font-size:.88rem;color:var(--muted)}
 #andockWizard #sbkim-aw-out{margin-top:16px}
@@ -460,7 +486,7 @@ a.rf-step:hover{border-color:var(--accent);transform:translateY(-2px)}
 .seal-lbl{font-size:.85rem;color:var(--muted)}
 .seal-input{width:100%;max-width:340px;padding:11px 14px;border-radius:10px;border:1px solid var(--line);
   background:var(--bg2);color:inherit;font-size:1rem;font-family:var(--mono);letter-spacing:.04em}
-.seal-input:focus{outline:none;border-color:var(--gold)}
+.seal-input:focus{border-color:var(--gold)}
 
 /* ── Werkzeug-Landing: Link-Landkarte (jede Aussage ein Link) ──────────────── */
 .lm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}

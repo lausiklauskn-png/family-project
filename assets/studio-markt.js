@@ -51,6 +51,21 @@
       f_imgurl: "Bild-URL (https, kein SVG)", f_imgpick: "🖼 Bild vom Gerät wählen",
       f_cat: "Kategorie", f_tags: "Tags (mit Komma trennen)", f_by: "Anbieter-Kürzel",
       f_mycel: "mit Mycel-Integration",
+      f_spore: "Spore-Link des Anbieters (optional, https)",
+      ph_spore: "https://…/sbkim/spore.json",
+      f_sporeauto: "Beschreibung darf sich nachts selbst aus der Spore aktualisieren",
+      sp_h: "🧬 Sporen der Anbieter",
+      sp_intro: "Was die nächtliche Prüfung zuletzt gesehen hat. Ohne Haken am Eintrag wird eine geänderte Beschreibung nur gemeldet — übernommen wird sie erst hier.",
+      sp_none: "Noch kein Bericht. Er entsteht beim ersten nächtlichen Lauf.",
+      sp_geprueft: "zuletzt geprüft: ",
+      sp_take: "Beschreibung übernehmen",
+      sp_taken: "Übernommen — jetzt noch auf Veröffentlichen drücken.",
+      sp_gone: "Eintrag nicht mehr vorhanden.",
+      sp_lage_geaendert: "Beschreibung geändert — wartet auf dich",
+      sp_lage_uebernommen: "automatisch übernommen",
+      sp_lage_gleich: "unverändert",
+      sp_lage_unerreichbar: "nicht erreichbar",
+      sp_lage_unbrauchbar: "unbrauchbar",
       ph_name: "z. B. Mein Tool", ph_desc: "Was macht das Tool? Frei und mit Synonymen — hilft der Suche.",
       ph_url: "https://…", ph_imgurl: "https://…/bild.png", ph_cat: "z. B. Werkzeug, Spiel, Büro",
       ph_tags: "z. B. notizen, offline, pwa", ph_by: "z. B. @extern",
@@ -125,6 +140,21 @@
       f_imgurl: "Image URL (https, no SVG)", f_imgpick: "🖼 Pick an image from your device",
       f_cat: "Category", f_tags: "Tags (comma-separated)", f_by: "Provider handle",
       f_mycel: "with Mycel integration",
+      f_spore: "Provider spore link (optional, https)",
+      ph_spore: "https://…/sbkim/spore.json",
+      f_sporeauto: "Description may update itself from the spore overnight",
+      sp_h: "🧬 Provider spores",
+      sp_intro: "What the nightly check last saw. Without the checkbox a changed description is only reported — you accept it here.",
+      sp_none: "No report yet. It appears after the first nightly run.",
+      sp_geprueft: "last checked: ",
+      sp_take: "Accept description",
+      sp_taken: "Accepted — now press Publish.",
+      sp_gone: "Entry no longer present.",
+      sp_lage_geaendert: "description changed — waiting for you",
+      sp_lage_uebernommen: "accepted automatically",
+      sp_lage_gleich: "unchanged",
+      sp_lage_unerreichbar: "unreachable",
+      sp_lage_unbrauchbar: "unusable",
       ph_name: "e.g. My Tool", ph_desc: "What does the tool do? Free text with synonyms — helps search.",
       ph_url: "https://…", ph_imgurl: "https://…/image.png", ph_cat: "e.g. Tool, Game, Office",
       ph_tags: "e.g. notes, offline, pwa", ph_by: "e.g. @extern",
@@ -259,6 +289,11 @@
     if (Array.isArray(e.tags) && e.tags.length) o.tags = e.tags.slice();
     if (e.mycel === true) o.mycel = true;
     if (e.own === true) o.own = true;
+    // Stufe 2: Spore-Link des Anbieters + die ausdrückliche Erlaubnis, dass
+    // seine Beschreibung sich nachts selbst aktualisieren darf. Ohne Haken
+    // meldet die nächtliche Aktion eine Änderung nur (Klaus 2026-08-02).
+    if (e.sporeUrl) o.sporeUrl = String(e.sporeUrl).trim();
+    if (e.sporeAuto === true) o.sporeAuto = true;
     return o;
   }
   function serialize() {
@@ -304,13 +339,16 @@
       category: panel.querySelector("[data-f=cat]").value,
       tags: panel.querySelector("[data-f=tags]").value,
       by: panel.querySelector("[data-f=by]").value,
-      mycel: panel.querySelector("[data-f=mycel]").checked
+      mycel: panel.querySelector("[data-f=mycel]").checked,
+      sporeUrl: panel.querySelector("[data-f=spore]").value,
+      sporeAuto: panel.querySelector("[data-f=sporeauto]").checked
     };
   }
   function clearForm() {
     editIdx = -1; _pendingImg = null;
-    ["label", "desc", "url", "imgurl", "cat", "tags", "by"].forEach(function (f) { var el = panel.querySelector("[data-f=" + f + "]"); if (el) el.value = ""; });
+    ["label", "desc", "url", "imgurl", "cat", "tags", "by", "spore"].forEach(function (f) { var el = panel.querySelector("[data-f=" + f + "]"); if (el) el.value = ""; });
     var m = panel.querySelector("[data-f=mycel]"); if (m) m.checked = false;
+    var sa = panel.querySelector("[data-f=sporeauto]"); if (sa) sa.checked = false;
     setImgPreview("");
     panel.querySelector("[data-role=addbtn]").textContent = T("add_btn");
     panel.querySelector("[data-role=cancel]").style.display = "none";
@@ -378,6 +416,8 @@
     panel.querySelector("[data-f=tags]").value = (e.tags || []).join(", ");
     panel.querySelector("[data-f=by]").value = e.by || "";
     panel.querySelector("[data-f=mycel]").checked = !!e.mycel;
+    panel.querySelector("[data-f=spore]").value = e.sporeUrl || "";
+    panel.querySelector("[data-f=sporeauto]").checked = e.sporeAuto === true;
     setImgPreview(safeImg(e.img));
     panel.querySelector("[data-role=addbtn]").textContent = T("update_btn");
     panel.querySelector("[data-role=cancel]").style.display = "";
@@ -606,6 +646,91 @@
   function standLaden() {
     renderStand(null);
     return vecPruefe().then(renderStand).catch(function () { renderStand({ fehler: true }); });
+  }
+
+  /* ── Sporen-Bericht (Stufe 2) ───────────────────────────────────────────────
+   * assets/config/spore-stand.json schreibt die nächtliche Aktion. Sie liest
+   * die Spore jedes Anbieters und meldet, was sie gesehen hat. Hat sich eine
+   * Beschreibung geändert, OHNE dass der Eintrag den Haken „darf sich selbst
+   * aktualisieren" trägt, wird sie NICHT übernommen — sie steht hier, und
+   * Klaus entscheidet mit einem Knopf. Das ist der ganze Sinn der Trennung:
+   * fremder Text kommt nicht ungefragt auf die Seite.
+   *
+   * Alles aus dieser Datei ist fremder Text und wird ausschließlich über
+   * textContent gesetzt, nie als HTML. */
+  var SPORENSTAND = null;
+  var LAGE_TEXT = { geaendert: "sp_lage_geaendert", uebernommen: "sp_lage_uebernommen",
+                    gleich: "sp_lage_gleich", unerreichbar: "sp_lage_unerreichbar",
+                    unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich" };
+
+  function sporenLaden() {
+    var box = panel && panel.querySelector("[data-role=sporen]");
+    if (!box) return Promise.resolve();
+    return fetch("assets/config/spore-stand.json?ts=" + Date.now(), { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .catch(function () { return null; })
+      .then(function (st) { SPORENSTAND = st; renderSporen(st); });
+  }
+
+  function renderSporen(st) {
+    var box = panel && panel.querySelector("[data-role=sporen]");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!st || !st.eintraege || !Object.keys(st.eintraege).length) {
+      box.textContent = T("sp_none");
+      return;
+    }
+    var kopf = document.createElement("small");
+    kopf.textContent = T("sp_geprueft") + String(st.geprueft || "?").slice(0, 10);
+    box.appendChild(kopf);
+    // Wartende zuerst — das ist das Einzige, was eine Handlung braucht.
+    var ids = Object.keys(st.eintraege).sort(function (a, b) {
+      var wa = st.eintraege[a].lage === "geaendert" ? 0 : 1;
+      var wb = st.eintraege[b].lage === "geaendert" ? 0 : 1;
+      return wa - wb;
+    });
+    for (var i = 0; i < ids.length; i++) {
+      var id = ids[i], e = st.eintraege[id] || {};
+      var zeile = document.createElement("div");
+      zeile.className = "fpst-sporezeile" + (e.lage === "geaendert" ? " is-warn" : "");
+      var name = document.createElement("b");
+      var eintrag = findeEintrag(id);
+      name.textContent = (eintrag && eintrag.label) || id;
+      zeile.appendChild(name);
+      var lage = document.createElement("span");
+      lage.textContent = T(LAGE_TEXT[e.lage] || "sp_lage_unbrauchbar") + (e.hinweis ? " (" + e.hinweis + ")" : "");
+      zeile.appendChild(lage);
+      if (e.lage === "geaendert" && e.neuerText) {
+        var vor = document.createElement("small");
+        vor.textContent = e.neuerText;          // fremder Text — nie als HTML
+        zeile.appendChild(vor);
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "fpst-btn";
+        b.textContent = T("sp_take");
+        b.setAttribute("data-sptake", id);
+        zeile.appendChild(b);
+      }
+      box.appendChild(zeile);
+    }
+  }
+
+  function findeEintrag(anchorId) {
+    for (var i = 0; i < WORK.length; i++) if (WORK[i] && WORK[i].anchorId === anchorId) return WORK[i];
+    return null;
+  }
+
+  /* Übernehmen ist bewusst NUR ein Vorschlag in die Arbeitsliste: veröffentlicht
+   * wird erst mit dem vorhandenen Knopf. So sieht Klaus die Änderung vorher in
+   * der Liste, und ein Fehlgriff ist eine Verwerfung entfernt. */
+  function sporeUebernehmen(anchorId) {
+    var st = SPORENSTAND && SPORENSTAND.eintraege && SPORENSTAND.eintraege[anchorId];
+    if (!st || !st.neuerText) return;
+    var e = findeEintrag(anchorId);
+    if (!e) { toast(T("sp_gone"), false); return; }
+    e.text = String(st.neuerText);
+    st.lage = "uebernommen";
+    renderList(); markDirty(); renderSporen(SPORENSTAND);
+    toast(T("sp_taken"));
   }
 
   /* Bericht zum Ausdrucken bzw. als PDF sichern.
@@ -860,6 +985,10 @@
       img: safeImg(it.img),
       category: String(it.category || "").trim(),
       tags: [], mycel: false,
+      // Der Spore-Link wird uebernommen, der HAKEN aber nie: ob eine fremde
+      // Beschreibung sich selbst aktualisieren darf, entscheidet Klaus — nicht
+      // der Einreichende. Nur https, sonst gar nicht.
+      sporeUrl: /^https:\/\//i.test(String(it.sporeUrl || "")) ? String(it.sporeUrl).trim() : "",
       anchorId: "markt-" + slugify(it.label) + "-" + String(it.id).slice(-6)
     };
   }
@@ -992,6 +1121,8 @@
           '</div>' +
           '<label>' + esc(T("f_tags")) + '<input data-f="tags" placeholder="' + esc(T("ph_tags")) + '"></label>' +
           '<label class="fpst-chk"><input type="checkbox" data-f="mycel"> ' + esc(T("f_mycel")) + '</label>' +
+          '<label>' + esc(T("f_spore")) + '<input data-f="spore" placeholder="' + esc(T("ph_spore")) + '"></label>' +
+          '<label class="fpst-chk"><input type="checkbox" data-f="sporeauto"> ' + esc(T("f_sporeauto")) + '</label>' +
           '<div class="fpst-formbtns">' +
             '<button type="button" data-role="addbtn" class="fpst-btn fpst-btn--go">' + esc(T("add_btn")) + '</button>' +
             '<button type="button" data-role="cancel" class="fpst-btn" style="display:none">' + esc(T("cancel_btn")) + '</button>' +
@@ -1007,6 +1138,11 @@
           '<div class="fpst-vecstatus" data-role="vecstatus"></div>' +
           '<small>' + esc(T("vec_hint")) + '</small>' +
         '</div>' +
+        '<div class="fpst-vec">' +
+          '<h4>' + esc(T("sp_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("sp_intro")) + '</p>' +
+          '<div class="fpst-sporen" data-role="sporen"></div>' +
+        '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
         '<div class="fpst-list" data-role="list"></div>' +
         '<div class="fpst-foot">' +
@@ -1021,7 +1157,11 @@
     panel.querySelector("[data-role=cancel]").addEventListener("click", clearForm);
     panel.querySelector("[data-role=publish]").addEventListener("click", publish);
     var vb = panel.querySelector("[data-role=vecbtn]"); if (vb) vb.addEventListener("click", buildVectors);
-    var vr = panel.querySelector("[data-role=vecrecheck]"); if (vr) vr.addEventListener("click", standLaden);
+    var vr = panel.querySelector("[data-role=vecrecheck]"); if (vr) vr.addEventListener("click", function () { standLaden(); sporenLaden(); });
+    var sb = panel.querySelector("[data-role=sporen]");
+    if (sb) sb.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-sptake]"); if (b) sporeUebernehmen(b.getAttribute("data-sptake"));
+    });
     var vp = panel.querySelector("[data-role=vecreport]"); if (vp) vp.addEventListener("click", vecBericht);
     panel.querySelector("[data-role=imgpick]").addEventListener("click", function () {
       var fi = ensureFileInput(); fi.value = "";
@@ -1057,8 +1197,10 @@
     });
     renderList(); markDirty();
     // Beim Öffnen sofort messen — die Frage „ist das aktualisiert?" soll man
-    // nicht erst stellen müssen.
+    // nicht erst stellen müssen. Der Sporen-Bericht gehört dazu: wartet dort
+    // eine Beschreibung auf Klaus, soll er es beim Öffnen sehen.
     standLaden();
+    sporenLaden();
   }
   function closePanel() { if (panel) panel.style.display = "none"; }
 
@@ -1110,6 +1252,14 @@
       ".fpst-vecstand.is-ok{border-color:rgba(95,206,143,.5);background:rgba(95,206,143,.10)}" +
       ".fpst-vecstand.is-warn{border-color:rgba(255,178,107,.55);background:rgba(255,178,107,.10)}" +
       ".fpst-vecstand.is-err{border-color:rgba(255,140,140,.45);background:rgba(255,140,140,.08)}" +
+      // Sporen-Bericht (Stufe 2). Eine Zeile je Anbieter; wartet dort etwas
+      // auf Klaus, ist sie warm eingefärbt und trägt einen Knopf.
+      ".fpst-sporen{font-size:.82rem;margin:.4rem 0}" +
+      ".fpst-sporezeile{border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);border-radius:9px;padding:8px 10px;margin-top:6px}" +
+      ".fpst-sporezeile b{display:block;font-size:.86rem}" +
+      ".fpst-sporezeile span{opacity:.75}" +
+      ".fpst-sporezeile small{display:block;opacity:.8;margin:5px 0}" +
+      ".fpst-sporezeile.is-warn{border-color:rgba(255,178,107,.55);background:rgba(255,178,107,.10)}" +
       ".fpst-vectext{display:block;margin-bottom:4px}" +
       ".fpst-vecbar{display:block;height:6px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}" +
       ".fpst-vecbar-fill{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#6aa0ff,#5fce8f);transition:width .25s}" +

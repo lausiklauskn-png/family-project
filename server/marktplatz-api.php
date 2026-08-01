@@ -117,6 +117,9 @@ if ($action === 'list') {
       'by' => isset($r['by']) ? $r['by'] : '', 'url' => isset($r['url']) ? $r['url'] : '',
       'img' => isset($r['img']) ? $r['img'] : '', 'category' => isset($r['category']) ? $r['category'] : '',
       'contact' => isset($r['contact']) ? $r['contact'] : '',
+      // Stufe 2 (2026-08-02): der freiwillige Spore-Link des Anbieters. Ohne
+      // diese Zeile kaeme er nie im Studio an, obwohl er eingereicht wurde.
+      'sporeUrl' => isset($r['sporeUrl']) ? $r['sporeUrl'] : '',
     );
   }
   out(array('ok' => true, 'items' => $items));

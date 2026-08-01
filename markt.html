@@ -36,7 +36,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=74" />
+  <link rel="stylesheet" href="assets/style.css?v=76" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -133,6 +133,7 @@
           </div>
           <div><label data-i18n="mk_f_cat">Kategorie</label><div class="field"><input id="sbCat" type="text" maxlength="40" data-i18n-ph="mk_ph_cat" placeholder="z. B. Rezepte, Werkzeug, Spiel" /><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
           <div><label data-i18n="mk_f_desc">Beschreibung (in eigenen Worten, mit Synonymen) *</label><div class="field"><textarea id="sbText" required maxlength="600" data-i18n-ph="mk_ph_desc" placeholder="Was macht deine App? Schreib frei und mit Synonymen, das hilft der Suche."></textarea><button class="mic" type="button" aria-label="Spracheingabe">🎤</button></div></div>
+          <div><label data-i18n="mk_f_spore">Link zu deiner Spore (freiwillig)</label><div class="field"><input id="sbSpore" type="url" maxlength="300" placeholder="https://deine-app.de/sbkim/spore.json" data-nomic /></div><p class="mk-fieldhint" data-i18n="mk_hint_spore">Wenn deine App eine SBKIM-Spore hat: Dann kannst du deine Beschreibung selbst bei dir pflegen — wir lesen sie einmal täglich. Ohne Spore ändert sich für dich nichts.</p></div>
           <div><label data-i18n="mk_f_contact">Deine Kontakt-Adresse (E-Mail) *</label><div class="field"><input id="sbContact" type="email" required maxlength="120" placeholder="du@example.com" data-nomic /></div><p class="mk-fieldhint" data-i18n="mk_hint_contact">Nur für unsere Rückmeldung zur Freigabe, nicht veröffentlicht.</p></div>
           <div class="haftung">
             <!-- Interne Politik: die ersten 100 fremden Apps sind gratis — bewusst NICHT
@@ -217,6 +218,8 @@
         mk_submit_sub: "Du hast selbst eine App, Seite oder ein Werkzeug? Trag sie kostenlos in den Marktplatz ein, so wie die Beispiele oben. Nötig sind nur ein Link und mindestens ein Bild (JPG/PNG/WebP, kein SVG). Das Bild bleibt bei dir; wir speichern nur den Link. Jeder Eintrag wird vor der Veröffentlichung kurz geprüft.",
         mk_f_title: "Name deiner App *", mk_f_handle: "Dein Kürzel / Anbieter (kein echter Name) *", mk_f_url: "Adresse deiner App im Netz *",
         mk_f_img: "Bild deiner App *", mk_f_cat: "Kategorie", mk_f_desc: "Beschreibung (in eigenen Worten, mit Synonymen) *",
+        mk_f_spore: "Link zu deiner Spore (freiwillig)",
+        mk_hint_spore: "Wenn deine App eine SBKIM-Spore hat: Dann kannst du deine Beschreibung selbst bei dir pflegen — wir lesen sie einmal täglich. Ohne Spore ändert sich für dich nichts.",
         mk_ph_title: "z. B. Mein Rezeptbuch", mk_ph_cat: "z. B. Rezepte, Werkzeug, Spiel",
         mk_ph_desc: "Was macht deine App? Schreib frei und mit Synonymen, das hilft der Suche.",
         mk_ph_img: "oder Bild-Link: https://…/bild.jpg",
@@ -283,6 +286,8 @@
         mk_submit_sub: "Got your own app, site or tool? List it in the marketplace for free, just like the examples above. All you need is a link and at least one image (JPG/PNG/WebP, no SVG). The image stays with you; we only store the link. Every entry is briefly reviewed before it goes live.",
         mk_f_title: "Your app's name *", mk_f_handle: "Your handle / provider (no real name) *", mk_f_url: "Your app's web address *",
         mk_f_img: "Your app's image *", mk_f_cat: "Category", mk_f_desc: "Description (in your own words, with synonyms) *",
+        mk_f_spore: "Link to your spore (optional)",
+        mk_hint_spore: "If your app has an SBKIM spore: you can maintain your description on your own side — we read it once a day. Without a spore nothing changes for you.",
         mk_ph_title: "e.g. My Recipe Book", mk_ph_cat: "e.g. Recipes, Tool, Game",
         mk_ph_desc: "What does your app do? Write freely and with synonyms. It helps the search.",
         mk_ph_img: "or image link: https://…/image.jpg",
@@ -329,8 +334,8 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/app.js?v=74"></script>
-  <script src="assets/vec-codec.js?v=74"></script>
+  <script src="assets/app.js?v=76"></script>
+  <script src="assets/vec-codec.js?v=76"></script>
   <script src="assets/status-widget.js"></script>
   <script>
     (function () {
@@ -550,8 +555,15 @@
           text: document.getElementById("sbText").value.trim(),
           by: document.getElementById("sbBy").value.trim(),
           url: url, img: img,
-          category: document.getElementById("sbCat").value.trim()
+          category: document.getElementById("sbCat").value.trim(),
+          // Stufe 2: freiwilliger Link auf die eigene Spore. Leer lassen ist
+          // ausdruecklich in Ordnung — ohne Spore aendert sich fuer den
+          // Anbieter nichts (fail-soft, keine Eintritts-Huerde).
+          sporeUrl: ((document.getElementById("sbSpore") || {}).value || "").trim()
         };
+        if (listing.sporeUrl && !/^https:\/\//i.test(listing.sporeUrl)) {
+          out.textContent = "Der Spore-Link muss mit https:// beginnen — oder leer bleiben."; return;
+        }
         var json = JSON.stringify(listing, null, 2);
         var endpoint = (window.FP_MARKT_SUBMIT_ENDPOINT || "").trim();
         if (!endpoint) {
@@ -572,6 +584,7 @@
               app: listing.label, kuerzel: listing.by, url: listing.url,
               bild: listing.img, kategorie: listing.category,
               beschreibung: listing.text, kontakt: contact,
+              spore: listing.sporeUrl,
               eintrag_json: json,
               fp_hp_url: hp, fp_elapsed: Date.now() - FP_T0
             })
@@ -864,6 +877,6 @@
   <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
        App-spezifischer Speicher-Präfix; Token nur im Browser. -->
   <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
-  <script src="assets/studio-markt.js?v=74" defer></script>
+  <script src="assets/studio-markt.js?v=76" defer></script>
 </body>
 </html>

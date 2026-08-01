@@ -71,17 +71,21 @@
     { name: "Neon", vars: {
       "--bg": "#08081a", "--bg2": "#0e0e22", "--card": "rgba(20,16,40,.55)", "--line": "rgba(157,92,255,.28)", "--header-bg": "rgba(8,8,26,.6)",
       "--text": "#ece4ff", "--muted": "#a79ad0", "--accent": "#ff3f9a", "--accent2": "#9d5cff", "--accent3": "#00c8f0",
+      "--focus": "#ffe14d",
       "--glow": "0 0 26px rgba(157,92,255,.45),0 0 60px rgba(255,63,154,.20)",
       "--holo-text": "linear-gradient(100deg,#ff9ed4,#b69bff,#7fe8ff,#ffb0e0,#b69bff,#ff9ed4)",
       "--holo-border": "conic-gradient(from var(--rot),#ff3f9a,#9d5cff,#00c8f0,#ff3f9a,#b69bff,#ff3f9a)" } },
     { name: "Hell", vars: {
       "--bg": "#f4f6fa", "--bg2": "#eaeef4", "--card": "rgba(255,255,255,.72)", "--line": "rgba(20,30,45,.14)", "--header-bg": "rgba(244,246,250,.80)",
       "--text": "#16202c", "--muted": "#54637a", "--accent": "#0e8f86", "--accent2": "#6a4fd0", "--accent3": "#2f6df0",
+      // Gold verschwindet auf Weiß. Auf dem hellen Thema markiert ein kräftiges
+      // Blau — Kontrast gegen #f4f6fa rund 8:1, weit über der Norm-Grenze 3:1.
+      "--focus": "#123fc9",
       "--glow": "0 8px 26px rgba(47,109,240,.16)",
       "--holo-text": "linear-gradient(100deg,#0e8f86,#2f6df0,#6a4fd0,#0e8f86,#2f6df0)",
       "--holo-border": "conic-gradient(from var(--rot),#0e8f86,#2f6df0,#6a4fd0,#0e8f86,#2f6df0)" } }
   ];
-  var THEME_KEYS = ["--bg", "--bg2", "--card", "--line", "--text", "--muted", "--accent", "--accent2", "--accent3", "--header-bg", "--glow", "--holo-text", "--holo-border"];
+  var THEME_KEYS = ["--bg", "--bg2", "--card", "--line", "--text", "--muted", "--accent", "--accent2", "--accent3", "--header-bg", "--glow", "--holo-text", "--holo-border", "--focus"];
   var ti = 0;
   try { var st = parseInt(localStorage.getItem("fp_theme"), 10); if (st >= 0 && st < THEMES.length) ti = st; } catch (_e) {}
 
