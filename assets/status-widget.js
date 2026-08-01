@@ -117,6 +117,41 @@
   siegel.addEventListener("click", siegelOeffnen);
   alsKnopf(siegel, siegelOeffnen, "SBKIM-Siegel öffnen");
 
+  /* ---- FREMD-Klick öffnet das Fremdzugriff-Fenster (Modul 15) -------------
+   * Befund von Klaus, 2026-08-01, im DuckDuckGo-Browser: die FREMD-Lampe stand
+   * auf ROT — dieselbe Seite, in Chrome grün. Die Membran hatte also wirklich
+   * etwas bemerkt. Nur: **die Lampe ließ sich nicht anklicken.** Der Mauszeiger
+   * blieb die Verschiebe-Hand, beim SIEGEL daneben kam der Zeigefinger.
+   *
+   * Grund: nur die SIEGEL-Lampe hatte einen Handler. FREMD war reine Anzeige.
+   * Damit meldete das Widget zwar „hier greift etwas von außen zu", aber der
+   * GRUND war für niemanden erreichbar — Modul 15 hält ihn in seinem
+   * Fremdzugriff-Fenster bereit und hängt es an den Anker `#lamp-fremd`, den
+   * Modul 17 als unsichtbaren Proxy anlegt. Wir haben nur nie dorthin geklickt.
+   *
+   * Das ist derselbe Mangel-Typ wie Befund 5.1 vom selben Tag: etwas ist
+   * sichtbar, aber nicht bedienbar. Eine Warnung, deren Begründung niemand
+   * lesen kann, ist eine halbe Warnung.
+   *
+   * Fail-soft: fehlt der Proxy (Modul 15/17 nicht geladen), passiert nichts —
+   * kein Fehler, kein toter Knopf mit falschem Versprechen. Deshalb bekommt die
+   * Lampe den Zeigefinger auch nur dann, wenn der Anker wirklich da ist. */
+  var fremd = w.querySelector('[data-slot="fremd"]');
+  if (fremd) {
+    fremd.addEventListener("pointerdown", function (e) { e.stopPropagation(); }); // kein Drag von hier
+    var fremdAnker = function () { return document.getElementById("lamp-fremd"); };
+    var fremdOeffnen = function () { var a = fremdAnker(); if (a) a.click(); };
+    fremd.addEventListener("click", fremdOeffnen);
+    alsKnopf(fremd, fremdOeffnen, "Fremdzugriffe ansehen");
+    /* Der Zeigefinger erscheint erst, wenn es wirklich etwas zu öffnen gibt.
+     * Modul 15 hängt seinen Handler beim init() an, also nach uns — deshalb
+     * einmal nachsehen, statt sofort zu entscheiden. */
+    var zeigefinger = function () { if (fremdAnker()) fremd.style.cursor = "pointer"; };
+    zeigefinger();
+    global.addEventListener("sbkim:fremd-alert", zeigefinger);
+    if (global.setTimeout) global.setTimeout(zeigefinger, 1500);
+  }
+
   // ---- Drag: andocken / lösen ----------------------------------------------
   var drag = null;
   function onDown(e) {
