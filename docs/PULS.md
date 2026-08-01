@@ -4,6 +4,110 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01 (abends): Katalog-Spore Stufe 3 — der Wächter
+
+### Warum es zur ersten Nacht keinen Bericht gab
+
+Nachgesehen wurde als Erstes, was die nächtliche Aktion ergeben hat. Antwort:
+**nichts** — und das ist kein Fehler. Die Aktion wurde am 2026-08-01 um
+12:32 Uhr nach `main` gemergt, ihr Zeitplan steht auf 02:40 UTC. Die erste
+Nacht liegt also noch vor uns. `assets/config/spore-stand.json` gab es
+deshalb noch gar nicht; die Liste der Läufe ist leer (0). Der Default-Branch
+ist `main`, der Zeitplan greift also — bei einem anderen Default-Branch würde
+GitHub den `schedule`-Block stillschweigend ignorieren, das war die erste
+Sorge und ist geprüft.
+
+**Von Hand auslösen konnte die Sitzung die Aktion nicht** (403, der
+Sitzungs-Zugang darf keine Workflows starten). Das bleibt Klaus' Schritt.
+
+Ersatzweise gemessen, was von hier aus messbar ist: die **vier** Spore-Links
+auf `raw.githubusercontent.com` antworten mit **200**. Die **fünf** auf
+`*.github.io` sind von dieser Maschine aus grundsätzlich gesperrt (Proxy 403)
+— das sagt nichts über ihre Erreichbarkeit im Netz. Geprüft wurde deshalb über
+die GitHub-API, ob `sbkim/spore.json` in den fünf Repos überhaupt auf `main`
+liegt: **ja, in allen fünf.** Ob GitHub Pages sie ausliefert, beantwortet erst
+der erste Lauf.
+
+### Der Wächter (Brief §3, Stufe 3)
+
+Hängt sich an **dieselbe** Aktion und erweitert **denselben** Bericht — kein
+zweiter Lauf, kein zweites Format. Neu: `tools/waechter.mjs`, aufgerufen von
+`tools/vektoren-bauen.mjs`.
+
+| Ampel | wann | Folge im Marktplatz |
+|---|---|---|
+| grün | nichts auffällig | Eintrag normal |
+| gelb | Zielseite geändert / einmal keine Antwort / kein https | Eintrag sichtbar **mit Warnband**, Link bleibt |
+| rot | von Hand gesperrt, Safe Browsing meldet die Adresse, oder **zweimal in Folge** tot | Eintrag **bleibt sichtbar**, Grund lesbar, **Link abgeschaltet** |
+
+**Ein Eintrag verschwindet nie stillschweigend** — das war Klaus' Bedingung.
+Rot heißt „auf Eis", nicht „weg": der Eintrag bleibt in `listings.js`, bleibt
+im Bericht, bleibt auf der Karte, der Grund steht dabei, und der Melde-Knopf
+bleibt offen. Beides ist im Browser geprüft.
+
+**Zwei Entscheidungen, die ein Loch geschlossen haben:**
+
+1. **Erst der zweite Fehlschlag in Folge sperrt.** Ein einzelner Netz-Aussetzer
+   darf keine fremde App aus dem Marktplatz werfen. Der Zähler steht im Bericht
+   und geht bei der ersten Antwort auf null zurück.
+2. **`grundlage` statt Vortages-Vergleich.** Der naheliegende Bau (heute gegen
+   gestern) hat ein Loch: ändert eine Seite sich einmal und steht dann still,
+   wäre sie am übernächsten Tag wieder „unverändert" — das Gelb verschwände von
+   allein, ohne dass jemand hingesehen hat. Der Bericht merkt sich deshalb die
+   Prüfsumme, die als in Ordnung **gilt**; sie wandert nicht mit. Gelb bleibt
+   Gelb, bis Klaus quittiert.
+
+**Der Handschalter** ist eine Datei, kein Klick: `assets/config/wache-hand.json`.
+`{"<anchorId>": {"ampel": "rot", "grund": "…"}}` sperrt, `{"gesehen": "<prüfsumme>"}`
+quittiert eine angesehene Änderung. Eine Sperre ist damit nachlesbar und
+begründet, statt ein Klick zu sein, den später niemand mehr erklären kann.
+Beim Gegenlesen fiel eine Lücke auf und wurde geschlossen: die Entwarnung
+(`ampel: "gruen"`) wirkte zuerst nur bei erreichbarer Seite und war damit fast
+wirkungslos — jetzt gilt sie auch für eine Seite, die gerade nicht antwortet.
+**Nicht** überstimmen lässt sich ein Safe-Browsing-Treffer; das ist der einzige
+Befund von außen und soll sich nicht per Datei wegräumen lassen.
+
+**Safe Browsing ist gebaut, aber leer** (Klaus' Entscheidung 2026-08-01:
+„Steckplatz bauen, heute leer lassen" — mit dem Zusatz, es später zu
+aktivieren). Ohne `SAFE_BROWSING_KEY` in der Umgebung wird Google **nicht**
+gefragt und der Bericht sagt `nicht_geprueft`, statt zu tun als sei geprüft
+worden. Der Workflow reicht das Secret bereits durch; scharf wird es allein
+durch das Anlegen des Secrets, ohne einen weiteren Bau. Fällt Google aus,
+wird **nichts** gesperrt — beide Ausfall-Arten einzeln geprüft.
+
+### Gemessen, nicht geschätzt
+
+`tests/smoke_stufe3_waechter.mjs` **64/64**: echter https-Server mit eigenem
+Zertifikat für die Zielseiten, derselbe Server spielt den Google-Endpunkt mit
+echtem POST. Mehrere Läufe hintereinander auf demselben Verzeichnis, weil
+Fehlschlag-Zähler und „Gelb bleibt Gelb" sich sonst gar nicht messen lassen.
+
+**Sieben Gegenproben, jede einzeln rot bekommen** — und eine davon war zuerst
+stumpf: die Probe am Safe-Browsing-Ausfall blieb **grün**, obwohl absichtlich
+„alles sperren" eingebaut war. Grund: der Test spielte den Ausfall nur als
+HTTP 503, und der läuft durch eine andere Zeile als ein abgerissener Draht.
+Seitdem prüft der Test beide Arten getrennt, und beide Gegenproben werden rot.
+Das ist wörtlich die Lehre der Vorsitzung, ein zweites Mal: **eine Gegenprobe,
+die den Fehler nicht fängt, ist keine.**
+
+Nebenbefund, ebenfalls gemessen statt vermutet: `smoke_all` wurde durch den
+neuen Abruf **rot** (404 auf die noch nicht existierende Berichtsdatei →
+Konsolenfehler). Deshalb liegt jetzt ein ehrlich leerer Anfangs-Bericht im
+Repo (`geprueft: null`).
+
+Cache-Version **v76 → v77** (markt.html, style.css, studio-markt.js sind
+CORE-Dateien), alle 22 `?v=`-Verweise mitgezogen.
+
+### Was Klaus tun muss
+
+1. `server/einreichung.php` und `server/marktplatz-api.php` per WebFTP hochladen
+   (Kontrollwort `sporeUrl`) — unverändert offen aus der Vorsitzung.
+2. Die Aktion einmal von Hand starten: Actions → „Sporen lesen und Vektoren
+   fortschreiben (täglich)" → *Run workflow*.
+3. Danach Safe Browsing scharf schalten, wenn er mag (siehe Brief).
+
+---
+
 ## ✅ 2026-08-02: Tastatur-Fokus gerichtet + Katalog-Spore Stufe 2 gebaut
 
 ### 1. Die Fokus-Markierung ist zurück (Brief §4.1)

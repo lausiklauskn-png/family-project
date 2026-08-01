@@ -1,0 +1,5 @@
+{
+  "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Diese Datei wird von tools/vektoren-bauen.mjs geschrieben, nicht von Hand gepflegt. Sie liegt hier als leerer Anfang, damit Marktplatz und Studio sie abrufen können, bevor der erste Lauf stattgefunden hat — geprueft: null heißt genau das: es hat noch keiner nachgesehen.",
+  "geprueft": null,
+  "eintraege": {}
+}

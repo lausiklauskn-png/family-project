@@ -1,10 +1,13 @@
 name: Sporen lesen und Vektoren fortschreiben (täglich)
 
-# Katalog-Spore Stufe 2. Einmal pro Nacht:
+# Katalog-Spore Stufe 2 + 3. Einmal pro Nacht, EIN Lauf, EIN Bericht:
 #   1. die hinterlegten Sporen der Anbieter lesen (Feld `sporeUrl` je Eintrag),
 #   2. Beschreibungen übernehmen, WO Klaus es erlaubt hat (`sporeAuto: true`) —
 #      sonst nur melden,
-#   3. die vorberechneten Vektoren fortschreiben, mit derselben Spar-Logik wie
+#   3. den Wächter über ALLE Zielseiten laufen lassen (erreichbar? Inhalt
+#      geändert? von Hand gesperrt? von Safe Browsing gemeldet?) und das
+#      Ergebnis als Ampel in denselben Bericht schreiben,
+#   4. die vorberechneten Vektoren fortschreiben, mit derselben Spar-Logik wie
 #      der Studio-Knopf: gerechnet wird nur, was sich geändert hat.
 #
 # Der Studio-Knopf bleibt daneben als Hand-Auslöser; beide schreiben dieselbe
@@ -59,9 +62,15 @@ jobs:
           PW_CORE: playwright
         run: node tools/vektoren-bauen.mjs
 
-      - name: Sporen lesen und Vektoren fortschreiben
+      - name: Sporen lesen, Zielseiten bewachen, Vektoren fortschreiben
         env:
           PW_CORE: playwright
+          # Stufe 3, Steckplatz. Ist das Secret nicht gesetzt, ist die Variable
+          # leer, es wird nicht bei Google gefragt, und der Bericht sagt ehrlich
+          # „nicht geprüft" — der Rest des Wächters läuft unverändert weiter.
+          # Zum Scharfschalten: Settings -> Secrets and variables -> Actions ->
+          # New repository secret, Name SAFE_BROWSING_KEY.
+          SAFE_BROWSING_KEY: ${{ secrets.SAFE_BROWSING_KEY }}
         run: node tools/vektoren-bauen.mjs --schreiben
 
       - name: Ergebnis committen
@@ -71,6 +80,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Nur diese drei Dateien — nie versehentlich das Modell oder
           # node_modules. `git add <pfad>` statt `git add -A`.
+          # wache-hand.json steht bewusst NICHT dabei: der Lauf liest sie nur.
+          # Was von Hand gesperrt wird, entscheidet Klaus, nicht die Aktion.
           git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json
           if git diff --cached --quiet; then
             echo "Keine Änderung."

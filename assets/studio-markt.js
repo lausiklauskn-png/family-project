@@ -66,6 +66,22 @@
       sp_lage_gleich: "unverändert",
       sp_lage_unerreichbar: "nicht erreichbar",
       sp_lage_unbrauchbar: "unbrauchbar",
+      sp_lage_ohne_spore: "kein Spore-Link hinterlegt",
+      wa_gruen: "Zielseite in Ordnung",
+      wa_gelb: "Zielseite: bitte ansehen",
+      wa_rot: "auf Eis gelegt — Link abgeschaltet",
+      wa_g_unveraendert: "unverändert",
+      wa_g_erste_pruefung: "erstmals geprüft",
+      wa_g_hand_freigegeben: "von dir freigegeben",
+      wa_g_geaendert: "Inhalt hat sich geändert",
+      wa_g_antwortet_nicht: "hat einmal nicht geantwortet",
+      wa_g_nicht_erreichbar: "antwortet seit mehreren Prüfungen nicht",
+      wa_g_nicht_pruefbar: "zu groß zum Prüfen",
+      wa_g_kein_https: "kein https-Link",
+      wa_g_hand_gesperrt: "von dir gesperrt",
+      wa_g_hand_verdacht: "von dir auf Verdacht gesetzt",
+      wa_g_safebrowsing: "von Google Safe Browsing gemeldet",
+      wa_sb_nicht_geprueft: "Safe Browsing: nicht geprüft (kein Schlüssel hinterlegt)",
       ph_name: "z. B. Mein Tool", ph_desc: "Was macht das Tool? Frei und mit Synonymen — hilft der Suche.",
       ph_url: "https://…", ph_imgurl: "https://…/bild.png", ph_cat: "z. B. Werkzeug, Spiel, Büro",
       ph_tags: "z. B. notizen, offline, pwa", ph_by: "z. B. @extern",
@@ -155,6 +171,22 @@
       sp_lage_gleich: "unchanged",
       sp_lage_unerreichbar: "unreachable",
       sp_lage_unbrauchbar: "unusable",
+      sp_lage_ohne_spore: "no spore link on file",
+      wa_gruen: "target site fine",
+      wa_gelb: "target site: please review",
+      wa_rot: "on hold — link switched off",
+      wa_g_unveraendert: "unchanged",
+      wa_g_erste_pruefung: "checked for the first time",
+      wa_g_hand_freigegeben: "released by you",
+      wa_g_geaendert: "content has changed",
+      wa_g_antwortet_nicht: "did not answer once",
+      wa_g_nicht_erreichbar: "no answer for several checks",
+      wa_g_nicht_pruefbar: "too large to check",
+      wa_g_kein_https: "not an https link",
+      wa_g_hand_gesperrt: "blocked by you",
+      wa_g_hand_verdacht: "marked suspicious by you",
+      wa_g_safebrowsing: "flagged by Google Safe Browsing",
+      wa_sb_nicht_geprueft: "Safe Browsing: not checked (no key on file)",
       ph_name: "e.g. My Tool", ph_desc: "What does the tool do? Free text with synonyms — helps search.",
       ph_url: "https://…", ph_imgurl: "https://…/image.png", ph_cat: "e.g. Tool, Game, Office",
       ph_tags: "e.g. notes, offline, pwa", ph_by: "e.g. @extern",
@@ -661,7 +693,38 @@
   var SPORENSTAND = null;
   var LAGE_TEXT = { geaendert: "sp_lage_geaendert", uebernommen: "sp_lage_uebernommen",
                     gleich: "sp_lage_gleich", unerreichbar: "sp_lage_unerreichbar",
-                    unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich" };
+                    unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich",
+                    ohne_spore: "sp_lage_ohne_spore" };
+
+  /* ── Wächter-Ampel (Stufe 3) ───────────────────────────────────────────────
+   * Der Wächter schreibt in denselben Bericht. Hier wird er nur ANGEZEIGT —
+   * gesperrt und freigegeben wird über assets/config/wache-hand.json, damit
+   * eine Sperre eine nachlesbare Datei ist und nicht ein Klick, den später
+   * niemand mehr erklären kann.
+   * `handgrund` ist Klaus' eigener Text, wird aber wie jeder andere über
+   * textContent gesetzt — eine Regel, die keine Ausnahme verträgt. */
+  var AMPEL_ZEICHEN = { gruen: "●", gelb: "▲", rot: "⛔" };
+  function ampelZeile(w) {
+    var s = document.createElement("span");
+    s.className = "fpst-ampel is-" + (w.ampel || "gruen");
+    // Unbekannter Grund (neuere Werkzeug-Fassung, ältere Seite): den rohen
+    // Schlüssel zeigen statt ihn zu verschlucken. Lieber unschön als still.
+    var gk = "wa_g_" + String(w.grund || "");
+    var g = (STR[lang()] || STR.de)[gk] || STR.de[gk] || String(w.grund || "?");
+    var t = (AMPEL_ZEICHEN[w.ampel] || "●") + " " + T("wa_" + (w.ampel || "gruen")) + " · " + g;
+    if (w.handgrund) t += " — " + w.handgrund;
+    if (w.seit) t += " (" + w.seit + ")";
+    if (w.safebrowsing === "nicht_geprueft") t += " · " + T("wa_sb_nicht_geprueft");
+    s.textContent = t;
+    return s;
+  }
+  function rang(e) {
+    var w = e && e.wache;
+    if (w && w.ampel === "rot") return 0;
+    if (e && e.lage === "geaendert") return 1;
+    if (w && w.ampel === "gelb") return 2;
+    return 3;
+  }
 
   function sporenLaden() {
     var box = panel && panel.querySelector("[data-role=sporen]");
@@ -683,20 +746,24 @@
     var kopf = document.createElement("small");
     kopf.textContent = T("sp_geprueft") + String(st.geprueft || "?").slice(0, 10);
     box.appendChild(kopf);
-    // Wartende zuerst — das ist das Einzige, was eine Handlung braucht.
+    // Dringlichkeit zuerst: erst was gesperrt ist, dann was angesehen werden
+    // will, dann der Rest. Wer den Block öffnet, soll oben sehen, was ihn
+    // etwas angeht.
     var ids = Object.keys(st.eintraege).sort(function (a, b) {
-      var wa = st.eintraege[a].lage === "geaendert" ? 0 : 1;
-      var wb = st.eintraege[b].lage === "geaendert" ? 0 : 1;
-      return wa - wb;
+      return rang(st.eintraege[a]) - rang(st.eintraege[b]);
     });
     for (var i = 0; i < ids.length; i++) {
       var id = ids[i], e = st.eintraege[id] || {};
+      var w = e.wache || null;
       var zeile = document.createElement("div");
-      zeile.className = "fpst-sporezeile" + (e.lage === "geaendert" ? " is-warn" : "");
+      zeile.className = "fpst-sporezeile"
+        + (w && w.ampel === "rot" ? " is-stop" : "")
+        + ((e.lage === "geaendert" || (w && w.ampel === "gelb")) ? " is-warn" : "");
       var name = document.createElement("b");
       var eintrag = findeEintrag(id);
       name.textContent = (eintrag && eintrag.label) || id;
       zeile.appendChild(name);
+      if (w) zeile.appendChild(ampelZeile(w));
       var lage = document.createElement("span");
       lage.textContent = T(LAGE_TEXT[e.lage] || "sp_lage_unbrauchbar") + (e.hinweis ? " (" + e.hinweis + ")" : "");
       zeile.appendChild(lage);
@@ -1260,6 +1327,13 @@
       ".fpst-sporezeile span{opacity:.75}" +
       ".fpst-sporezeile small{display:block;opacity:.8;margin:5px 0}" +
       ".fpst-sporezeile.is-warn{border-color:rgba(255,178,107,.55);background:rgba(255,178,107,.10)}" +
+      ".fpst-sporezeile.is-stop{border-color:rgba(255,107,107,.65);background:rgba(255,107,107,.12)}" +
+      // Spezifisch genug, um das pauschale `.fpst-sporezeile span{opacity:.75}`
+      // zu schlagen — eine halbdurchsichtige Warnung ist keine.
+      ".fpst-sporezeile span.fpst-ampel{display:block;font-size:.8rem;margin:3px 0;opacity:1}" +
+      ".fpst-sporezeile span.fpst-ampel.is-gruen{color:#8fd18f}" +
+      ".fpst-sporezeile span.fpst-ampel.is-gelb{color:#ffb26b}" +
+      ".fpst-sporezeile span.fpst-ampel.is-rot{color:#ff8a7a}" +
       ".fpst-vectext{display:block;margin-bottom:4px}" +
       ".fpst-vecbar{display:block;height:6px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}" +
       ".fpst-vecbar-fill{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#6aa0ff,#5fce8f);transition:width .25s}" +
