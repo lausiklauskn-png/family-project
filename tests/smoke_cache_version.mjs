@@ -37,6 +37,14 @@ function coreListOf(text) {
   if (!m) return [];
   return [...m[1].matchAll(/"([^"]+)"/g)]
     .map((x) => x[1])
+    /* Der Versions-Anhang MUSS weg, bevor verglichen wird (Befund 2026-08-01).
+     * In CORE steht "assets/app.js?v=77", git meldet "assets/app.js" — der
+     * Vergleich `core.includes(datei)` traf deshalb NIE zu. Ausgerechnet die
+     * beiden meistgeänderten Dateien, style.css und app.js, waren damit von der
+     * Prüfung ausgenommen: der Wächter meldete brav „nichts zu prüfen", während
+     * genau das Gegenteil stimmte. Derselbe Fehlertyp wie bei den
+     * Playwright-Umleitungen, die an einem angehängten ?ts= zerbrechen. */
+    .map((p) => p.split("?")[0])
     .filter((p) => p !== "./" && !p.startsWith("http"));
 }
 
@@ -49,6 +57,10 @@ const core = coreListOf(swNow);
 ok(!!verNow, `CACHE_VERSION lesbar (${verNow})`);
 ok(core.length > 0, `CORE-Liste gelesen (${core.length} Dateien)`);
 ok(core.some((p) => p.startsWith("assets/style.css")), "assets/style.css steht in CORE (wird gecacht)");
+/* status-widget.js stand weder in CORE noch trug es ein ?v= (Befund
+ * 2026-08-01): es hing frei am HTTP-Cache des Browsers, den niemand bustet.
+ * Eine Änderung daran wäre auf Klaus' Tablet unter Umständen nie angekommen. */
+ok(core.includes("assets/status-widget.js"), "assets/status-widget.js steht in CORE (wird gecacht)");
 
 /* ---- Versions-Anhang der Assets (?v=NN) -------------------------------------
  * Ohne geänderte Adresse sieht ein Besucher nach einem Deploy die neue Seite mit
@@ -74,7 +86,7 @@ const wrong = [];
 let refs = 0;
 for (const f of htmlFiles) {
   const t = readFileSync(f, "utf8");
-  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js)(\?v=(\d+))?"/g)) {
+  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js|status-widget\.js)(\?v=(\d+))?"/g)) {
     refs++;
     if (m[3] !== assetV) wrong.push(`${f.replace(repoRoot + "/", "")}: assets/${m[1]}${m[2] || " (ohne ?v=)"}`);
   }
