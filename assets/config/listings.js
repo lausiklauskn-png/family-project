@@ -13,7 +13,28 @@
  *     own:      true = Klaus' eigene Beispiel-App (aus seinen Repos). Zählt
  *               NICHT zu den 100 Gratis-Plätzen des Gründer-Angebots — nur
  *               FREMDE Einträge (ohne own) werden gezählt (Klaus 2026-07-12).
+ *     sporeUrl: optional — https-Link auf die sbkim/spore.json im EIGENEN Repo
+ *               des Anbieters, z.B.
+ *               https://raw.githubusercontent.com/<owner>/<repo>/main/sbkim/spore.json
+ *               Der Anbieter behält seine Spore bei sich und ändert sie dort;
+ *               der Marktplatz LIEST sie nur (Stufe 2 der Katalog-Spore).
+ *     sporeAuto: optional true — die Beschreibung dieses Eintrags darf sich
+ *               über Nacht selbst aus der Spore aktualisieren. OHNE dieses
+ *               Feld (Standard) meldet die tägliche Aktion eine Änderung nur,
+ *               und Klaus übernimmt sie im Studio per Knopf. Klaus'
+ *               Entscheidung 2026-08-02: automatisch ja, aber nur, wo er es
+ *               ausdrücklich erlaubt hat.
  *   }
+ *
+ * WARUM der Vektor NICHT aus der Spore übernommen wird (gemessen 2026-08-02):
+ * Die Spore trägt zwar einen fertigen domainVector mit demselben Modell — aber
+ * nicht über denselben Text. In diesem Repo allein gibt es zwei Regeln:
+ * sbkim-init.js rechnet embedPassage(description), der Siegel-Wizard dagegen
+ * embedPassage(description + ". " + keywords). Ein fremder Knoten kann eine
+ * dritte benutzen. Ein übernommener Vektor sähe richtig aus und gehörte zu
+ * einem anderen Text — genau die Falle „funktioniert alles, bringt nichts".
+ * Der Marktplatz rechnet den Vektor deshalb immer selbst über den Text, den er
+ * auch hasht (tools/vektoren-bauen.mjs).
  *
  * SICHERHEIT (Brief §5): FREMDE Einträge werden NICHT automatisch veröffentlicht.
  * Klaus gibt frei (Freigabe-Liste). Nur Link + Text + Bild-Link, alles wird beim
@@ -71,7 +92,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/BookLedgerPro/",
     "img": "https://lausiklauskn-png.github.io/BookLedgerPro/assets/img/og-image.png",
     "category": "Büro",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json"
   },
   {
     "label": "Mein Tresor",
@@ -81,7 +103,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Mein-Tresor/",
     "img": "https://family-projekt.de/assets/apps/mein-tresor.png",
     "category": "Sicherheit",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/spore.json"
   },
   {
     "label": "Jasons Tresor",
@@ -91,7 +114,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
     "img": "https://family-projekt.de/assets/apps/jasons-tresor.png",
     "category": "Sicherheit",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/spore.json"
   },
   {
     "label": "Tomys Hub",
@@ -101,7 +125,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Tomys-Hub/",
     "img": "https://lausiklauskn-png.github.io/Tomys-Hub/icons/icon-512.png",
     "category": "Druck & Design",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://lausiklauskn-png.github.io/Tomys-Hub/sbkim/spore.json"
   },
   {
     "label": "Perfect Skin Beauty",
@@ -141,7 +166,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Kim-Bell/",
     "img": "https://lausiklauskn-png.github.io/Kim-Bell/icon-512.png",
     "category": "Werkzeug",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://lausiklauskn-png.github.io/Kim-Bell/sbkim/spore.json"
   },
   {
     "label": "Kimseek",
@@ -151,7 +177,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Kimseek/",
     "img": "https://lausiklauskn-png.github.io/Kimseek/icon-512.png",
     "category": "Werkzeug",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Kimseek/main/sbkim/spore.json"
   },
   {
     "label": "Kimboard",
@@ -161,7 +188,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Kimboard/",
     "img": "https://lausiklauskn-png.github.io/Kimboard/icon-512.png",
     "category": "Werkzeug",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Kimboard/main/sbkim/spore.json"
   },
   {
     "label": "Private Brain",
@@ -171,7 +199,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Privat-Brain/",
     "img": "https://lausiklauskn-png.github.io/Privat-Brain/icon-512.png",
     "category": "Büro",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://lausiklauskn-png.github.io/Privat-Brain/sbkim/spore.json"
   },
   {
     "label": "WorkFloh",
@@ -181,7 +210,8 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/",
     "img": "https://lausiklauskn-png.github.io/Mein-WorkFloh/icon-512.png",
     "category": "Büro",
-    "own": true
+    "own": true,
+    "sporeUrl": "https://lausiklauskn-png.github.io/Mein-WorkFloh/sbkim/spore.json"
   },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.

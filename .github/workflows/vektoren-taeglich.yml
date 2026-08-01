@@ -1,0 +1,85 @@
+name: Sporen lesen und Vektoren fortschreiben (täglich)
+
+# Katalog-Spore Stufe 2. Einmal pro Nacht:
+#   1. die hinterlegten Sporen der Anbieter lesen (Feld `sporeUrl` je Eintrag),
+#   2. Beschreibungen übernehmen, WO Klaus es erlaubt hat (`sporeAuto: true`) —
+#      sonst nur melden,
+#   3. die vorberechneten Vektoren fortschreiben, mit derselben Spar-Logik wie
+#      der Studio-Knopf: gerechnet wird nur, was sich geändert hat.
+#
+# Der Studio-Knopf bleibt daneben als Hand-Auslöser; beide schreiben dieselbe
+# Datei nach demselben Vertrag.
+#
+# EHRLICH ÜBER DIE SCHICHT: Das hier ist Pilz-Schicht, kein Mycel. Ein benannter
+# Server-Dienst fragt einmal am Tag öffentliche Dateien ab. Kein Crawler, keine
+# Pulsation — der Knoten selbst bleibt Empfangsmodus.
+#
+# Warum ein Browser statt eines Node-Nachbaus: Gerechnet wird mit denselben
+# Dateien, die auch markt.html lädt (sbkim/03_embedding.js, assets/vec-codec.js).
+# Ein zweiter Rechenweg wäre eine zweite Wahrheit, die auseinanderläuft — und
+# man merkt es erst an einem stillen, nutzlosen Paket.
+#
+# Der Lauf schreibt einmal täglich assets/config/spore-stand.json fort, auch
+# wenn sich sonst nichts geändert hat. Das ist Absicht: der Zeitstempel darin
+# ist der Beleg, DASS nachgesehen wurde. Ein Bericht, der stehen bleibt, wäre
+# von einem ausgefallenen Lauf nicht zu unterscheiden.
+
+on:
+  schedule:
+    - cron: "40 2 * * *"     # 02:40 UTC — nachts, außerhalb von Klaus' Arbeitszeit
+  workflow_dispatch:          # und jederzeit von Hand: Actions -> Run workflow
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vektoren-taeglich
+  cancel-in-progress: false
+
+jobs:
+  vektoren:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Browser bereitstellen
+        run: |
+          set -euo pipefail
+          npm install playwright --no-save
+          npx playwright install --with-deps chromium
+
+      - name: Probelauf (ändert nichts, zeigt was anstünde)
+        env:
+          PW_CORE: playwright
+        run: node tools/vektoren-bauen.mjs
+
+      - name: Sporen lesen und Vektoren fortschreiben
+        env:
+          PW_CORE: playwright
+        run: node tools/vektoren-bauen.mjs --schreiben
+
+      - name: Ergebnis committen
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Nur diese drei Dateien — nie versehentlich das Modell oder
+          # node_modules. `git add <pfad>` statt `git add -A`.
+          git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json
+          if git diff --cached --quiet; then
+            echo "Keine Änderung."
+            exit 0
+          fi
+          UEB=$(git diff --cached --name-only | grep -c 'listings.js' || true)
+          if [ "$UEB" -gt 0 ]; then
+            git commit -m "Sporen gelesen: Beschreibung(en) übernommen, Vektoren fortgeschrieben"
+          else
+            git commit -m "Tägliche Aktualisierung: Sporen geprüft, Vektoren fortgeschrieben"
+          fi
+          git push origin HEAD:"${GITHUB_REF_NAME}"

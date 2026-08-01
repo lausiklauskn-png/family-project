@@ -156,7 +156,11 @@ if ($zweck === 'meldung') {
     'category'     => field($data, 'kategorie', 40),
     'text'         => field($data, 'beschreibung', 600),
     'contact'      => field($data, 'kontakt', 160),
+    // Stufe 2 (2026-08-02): freiwilliger Link auf die eigene sbkim/spore.json.
+    // Leer ist ausdruecklich in Ordnung — ohne Spore aendert sich nichts.
+    'sporeUrl'     => field($data, 'spore', 300),
   ];
+  if ($rec['sporeUrl'] !== '' && !is_https($rec['sporeUrl'])) out(400, ['ok' => false, 'error' => 'spore']);
   if ($rec['label'] === '' || $rec['text'] === '') out(400, ['ok' => false, 'error' => 'felder']);
   if (!is_https($rec['url']))   out(400, ['ok' => false, 'error' => 'url']);
   if (!is_img($rec['img']))     out(400, ['ok' => false, 'error' => 'bild']);
@@ -172,6 +176,7 @@ if ($zweck === 'meldung') {
     'Bild:         ' . $rec['img'],
     'Kategorie:    ' . $rec['category'],
     'Kontakt:      ' . $rec['contact'],
+    'Spore:        ' . ($rec['sporeUrl'] !== '' ? $rec['sporeUrl'] : '(keine)'),
     '',
     'Beschreibung:',
     $rec['text'],
