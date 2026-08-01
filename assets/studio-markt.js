@@ -113,7 +113,9 @@
       vec_report_covered: "abgedeckt",
       vec_report_missing: "fehlt \u2014 wird live gerechnet",
       vec_report_stale: "veraltet \u2014 Text hat sich ge\u00e4ndert",
-      vec_report_none: "Kein Bericht m\u00f6glich \u2014 erst den Stand pr\u00fcfen."
+      vec_report_none: "Kein Bericht m\u00f6glich \u2014 erst den Stand pr\u00fcfen.",
+      vec_reuse: " \u00b7 unver\u00e4ndert \u00fcbernommen: ",
+      vec_nothing: "Nichts zu tun \u2014 alle Eintr\u00e4ge sind bereits abgedeckt."
     },
     en: {
       studio_on: "Studio mode on — long-press the footer to leave.",
@@ -185,7 +187,9 @@
       vec_report_covered: "covered",
       vec_report_missing: "missing \u2014 computed live",
       vec_report_stale: "stale \u2014 text has changed",
-      vec_report_none: "No report possible \u2014 check the state first."
+      vec_report_none: "No report possible \u2014 check the state first.",
+      vec_reuse: " \u00b7 reused unchanged: ",
+      vec_nothing: "Nothing to do \u2014 every entry is already covered."
     }
   };
   function lang() { try { return (window.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de"; } catch (e) { return "de"; } }
@@ -689,10 +693,10 @@
     var CHUNK = 8;
     var vecs = [];
     function schritt(k) {
-      if (k >= items.length) return Promise.resolve();
-      var fertig = Math.min(k + CHUNK, items.length);
-      vecStatus(T("vec_working") + fertig + "/" + items.length, (k / items.length) * 100);
-      var teil = items.slice(k, k + CHUNK).map(function (it) { return it.text; });
+      if (k >= offen.length) return Promise.resolve();
+      var fertig = Math.min(k + CHUNK, offen.length);
+      vecStatus(T("vec_working") + fertig + "/" + offen.length, (k / offen.length) * 100);
+      var teil = offen.slice(k, k + CHUNK).map(function (it) { return it.text; });
       return emb.embedPassageBatch(teil).then(function (res) {
         if (!res || res.length !== teil.length) throw new Error("embedPassageBatch: " + teil.length + " erwartet, " + ((res && res.length) || 0) + " bekommen");
         for (var j = 0; j < res.length; j++) vecs.push(res[j]);
@@ -700,15 +704,61 @@
       });
     }
 
-    var items = [];
+    var items = [];       // alle Eintraege
+    var offen = [];       // nur die, die WIRKLICH gerechnet werden muessen
+    var uebernommen = {}; // anchorId -> fertiger Eintrag aus dem alten Paket
+
     Promise.resolve()
-      .then(function () { return frischeListings(); })
-      .then(function (liste) {
+      .then(function () {
+        // Beides zugleich: die Eintraege UND das bisherige Paket.
+        return Promise.all([
+          frischeListings(),
+          fetch("assets/config/listings-vec.json?ts=" + Date.now(), { cache: "no-store" })
+            .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+        ]);
+      })
+      .then(function (beide) {
+        var liste = beide[0], alt = beide[1];
         // Ehrlich benennen, WORUEBER gerechnet wird — der Unterschied ist der
         // ganze Befund von oben.
         vecStatus(liste ? T("vec_fresh") : T("vec_local"), null);
         items = vecEntries(liste);
         if (!items.length) throw new Error(T("vec_noentries"));
+
+        /* Nur rechnen, was sich geaendert hat (Klaus' Frage 2026-08-01:
+         * „rechnet er dann fuer tausend Apps jedes Mal alles nach? Das waere
+         * ziemlich ueberfluessig").
+         *
+         * Er hat recht, und die Antwort lag schon im Paket: jeder Vektor traegt
+         * den Hash des Textes, aus dem er entstand. Passt der Hash noch UND
+         * stimmen Modell und Dimension mit dem laufenden Modell ueberein, ist der
+         * alte Vektor exakt derselbe, den eine Neuberechnung liefern wuerde — nur
+         * ohne die Rechenzeit. Bei 1000 Apps und drei geaenderten Texten sind das
+         * drei Einbettungen statt tausend.
+         *
+         * Die drei Bedingungen sind alle noetig: ein anderes Modell erzeugt
+         * voellig andere Vektoren, eine andere Dimension macht sie unlesbar, und
+         * ohne Hash-Vergleich uebernaehme man genau die veralteten Vektoren, die
+         * der ganze Waechter verhindern soll. Im Zweifel wird neu gerechnet —
+         * das kostet Zeit, nie Richtigkeit. */
+        var meta = emb._meta || {};
+        var passt = alt && alt.vectors && alt.model && meta.model &&
+                    alt.model === meta.model && (!alt.dim || !meta.dim || alt.dim === meta.dim);
+        offen = [];
+        for (var i = 0; i < items.length; i++) {
+          var it = items[i];
+          var rec = passt ? alt.vectors[it.id] : null;
+          if (rec && rec.h && rec.v && typeof rec.s === "number" && rec.h === codec.textHash(it.text)) {
+            uebernommen[it.id] = { s: rec.s, v: rec.v, h: rec.h };
+          } else {
+            offen.push(it);
+          }
+        }
+        if (!offen.length) {
+          // Nichts geaendert: kein Modell laden, kein Commit. Ehrlich sagen,
+          // dass nichts zu tun war — nicht so tun, als haette man gearbeitet.
+          throw { _nichtsZuTun: true };
+        }
       })
       .then(function () { return emb.init ? emb.init() : null; })
       .then(function () { stopProg(); return schritt(0); })
@@ -723,10 +773,12 @@
           built: new Date().toISOString().slice(0, 10),
           vectors: {}
         };
-        for (var i = 0; i < items.length; i++) {
+        // Erst die unveraendert uebernommenen, dann die frisch gerechneten.
+        for (var k in uebernommen) { if (Object.prototype.hasOwnProperty.call(uebernommen, k)) pack.vectors[k] = uebernommen[k]; }
+        for (var i = 0; i < offen.length; i++) {
           var p = codec.encode(vecs[i]);
-          p.h = codec.textHash(items[i].text);
-          pack.vectors[items[i].id] = p;
+          p.h = codec.textHash(offen[i].text);
+          pack.vectors[offen[i].id] = p;
         }
         if (!Object.keys(pack.vectors).length) throw new Error("leeres Paket");
         vecStatus(T("vec_committing"), 100);
@@ -739,8 +791,11 @@
         // Die Bestätigung BLEIBT stehen (Klaus 2026-08-01: „ich sehe noch keine
         // Bestätigung, dass das aktualisiert wurde"). Ein Toast ist nach 2,6 s
         // weg; wer in dem Moment nicht hinsieht, erfährt nie, ob es geklappt hat.
-        vecStatus(T("vec_done") + items.length + T("vec_done2"), 100);
-        toast(T("vec_done") + items.length + T("vec_done2"));
+        var wieder = Object.keys(uebernommen).length;
+        var meldung = T("vec_done") + items.length + T("vec_done2") +
+          (wieder ? T("vec_reuse") + wieder : "");
+        vecStatus(meldung, 100);
+        toast(meldung);
         // Und gleich nachmessen statt behaupten: GitHub Pages braucht ~1 Minute,
         // bis die neue Datei ausgeliefert wird — die Prüfung sagt ehrlich, was
         // JETZT auf dem Server liegt. Wer zu früh schaut, sieht den alten Stand
@@ -750,6 +805,8 @@
       .catch(function (err) {
         stopProg();
         if (btn) btn.disabled = false;
+        // Kein Fehler, sondern das gute Ergebnis: es gab schlicht nichts zu tun.
+        if (err && err._nichtsZuTun) { vecStatus(T("vec_nothing"), 100); toast(T("vec_nothing")); return; }
         // Die Fehlermeldung BLEIBT stehen. Ein Toast verschwindet nach 2,6 s —
         // wer gerade nicht hinsieht, bekommt sonst nie zu lesen, woran es lag.
         vecStatus(T("vec_err") + (err && err.message ? err.message : err), 0);

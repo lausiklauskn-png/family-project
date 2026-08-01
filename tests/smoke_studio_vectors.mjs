@@ -160,6 +160,16 @@ let paket = null;
     (0, eval)(src);
   }, { api: API_URL, src: studioSrc });
 
+  /* Kein Alt-Paket für diesen Fall — hier soll von Null gebaut werden.
+   *
+   * Ohne diese Umleitung liefert der Test-Server die ECHTE
+   * assets/config/listings-vec.json aus dem Repo, und der inkrementelle Bau
+   * übernimmt daraus die Vektoren, deren Hash zufällig noch passt. Die stammen
+   * vom echten Modell, der Test rechnet aber mit einem Stub — das Ergebnis war
+   * ein Paket aus zwei Welten, und die Proben (12) und (38) fielen mit einem
+   * Cosinus von -0,03 durch. Der Code hatte recht, der Test war unvollständig. */
+  await page.route(VEC_PFAD, (route) => route.fulfill({ status: 404, body: "404", headers: { "cache-control": "no-store" } }));
+
   // Den Commit abfangen, statt ihn zu verschicken.
   let gesehen = null;
   await page.route("**/marktplatz-api.php*", (route) => {
@@ -268,6 +278,9 @@ let paket = null;
   const studioSrc2 = fs.readFileSync(path.join(ROOT, "assets/studio-markt.js"), "utf8");
   await page.evaluate(({ api, src }) => { window.FP_MARKT_API = api; (0, eval)(src); }, { api: API_URL, src: studioSrc2 });
 
+  // Auch hier kein Alt-Paket: gemessen wird, WORÜBER gerechnet wird, nicht wie
+  // viel gespart wird.
+  await page.route(VEC_PFAD, (route) => route.fulfill({ status: 404, body: "404", headers: { "cache-control": "no-store" } }));
   let gesehen2 = null;
   await page.route("**/marktplatz-api.php*", (route) => {
     try { gesehen2 = JSON.parse(route.request().postData() || "{}"); } catch (_e) { gesehen2 = {}; }
@@ -291,9 +304,9 @@ let paket = null;
     return ids.some((id) => pack.vectors[id].h === C.textHash("VERALTETER CACHE " + id));
   }, { pack: p2 || { vectors: {} }, ids: proben }).catch(() => false);
 
-  ok(proben.length > 0, `(26) Paket trotz veraltetem Browser-Stand gebaut (${proben.length} Vektoren)`);
-  ok(hashServer, "(27) Hashes stammen vom SERVER-Stand — der Knopf holt frisch, statt dem Cache zu glauben");
-  ok(!hashCache, "(28) kein einziger Hash stammt aus der veralteten Browser-Liste");
+  ok(proben.length > 0, `(34) Paket trotz veraltetem Browser-Stand gebaut (${proben.length} Vektoren)`);
+  ok(hashServer, "(35) Hashes stammen vom SERVER-Stand — der Knopf holt frisch, statt dem Cache zu glauben");
+  ok(!hashCache, "(36) kein einziger Hash stammt aus der veralteten Browser-Liste");
   await ctx.close();
 }
 
@@ -386,6 +399,106 @@ async function standMessen(page, paket) {
   await ctx.close();
 }
 
+/* ═══ Teil A4 — rechnet er nur, was sich geändert hat? ═══
+ *
+ * Klaus 2026-08-01: „Rechnet er dann für tausend Apps jedes Mal alles nach? Das
+ * wäre ziemlich überflüssig." Er hat recht. Der Hash im Paket sagt bereits, ob
+ * ein Vektor noch zum Text passt — passt er, ist Neurechnen reine Zeitverschwendung.
+ *
+ * Zwei Fallen lauern dabei, beide hier geprüft: ein Paket von einem ANDEREN
+ * Modell darf nicht übernommen werden (die Vektoren wären unvergleichbar), und
+ * das Ergebnis muss trotz Sparen VOLLSTÄNDIG sein — sonst spart man sich ein
+ * kaputtes Paket zusammen. */
+async function bauenMit(paketVorher, aendere) {
+  const ctx = await browser.newContext({ serviceWorkers: "block" });
+  const page = await ctx.newPage();
+  await ctx.addInitScript(() => { try { localStorage.setItem("fpstudio_srv_key", "test-passwort"); } catch (e) {} });
+  await page.goto(base + "/markt.html", { waitUntil: "load" });
+  await page.waitForTimeout(800);
+  await stubSetzen(page);
+  if (aendere) await page.evaluate((id) => {
+    const x = (window.FP_LISTINGS || []).find((y) => y.anchorId === id);
+    if (x) x.text = "DIESER TEXT IST NEU " + id;
+  }, aendere);
+  // Der Server liefert dieselbe Liste, die im Browser steht (inkl. Änderung).
+  const liste = await page.evaluate(() => window.FP_LISTINGS);
+  await page.route("**/assets/config/listings.js*", (route) => route.fulfill({
+    status: 200, contentType: "text/javascript", headers: { "cache-control": "no-store" },
+    body: "window.FP_LISTINGS = " + JSON.stringify(liste) + ";" }));
+  await page.route(VEC_PFAD, (route) => {
+    const headers = { "cache-control": "no-store" };
+    if (!paketVorher) return route.fulfill({ status: 404, body: "404", headers });
+    route.fulfill({ status: 200, contentType: "application/json", headers, body: JSON.stringify(paketVorher) });
+  });
+  const src = fs.readFileSync(path.join(ROOT, "assets/studio-markt.js"), "utf8");
+  await page.evaluate(({ api, s2 }) => { window.FP_MARKT_API = api; (0, eval)(s2); }, { api: API_URL, s2: src });
+
+  let commit = null;
+  await page.route("**/marktplatz-api.php*", (route) => {
+    try { commit = JSON.parse(route.request().postData() || "{}"); } catch (_e) { commit = {}; }
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true }) });
+  });
+  await page.evaluate(() => window.FPStudio.open());
+  const b = await page.$("[data-role=vecbtn]");
+  if (b) await b.click();
+  // Auf das Ergebnis warten: entweder ein Commit oder die „nichts zu tun"-Meldung.
+  await page.waitForFunction(() => {
+    const t = document.querySelector("[data-role=vecstatus] .fpst-vectext");
+    return t && /gebaut|Nichts zu tun/i.test(t.textContent || "");
+  }, null, { timeout: 25000 }).catch(() => {});
+  for (let i = 0; i < 60 && !commit; i++) await page.waitForTimeout(50);
+  const gerechnet = await page.evaluate(() => window.__embedCount);
+  const meldung = await page.evaluate(() => {
+    const t = document.querySelector("[data-role=vecstatus] .fpst-vectext");
+    return t ? (t.textContent || "").trim() : "";
+  });
+  let pk = null; try { pk = JSON.parse((commit || {}).content || "null"); } catch (_e) {}
+  await ctx.close();
+  return { gerechnet, paket: pk, meldung };
+}
+
+{
+  // Vollständiges, passendes Paket bauen — der Ausgangszustand nach einem Lauf.
+  const erst = await bauenMit(null, null);
+  ok(erst.gerechnet > 0 && erst.paket, `(26) ohne Vorlage wird alles gerechnet (${erst.gerechnet})`);
+  const alle = erst.gerechnet;
+
+  // (a) nichts geändert → gar keine Einbettung, kein Commit
+  const nix = await bauenMit(erst.paket, null);
+  ok(nix.gerechnet === 0, `(27) nichts geändert → 0 Einbettungen statt ${alle}`);
+  ok(!nix.paket, "(28) nichts geändert → gar kein Commit (nicht dieselbe Datei nochmal schreiben)");
+  ok(/Nichts zu tun/i.test(nix.meldung), `(29) sagt ehrlich „nichts zu tun\u201c („${nix.meldung}\u201c)`);
+
+  // (b) EIN Text geändert → genau eine Einbettung, Paket trotzdem vollständig
+  const eineId = await (async () => {
+    const ctx = await browser.newContext({ serviceWorkers: "block" });
+    const pg = await ctx.newPage();
+    await pg.goto(base + "/markt.html", { waitUntil: "load" });
+    const id = await pg.evaluate(() => (window.FP_LISTINGS || []).find((x) => x && x.img).anchorId);
+    await ctx.close(); return id;
+  })();
+  const eins = await bauenMit(erst.paket, eineId);
+  ok(eins.gerechnet === 1, `(30) ein Text geändert → genau 1 Einbettung statt ${alle}`);
+  ok(eins.paket && Object.keys(eins.paket.vectors).length === Object.keys(erst.paket.vectors).length,
+    `(31) Paket bleibt VOLLSTÄNDIG (${eins.paket && Object.keys(eins.paket.vectors).length} Vektoren)`);
+  const neuerHash = await (async () => {
+    const ctx = await browser.newContext({ serviceWorkers: "block" });
+    const pg = await ctx.newPage();
+    await pg.goto(base + "/markt.html", { waitUntil: "load" });
+    const h = await pg.evaluate((id) => window.FPVecCodec.textHash("DIESER TEXT IST NEU " + id), eineId);
+    await ctx.close(); return h;
+  })();
+  ok(eins.paket && eins.paket.vectors[eineId] && eins.paket.vectors[eineId].h === neuerHash,
+    "(32) der geänderte Eintrag trägt den NEUEN Hash, nicht den übernommenen");
+
+  // (c) Paket von einem anderen Modell → nichts übernehmen, alles neu
+  const fremd = JSON.parse(JSON.stringify(erst.paket));
+  fremd.model = "irgendein/anderes-modell";
+  const anders = await bauenMit(fremd, null);
+  ok(anders.gerechnet === alle,
+    `(33) Paket von fremdem Modell wird NICHT übernommen — alles neu (${anders.gerechnet} von ${alle})`);
+}
+
 /* Die Nagelprobe: dasselbe Paket der Leseseite vorlegen. 0 Einbettungen heißt,
  * die beiden Dateien passen zusammen — bei jeder Abweichung (Text-Regel,
  * Modell, Dimension, Codec) rechnet die Seite still nach und zählt hoch. */
@@ -421,11 +534,11 @@ if (paket) {
   const ohne = await leseseite(null);          // Referenz: heutiger Weg
   const mit = await leseseite(paket);          // mit dem Paket aus dem Studio
   ok(mit.eingebettet === 0,
-    `(29) Rundlauf: Paket aus dem Studio → 0 Passagen live eingebettet (${mit.eingebettet} von ${ohne.eingebettet})`);
+    `(37) Rundlauf: Paket aus dem Studio → 0 Passagen live eingebettet (${mit.eingebettet} von ${ohne.eingebettet})`);
   ok(JSON.stringify(mit.reihenfolge) === JSON.stringify(ohne.reihenfolge),
-    "(30) Rundlauf: Reihenfolge identisch zur Live-Berechnung");
+    "(38) Rundlauf: Reihenfolge identisch zur Live-Berechnung");
 } else {
-  ok(false, "(29) Rundlauf nicht möglich — kein Paket gebaut");
+  ok(false, "(37) Rundlauf nicht möglich — kein Paket gebaut");
 }
 
 await browser.close(); server.close();
@@ -470,20 +583,20 @@ if (!phpDa) {
   } else {
     let r;
     r = await frage({ key: "falsch", content: '{"model":"m","vectors":{"a":{}}}' });
-    ok(r.code === 401 && r.j && r.j.error === "unauthorized", "(31) ohne richtiges Studio-Passwort: 401");
+    ok(r.code === 401 && r.j && r.j.error === "unauthorized", "(39) ohne richtiges Studio-Passwort: 401");
 
     r = await frage({ key: KEY, content: "das ist kein json" });
-    ok(r.code === 422 && r.j && r.j.error === "content_not_json", "(32) kaputtes JSON wird abgelehnt (422)");
+    ok(r.code === 422 && r.j && r.j.error === "content_not_json", "(40) kaputtes JSON wird abgelehnt (422)");
 
     r = await frage({ key: KEY, content: '{"model":"m","vectors":{}}' });
-    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(33) LEERES Paket wird abgelehnt — nie über die gute Datei schreiben");
+    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(41) LEERES Paket wird abgelehnt — nie über die gute Datei schreiben");
 
     r = await frage({ key: KEY, content: '{"model":"m"}' });
-    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(34) Paket ganz ohne vectors wird abgelehnt");
+    ok(r.code === 422 && r.j && r.j.error === "vectors_empty", "(42) Paket ganz ohne vectors wird abgelehnt");
 
     r = await frage({ key: KEY, content: '{"vectors":{"a":{"s":1,"v":"AA"}}}' });
     ok(r.code === 422 && r.j && r.j.error === "model_missing",
-      "(35) ohne Modell-Kennung abgelehnt — sonst wäre der Modell-Wächter der Leseseite still ausgehebelt");
+      "(43) ohne Modell-Kennung abgelehnt — sonst wäre der Modell-Wächter der Leseseite still ausgehebelt");
   }
   php.kill();
   try { fs.rmSync(tmp, { recursive: true, force: true }); } catch {}
