@@ -155,6 +155,12 @@
       aspect:      "Echtheit der Karten im gemeinsamen Raum",
       description: "Jede Visitenkarte im Rendezvous-Raum wird jetzt geprüft, bevor sie angezeigt wird: die Karte muss ihre eigene Spore tragen (spore.id === nodeId) und deren Ed25519-Signatur muss über Modul 02 (verifyForeignSpore) halten. Damit kann sich niemand mehr unter fremder Identität ins Brett hängen. Dazu Mengen-Deckel je Durchlauf (200 Karten) und je Nostr-Absender (3 Identitäten) gegen Flutung. Fehlt der Prüfer, läuft der Raum weiter, meldet die Karten aber ehrlich als UNGEPRÜFT statt sie still durchzuwinken. Reine Vor-Prüfung — der 0.80-Andock-Riegel bleibt unberührt.",
     },
+    {
+      since:       "2026-08-01",
+      module:      "15",
+      aspect:      "Nachvollziehbares Fremdzugriff-Protokoll",
+      description: "Anlass war ein echter Fund im Feld: die FREMD-Lampe stand auf Rot, das Fenster sagte nur „ignored“ — die Membran hatte etwas abgewiesen, aber WER gesendet hatte, war nicht zu erkennen. Jeder Eintrag führt jetzt mit, welcher der vier gleich aussehenden Abweis-Gründe zutraf (fremder Typ / nicht erlaubt / fehlende Kennung / unbekannter Wunsch / gedrosselt), wer abgeschickt hat (Fenster, eingebetteter Rahmen, öffnendes Fenster), wofür sich die Nachricht ausgab, wie lange nach dem Laden sie kam und ob der Tab dabei vorn war. Das Fenster erklärt das in ganzen Sätzen. PII-Tabu bleibt hart: keine Werte aus fremden Objekten, nur Feld-Namen, Text-Auszug gekappt und Ziffernfolgen maskiert, alles RAM-only und nie übers Netz.",
+    },
   ];
 
   // ---- Aspekt-4-Anker (Karte 16 § Sub (e) dynamische Render-Variante) ----
