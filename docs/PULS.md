@@ -4,6 +4,45 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01: Caddy-Regel eingespielt — und eine falsche Erklärung korrigiert
+
+**Die Regel ist am Server scharf und belegt:**
+
+```
+Daten-Datei    (/assets/config/spenden.js) → cache-control: public, max-age=300, must-revalidate
+Programm-Datei (/assets/app.js)            → (keiner — unverändert)
+```
+
+Zwei verschiedene Werte, also greift sie genau dort, wo sie soll, und sonst nirgends.
+Eingespielt über Termux per `ssh`, mit Sicherungskopie, Konfigurations-Prüfung und
+Selbst-Rückrollung im Fehlerfall. Eine freigegebene App erscheint jetzt binnen fünf
+Minuten statt irgendwann.
+
+### Der eigentliche Befund: die Vorlage im Repo war nie der Server
+
+Beim Einspielen kam heraus, dass `/opt/relay/Caddyfile` **gar keine Cache-Regel hatte** —
+kein `@assets`, kein `max-age=604800`, kein `@html`. Die „sieben Tage", mit denen diese
+Sitzung Klaus' Cache-Problem erklärt hat, standen ausschließlich in `Caddyfile.example`,
+einer Vorlage, die so nie auf den Server kam.
+
+**Das Problem war echt, die Erklärung war es nicht.** Ohne Cache-Header rät der Browser
+selbst, wie lange er eine Datei behält — üblicherweise ein Zehntel ihres Alters. Klaus'
+`listings.js` war fünf Tage alt, also hielt Chrome sie viele Stunden fest. Anderer
+Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme. Die Schlussfolgerungen (`?v=`,
+Cache-Bump, frisches Holen) bleiben alle richtig; nur die Begründung war falsch.
+
+**Die Lehre, netzweit gültig:** eine Vorlage im Repo ist **kein Beweis** für die
+Wirklichkeit. Wer eine Aussage über den Server trifft, misst am Server:
+`curl -sI <url> | grep -i cache-control`. Das ist dieselbe Disziplin wie „immer frisch von
+`origin/main`" — nur eine Ebene tiefer.
+
+**Nachgezogen:** `Caddyfile.example` enthält jetzt den **tatsächlichen** Server-Stand mit
+einer Warnung im Kopf; die falsche Behauptung ist in `sw.js`,
+`tests/smoke_cache_version.mjs` und `assets/studio-markt.js` korrigiert — überall mit dem
+Hinweis, was daran falsch war, damit der Irrtum nicht ein zweites Mal übernommen wird.
+
+---
+
 ## ✅ 2026-08-01: Die neun roten Tests aufgeräumt — `smoke_all` 107/107 grün
 
 Seit Längerem standen neun Zeilen dauerhaft auf rot. Das entwertet jede spätere Prüfung:

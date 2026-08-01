@@ -480,11 +480,17 @@
    *
    * Befund 2026-08-01, gemessen und belegt: Klaus' erster Lauf baute 14 saubere
    * Vektoren — von denen die Leseseite nur 4 nutzen konnte. Die Hashes passten
-   * 14/14 zur listings.js vom 26.07. und 4/14 zur aktuellen. Grund: markt.html
-   * laedt `assets/config/listings.js` OHNE `?v=`, und Caddy cacht *.js sieben
-   * Tage (Caddyfile.example). Im Browser lag also eine Monat-alte Liste,
-   * waehrend die Seite live die neuen Texte vom 31.07. zeigte (PR #135 hat sie
-   * umformuliert). Der Knopf rechnete brav ueber die alten Texte.
+   * 14/14 zur listings.js vom 26.07. und 4/14 zur aktuellen. Grund: der Browser
+   * hielt eine alte `assets/config/listings.js` fest, waehrend die Seite live
+   * die neuen Texte vom 31.07. zeigte (PR #135 hat sie umformuliert). Der Knopf
+   * rechnete brav ueber die alten Texte.
+   *
+   * (Zur Ursache: Caddy setzte fuer diese Datei GAR KEINEN Cache-Header, also
+   * riet der Browser selbst — etwa ein Zehntel des Datei-Alters. Seit dem
+   * 2026-08-01 steht am Server eine ausdrueckliche Regel: /assets/config/* mit
+   * 300 s. Die erste Fassung dieses Kommentars sprach von „sieben Tagen" und
+   * berief sich auf Caddyfile.example — eine Vorlage, die dem Server nie
+   * entsprach.)
    *
    * Das ist die tueckischste Sorte Fehler: nichts stuerzte ab, die Meldung sagte
    * „14 Eintraege", der Hash-Waechter der Leseseite verwarf die falschen still
