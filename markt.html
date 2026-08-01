@@ -36,7 +36,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=79" />
+  <link rel="stylesheet" href="assets/style.css?v=80" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -252,6 +252,26 @@
         mk_wa_rot_tot: "Die Zielseite antwortet seit mehreren Prüfungen nicht mehr. Der Link ist deshalb abgeschaltet.",
         mk_wa_rot_sb: "Google Safe Browsing meldet diese Adresse als gefährlich. Der Link ist deshalb abgeschaltet.",
         mk_wa_seit: "seit ",
+        /* Stufe 5 — die Messung. Klaus' Vorgabe: „es soll mehr zu lesen sein."
+           Eine Zahl ohne Erklärung ist für einen Besucher wertlos, also steht
+           kurz an der Karte, was gemessen wurde, und ausführlich zum Aufklappen,
+           was ein niedriger Wert für ihn konkret bedeutet. */
+        mk_ms_keine: "Noch nicht gemessen.",
+        mk_ms_von: "gemessen am ",
+        mk_ms_alt: "Diese Zahlen stammen vom letzten geglückten Lauf — die jüngste Messung ist fehlgeschlagen.",
+        mk_ms_mehr: "Was bedeuten diese Zahlen?",
+        mk_ms_k_leistung: "Leistung",
+        mk_ms_k_bedienbarkeit: "Bedienbarkeit",
+        mk_ms_k_gute_praxis: "Gute Praxis",
+        mk_ms_k_auffindbarkeit: "Auffindbarkeit",
+        mk_ms_sum_gut: "Alle vier Werte sind gut.",
+        mk_ms_sum_ok: "Brauchbar, mit Luft nach oben bei: ",
+        mk_ms_sum_schwach: "Ein Wert ist schwach: ",
+        mk_ms_e_leistung: "Wie schnell die Seite auf einem durchschnittlichen Handy über Mobilfunk brauchbar wird: wann der erste Inhalt steht, wann das größte Bild fertig ist, wie lange sie auf Tippen nicht reagiert. Ein niedriger Wert heißt für dich: du wartest, die Seite springt beim Laden herum, und auf einem älteren Gerät oder bei schwachem Empfang fühlt sie sich zäh an.",
+        mk_ms_e_bedienbarkeit: "Ob die Seite auch ohne Maus und ohne gutes Augenlicht zu bedienen ist: Beschriftungen an Knöpfen und Feldern, ausreichender Farbkontrast, erreichbare Bedien-Elemente, sinnvolle Reihenfolge beim Durchtippen. Ein niedriger Wert heißt für dich: mit Tastatur, mit einer Vorlesehilfe oder bei Sonne auf dem Bildschirm wird die Bedienung mühsam bis unmöglich.",
+        mk_ms_e_gute_praxis: "Handwerk und Sicherheit: verschlüsselte Verbindung, keine bekannt unsicheren Bibliotheken, keine Fehler in der Browser-Konsole, Bilder in der Größe, in der sie auch angezeigt werden. Ein niedriger Wert heißt für dich: an der Seite ist geschludert worden — oft ein Hinweis auf mehr, als man von außen sieht.",
+        mk_ms_e_auffindbarkeit: "Ob Suchmaschinen die Seite verstehen: Titel, Kurzbeschreibung, lesbare Schriftgrößen, funktionierende Links. Ein niedriger Wert heißt für dich meist wenig — er ist vor allem ein Nachteil für den Anbieter, weil seine Seite schwerer zu finden ist.",
+        mk_ms_hinweis: "Gemessen wird einmal je Nacht mit Lighthouse, so wie ein Handy über Mobilfunk die Seite sieht. Das ist eine Momentaufnahme und schwankt — ein paar Punkte Unterschied bedeuten nichts. Und es ist eine Maschinen-Messung: sie sagt, wie sauber eine Seite gebaut ist, nicht ob die App gut oder nützlich ist. Beides bleibt getrennt und wird nicht zu einer Note verrechnet.",
         mk_rep_t: "Diesen Eintrag melden",
         mk_rep_btn: "Melden",
         mk_rep_h: "Eintrag melden",
@@ -329,6 +349,22 @@
         mk_wa_rot_tot: "The target site has not answered for several checks. The link is therefore switched off.",
         mk_wa_rot_sb: "Google Safe Browsing flags this address as dangerous. The link is therefore switched off.",
         mk_wa_seit: "since ",
+        mk_ms_keine: "Not measured yet.",
+        mk_ms_von: "measured on ",
+        mk_ms_alt: "These numbers are from the last successful run — the most recent measurement failed.",
+        mk_ms_mehr: "What do these numbers mean?",
+        mk_ms_k_leistung: "Performance",
+        mk_ms_k_bedienbarkeit: "Accessibility",
+        mk_ms_k_gute_praxis: "Best practices",
+        mk_ms_k_auffindbarkeit: "Findability",
+        mk_ms_sum_gut: "All four values are good.",
+        mk_ms_sum_ok: "Usable, with room to improve in: ",
+        mk_ms_sum_schwach: "One value is weak: ",
+        mk_ms_e_leistung: "How quickly the page becomes usable on an average phone over mobile data: when the first content appears, when the largest image is done, how long it ignores taps. A low value means for you: you wait, the page jumps around while loading, and on an older device or with poor reception it feels sluggish.",
+        mk_ms_e_bedienbarkeit: "Whether the page can be operated without a mouse and without good eyesight: labels on buttons and fields, sufficient colour contrast, reachable controls, a sensible tab order. A low value means for you: with a keyboard, with a screen reader, or with sunlight on the screen it becomes hard to impossible to use.",
+        mk_ms_e_gute_praxis: "Craft and safety: encrypted connection, no known-vulnerable libraries, no errors in the browser console, images at the size they are actually shown. A low value means for you: the page was built carelessly — often a hint at more than you can see from outside.",
+        mk_ms_e_auffindbarkeit: "Whether search engines understand the page: title, short description, readable font sizes, working links. A low value usually means little for you — it is mainly a disadvantage for the provider, whose page is harder to find.",
+        mk_ms_hinweis: "Measured once a night with Lighthouse, the way a phone on mobile data sees the page. It is a snapshot and it fluctuates — a few points of difference mean nothing. And it is a machine measurement: it says how cleanly a page is built, not whether the app is good or useful. The two stay separate and are never averaged into one grade.",
         mk_rep_t: "Report this entry",
         mk_rep_btn: "Report",
         mk_rep_h: "Report entry",
@@ -352,9 +388,9 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/app.js?v=79"></script>
-  <script src="assets/vec-codec.js?v=79"></script>
-  <script src="assets/status-widget.js?v=79"></script>
+  <script src="assets/app.js?v=80"></script>
+  <script src="assets/vec-codec.js?v=80"></script>
+  <script src="assets/status-widget.js?v=80"></script>
   <script>
     (function () {
       function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -362,7 +398,14 @@
       function safeUrl(u){ u=String(u||""); return /^https?:\/\//i.test(u) ? u : ""; }
       var FP_T0 = Date.now(); // Ladezeitpunkt — für die Mindest-Ausfüllzeit (Bot-Schutz)
 
-      var ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img); }); // Bild-Pflicht
+      // Bild-Pflicht, und ab Stufe 5 zusätzlich der Schieberegler (gelistet()).
+      // Beim ersten Aufbau greift er noch nicht — die Messwerte kommen erst mit
+      // dem Bericht; deshalb wird die Liste danach einmal neu aufgebaut.
+      function neuAufbauen() {
+        ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img) && gelistet(x); });
+      }
+      var ALL = [];
+      neuAufbauen();
       var view = ALL.slice();
 
       // A5 (2026-07-11): Multi-Query-Synonym-Karte für die Marktplatz-Bedeutungs-
@@ -411,6 +454,88 @@
           '</p>';
       }
 
+      /* ── Messung (Stufe 5) ────────────────────────────────────────────────
+       * Vier Zahlen aus derselben Datei, in der auch die Ampel steht. Sie
+       * werden NICHT zu einer Note verrechnet — eine Seite mit 100/100/100/20
+       * ist nicht „80 gut", und der schwächste Wert ist genau der, den man
+       * wissen will. Deshalb steht er in der Zusammenfassung.
+       *
+       * Klaus' Vorgabe „es soll mehr zu lesen sein": kurz an der Karte (vier
+       * Zahlen + ein Satz), ausführlich hinter dem Aufklapper (was gemessen
+       * wurde, was die Zahl bedeutet, was ein niedriger Wert für den Besucher
+       * konkret heißt). Eine Zahl ohne Erklärung ist für ihn wertlos.
+       *
+       * Und die zweite Vorgabe, im Text sichtbar: Menschenmeinung (Ja/Nein-
+       * Stimmen) kommt später DANEBEN, nie hinein. Ein Mittelwert aus Messwert
+       * und Meinung bedeutet nichts mehr.
+       *
+       * Fail-soft wie die Ampel: fehlt der Bericht oder trägt er (noch) kein
+       * `messung`, sieht der Marktplatz aus wie immer. */
+      var MESSUNG = {};
+      var MS_KAT = ["leistung", "bedienbarkeit", "gute_praxis", "auffindbarkeit"];
+      var MS_ICON = { leistung: "⚡", bedienbarkeit: "♿", gute_praxis: "🛡", auffindbarkeit: "🔎" };
+      function messungVon(x) { return (MESSUNG && x && x.anchorId && MESSUNG[x.anchorId]) || null; }
+      function msZahlen(m) { return !!m && MS_KAT.every(function (k) { return typeof m[k] === "number"; }); }
+      // Die Stufen sind Lighthouses eigene: ab 90 gut, ab 50 mittel, darunter
+      // schwach. Eigene Grenzen zu erfinden hieße, eine fremde Messung anders
+      // zu beschriften, als ihr Urheber sie meint.
+      function msStufe(n) { return n >= 90 ? "gut" : (n >= 50 ? "mittel" : "schwach"); }
+      function msSchwaechste(m) {
+        return MS_KAT.slice().sort(function (a, b) { return m[a] - m[b]; })[0];
+      }
+      function messungBand(m) {
+        if (!m) return "";
+        if (!msZahlen(m)) {
+          // Der ehrliche Steckplatz: kein Wert, also auch kein Anschein eines
+          // Werts. Eine fehlende Messung darf nie wie eine schlechte aussehen.
+          return '<p class="mk-mess mk-mess--leer"><span aria-hidden="true">📈</span> ' + esc(FP.t("mk_ms_keine")) + '</p>';
+        }
+        var werte = MS_KAT.map(function (k) {
+          return '<span class="mk-ms-w is-' + msStufe(m[k]) + '">' +
+            '<span aria-hidden="true">' + MS_ICON[k] + '</span> ' + esc(FP.t("mk_ms_k_" + k)) +
+            ' <b>' + esc(String(m[k])) + '</b></span>';
+        }).join("");
+        var tief = msSchwaechste(m);
+        var summe = m[tief] >= 90 ? FP.t("mk_ms_sum_gut")
+          : (m[tief] >= 50 ? FP.t("mk_ms_sum_ok") + FP.t("mk_ms_k_" + tief) + "."
+            : FP.t("mk_ms_sum_schwach") + FP.t("mk_ms_k_" + tief) + ".");
+        return '<div class="mk-mess">' +
+          '<p class="mk-ms-zeile">' + werte + '</p>' +
+          '<p class="mk-ms-sum">' + esc(summe) +
+            (m.gemessen ? ' <small>(' + esc(FP.t("mk_ms_von")) + esc(m.gemessen) + ')</small>' : '') + '</p>' +
+          (m.stand === "veraltet" ? '<p class="mk-ms-alt">' + esc(FP.t("mk_ms_alt")) + '</p>' : '') +
+          '<details class="mk-ms-mehr"><summary>' + esc(FP.t("mk_ms_mehr")) + '</summary>' +
+            MS_KAT.map(function (k) {
+              return '<p><b>' + esc(FP.t("mk_ms_k_" + k)) + ' ' + esc(String(m[k])) + '</b> — ' + esc(FP.t("mk_ms_e_" + k)) + '</p>';
+            }).join("") +
+            '<p class="mk-ms-fuss">' + esc(FP.t("mk_ms_hinweis")) + '</p>' +
+          '</details></div>';
+      }
+
+      /* ── Der Schieberegler: ab welchem Leistungswert wird gelistet ─────────
+       * Einmalig im Studio eingestellt, mit den Einträgen veröffentlicht
+       * (window.FP_MARKT_MIN_LEISTUNG in assets/config/listings.js).
+       *
+       * ZWEI SICHERUNGEN, damit daraus kein stilles Verschwinden wird:
+       *   · 0 (Vorgabe) heißt AUS — ohne ausdrückliche Einstellung filtert
+       *     nichts.
+       *   · Ein Eintrag OHNE Zahl wird nie ausgeblendet. Sonst wäre vor der
+       *     ersten Messung der ganze Marktplatz leer, und „noch nicht
+       *     gemessen" sähe aus wie „durchgefallen".
+       * Was der Regler wegnimmt, steht im Studio mit Grund in der Tabelle —
+       * niemand fällt heraus, ohne dass es irgendwo nachzulesen wäre. */
+      var MIN_LEISTUNG = 0;
+      try { MIN_LEISTUNG = Math.max(0, Math.min(100, Number(window.FP_MARKT_MIN_LEISTUNG) || 0)); } catch (e) { MIN_LEISTUNG = 0; }
+      function gelistet(x) {
+        // `!MIN_LEISTUNG` fängt 0 UND den Zustand vor der Zuweisung: neuAufbauen()
+        // läuft schon beim ersten Aufbau, da steht hier noch nichts. Ohne diese
+        // Abkürzung liefe der erste Aufbau in ein leeres MESSUNG hinein.
+        if (!MIN_LEISTUNG) return true;
+        var m = messungVon(x);
+        if (!msZahlen(m)) return true;
+        return m.leistung >= MIN_LEISTUNG;
+      }
+
       function card(x) {
         var img = safeImg(x.img), url = safeUrl(x.url);
         var w = wacheVon(x);
@@ -421,6 +546,7 @@
           (x.by ? '<p class="by">' + esc(x.by) + '</p>' : '') +
           '<p>' + esc((x.text || "").slice(0, 160)) + '</p>' +
           wacheBand(w) +
+          messungBand(messungVon(x)) +
           '<div class="listing-foot">' +
             (url ? '<a class="btn ghost ext" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(FP.t("mk_open")) + '</a>' : '<span></span>') +
             '<button type="button" class="btn ghost mk-report" data-id="' + esc(x.anchorId || "") + '" data-label="' + esc(x.label || "") +
@@ -927,8 +1053,17 @@
           var e = st && st.eintraege;
           if (!e) return;
           var n = 0;
-          for (var k in e) if (e[k] && e[k].wache) { WACHE[k] = e[k].wache; n++; }
-          if (n) render();
+          for (var k in e) {
+            if (e[k] && e[k].wache) { WACHE[k] = e[k].wache; n++; }
+            if (e[k] && e[k].messung) { MESSUNG[k] = e[k].messung; n++; }
+          }
+          if (!n) return;
+          // Die Liste neu aufbauen, weil der Schieberegler erst jetzt greifen
+          // kann — die Zahlen kommen mit dem Bericht. Eine laufende Suche wird
+          // dabei wiederholt statt verworfen: wer gerade gesucht hat, soll
+          // nicht plötzlich wieder alles sehen.
+          neuAufbauen();
+          if (input && input.value.trim()) wordSearch(input.value); else { view = ALL.slice(); render(); }
         });
       if (pq) { input.value = pq; wordSearch(pq); }
 
@@ -936,7 +1071,7 @@
       // Hinzufügen/Ändern/Löschen neu zu zeichnen (arbeitet auf window.FP_LISTINGS).
       window.FP_MARKT = {
         rerender: function () {
-          ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img); });
+          neuAufbauen();
           // ALL ist neu — der alte Vektor-Zwischenspeicher hing am alten ALL und
           // würde nach einer Studio-Änderung falsch sortieren. Er baut sich bei
           // der nächsten Bedeutungs-Suche von selbst wieder auf.
@@ -948,6 +1083,6 @@
   <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
        App-spezifischer Speicher-Präfix; Token nur im Browser. -->
   <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
-  <script src="assets/studio-markt.js?v=79" defer></script>
+  <script src="assets/studio-markt.js?v=80" defer></script>
 </body>
 </html>

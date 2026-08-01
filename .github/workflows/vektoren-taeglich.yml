@@ -7,7 +7,11 @@ name: Sporen lesen und Vektoren fortschreiben (täglich)
 #   3. den Wächter über ALLE Zielseiten laufen lassen (erreichbar? Inhalt
 #      geändert? von Hand gesperrt? von Safe Browsing gemeldet?) und das
 #      Ergebnis als Ampel in denselben Bericht schreiben,
-#   4. die vorberechneten Vektoren fortschreiben, mit derselben Spar-Logik wie
+#   4. Lighthouse über die Zielseiten laufen lassen (Stufe 5, Weg A: auf
+#      GitHubs Rechnern, NICHT über Googles PageSpeed-API — kein Schlüssel,
+#      keine Adressliste an Google) und die vier Zahlen als `messung` in
+#      denselben Bericht schreiben,
+#   5. die vorberechneten Vektoren fortschreiben, mit derselben Spar-Logik wie
 #      der Studio-Knopf: gerechnet wird nur, was sich geändert hat.
 #
 # Der Studio-Knopf bleibt daneben als Hand-Auslöser; beide schreiben dieselbe
@@ -42,7 +46,10 @@ concurrency:
 jobs:
   vektoren:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Stufe 5 misst je Eintrag rund eine halbe bis eine Minute; der Deckel in
+    # tools/messung.mjs hält das bei höchstens zehn Einträgen je Nacht. Mit dem
+    # Modell-Download davor bleibt eine Stunde reichlich Luft.
+    timeout-minutes: 60
     steps:
       - name: Repo auschecken
         uses: actions/checkout@v4
@@ -57,12 +64,20 @@ jobs:
           npm install playwright --no-save
           npx playwright install --with-deps chromium
 
-      - name: Probelauf (ändert nichts, zeigt was anstünde)
+      # Stufe 5, Weg A. Schlägt die Installation fehl, bricht der Lauf NICHT ab:
+      # ohne Lighthouse wird nicht gemessen, und der Bericht sagt ehrlich
+      # „nicht gemessen" — genau wie der Safe-Browsing-Steckplatz ohne Schlüssel.
+      # Eine ausgefallene Messung darf die nächtliche Arbeit nicht anhalten.
+      - name: Lighthouse bereitstellen (Stufe 5, darf fehlschlagen)
+        continue-on-error: true
+        run: npm install lighthouse --no-save
+
+      - name: Probelauf (ändert nichts, zeigt was anstünde; misst nicht)
         env:
           PW_CORE: playwright
         run: node tools/vektoren-bauen.mjs
 
-      - name: Sporen lesen, Zielseiten bewachen, Vektoren fortschreiben
+      - name: Sporen lesen, Zielseiten bewachen, messen, Vektoren fortschreiben
         env:
           PW_CORE: playwright
           # Stufe 3, Steckplatz. Ist das Secret nicht gesetzt, ist die Variable
@@ -71,7 +86,20 @@ jobs:
           # Zum Scharfschalten: Settings -> Secrets and variables -> Actions ->
           # New repository secret, Name SAFE_BROWSING_KEY.
           SAFE_BROWSING_KEY: ${{ secrets.SAFE_BROWSING_KEY }}
-        run: node tools/vektoren-bauen.mjs --schreiben
+        run: |
+          set -euo pipefail
+          # Lighthouse startet Chrome selbst. Auf ubuntu-latest liegt in der
+          # Regel ein Google Chrome — ist er da, wird er genannt. Ist er NICHT
+          # da, wird die Variable bewusst NICHT gesetzt: ein CHROME_PATH auf
+          # eine Datei, die es nicht gibt, wäre schlimmer als gar keiner, weil
+          # chrome-launcher dann nicht mehr selbst sucht.
+          if [ -x /usr/bin/google-chrome ]; then
+            export CHROME_PATH=/usr/bin/google-chrome
+            echo "Chrome für die Messung: $CHROME_PATH"
+          else
+            echo "Kein /usr/bin/google-chrome — chrome-launcher sucht selbst"
+          fi
+          node tools/vektoren-bauen.mjs --schreiben
 
       - name: Ergebnis committen
         run: |

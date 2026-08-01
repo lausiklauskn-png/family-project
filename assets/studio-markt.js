@@ -82,6 +82,23 @@
       wa_g_hand_verdacht: "von dir auf Verdacht gesetzt",
       wa_g_safebrowsing: "von Google Safe Browsing gemeldet",
       wa_sb_nicht_geprueft: "Safe Browsing: nicht geprüft (kein Schlüssel hinterlegt)",
+      ms_h: "📈 Messung (Lighthouse)",
+      ms_intro: "Was der nächtliche Lauf zuletzt gemessen hat — vier Zahlen je Eintrag, bewusst OHNE Gesamtnote. Eine gemittelte Zahl verdeckt genau das, was man wissen will. Ja/Nein-Stimmen von Besuchern kommen später daneben, nie hinein.",
+      ms_none: "Noch kein Messwert. Er entsteht beim nächsten nächtlichen Lauf.",
+      ms_leistung: "Leistung", ms_bedienbarkeit: "Bedienbarkeit",
+      ms_gute_praxis: "Gute Praxis", ms_auffindbarkeit: "Auffindbarkeit",
+      ms_st_gemessen: "gemessen", ms_st_veraltet: "veraltet (letzte Messung fehlgeschlagen)",
+      ms_st_nicht_gemessen: "nicht gemessen",
+      ms_am: "am ",
+      ms_g_noch_nicht_dran: "war noch nicht an der Reihe (Deckel je Lauf)",
+      ms_regler_h: "Ab welchem Leistungswert wird gelistet?",
+      ms_regler_aus: "aus — es wird nichts ausgeblendet",
+      ms_regler_ab: "ab ",
+      ms_regler_wirkung_0: "Kein Eintrag fällt damit heraus.",
+      ms_regler_wirkung_1: " Eintrag fällt damit aus dem Marktplatz.",
+      ms_regler_wirkung_n: " Einträge fallen damit aus dem Marktplatz.",
+      ms_regler_hint: "Wirkt erst nach dem Veröffentlichen. Einträge OHNE Messwert werden nie ausgeblendet — „noch nicht gemessen\" ist kein schlechter Wert. Was der Regler wegnimmt, bleibt hier in der Liste sichtbar, damit niemand still verschwindet.",
+      ms_raus: "unter der Schwelle — wird nicht gelistet",
       ph_name: "z. B. Mein Tool", ph_desc: "Was macht das Tool? Frei und mit Synonymen — hilft der Suche.",
       ph_url: "https://…", ph_imgurl: "https://…/bild.png", ph_cat: "z. B. Werkzeug, Spiel, Büro",
       ph_tags: "z. B. notizen, offline, pwa", ph_by: "z. B. @extern",
@@ -187,6 +204,23 @@
       wa_g_hand_verdacht: "marked suspicious by you",
       wa_g_safebrowsing: "flagged by Google Safe Browsing",
       wa_sb_nicht_geprueft: "Safe Browsing: not checked (no key on file)",
+      ms_h: "📈 Measurement (Lighthouse)",
+      ms_intro: "What the nightly run last measured — four numbers per entry, deliberately WITHOUT an overall grade. An averaged number hides exactly what you want to know. Visitor yes/no votes will sit beside these later, never inside them.",
+      ms_none: "No measurement yet. It appears with the next nightly run.",
+      ms_leistung: "Performance", ms_bedienbarkeit: "Accessibility",
+      ms_gute_praxis: "Best practices", ms_auffindbarkeit: "Findability",
+      ms_st_gemessen: "measured", ms_st_veraltet: "stale (last measurement failed)",
+      ms_st_nicht_gemessen: "not measured",
+      ms_am: "on ",
+      ms_g_noch_nicht_dran: "not its turn yet (per-run cap)",
+      ms_regler_h: "From which performance value on is an entry listed?",
+      ms_regler_aus: "off — nothing is hidden",
+      ms_regler_ab: "from ",
+      ms_regler_wirkung_0: "No entry drops out.",
+      ms_regler_wirkung_1: " entry drops out of the marketplace.",
+      ms_regler_wirkung_n: " entries drop out of the marketplace.",
+      ms_regler_hint: "Takes effect after publishing. Entries WITHOUT a measurement are never hidden — \"not measured yet\" is not a bad value. Whatever the slider removes stays visible in this list, so nobody disappears silently.",
+      ms_raus: "below the threshold — not listed",
       ph_name: "e.g. My Tool", ph_desc: "What does the tool do? Free text with synonyms — helps search.",
       ph_url: "https://…", ph_imgurl: "https://…/image.png", ph_cat: "e.g. Tool, Game, Office",
       ph_tags: "e.g. notes, offline, pwa", ph_by: "e.g. @extern",
@@ -291,13 +325,41 @@
   function loadWork() {
     try { WORK = JSON.parse(JSON.stringify(window.FP_LISTINGS || [])); } catch (e) { WORK = (window.FP_LISTINGS || []).slice(); }
   }
+  /* Stufe 5 — der Schieberegler. Ab welchem Leistungswert ein Eintrag im
+   * Marktplatz gelistet wird. Er reist in derselben Datei mit, die das Studio
+   * ohnehin veröffentlicht (assets/config/listings.js) — dadurch braucht es
+   * keinen zweiten Server-Pfad und keine zweite Datei, die jemand von Hand
+   * hochladen muss.
+   *
+   * Deshalb muss capturePrefix den Kopf VOR dieser Zeile abschneiden: sonst
+   * wanderte sie beim nächsten Veröffentlichen in den erhaltenen Kopf und
+   * stünde zweimal in der Datei. */
+  var MIN_MARKE = "window.FP_MARKT_MIN_LEISTUNG";
+  var MIN_LEISTUNG = 0;
+  function klemmeMin(n) { n = Math.round(Number(n) || 0); return n < 0 ? 0 : (n > 100 ? 100 : n); }
+
+  /* Der Kopf und der Regler-Wert aus einer vorhandenen listings.js. Eigene
+   * Funktion, damit der Rundlauf (schreiben -> wieder einlesen -> schreiben)
+   * prüfbar ist: genau dort läge die Falle, dass die Regler-Zeile mit in den
+   * erhaltenen Kopf wandert und bei jedem Veröffentlichen einmal mehr in der
+   * Datei stünde. */
+  function kopfUndMin(txt) {
+    if (!txt) return { prefix: null, min: 0 };
+    var m = /window\.FP_MARKT_MIN_LEISTUNG\s*=\s*(\d+)/.exec(txt);
+    var i = txt.indexOf(MIN_MARKE);
+    var j = txt.indexOf("window.FP_LISTINGS");
+    var k = (i >= 0 && (j < 0 || i < j)) ? i : j;
+    return { prefix: k > 0 ? txt.slice(0, k) : null, min: m ? klemmeMin(m[1]) : 0 };
+  }
+
   // Kopf der Datei erhalten (Kommentar + Endpunkt). Fail-soft rekonstruieren, falls kein Netz.
   function capturePrefix() {
     return fetch("assets/config/listings.js?ts=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.text() : null; })
       .then(function (txt) {
-        if (txt) { var i = txt.indexOf("window.FP_LISTINGS"); if (i > 0) { filePrefix = txt.slice(0, i); return; } }
-        filePrefix = null;
+        var r = kopfUndMin(txt);
+        filePrefix = r.prefix;
+        MIN_LEISTUNG = r.min;
       }).catch(function () { filePrefix = null; });
   }
   function fallbackPrefix() {
@@ -333,7 +395,8 @@
     var items = WORK.map(function (e) {
       return JSON.stringify(normEntry(e), null, 2).split("\n").map(function (l) { return "  " + l; }).join("\n");
     }).join(",\n");
-    return head + "window.FP_LISTINGS = [\n" + (items ? items + ",\n" : "") + MARKER + "];\n";
+    return head + MIN_MARKE + " = " + klemmeMin(MIN_LEISTUNG) + ";\n\n" +
+      "window.FP_LISTINGS = [\n" + (items ? items + ",\n" : "") + MARKER + "];\n";
   }
 
   /* --------------------------------------------------------------- Studio-Zugang */
@@ -732,7 +795,7 @@
     return fetch("assets/config/spore-stand.json?ts=" + Date.now(), { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
       .catch(function () { return null; })
-      .then(function (st) { SPORENSTAND = st; renderSporen(st); });
+      .then(function (st) { SPORENSTAND = st; renderSporen(st); renderMessung(st); reglerAnzeigen(); });
   }
 
   function renderSporen(st) {
@@ -779,6 +842,105 @@
       }
       box.appendChild(zeile);
     }
+  }
+
+  /* ── Messung (Stufe 5) ─────────────────────────────────────────────────────
+   * Die volle Tabelle. Der Marktplatz zeigt je Karte eine kurze Zeile mit
+   * Aufklapper; hier steht alles nebeneinander, damit Klaus in einem Blick
+   * sieht, wo es hakt und was der Regler wegnehmen würde.
+   *
+   * KEINE Gesamtnote, an keiner Stelle. Und ausdrücklich keine Verrechnung mit
+   * Menschenmeinung: Ja/Nein-Stimmen bekommen später eine eigene Spalte, nie
+   * einen Anteil an diesen Zahlen (Klaus' Vorgabe, nicht verhandelbar).
+   *
+   * Alles aus spore-stand.json ist maschinell geschriebener Text und wird über
+   * textContent gesetzt, nie als HTML. */
+  var MS_KAT = ["leistung", "bedienbarkeit", "gute_praxis", "auffindbarkeit"];
+  function msZahlen(m) { return !!m && MS_KAT.every(function (k) { return typeof m[k] === "number"; }); }
+  function msStufe(n) { return n >= 90 ? "gut" : (n >= 50 ? "mittel" : "schwach"); }
+  function msRaus(m) { return MIN_LEISTUNG > 0 && msZahlen(m) && m.leistung < MIN_LEISTUNG; }
+
+  function msZaehleRaus(st) {
+    var n = 0, e = (st && st.eintraege) || {};
+    for (var k in e) if (e[k] && msRaus(e[k].messung)) n++;
+    return n;
+  }
+
+  function renderMessung(st) {
+    var box = panel && panel.querySelector("[data-role=messung]");
+    if (!box) return;
+    box.innerHTML = "";
+    var mit = [];
+    var e = (st && st.eintraege) || {};
+    for (var k in e) if (e[k] && e[k].messung) mit.push(k);
+    if (!mit.length) { box.textContent = T("ms_none"); return; }
+    // Schwächste zuerst: wer den Block öffnet, soll oben sehen, was ihn angeht.
+    // Ohne Zahl ganz nach unten — das ist kein schlechter Wert, nur keiner.
+    mit.sort(function (a, b) {
+      var ma = e[a].messung, mb = e[b].messung;
+      var za = msZahlen(ma) ? ma.leistung : 999, zb = msZahlen(mb) ? mb.leistung : 999;
+      return za !== zb ? za - zb : (a < b ? -1 : 1);
+    });
+    for (var i = 0; i < mit.length; i++) {
+      var id = mit[i], m = e[id].messung || {};
+      var zeile = document.createElement("div");
+      zeile.className = "fpst-sporezeile" + (msRaus(m) ? " is-warn" : "");
+      var name = document.createElement("b");
+      var eintrag = findeEintrag(id);
+      name.textContent = (eintrag && eintrag.label) || id;
+      zeile.appendChild(name);
+
+      if (msZahlen(m)) {
+        var reihe = document.createElement("span");
+        reihe.className = "fpst-mswerte";
+        for (var j = 0; j < MS_KAT.length; j++) {
+          var kk = MS_KAT[j];
+          var w = document.createElement("span");
+          w.className = "fpst-msw is-" + msStufe(m[kk]);
+          w.textContent = T("ms_" + kk) + " " + m[kk];
+          reihe.appendChild(w);
+        }
+        zeile.appendChild(reihe);
+      }
+
+      var stand = document.createElement("span");
+      var txt = T("ms_st_" + (m.stand || "nicht_gemessen"));
+      if (m.gemessen) txt += " · " + T("ms_am") + m.gemessen;
+      if (m.grund) txt += " — " + (m.grund === "noch_nicht_dran" ? T("ms_g_noch_nicht_dran") : m.grund);
+      stand.textContent = txt;
+      zeile.appendChild(stand);
+
+      if (msRaus(m)) {
+        var raus = document.createElement("small");
+        raus.textContent = "⚠ " + T("ms_raus");
+        zeile.appendChild(raus);
+      }
+      box.appendChild(zeile);
+    }
+  }
+
+  /* Der Schieberegler. Er ändert nur die Arbeitskopie — wirksam wird er mit
+   * demselben „Veröffentlichen"-Knopf wie jede andere Änderung. Deshalb setzt
+   * er auch markDirty(): sonst könnte Klaus ihn schieben, das Panel schließen
+   * und glauben, es sei etwas passiert. */
+  function reglerAnzeigen() {
+    if (!panel) return;
+    var out = panel.querySelector("[data-role=msreglerwert]");
+    var wirk = panel.querySelector("[data-role=msreglerwirkung]");
+    if (out) out.textContent = MIN_LEISTUNG > 0 ? (T("ms_regler_ab") + MIN_LEISTUNG) : T("ms_regler_aus");
+    if (wirk) {
+      var n = msZaehleRaus(SPORENSTAND);
+      wirk.textContent = n === 0 ? T("ms_regler_wirkung_0")
+        : n + (n === 1 ? T("ms_regler_wirkung_1") : T("ms_regler_wirkung_n"));
+    }
+  }
+  function reglerGesetzt(v) {
+    var neu = klemmeMin(v);
+    if (neu === MIN_LEISTUNG) { reglerAnzeigen(); return; }
+    MIN_LEISTUNG = neu;
+    markDirty();
+    reglerAnzeigen();
+    renderMessung(SPORENSTAND);
   }
 
   function findeEintrag(anchorId) {
@@ -1210,6 +1372,20 @@
           '<p class="fpst-qintro">' + esc(T("sp_intro")) + '</p>' +
           '<div class="fpst-sporen" data-role="sporen"></div>' +
         '</div>' +
+        '<div class="fpst-vec">' +
+          '<h4>' + esc(T("ms_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("ms_intro")) + '</p>' +
+          '<div class="fpst-msregler">' +
+            '<label for="fpst-msregler">' + esc(T("ms_regler_h")) + '</label>' +
+            '<div class="fpst-msreglerrow">' +
+              '<input id="fpst-msregler" type="range" min="0" max="100" step="5" value="' + esc(String(klemmeMin(MIN_LEISTUNG))) + '" data-role="msregler">' +
+              '<output data-role="msreglerwert"></output>' +
+            '</div>' +
+            '<small data-role="msreglerwirkung"></small>' +
+            '<small>' + esc(T("ms_regler_hint")) + '</small>' +
+          '</div>' +
+          '<div class="fpst-sporen" data-role="messung"></div>' +
+        '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
         '<div class="fpst-list" data-role="list"></div>' +
         '<div class="fpst-foot">' +
@@ -1230,6 +1406,14 @@
       var b = e.target.closest("[data-sptake]"); if (b) sporeUebernehmen(b.getAttribute("data-sptake"));
     });
     var vp = panel.querySelector("[data-role=vecreport]"); if (vp) vp.addEventListener("click", vecBericht);
+    var mr = panel.querySelector("[data-role=msregler]");
+    if (mr) {
+      // `input` fürs Mitlaufen beim Ziehen, `change` fürs Loslassen — und beide
+      // auf denselben Weg, damit die Tastatur-Bedienung (Pfeiltasten setzen
+      // beides aus) sich nicht anders verhält als der Finger.
+      mr.addEventListener("input", function () { reglerGesetzt(mr.value); });
+      mr.addEventListener("change", function () { reglerGesetzt(mr.value); });
+    }
     panel.querySelector("[data-role=imgpick]").addEventListener("click", function () {
       var fi = ensureFileInput(); fi.value = "";
       fi.onchange = function () {
@@ -1268,6 +1452,11 @@
     // eine Beschreibung auf Klaus, soll er es beim Öffnen sehen.
     standLaden();
     sporenLaden();
+    // Der Regler-Wert kommt aus listings.js und wird von capturePrefix() gelesen
+    // — das läuft nebenher und kann nach dem Panel-Bau fertig werden. Deshalb
+    // hier noch einmal angleichen, statt sich auf die Reihenfolge zu verlassen.
+    var mr0 = panel.querySelector("[data-role=msregler]"); if (mr0) mr0.value = String(klemmeMin(MIN_LEISTUNG));
+    reglerAnzeigen();
   }
   function closePanel() { if (panel) panel.style.display = "none"; }
 
@@ -1334,6 +1523,16 @@
       ".fpst-sporezeile span.fpst-ampel.is-gruen{color:#8fd18f}" +
       ".fpst-sporezeile span.fpst-ampel.is-gelb{color:#ffb26b}" +
       ".fpst-sporezeile span.fpst-ampel.is-rot{color:#ff8a7a}" +
+      // Messung (Stufe 5). Die Zahl steht immer neben der Farbe — auf Farbe
+      // allein darf sich keine Aussage stützen.
+      ".fpst-mswerte{display:flex!important;flex-wrap:wrap;gap:5px;margin:4px 0;opacity:1!important}" +
+      ".fpst-msw{font-size:.75rem;border-radius:999px;padding:2px 8px;border:1px solid currentColor;white-space:nowrap}" +
+      ".fpst-msw.is-gut{color:#8fd18f}.fpst-msw.is-mittel{color:#ffb26b}.fpst-msw.is-schwach{color:#ff8a7a}" +
+      ".fpst-msregler{border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px;margin:.5rem 0}" +
+      ".fpst-msregler label{margin:0 0 6px;opacity:1;font-size:.85rem}" +
+      ".fpst-msreglerrow{display:flex;align-items:center;gap:10px}" +
+      ".fpst-msreglerrow input[type=range]{flex:1;min-width:0;accent-color:#6aa0ff}" +
+      ".fpst-msreglerrow output{font:600 .85rem ui-monospace,monospace;min-width:6.5em;text-align:right}" +
       ".fpst-vectext{display:block;margin-bottom:4px}" +
       ".fpst-vecbar{display:block;height:6px;border-radius:4px;background:rgba(255,255,255,.12);overflow:hidden}" +
       ".fpst-vecbar-fill{display:block;height:100%;border-radius:4px;background:linear-gradient(90deg,#6aa0ff,#5fce8f);transition:width .25s}" +
@@ -1373,7 +1572,9 @@
   window.FPStudio = {
     _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64,
           entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, vecEntries: vecEntries, vecPruefe: vecPruefe,
-          setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; }, MARKER: MARKER, CFG: CFG },
+          setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; },
+          kopfUndMin: kopfUndMin, setMin: function (n) { MIN_LEISTUNG = klemmeMin(n); }, getMin: function () { return MIN_LEISTUNG; },
+          MARKER: MARKER, CFG: CFG },
     open: function () { document.body.classList.add("fpstudio"); openPanel(); },
     close: exitStudio
   };

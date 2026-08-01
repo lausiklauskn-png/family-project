@@ -15,7 +15,7 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v79";
+var CACHE_VERSION = "family-projekt-v80";
 // Versions-Anhang der Asset-Adressen (?v=NN) — MUSS zur Zahl in CACHE_VERSION
 // passen und in ALLEN HTML-Seiten identisch stehen.
 //
@@ -31,11 +31,11 @@ var CACHE_VERSION = "family-projekt-v79";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "79";
+var ASSET_V = "80";
 var CORE = [
   "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=79", "assets/app.js?v=79", "assets/status-widget.js?v=79",
+  "assets/style.css?v=80", "assets/app.js?v=80", "assets/status-widget.js?v=80",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
   "manifest.json", "icon-192.png", "icon-512.png", "og-image.png"
 ];
