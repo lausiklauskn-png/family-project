@@ -48,12 +48,28 @@
     '</span>' +
     '<button type="button" class="fp-sw-x" data-act="close" title="Schließen" aria-label="Schließen">✕</button>';
 
+  /* Macht aus einem <span> ein richtiges Bedien-Element (Befund 5.1, 2026-08-01).
+   * Die SIEGEL-Lampe und der Zurückhol-Chip waren klickbare <span>-Elemente ohne
+   * Tabulator-Halt: per Tastatur kam niemand an sie heran. Gleiche Hilfe wie in
+   * assets/app.js — hier eigenständig, weil das Widget ohne app.js läuft.
+   * Die Leertaste braucht `preventDefault`, sonst scrollt die Seite weg. */
+  function alsKnopf(el, aktion, label) {
+    if (!el) return;
+    el.setAttribute("role", "button");
+    el.tabIndex = 0;
+    if (label) el.setAttribute("aria-label", label);
+    el.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); aktion(e); }
+    });
+  }
+
   var restore = document.createElement("span");
   restore.className = "fp-sw-restore";
   restore.textContent = "⊕ Status";
   restore.title = "Status-Widget zurückholen";
   restore.style.display = "none";
   restore.addEventListener("click", function () { setMode("docked"); });
+  alsKnopf(restore, function () { setMode("docked"); }, "Status-Anzeige zurückholen");
 
   dock.appendChild(w);
   dock.appendChild(restore);
@@ -94,10 +110,12 @@
   // ---- SIEGEL-Klick öffnet Modul-16-Modal (Proxy-Klick) --------------------
   var siegel = w.querySelector('[data-slot="siegel"]');
   siegel.addEventListener("pointerdown", function (e) { e.stopPropagation(); }); // kein Drag von hier
-  siegel.addEventListener("click", function () {
+  function siegelOeffnen() {
     var badge = document.getElementById("sbkim-siegel-badge");
     if (badge) badge.click();
-  });
+  }
+  siegel.addEventListener("click", siegelOeffnen);
+  alsKnopf(siegel, siegelOeffnen, "SBKIM-Siegel öffnen");
 
   // ---- Drag: andocken / lösen ----------------------------------------------
   var drag = null;
