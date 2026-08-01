@@ -54,11 +54,13 @@ import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { wacheLaufen, handLesen } from "./waechter.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P_LISTINGS = path.join(ROOT, "assets/config/listings.js");
 const P_PACK = path.join(ROOT, "assets/config/listings-vec.json");
 const P_STAND = path.join(ROOT, "assets/config/spore-stand.json");
+const P_HAND = path.join(ROOT, "assets/config/wache-hand.json");
 
 const ARG = new Set(process.argv.slice(2));
 const SCHREIBEN = ARG.has("--schreiben");
@@ -223,7 +225,29 @@ try { paket = JSON.parse(fs.readFileSync(P_PACK, "utf8")); } catch (_e) { paket 
 log(paket ? `  bestehendes Paket: ${Object.keys(paket.vectors || {}).length} Vektoren, Modell ${paket.model}` : "  kein bestehendes Paket");
 
 /* ── 1. Sporen ─────────────────────────────────────────────────────────────── */
-const stand = { geprueft: new Date().toISOString(), eintraege: {} };
+/* Den Bericht des Vortages lesen, BEVOR der neue entsteht: der Wächter braucht
+ * ihn, um „hat sich etwas geändert?" und „wie oft hintereinander tot?"
+ * überhaupt beantworten zu können. Fehlt er (erster Lauf), fängt alles bei
+ * null an — das ist kein Fehler, sondern der Anfang. */
+let vorherigeWachen = {};
+try {
+  const alt = JSON.parse(fs.readFileSync(P_STAND, "utf8"));
+  for (const k of Object.keys((alt && alt.eintraege) || {})) {
+    if (alt.eintraege[k] && alt.eintraege[k].wache) vorherigeWachen[k] = alt.eintraege[k].wache;
+  }
+  log(`  vorheriger Bericht: ${Object.keys(vorherigeWachen).length} Wächter-Einträge`);
+} catch (_e) {
+  log("  kein vorheriger Bericht — der Wächter fängt bei null an");
+}
+
+/* Der Hinweis reist mit: die Datei wird maschinell überschrieben, und wer sie
+ * im Repo findet, soll ohne Umweg wissen, woher sie kommt und dass Handarbeit
+ * darin verloren geht. */
+const stand = {
+  _hinweis: "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
+  geprueft: new Date().toISOString(),
+  eintraege: {}
+};
 const uebernahmen = [];
 let mitSpore = 0;
 
@@ -255,6 +279,32 @@ for (const x of liste) {
   log(`  · ${x.anchorId.padEnd(28)} ${e.lage}${e.hinweis ? " (" + e.hinweis + ")" : ""}`);
 }
 log(`  ${mitSpore} Einträge mit sporeUrl, ${uebernahmen.length} Beschreibung(en) automatisch übernommen`);
+
+/* ── 1b. Der Wächter (Stufe 3) ─────────────────────────────────────────────
+ * Hängt sich an denselben Lauf und erweitert denselben Bericht — kein zweiter
+ * Lauf, kein zweites Format. Anders als der Sporen-Teil prüft er ALLE
+ * Einträge, auch die ohne `sporeUrl`: eine tote oder gekaperte Zielseite ist
+ * unabhängig davon ein Befund. Die Regeln stehen in tools/waechter.mjs. */
+log("\nWächter — Zielseiten prüfen");
+// Ohne Netz wird nicht geprüft — dann aber der VORIGE Befund unverändert
+// weitergereicht statt gelöscht. Sonst nähme ein Testlauf mit --ohne-netz
+// --schreiben dem Wächter sein Gedächtnis (Grundlage, Fehlschlag-Zähler), und
+// der nächste echte Lauf finge stillschweigend wieder bei null an.
+const wache = OHNE_NETZ
+  ? vorherigeWachen
+  : await wacheLaufen(liste, { vorher: vorherigeWachen, hand: handLesen(P_HAND), log });
+for (const x of liste) {
+  if (!x || !x.anchorId) continue;
+  if (!stand.eintraege[x.anchorId]) stand.eintraege[x.anchorId] = { lage: "ohne_spore" };
+  if (wache[x.anchorId]) stand.eintraege[x.anchorId].wache = wache[x.anchorId];
+}
+{
+  const z = { gruen: 0, gelb: 0, rot: 0 };
+  for (const k of Object.keys(wache)) z[wache[k].ampel] = (z[wache[k].ampel] || 0) + 1;
+  stand.wacheZaehler = z;
+  log(`  ${z.gruen} grün, ${z.gelb} gelb, ${z.rot} rot`
+    + (OHNE_NETZ ? "  (übersprungen: --ohne-netz)" : ""));
+}
 
 /* Übernahmen in die Quelle einarbeiten (im Speicher; geschrieben wird später). */
 let quelleGeaendert = false;
