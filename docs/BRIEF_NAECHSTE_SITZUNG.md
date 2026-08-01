@@ -184,6 +184,62 @@ Der Workflow reicht ihn bereits durch; es braucht keinen weiteren Bau.
 
 ---
 
+## 3b. ENTSCHIEDEN und BESTÄTIGT am 2026-08-01 (Klaus, im Browser)
+
+**Der erste Wächter-Lauf ist gelaufen und war grün.** Alle 14 Einträge `gruen`,
+HTTP 200 durchweg — auch die fünf Adressen auf `*.github.io`, über die vorher
+nichts feststand. Modell echt (`Xenova/multilingual-e5-small`, 14 Vektoren). Der
+Lauf schrieb nur den Bericht, keine Vektoren neu — die Spar-Logik greift.
+
+*Nebenbefund zum Ansehen bei Gelegenheit:* bei neun Anbietern steht
+`"lage": "geaendert"` — ihre Spore beschreibt sich anders als ihr
+Marktplatz-Eintrag. Gemeldet, nicht übernommen (richtig so, `sporeAuto` ist aus).
+Klaus kann entscheiden, ob ihm die Selbstbeschreibungen besser gefallen.
+
+**Klaus' Browser-Sichttest, beide grün:**
+
+- **Modul 17** in Private Brain (helles Thema): die schwebende Pille sitzt auf
+  sattem, fast schwarzem Grund, alle vier Wörter klar lesbar — auch die grauen.
+  Der Kontrast-Fix ist damit nicht nur gerechnet, sondern **gesehen**.
+- **Der ⊕-Status-Chip** auf family-projekt.de holt das Widget zurück. Das war
+  einer der vier Knöpfe, die vorher per Tastatur unerreichbar waren.
+
+*Klarstellung für die nächste Sitzung, damit der Irrtum sich nicht wiederholt:*
+family-projekt.de zeigt **nicht** das Modul-17-Widget. Es hat ein eigenes,
+angedocktes (`assets/status-widget.js`); Modul 17 läuft dort versteckt als
+Zulieferer. Wer Modul 17 sichtbar prüfen will, nimmt eine App mit
+`SbkimWidget.show()` — Privat-Brain, Kimboard, Kimseek, Mein-Tresor,
+Jasons-Tresor.
+
+**Offener Befund von Klaus, wert nachzugehen:** im **DuckDuckGo-Browser** steht
+die **FREMD-Lampe auf Rot**, während sie in Chrome auf derselben Seite grün ist.
+Klaus' Deutung: die eingebaute KI des Browsers. Plausibel, aber noch **nicht
+belegt** — die Lampe meldet „etwas greift von außen zu", nicht *was*. Ein Klick
+auf die Lampe öffnet das Fremdzugriff-Fenster und nennt den Grund. **Das gehört
+nachgelesen und festgehalten**, es wäre der erste Live-Beleg dafür, dass Modul 15
+im Feld etwas Echtes fängt.
+
+**STUFE 5 — Klaus hat entschieden: WEG A.** Lighthouse läuft in der **eigenen
+Aktion** auf GitHubs Rechnern, **nicht** über Googles PageSpeed-API. Kein
+Schlüssel, keine Adressliste an Google. Die zusätzliche Laufzeit (grob eine
+halbe bis eine Minute je Eintrag) ist in einem nächtlichen Lauf ohne Belang.
+
+Die Form ist vom Wächter vorgegeben — **nichts Neues daneben bauen:**
+
+1. **Dieselbe Aktion**, derselbe Lauf.
+2. **Derselbe Bericht:** neben `wache` je Eintrag ein Block `messung` mit den
+   vier Zahlen (Leistung, Bedienbarkeit, gute Praxis, Auffindbarkeit).
+3. **Zwei Anzeige-Orte:** an jeder Marktplatz-Karte eine kleine Zeile dort, wo
+   heute das Warnband des Wächters sitzt · im Studio die volle Tabelle.
+4. **Der Schieberegler** stellt einmalig ein, ab welchem Wert gelistet wird.
+5. **Ja/Nein-Stimmen kommen daneben, NICHT hineingerechnet.** Eine
+   Durchschnittsnote aus Messwert und Menschenmeinung bedeutet nichts mehr —
+   das ist Klaus' ausdrückliche Vorgabe.
+6. Ein **Steckplatz, der ohne Messung ehrlich „nicht gemessen" meldet**, genau
+   wie Safe Browsing heute `nicht_geprueft` sagt.
+
+---
+
 ## 4. Die offene Frage aus dieser Sitzung
 
 Du hast auf die Symbol-Frage „keine Präferenz" geantwortet — die zweite Hälfte
