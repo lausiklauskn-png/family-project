@@ -4,6 +4,66 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01 (Nachtrag 2): drei Befunde aus Klaus' Browser
+
+### 1. „Ich sehe gar nichts" — und er hatte recht
+
+Nachgemessen: `assets/config/spore-stand.json` auf `main` enthielt **null**
+`messung`-Einträge. Der Bericht stammte vom Wächter-Lauf um 13:18 Uhr, also von
+**vor** dem Bau von Stufe 5.
+
+Die Karte verhielt sich korrekt (kein `messung` → kein Band), aber der Befund
+war für einen Besucher nicht zu deuten: **zwei verschiedene Nichts sahen gleich
+aus.** Jetzt unterschieden:
+
+| Lage | Was die Karte zeigt |
+|---|---|
+| Bericht gar nicht da (404, kaputtes JSON) | gar nichts — der Marktplatz sieht aus wie immer |
+| Bericht da, für diesen Eintrag keine Messung | **„📈 Noch nicht gemessen."** |
+
+Der Platz ist damit von Anfang an sichtbar und sagt die Wahrheit. Ohne Knopf —
+es gibt ja nichts nachzulesen.
+
+*Und eine Korrektur an Klaus:* ich hatte gesagt, jede Karte würde „Noch nicht
+gemessen" anzeigen. Das stimmte nicht — diese Zeile erschien nur, wenn der
+Bericht einen leeren `messung`-Block trug. Jetzt stimmt es.
+
+### 2. „Jede Nacht eine neue Beschreibung" — ein Zustand als Fund gemeldet
+
+Klaus' Befund: das Studio meldete Nacht für Nacht **„Beschreibung geändert —
+wartet auf dich"**, obwohl er nichts geändert hatte. Nachgezählt: **neun von
+vierzehn** Einträgen standen dauerhaft auf `geaendert`.
+
+Der Grund: verglichen wurde die Spore des Anbieters mit Klaus'
+Marktplatz-Text. Das sind schlicht **zwei verschiedene Texte, dauerhaft** — der
+Vergleich meldete also ewig dasselbe.
+
+Neue Regel, dieselbe Haltung wie beim Wächter mit seiner `grundlage`: gemeldet
+wird nur, was sich **seit dem letzten Bericht** wirklich geändert hat.
+
+- `geaendert` — neu, gehört gemeldet (warm, mit Knopf)
+- `abweichend` — weicht ab, ist aber nichts Neues (ruhig, Knopf bleibt)
+
+Der Fingerabdruck der gelesenen Spore (`sporeHash`) wandert dafür in den
+Bericht. Weil der alte Bericht den Text schon als `neuerText` trägt, wird auch
+dagegen verglichen — die Sache ist damit **schon beim nächsten Lauf** ruhig und
+nicht erst beim übernächsten.
+
+### 3. Der Knopf soll aussehen wie die anderen
+
+Er trug eigene Größe und eigenes Polster. Jetzt erbt er alles von `.btn.ghost`
+und bekommt nur noch die Mono-Schrift von „→ Zur Seite" — **gemessen** im Test
+gegen den Nachbarknopf auf derselben Karte, nicht behauptet.
+
+Dazu Klaus' Wortlaut-Wunsch („was besser gehen könnte. nicht muss"): der
+Abschnitt im Fenster heißt jetzt **„Was besser gehen könnte"** mit dem Zusatz
+*„Vorschläge, keine Pflicht — die App funktioniert auch so."*
+
+`smoke_stufe5_messung` **81/81**, `smoke_stufe2_sporen` **45/45** (neuer Fall 4b:
+vier Abende hintereinander). Drei weitere Gegenproben rot bekommen. Cache **v82**.
+
+---
+
 ## ✅ 2026-08-01 (Nachtrag): Bewertungs-Fenster statt Aufklapper, mit Nachbesserungen
 
 Klaus' Wunsch nach dem ersten Bau: **ein Knopf an der Karte, ein Fenster zum

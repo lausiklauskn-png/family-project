@@ -483,6 +483,26 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       return k ? !!k.querySelector(".mk-ms-btn") : null;
     });
     ok(ohne === false, "C2c ein nicht gemessener Eintrag trägt keinen Knopf ins Leere");
+
+    // Klaus 2026-08-01: „der Knopf soll zum anderen Button-Design passen."
+    // Gemessen statt behauptet — verglichen wird mit „→ Zur Seite" auf
+    // derselben Karte, denn genau daneben steht er.
+    const gleich = await page.evaluate(() => {
+      // Die Karte nehmen, die BEIDES trägt — sonst vergleicht man zwei Karten.
+      const k = Array.from(document.querySelectorAll(".listing"))
+        .find((e) => e.querySelector("a.ext") && e.querySelector(".mk-ms-btn"));
+      const a = k && k.querySelector("a.ext");
+      const m = k && k.querySelector(".mk-ms-btn");
+      if (!a || !m) return null;
+      const f = (el) => { const c = getComputedStyle(el);
+        return { schrift: c.fontFamily, groesse: c.fontSize, rund: c.borderRadius,
+                 rahmen: c.borderTopWidth, polster: c.paddingTop + "/" + c.paddingLeft, fett: c.fontWeight }; };
+      return { a: f(a), m: f(m) };
+    });
+    ok(!!gleich && gleich.a.schrift === gleich.m.schrift && gleich.a.groesse === gleich.m.groesse,
+      "C2d gleiche Schrift und Größe wie „→ Zur Seite“ (" + (gleich && gleich.m.groesse) + ")");
+    ok(!!gleich && gleich.a.rund === gleich.m.rund && gleich.a.polster === gleich.m.polster && gleich.a.fett === gleich.m.fett,
+      "C2e gleiche Rundung, gleiches Polster, gleiche Strichstärke");
   }
 
   // C3 — das Fenster. Es muss die drei Fragen beantworten: wer misst (und kann
@@ -510,7 +530,8 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     ok(/nicht, ob die App gut, nützlich oder vertrauenswürdig ist/.test(d.text),
       "C3e und wo die Grenze der Aussage liegt");
     ok(d.kategorien === 4, "C3f alle vier Kategorien haben einen eigenen Abschnitt (" + d.kategorien + ")");
-    ok(/Empfohlene Nachbesserungen/.test(d.text), "C3g mit den empfohlenen Nachbesserungen");
+    ok(/Was besser gehen könnte/.test(d.text) && /Vorschläge, keine Pflicht/.test(d.text),
+      "C3g mit dem Abschnitt „Was besser gehen könnte“ — ausdrücklich als Vorschlag, nicht als Pflicht");
     ok(d.fixPunkte.some((t) => /Bilder in modernen Formaten/.test(t)),
       "C3h und die stehen wirklich drin (" + (d.fixPunkte[0] || "—") + ")");
     ok(d.leer >= 1, "C3i wo nichts offen ist, steht das auch — kein leerer Kasten");
@@ -538,16 +559,44 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     ok(!!j && j.leer, "C5c der NICHT gemessene bleibt gelistet und sagt ehrlich „noch nicht gemessen“");
   }
 
-  // C6 — ohne Messung im Bericht sieht der Marktplatz aus wie immer.
+  // C6 — zwei verschiedene Nichts, und sie sehen unterschiedlich aus.
+  // Klaus' Befund 2026-08-01: „ich sehe gar nichts." Der Bericht lag vor,
+  // stammte aber von VOR dem Bau und trug kein `messung`. Ein Besucher konnte
+  // nicht unterscheiden, ob nicht gemessen wurde oder ob es die Messung
+  // überhaupt nicht gibt.
   {
+    // (a) Bericht da, aber ohne `messung` -> der Platz ist da und sagt es.
     const p2 = await browser.newPage();
     await p2.route("**/assets/config/spore-stand.json*", (r) =>
-      r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ eintraege: { "markt-bookledgerpro": { lage: "gleich" } } }) }));
+      r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ eintraege: { "markt-bookledgerpro": { lage: "gleich", wache: { ampel: "gruen", grund: "unveraendert" } } } }) }));
     await p2.goto(base + "/markt.html", { waitUntil: "load" });
-    await p2.waitForSelector(".listing", { timeout: 20000 });
-    const z = await p2.evaluate(() => ({ karten: document.querySelectorAll(".listing").length, mess: document.querySelectorAll(".mk-mess").length }));
-    ok(z.karten > 0 && z.mess === 0, "C6 kein `messung` im Bericht -> kein Band, Karten unverändert (" + z.karten + ")");
+    await p2.waitForSelector(".listing .mk-mess--leer", { timeout: 20000 }).catch(() => {});
+    const z = await p2.evaluate(() => ({
+      karten: document.querySelectorAll(".listing").length,
+      leer: document.querySelectorAll(".mk-mess--leer").length,
+      knopf: document.querySelectorAll(".mk-ms-btn").length,
+      text: (document.querySelector(".mk-mess--leer") || {}).textContent || ""
+    }));
+    ok(z.karten > 0 && z.leer === z.karten,
+      "C6 Bericht ohne Messung -> jede Karte sagt es (" + z.leer + " von " + z.karten + ")");
+    ok(/Noch nicht gemessen/.test(z.text), "C6b und zwar im Klartext („" + z.text.trim() + "“)");
+    ok(z.knopf === 0, "C6c aber ohne Knopf — es gibt ja nichts nachzulesen");
     await p2.close();
+
+    // (b) GAR KEIN Bericht -> der Marktplatz sieht aus wie immer. Ein Wächter,
+    // der die Seite verändert, wenn er selbst ausfällt, wäre schlimmer als keiner.
+    const p3 = await browser.newPage();
+    await p3.route("**/assets/config/spore-stand.json*", (r) => r.fulfill({ status: 404, body: "no" }));
+    await p3.goto(base + "/markt.html", { waitUntil: "load" });
+    await p3.waitForSelector(".listing", { timeout: 20000 });
+    const z3 = await p3.evaluate(() => ({
+      karten: document.querySelectorAll(".listing").length,
+      mess: document.querySelectorAll(".mk-mess").length,
+      links: document.querySelectorAll(".listing a.ext").length
+    }));
+    ok(z3.karten > 0 && z3.mess === 0, "C6d ohne Bericht gar kein Band (" + z3.karten + " Karten)");
+    ok(z3.links === z3.karten, "C6e und alle Links funktionieren wie bisher");
+    await p3.close();
   }
 
   /* ══ D — Der Schieberegler im Studio ═══════════════════════════════════

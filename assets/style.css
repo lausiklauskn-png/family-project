@@ -403,7 +403,11 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .listing .mk-ms-alt{color:#b8860b}
 :root[data-theme="dark"] .listing .mk-ms-alt,
 :root[data-theme="neon"] .listing .mk-ms-alt{color:#e8c14a}
-.mk-ms-btn{margin-top:2px;font-size:.8rem;padding:6px 11px}
+/* Der Knopf trägt dieselben Klassen wie „→ Zur Seite" (.btn.ghost) und bekommt
+   hier nur noch dessen Schrift — damit sieht er aus wie die anderen Knöpfe der
+   Karte und erbt Schliffkante, Neigung und Holo-Schimmer unverändert
+   (Klaus 2026-08-01: „soll zum anderen Button-Design passen"). */
+.listing .mk-ms-btn{font-family:var(--mono);font-size:.82rem;margin-top:2px}
 
 /* Das Bewertungs-Fenster (Stufe 5). Natives <dialog>, dieselbe Optik wie der
    Melder — wer beide kennt, muss sich nicht umgewöhnen. Breiter als der Melder,
@@ -420,6 +424,7 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .mk-ms-kat{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
 .mk-ms-kat h4{margin:0 0 7px;font-size:.95rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .mk-ms-fix-h{font-weight:600;color:var(--text)!important;margin-bottom:5px!important;font-size:.83rem!important}
+.mk-ms-fix-sub{font-weight:400;color:var(--muted);font-size:.78rem}
 .mk-ms-fix{margin:0 0 4px;padding-left:20px;font-size:.84rem;line-height:1.5;color:var(--muted)}
 .mk-ms-fix li{margin-bottom:5px}
 .mk-ms-fix small{opacity:.7;font-family:var(--mono);font-size:.76rem}

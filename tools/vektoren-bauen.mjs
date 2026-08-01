@@ -234,11 +234,13 @@ log(paket ? `  bestehendes Paket: ${Object.keys(paket.vectors || {}).length} Vek
  * null an — das ist kein Fehler, sondern der Anfang. */
 let vorherigeWachen = {};
 let vorherigeMessungen = {};
+let vorherigeSporen = {};
 try {
   const alt = JSON.parse(fs.readFileSync(P_STAND, "utf8"));
   for (const k of Object.keys((alt && alt.eintraege) || {})) {
     if (alt.eintraege[k] && alt.eintraege[k].wache) vorherigeWachen[k] = alt.eintraege[k].wache;
     if (alt.eintraege[k] && alt.eintraege[k].messung) vorherigeMessungen[k] = alt.eintraege[k].messung;
+    if (alt.eintraege[k]) vorherigeSporen[k] = alt.eintraege[k];
   }
   log(`  vorheriger Bericht: ${Object.keys(vorherigeWachen).length} Wächter-Einträge, ${Object.keys(vorherigeMessungen).length} Messungen`);
 } catch (_e) {
@@ -267,6 +269,10 @@ for (const x of liste) {
   if (s.modell) e.modell = s.modell;
 
   if (s.lage === "gelesen") {
+    // Der Fingerabdruck der GELESENEN Spore. Er beantwortet beim nächsten Lauf
+    // die Frage „hat der Anbieter seinen Text seitdem angefasst?" — ohne den
+    // ganzen Text ein zweites Mal zu speichern.
+    e.sporeHash = CODEC.textHash(s.beschreibung);
     if (s.beschreibung === eintragsText(x)) {
       e.lage = "gleich";
     } else if (x.sporeAuto === true) {
@@ -274,9 +280,29 @@ for (const x of liste) {
       e.stand = new Date().toISOString().slice(0, 10);
       uebernahmen.push({ id: x.anchorId, text: s.beschreibung });
     } else {
-      // Nur melden. Der neue Text wandert in den Bericht, damit das Studio ihn
-      // Klaus zum Übernehmen anbieten kann — angezeigt wird er dort escaped.
-      e.lage = "geaendert";
+      /* Nur melden — aber NICHT jede Nacht aufs Neue.
+       *
+       * Befund von Klaus, 2026-08-01: das Studio meldete Nacht für Nacht
+       * „Beschreibung geändert — wartet auf dich", obwohl niemand etwas
+       * geändert hatte. Der Grund: verglichen wurde die Spore des Anbieters
+       * mit Klaus' Marktplatz-Text. Das sind schlicht zwei verschiedene Texte,
+       * dauerhaft. Also meldete der Vergleich ewig dasselbe.
+       *
+       * Eine Abweichung, die schon gestern bestand, ist kein Fund, sondern ein
+       * Zustand. Gemeldet wird ab jetzt nur, was sich SEIT DEM LETZTEN BERICHT
+       * wirklich geändert hat — dieselbe Haltung wie beim Wächter, der sich
+       * seine `grundlage` merkt, statt den Vortag zu vergleichen.
+       *
+       * `abweichend` heißt: weicht ab, ist aber nichts Neues. Der Text bleibt
+       * im Bericht, das Studio bietet ihn weiter zum Übernehmen an — nur ohne
+       * Ausrufezeichen.
+       *
+       * Der frühere Bericht trägt den Text als `neuerText`; deshalb wird auch
+       * dagegen verglichen. So ist die Sache schon beim NÄCHSTEN Lauf ruhig und
+       * nicht erst beim übernächsten. */
+      const vor = vorherigeSporen[x.anchorId];
+      const bekannt = !!vor && (vor.sporeHash === e.sporeHash || vor.neuerText === s.beschreibung);
+      e.lage = bekannt ? "abweichend" : "geaendert";
       e.neuerText = s.beschreibung;
     }
   }
