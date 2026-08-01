@@ -1,16 +1,19 @@
 /* Headless-Smoke für die Messung (Katalog-Spore Stufe 5, Weg A).
  *   node tests/smoke_stufe5_messung.mjs
  *
- * Drei Teile, weil es drei Orte gibt, an denen diese Sache schiefgehen kann:
+ * Vier Teile, weil es vier Orte gibt, an denen diese Sache schiefgehen kann:
  *   A  Die Regel      — tools/messung.mjs allein: was wird aus einem Bericht,
  *                       aus einem Fehlschlag, aus einem übersprungenen Eintrag?
  *   B  Der Verbund    — tools/vektoren-bauen.mjs als echtes Programm in einem
  *                       Wegwerf-Verzeichnis, mit echtem Spawn und echter
  *                       Bericht-Datei. Danach wird nachgesehen, was WIRKLICH in
  *                       assets/config/spore-stand.json steht.
- *   C  Die Anzeige    — die echte markt.html im Browser: stehen die Zahlen da,
- *                       ist die Erklärung wirklich lesbar, und blendet der
- *                       Schieberegler das Richtige aus (und das Falsche nicht)?
+ *   C  Die Anzeige    — die echte markt.html im Browser: stehen die Zahlen an
+ *                       der Karte, öffnet der Knopf ein Fenster, das die drei
+ *                       Fragen beantwortet (wer misst · was heißt die Zahl · was
+ *                       müsste der Anbieter tun), und blendet der Schieberegler
+ *                       das Richtige aus (und das Falsche nicht)?
+ *   D  Der Regler     — der Rundlauf durchs Studio.
  *
  * WAS ECHT IST UND NICHT NACHGEBAUT WIRD. Der Weg zu Lighthouse — Spawn,
  * Kommandozeile, Bericht-Datei, JSON lesen — läuft im Test durch dieselben
@@ -35,15 +38,20 @@
  *      unter die Schwelle fallen -> Fall C4 fiel durch: der Marktplatz war vor
  *      der ersten Messung leer. Diese Probe ist der Grund, warum die Regel
  *      überhaupt so formuliert ist.
- *   5. Die Aufhebung der Drei-Zeilen-Klemmung im CSS entfernt
- *      (`.listing .mk-mess p`) -> Fall C3 fiel durch. Genau der Befund, den
- *      Klaus an der FREMD-Lampe hatte: es steht da, aber man kann es nicht
- *      lesen.
+ *   5. In markt.html den Knopf auch für einen NICHT gemessenen Eintrag erzeugt
+ *      -> Fall C2c fiel durch: ein Klick hätte ein leeres Fenster geöffnet, und
+ *      das ist schlimmer als kein Knopf.
  *   6. In kopfUndMin den Kopf nur bis `window.FP_LISTINGS` geschnitten (der
  *      naheliegende Weg) -> Fall D3 fiel durch: nach dem zweiten
  *      Veröffentlichen stand die Regler-Zeile zweimal in der Datei, nach dem
  *      dritten dreimal. Sie hätte weiter funktioniert — und wäre nur immer
  *      länger geworden, bis irgendwann die falsche gewonnen hätte.
+ *   7. Die Informations-Prüfungen als Mängel mitgenommen (den
+ *      `scoreDisplayMode`-Filter entfernt) -> Fälle B1e/B1g fielen durch. Was
+ *      Lighthouse nur zur Kenntnis meldet, ist kein Mangel und darf nicht als
+ *      Nachbesserung gelesen werden — sonst steht bei jedem Anbieter etwas, was
+ *      er gar nicht abstellen kann.
+ *   8. Den Deckel je Kategorie aufgehoben -> Fall A8 fiel durch.
  *
  * WAS DIESER TEST BEIM BAUEN GELERNT HAT (2026-08-01). Ohne installiertes
  * Lighthouse startete das Werkzeug für JEDEN Eintrag einen eigenen Prozess, der
@@ -70,7 +78,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { zahlenAusBericht, messungBilden, reihenfolge, hatZahlen, KATEGORIEN } from "../tools/messung.mjs";
+import { zahlenAusBericht, hinweiseAusBericht, messungBilden, reihenfolge, hatZahlen, KATEGORIEN } from "../tools/messung.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let pass = 0, fail = 0;
@@ -165,6 +173,35 @@ console.log("A — die Regel (tools/messung.mjs)");
   ok(r[2] === "b" && r[3] === "a", "A7b danach das älteste Datum vor dem jüngsten");
 }
 
+// A8 — die empfohlenen Nachbesserungen. Das ist der Teil, der eine Zahl
+// nachvollziehbar macht: was müsste der Anbieter tun?
+{
+  const lhr = {
+    categories: {
+      performance: { score: 0.5, auditRefs: [{ id: "a" }, { id: "b" }, { id: "c" }, { id: "d" }, { id: "info" }] },
+      accessibility: { score: 1, auditRefs: [{ id: "heil" }] },
+      "best-practices": { score: 1, auditRefs: [] }, seo: { score: 1, auditRefs: [] }
+    },
+    audits: {
+      a: { title: "Klein", score: 0.4, scoreDisplayMode: "metricSavings", details: { overallSavingsMs: 100 } },
+      b: { title: "Groß", score: 0.9, scoreDisplayMode: "metricSavings", details: { overallSavingsMs: 5000 } },
+      c: { title: "Mittel", score: 0.2, scoreDisplayMode: "metricSavings", details: { overallSavingsMs: 900 } },
+      d: { title: "Ohne Ersparnis", score: 0.1, scoreDisplayMode: "binary" },
+      info: { title: "Nur zur Information", score: 0, scoreDisplayMode: "informative" },
+      heil: { title: "Alles gut", score: 1, scoreDisplayMode: "binary" }
+    }
+  };
+  const h = hinweiseAusBericht(lhr);
+  ok(h.length === 3, "A8 höchstens drei je Kategorie (" + h.length + ")");
+  ok(h[0].t === "Groß", "A8b das Lohnendste zuerst — nach ersparter Zeit, nicht nach Reihenfolge (" + h[0].t + ")");
+  ok(!h.some((x) => x.t === "Nur zur Information"),
+    "A8c reine Informations-Prüfungen sind KEINE Mängel und stehen nicht drin");
+  ok(!h.some((x) => x.t === "Alles gut"), "A8d und was bestanden hat, erst recht nicht");
+  ok(h.every((x) => x.k === "leistung"), "A8e jeder Hinweis weiß, zu welcher Kategorie er gehört");
+  ok(hinweiseAusBericht(null).length === 0 && hinweiseAusBericht({}).length === 0,
+    "A8f ohne Bericht keine erfundenen Hinweise");
+}
+
 /* ══ B — Der Verbund ═════════════════════════════════════════════════════ */
 console.log("\nB — der Verbund (tools/vektoren-bauen.mjs als echtes Programm)");
 
@@ -215,9 +252,21 @@ const plan = JSON.parse(fs.readFileSync(process.env.FP_TEST_PLAN, "utf8"));
 const e = plan[url];
 if (!e) process.exit(3);                       // kein Bericht = Fehlschlag
 if (e === "kaputt") { fs.writeFileSync(ziel, "das ist kein json"); process.exit(0); }
-fs.writeFileSync(ziel, JSON.stringify({ lighthouseVersion: "12.0.0", categories: {
-  performance: { score: e[0] / 100 }, accessibility: { score: e[1] / 100 },
-  "best-practices": { score: e[2] / 100 }, seo: { score: e[3] / 100 } } }));
+fs.writeFileSync(ziel, JSON.stringify({ lighthouseVersion: "12.0.0",
+  categories: {
+    performance: { score: e[0] / 100, auditRefs: [{ id: "bilder" }, { id: "js" }, { id: "info" }] },
+    accessibility: { score: e[1] / 100, auditRefs: [{ id: "kontrast" }] },
+    "best-practices": { score: e[2] / 100, auditRefs: [{ id: "heil" }] },
+    seo: { score: e[3] / 100, auditRefs: [{ id: "titel" }] }
+  },
+  audits: {
+    bilder:   { title: "Bilder in modernen Formaten bereitstellen", score: 0.3, scoreDisplayMode: "metricSavings", details: { overallSavingsMs: 1200 } },
+    js:       { title: "Ungenutztes JavaScript entfernen", score: 0.5, scoreDisplayMode: "metricSavings", details: { overallSavingsMs: 300 } },
+    info:     { title: "Nur zur Information", score: 0, scoreDisplayMode: "informative" },
+    kontrast: { title: "Hintergrund- und Vordergrundfarben haben zu wenig Kontrast", score: 0, scoreDisplayMode: "binary" },
+    heil:     { title: "Alles in Ordnung", score: 1, scoreDisplayMode: "binary" },
+    titel:    { title: "Dem Dokument fehlt ein <title>-Element", score: 0, scoreDisplayMode: "binary" }
+  } }));
 `);
 fs.chmodSync(FAKE, 0o755);
 
@@ -249,6 +298,12 @@ const standVon = (dir) => JSON.parse(fs.readFileSync(path.join(dir, "assets/conf
   ok(m && m.werkzeug === "12.0.0", "B1b mit der Fassung des Werkzeugs, das gemessen hat");
   ok(st.messungZaehler && st.messungZaehler.gemessen === 3, "B1c der Zähler stimmt (" + JSON.stringify(st.messungZaehler) + ")");
   ok(st.eintraege["markt-app1"].wache, "B1d und der Wächter-Befund steht unberührt daneben — EIN Bericht, zwei Felder");
+  ok(Array.isArray(m.hinweise) && m.hinweise.length === 4,
+    "B1e die empfohlenen Nachbesserungen stehen mit im Bericht (" + (m.hinweise || []).length + ")");
+  ok(m.hinweise[0].t === "Bilder in modernen Formaten bereitstellen" && m.hinweise[0].ms === 1200,
+    "B1f mit Titel und ersparter Zeit (" + JSON.stringify(m.hinweise[0]) + ")");
+  ok(!JSON.stringify(m).includes("Nur zur Information"),
+    "B1g und ohne die reinen Informations-Prüfungen");
 }
 
 // B2 — kein Lighthouse da. Der Steckplatz schweigt ehrlich.
@@ -302,6 +357,8 @@ const standVon = (dir) => JSON.parse(fs.readFileSync(path.join(dir, "assets/conf
   ok(m.stand === "veraltet" && m.leistung === 88, "B5 nach dem Fehlschlag stehen die alten Zahlen noch da");
   ok(m.gemessen === heute, "B5b mit dem Datum, an dem sie entstanden (" + m.gemessen + ")");
   ok(String(m.grund || "").length > 3, "B5c und dem Grund des Fehlschlags (" + m.grund + ")");
+  ok(Array.isArray(m.hinweise) && m.hinweise.length > 0,
+    "B5d und die Nachbesserungen bleiben bei den Zahlen — sonst stünde eine Note ohne Begründung da");
 }
 
 // B6 — der Probelauf misst nicht doppelt.
@@ -344,7 +401,12 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
   const BERICHT = {
     geprueft: "2026-08-02T02:40:00.000Z",
     eintraege: {
-      "markt-bookledgerpro": { lage: "gleich", messung: { stand: "gemessen", leistung: 94, bedienbarkeit: 88, gute_praxis: 100, auffindbarkeit: 92, gemessen: "2026-08-02" } },
+      "markt-bookledgerpro": { lage: "gleich", messung: { stand: "gemessen", leistung: 94, bedienbarkeit: 88, gute_praxis: 100, auffindbarkeit: 92, gemessen: "2026-08-02", werkzeug: "12.0.0",
+        hinweise: [
+          { k: "leistung", t: "Bilder in modernen Formaten bereitstellen", ms: 1200 },
+          { k: "bedienbarkeit", t: "Hintergrund- und Vordergrundfarben haben zu wenig Kontrast" },
+          { k: "auffindbarkeit", t: "Dem Dokument fehlt eine Meta-Beschreibung" }
+        ] } },
       "markt-mein-tresor":   { lage: "gleich", messung: { stand: "gemessen", leistung: 34, bedienbarkeit: 96, gute_praxis: 100, auffindbarkeit: 90, gemessen: "2026-08-02" } },
       "markt-jasons-tresor": { lage: "gleich", messung: { stand: "nicht_gemessen", grund: "noch_nicht_dran" } },
       "markt-tomys-hub":     { lage: "gleich", messung: { stand: "gemessen", leistung: 95, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 98, gemessen: "2026-08-02" } },
@@ -381,7 +443,6 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     zeile: (e.querySelector(".mk-ms-zeile") || {}).textContent || "",
     summe: (e.querySelector(".mk-ms-sum") || {}).textContent || "",
     leer: !!e.querySelector(".mk-mess--leer"),
-    mehr: (e.querySelector(".mk-ms-mehr") || {}).textContent || "",
     alt: (e.querySelector(".mk-ms-alt") || {}).textContent || "",
     schwach: e.querySelectorAll(".mk-ms-w.is-schwach").length
   })));
@@ -406,44 +467,78 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       "C1g und veraltete Zahlen sagen, dass sie veraltet sind");
   }
 
-  // C2 — „es soll mehr zu lesen sein": die Erklärung nennt Zweck UND Folge.
+  // C2 — der Knopf. Klaus' Wunsch: nachlesen über einen Klick, nicht über
+  // einen Aufklapper mitten in der Liste.
   {
-    const k = karten.find((x) => /BookLedger/i.test(x.titel));
-    ok(!!k && k.mehr.length > 800, "C2 die Erklärung ist ausführlich (" + (k && k.mehr.length) + " Zeichen)");
-    ok(!!k && /Ein niedriger Wert heißt für dich/.test(k.mehr), "C2b sie sagt, was ein schlechter Wert KONKRET bedeutet");
-    ok(!!k && /nicht ob die App gut oder nützlich ist/.test(k.mehr),
-      "C2c und benennt die Grenze: Maschinen-Messung, keine Meinung — beides bleibt getrennt");
-    ok(!!k && KATEGORIEN.every((c) => new RegExp(c.schluessel === "gute_praxis" ? "Gute Praxis" : "").test(k.mehr) || true) && (k.mehr.match(/—/g) || []).length >= 4,
-      "C2d alle vier Kategorien werden einzeln erklärt");
-  }
-
-  // C3 — und sie ist auch wirklich lesbar. GEGENPROBE 5 hing hier.
-  {
-    const klemm = await page.evaluate(() => {
-      const d = document.querySelector(".mk-ms-mehr");
-      if (d) d.open = true;
-      const p = document.querySelector(".mk-ms-mehr p");
-      if (!p) return null;
-      const s = getComputedStyle(p);
-      return { klemm: s.webkitLineClamp, hoehe: p.getBoundingClientRect().height, zeile: parseFloat(s.lineHeight) || 0 };
+    const b = await page.evaluate(() => {
+      const el = document.querySelector(".listing .mk-ms-btn");
+      return el ? { text: el.textContent, id: el.getAttribute("data-msid"), tag: el.tagName } : null;
     });
-    ok(klemm && (klemm.klemm === "none" || klemm.klemm === "" || klemm.klemm === "normal"),
-      "C3 der Erklärtext wird nicht auf drei Zeilen geklemmt (" + (klemm && klemm.klemm) + ")");
-    ok(klemm && klemm.hoehe > klemm.zeile * 3.5,
-      "C3b und er ist tatsächlich höher als drei Zeilen (" + (klemm && Math.round(klemm.hoehe)) + " px)");
+    ok(!!b && b.tag === "BUTTON", "C2 an der Karte sitzt ein echter Knopf (" + (b && b.tag) + ")");
+    ok(!!b && /Bewertung/.test(b.text), "C2b und er sagt, was er tut („" + (b && b.text.trim()) + "“)");
+    // Ein Eintrag ohne Zahlen darf keinen Knopf haben — sonst öffnet sich ein
+    // leeres Fenster, und das ist schlimmer als kein Knopf.
+    const ohne = await page.evaluate(() => {
+      const k = Array.from(document.querySelectorAll(".listing")).find((e) => e.querySelector(".mk-mess--leer"));
+      return k ? !!k.querySelector(".mk-ms-btn") : null;
+    });
+    ok(ohne === false, "C2c ein nicht gemessener Eintrag trägt keinen Knopf ins Leere");
   }
 
-  // C4 — der Schieberegler. GEGENPROBE 4 hing hier.
+  // C3 — das Fenster. Es muss die drei Fragen beantworten: wer misst (und kann
+  // der Anbieter schummeln?), was heißt die Zahl, was müsste er tun?
+  {
+    await page.click(".listing .mk-ms-btn");
+    await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
+    const d = await page.evaluate(() => {
+      const el = document.getElementById("mkMessOv");
+      return {
+        offen: el.hasAttribute("open"),
+        text: el.textContent,
+        kategorien: el.querySelectorAll(".mk-ms-kat").length,
+        fixListen: el.querySelectorAll(".mk-ms-fix").length,
+        fixPunkte: Array.from(el.querySelectorAll(".mk-ms-fix li")).map((x) => x.textContent),
+        leer: el.querySelectorAll(".mk-ms-fix-leer").length,
+        top: getComputedStyle(el).position
+      };
+    });
+    ok(d.offen, "C3 der Klick öffnet ein Fenster");
+    ok(/Technische Bewertung/.test(d.text), "C3b es ist als TECHNISCHE Bewertung überschrieben");
+    ok(/weder selbst eintragen noch beschönigen/.test(d.text),
+      "C3c es sagt ausdrücklich, dass der Anbieter nicht schummeln kann");
+    ok(/Google Lighthouse/.test(d.text), "C3d und woher die Zahl kommt");
+    ok(/nicht, ob die App gut, nützlich oder vertrauenswürdig ist/.test(d.text),
+      "C3e und wo die Grenze der Aussage liegt");
+    ok(d.kategorien === 4, "C3f alle vier Kategorien haben einen eigenen Abschnitt (" + d.kategorien + ")");
+    ok(/Empfohlene Nachbesserungen/.test(d.text), "C3g mit den empfohlenen Nachbesserungen");
+    ok(d.fixPunkte.some((t) => /Bilder in modernen Formaten/.test(t)),
+      "C3h und die stehen wirklich drin (" + (d.fixPunkte[0] || "—") + ")");
+    ok(d.leer >= 1, "C3i wo nichts offen ist, steht das auch — kein leerer Kasten");
+    ok(/spart rund/.test(d.text), "C3j und wo Lighthouse eine Ersparnis nennt, steht sie dabei");
+  }
+
+  // C3b — Escape schließt, der Fokus kehrt zum Knopf zurück.
+  {
+    await page.keyboard.press("Escape");
+    const zu = await page.evaluate(() => ({
+      weg: !document.getElementById("mkMessOv"),
+      fokus: document.activeElement && document.activeElement.className || ""
+    }));
+    ok(zu.weg, "C4 Escape schließt das Fenster und räumt es aus dem Dokument");
+    ok(/mk-ms-btn/.test(zu.fokus), "C4b und der Fokus kehrt auf den Knopf zurück, der geöffnet hat");
+  }
+
+  // C5 — der Schieberegler. GEGENPROBE 4 hing hier.
   {
     const titel = karten.map((x) => x.titel);
     ok(!titel.some((t) => /Mein[- ]Tresor/i.test(t)),
-      "C4 der Eintrag mit Leistung 34 fällt unter der Schwelle 50 heraus");
-    ok(titel.some((t) => /BookLedger/i.test(t)), "C4b der mit 94 bleibt");
+      "C5 der Eintrag mit Leistung 34 fällt unter der Schwelle 50 heraus");
+    ok(titel.some((t) => /BookLedger/i.test(t)), "C5b der mit 94 bleibt");
     const j = karten.find((x) => /Jason/i.test(x.titel));
-    ok(!!j && j.leer, "C4c der NICHT gemessene bleibt gelistet und sagt ehrlich „noch nicht gemessen“");
+    ok(!!j && j.leer, "C5c der NICHT gemessene bleibt gelistet und sagt ehrlich „noch nicht gemessen“");
   }
 
-  // C5 — ohne Messung im Bericht sieht der Marktplatz aus wie immer.
+  // C6 — ohne Messung im Bericht sieht der Marktplatz aus wie immer.
   {
     const p2 = await browser.newPage();
     await p2.route("**/assets/config/spore-stand.json*", (r) =>
@@ -451,7 +546,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     await p2.goto(base + "/markt.html", { waitUntil: "load" });
     await p2.waitForSelector(".listing", { timeout: 20000 });
     const z = await p2.evaluate(() => ({ karten: document.querySelectorAll(".listing").length, mess: document.querySelectorAll(".mk-mess").length }));
-    ok(z.karten > 0 && z.mess === 0, "C5 kein `messung` im Bericht -> kein Band, Karten unverändert (" + z.karten + ")");
+    ok(z.karten > 0 && z.mess === 0, "C6 kein `messung` im Bericht -> kein Band, Karten unverändert (" + z.karten + ")");
     await p2.close();
   }
 

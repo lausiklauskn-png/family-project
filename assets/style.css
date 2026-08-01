@@ -403,12 +403,29 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .listing .mk-ms-alt{color:#b8860b}
 :root[data-theme="dark"] .listing .mk-ms-alt,
 :root[data-theme="neon"] .listing .mk-ms-alt{color:#e8c14a}
-.mk-ms-mehr summary{cursor:pointer;font-size:.8rem;color:var(--muted);padding:2px 0}
-.mk-ms-mehr summary:hover{color:var(--text)}
-.mk-ms-mehr[open]{border-left:2px solid var(--line,rgba(128,128,128,.35));padding-left:10px;margin-top:4px}
-.listing .mk-ms-mehr p{color:var(--muted);margin:0 0 8px}
-.listing .mk-ms-mehr p b{color:var(--text)}
-.listing .mk-ms-fuss{opacity:.85}
+.mk-ms-btn{margin-top:2px;font-size:.8rem;padding:6px 11px}
+
+/* Das Bewertungs-Fenster (Stufe 5). Natives <dialog>, dieselbe Optik wie der
+   Melder — wer beide kennt, muss sich nicht umgewöhnen. Breiter als der Melder,
+   weil hier vier Abschnitte mit Fließtext stehen. */
+.mk-ms-dlg{border:1px solid var(--line);border-radius:16px;padding:0;max-width:640px;width:calc(100% - 32px);
+  background:var(--bg2);color:var(--text);box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.mk-ms-dlg::backdrop{background:rgba(0,0,0,.62)}
+.mk-ms-box{padding:20px;max-height:84vh;overflow:auto}
+.mk-ms-box h3{margin:0 0 4px;font-size:1.05rem}
+.mk-ms-box p{font-size:.86rem;line-height:1.55;margin:0 0 10px;color:var(--muted)}
+.mk-ms-dlg-datum{font-family:var(--mono);font-size:.78rem!important;opacity:.75}
+.mk-ms-dlg-technisch{border-left:3px solid var(--gold);padding-left:11px;color:var(--text)!important}
+.mk-ms-dlg-farben{font-size:.8rem!important;opacity:.85}
+.mk-ms-kat{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
+.mk-ms-kat h4{margin:0 0 7px;font-size:.95rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mk-ms-fix-h{font-weight:600;color:var(--text)!important;margin-bottom:5px!important;font-size:.83rem!important}
+.mk-ms-fix{margin:0 0 4px;padding-left:20px;font-size:.84rem;line-height:1.5;color:var(--muted)}
+.mk-ms-fix li{margin-bottom:5px}
+.mk-ms-fix small{opacity:.7;font-family:var(--mono);font-size:.76rem}
+.mk-ms-fix-leer{opacity:.7;font-style:italic}
+.mk-ms-box .mk-ms-fuss{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;font-size:.8rem!important;opacity:.85}
+.mk-ms-dlg-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
 
 /* align-self bewusst NICHT flex-start: sonst haengt der Oeffnen-Knopf oben,
    waehrend der Melde-Knopf unten sitzt (Befund 2026-07-31). Beide unten buendig. */

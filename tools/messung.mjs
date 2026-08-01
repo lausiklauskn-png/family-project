@@ -42,11 +42,18 @@
  * war, behält seinen Befund samt Datum. Der Deckel wird protokolliert, nie
  * still angewandt — eine unsichtbare Kürzung liest sich wie Vollständigkeit.
  *
+ * WAS AUS DEM BERICHT KOMMT. Vier Zahlen — und die TITEL der durchgefallenen
+ * Prüfungen als „empfohlene Nachbesserungen". Die Zahl allein kann ein Anbieter
+ * nicht verbessern, einen benannten Mangel schon; und wer sehen kann, WORAN es
+ * liegt, kann die Bewertung nachvollziehen statt sie glauben zu müssen.
+ *
  * SICHERHEIT. Die Zielseite ist `untrusted external data`. Lighthouse lädt sie
  * zwar in einem echten Browser (anders geht eine Messung nicht), aber in einem
- * Wegwerf-Prozess mit eigenem Profil, und aus dem Ergebnis werden ausschließlich
- * VIER ZAHLEN entnommen. Kein Text, kein Bildschirmfoto, keine URL-Liste aus dem
- * Bericht wandert weiter. Nur https, Zeitlimit, Bericht-Datei gedeckelt.
+ * Wegwerf-Prozess mit eigenem Profil. Aus dem Ergebnis werden ausschließlich die
+ * vier Zahlen und die gekappten Prüfungs-Titel entnommen — NICHT der volle
+ * Prüfbericht, der Adressen, Zeilennummern und Auszüge aus fremdem Quelltext
+ * enthält. Kein Bildschirmfoto, keine URL-Liste. Nur https, Zeitlimit,
+ * Bericht-Datei gedeckelt.
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -70,6 +77,55 @@ export const KATEGORIEN = [
 ];
 
 const SCHLUESSEL = KATEGORIEN.map((k) => k.schluessel);
+
+/* ── Empfohlene Nachbesserungen ────────────────────────────────────────────
+ * Lighthouse sagt nicht nur, WIE gut eine Seite ist, sondern auch WAS ihr
+ * fehlt. Diese Liste ist der eigentliche Nutzen für einen Anbieter: eine Zahl
+ * allein kann er nicht verbessern, einen benannten Mangel schon.
+ *
+ * Aufgenommen wird nur, was durchgefallen ist — und nur der Titel, nie der
+ * ganze Prüfbericht (der enthält Adressen, Zeilennummern und Auszüge aus
+ * fremdem Quelltext; das gehört nicht in unseren Bericht). Gedeckelt je
+ * Kategorie, damit eine schlecht gebaute Seite den Bericht nicht sprengt. */
+export const HINWEISE_JE_KATEGORIE = 3;
+export const HINWEIS_TITEL_MAX = 120;
+
+// Lighthouse führt manche Prüfungen nur zur Information oder als Handarbeit —
+// die sind keine Mängel und dürfen nicht als solche gelesen werden.
+const WERTENDE_ARTEN = { numeric: 1, binary: 1, metricSavings: 1 };
+
+export function hinweiseAusBericht(lhr) {
+  var raus = [];
+  var kat = lhr && lhr.categories;
+  var audits = lhr && lhr.audits;
+  if (!kat || !audits) return raus;
+  for (const k of KATEGORIEN) {
+    const c = kat[k.lh];
+    if (!c || !Array.isArray(c.auditRefs)) continue;
+    const treffer = [];
+    for (const ref of c.auditRefs) {
+      const a = ref && audits[ref.id];
+      if (!a || typeof a.score !== "number" || a.score >= 1) continue;
+      if (a.scoreDisplayMode && !WERTENDE_ARTEN[a.scoreDisplayMode]) continue;
+      const titel = typeof a.title === "string"
+        ? a.title.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, HINWEIS_TITEL_MAX)
+        : "";
+      if (!titel) continue;
+      const ms = a.details && typeof a.details.overallSavingsMs === "number"
+        ? Math.round(a.details.overallSavingsMs) : null;
+      treffer.push({ k: k.schluessel, t: titel, s: a.score, ms: ms });
+    }
+    // Das Lohnendste zuerst: was am meisten Zeit spart, sonst was am
+    // schlechtesten abschnitt. Sonst stünde oben, was zufällig zuerst kam.
+    treffer.sort((x, y) => (y.ms || 0) - (x.ms || 0) || x.s - y.s);
+    for (const t of treffer.slice(0, HINWEISE_JE_KATEGORIE)) {
+      const e = { k: t.k, t: t.t };
+      if (t.ms) e.ms = t.ms;
+      raus.push(e);
+    }
+  }
+  return raus;
+}
 
 /* ── Hat ein Befund überhaupt Zahlen? ─────────────────────────────────────── */
 export function hatZahlen(m) {
@@ -167,7 +223,7 @@ export async function seiteMessen(url, opts) {
     const zahlen = zahlenAusBericht(lhr);
     if (!zahlen) return { ok: false, hinweis: "Bericht ohne vollständige Bewertung" };
     const werkzeug = typeof lhr.lighthouseVersion === "string" ? lhr.lighthouseVersion : "";
-    return { ok: true, zahlen, werkzeug };
+    return { ok: true, zahlen, werkzeug, hinweise: hinweiseAusBericht(lhr) };
   } finally {
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (_e) {}
   }
@@ -201,6 +257,7 @@ export function messungBilden(a) {
     for (const k of SCHLUESSEL) m[k] = roh.zahlen[k];
     m.gemessen = heute;
     if (roh.werkzeug) m.werkzeug = String(roh.werkzeug).slice(0, 40);
+    if (Array.isArray(roh.hinweise) && roh.hinweise.length) m.hinweise = roh.hinweise;
     return m;
   }
 
@@ -213,6 +270,7 @@ export function messungBilden(a) {
       if (vorher.gemessen) m.gemessen = vorher.gemessen;
       if (vorher.werkzeug) m.werkzeug = vorher.werkzeug;
       if (vorher.grund) m.grund = vorher.grund;
+      if (Array.isArray(vorher.hinweise)) m.hinweise = vorher.hinweise;
       return m;
     }
     m.stand = "nicht_gemessen";
@@ -226,6 +284,10 @@ export function messungBilden(a) {
     m.stand = "veraltet";
     if (vorher.gemessen) m.gemessen = vorher.gemessen;
     if (vorher.werkzeug) m.werkzeug = vorher.werkzeug;
+    // Die Nachbesserungen gehören zu den Zahlen: bleiben die stehen, bleiben
+    // auch sie stehen. Sonst hätte ein Anbieter plötzlich eine Note ohne
+    // Begründung.
+    if (Array.isArray(vorher.hinweise)) m.hinweise = vorher.hinweise;
     m.grund = grund;
     return m;
   }
