@@ -1,5 +1,252 @@
 {
-  "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Diese Datei wird von tools/vektoren-bauen.mjs geschrieben, nicht von Hand gepflegt. Sie liegt hier als leerer Anfang, damit Marktplatz und Studio sie abrufen können, bevor der erste Lauf stattgefunden hat — geprueft: null heißt genau das: es hat noch keiner nachgesehen.",
-  "geprueft": null,
-  "eintraege": {}
+  "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
+  "geprueft": "2026-08-01T13:18:55.498Z",
+  "eintraege": {
+    "markt-bookledgerpro": {
+      "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "BookLedgerPro",
+      "nodeId": "MyHVM7PdwEtNzOXiZNxfP_RcEXiTLjLpAls1oUm5-cQ",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Offline-first, verschlüsselte Buchhaltung: Belege, Konten, USt/EÜR, GoBD, Aufträge.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "4d4af8ed58997550",
+        "pruefsumme": "4d4af8ed58997550",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
+      }
+    },
+    "markt-mein-tresor": {
+      "url": "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Mein-Tresor",
+      "nodeId": "feV3o4qJF58caokPJr_oajm9dcnKwGjVXzBum8M8icM",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Mein-Tresor ist ein Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Verwandt mit dem Schwester-Tresor Jasons-Tresor und angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "374019c878d8ce21",
+        "pruefsumme": "374019c878d8ce21",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
+      }
+    },
+    "markt-jasons-tresor": {
+      "url": "https://raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Jasons-Tresor",
+      "nodeId": "lbUthjt-outt4ns4NJQI2TaMzubX4BzQJGp_Odx_vek",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Jasons-Tresor ist Jasons eigener Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Schwester-Knoten von Mein-Tresor, angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "58581e8412bd5033",
+        "pruefsumme": "58581e8412bd5033",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
+      }
+    },
+    "markt-tomys-hub": {
+      "url": "https://lausiklauskn-png.github.io/Tomys-Hub/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Tomys Hub",
+      "nodeId": "yaerFGfy7yAajFEce-sUiE6jo263TwkUmbsjIS8Js-8",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Tomys Hub ist der Werkzeug-Verbund für personalisierten Digitaldruck, Stickerei und Werbeartikel: Druckvorlagen für Tassen, T-Shirts, Handtücher, Kissen und Fotopuzzles selbst gestalten, Aufträge im WorkFloh verwalten, Angebote im BookLedger erstellen und Prompt-Vorlagen für Sublimationsdruck bauen.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "ab0e66f3675b8833",
+        "pruefsumme": "ab0e66f3675b8833",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Tomys-Hub/"
+      }
+    },
+    "markt-kim-bell": {
+      "url": "https://lausiklauskn-png.github.io/Kim-Bell/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Kim-Bell",
+      "nodeId": "Xg1xKoZ9vIgimEKlqeCDL_u4ptbRT6qvKplPAppyJfI",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Kim-Bell — die Glocke, mit der man sich sauber im gemeinsamen SBKIM-Raum anmeldet: eigene stabile Identität, Spore erzeugen, im Raum sichtbar werden und andere Knoten finden. Server-los, direkt im Browser, ohne Anmeldung.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "d996e88d923775a6",
+        "pruefsumme": "d996e88d923775a6",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
+      }
+    },
+    "markt-kimseek": {
+      "url": "https://raw.githubusercontent.com/lausiklauskn-png/Kimseek/main/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Kimseek",
+      "nodeId": "Yd8mwHSDYkcyd1meDe-7DJa5PS4KrY5bsl8VDn6x-TM",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Kimseek — semantisches Such-Werkzeug, das die Bedeutung und Absicht hinter einer Frage versteht (nicht nur Stichwörter). Ordnet Treffer nach Bedeutungs-Nähe, server-los im Browser; optional Spracheingabe, Bild-/Handschrift-Erkennung (OCR) und eine KI-Brücke mit Web-Suche.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "3f7d6c75c511554b",
+        "pruefsumme": "3f7d6c75c511554b",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Kimseek/"
+      }
+    },
+    "markt-kimboard": {
+      "url": "https://raw.githubusercontent.com/lausiklauskn-png/Kimboard/main/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Kimboard",
+      "nodeId": "1f9Jb7c3SEI8dUOtGR6_meMaOaPgbz2GWXMLmPCZMv8",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Kimboard — semantische Pinnwand: Fragen und Notizen an ein geborgtes „dummes Brett“ (Nostr) heften, geräteübergreifend und nach Bedeutung sortiert. Merken, Notizen, Frage-Antwort — server-los direkt im Browser, ohne Server und ohne Konto.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "cae86e9eda2e6fee",
+        "pruefsumme": "cae86e9eda2e6fee",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Kimboard/"
+      }
+    },
+    "markt-privat-brain": {
+      "url": "https://lausiklauskn-png.github.io/Privat-Brain/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Private Brain",
+      "nodeId": "6rmW2Q-53mzEylZiWuW4yNsbnxlyEoLD11860i3y0Cg",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "Private Brain — dein privates zweites Gehirn: durchsucht deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) nach Bedeutung, offline, ohne dass Originale bewegt werden. Es liest jede Datei einmal, behält nur einen winzigen Bedeutungs-Katalog und lässt die Originale unangetastet — liest nur, schlägt vor, bewegt nichts.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "77182c0ff5ad3ada",
+        "pruefsumme": "77182c0ff5ad3ada",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
+      }
+    },
+    "markt-workfloh": {
+      "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "WorkFloh",
+      "nodeId": "6YOPHbnKWreoF5og4PGc3fre7du1FhVc7dY1d5jZyHs",
+      "modell": "Xenova/multilingual-e5-small",
+      "neuerText": "WorkFloh ist ein Endknoten im SBKIM-Mycel und arbeitet auf Grundlage des Sage-Protokolls — semantisch verbunden mit den verwandten Knoten Tomys Hub (Digitaldruck und Werbeartikel), BookLedgerPro (Buchhaltung, Angebot und Rechnung), Kimseek (Bedeutungs-Suche) und dem SB-KIMTool-Point. Sein Kern ist der digitale Auftragszettel eines Betriebs: von der Kundenannahme über die Produktion (Schilder, Folierung, Beschriftung, Druck) bis zur Übergabe, samt Zeiterfassung sowie Angebot und Rechnung. Zugleich ist WorkFloh ein wandelbares Arbeitstool, nicht auf eine Branche festgelegt: jede Firma installiert ihren eigenen, firmenspezifischen Auftragszettel — aus dem Werbetechnik-Zettel wird ebenso der Werkstatt-, Handwerks-, Montage-, Reinigungs- oder Dienstleistungs-Auftrag. Wie die Schwester-Knoten Rezeptbuch und Mixarium ein Baukasten: Kategorien umbenennen, Felder anpassen, ein neues Auftrags-Pake",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "db635778f8bfb664",
+        "pruefsumme": "db635778f8bfb664",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
+      }
+    },
+    "markt-rezeptbuch": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "23db59c46a31676e",
+        "pruefsumme": "23db59c46a31676e",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
+      }
+    },
+    "markt-mixarium": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "8e18c5370e2750c6",
+        "pruefsumme": "8e18c5370e2750c6",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
+      }
+    },
+    "markt-perfect-skin-beauty": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "a9aec591b6a4e7fb",
+        "pruefsumme": "a9aec591b6a4e7fb",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/"
+      }
+    },
+    "markt-perfect-skin-fashion": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "8e64345faed62f4d",
+        "pruefsumme": "8e64345faed62f4d",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
+      }
+    },
+    "markt-mycel-karte": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "grundlage": "c2ce294cf1f5101b",
+        "pruefsumme": "c2ce294cf1f5101b",
+        "status": 200,
+        "seit": "2026-08-01",
+        "url": "https://lausiklauskn-png.github.io/mycel-karte/"
+      }
+    }
+  },
+  "wacheZaehler": {
+    "gruen": 14,
+    "gelb": 0,
+    "rot": 0
+  }
 }
