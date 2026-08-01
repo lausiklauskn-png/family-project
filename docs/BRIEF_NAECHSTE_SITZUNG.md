@@ -240,6 +240,40 @@ Die Form ist vom Wächter vorgegeben — **nichts Neues daneben bauen:**
 
 ---
 
+## 3c. ERSTER LIVE-BELEG: die Membran hat im Feld etwas gefangen (2026-08-01)
+
+Klaus hat im **DuckDuckGo-Browser** die rote FREMD-Lampe geklickt, nachdem der
+Zugang dazu gebaut war (PR #161). Das Fremdzugriff-Fenster ging auf und zeigte:
+
+```
+2026-08-01T13:54:14.130Z   membrane-postmessage   origin: —   decision: ignored
+```
+
+**Was belegt ist:** Etwas im Browser hat der Seite ein `postMessage` geschickt,
+und Modul 15 hat es **abgewiesen** (`ignored`) und protokolliert. Nicht im Test,
+nicht headless — in Klaus' Browser, auf der echten Seite, beim normalen Laden.
+Das ist der **erste Live-Beleg, dass die Membran im Feld etwas Echtes fängt.**
+
+**Was NICHT belegt ist, und das muss so stehen bleiben:** dass es DuckDuckGos KI
+war. Bei `origin` steht ein Strich — die Herkunft war nicht feststellbar
+(typisch für Browser-eigene Skripte und Erweiterungen, deren Origin leer oder
+`null` ist). Klaus' Deutung ist plausibel, auch weil in Chrome auf derselben
+Seite **nichts** kam. Aber ein Strich ist ein Strich. **Nicht als Tatsache
+weiterschreiben.**
+
+**Vorschlag für eine eigene Sitzung — Modul 15 protokolliert zu wortkarg.**
+Um solche Fälle künftig benennen zu können, müsste der Eintrag mehr mitführen:
+was gesendet hat (Fenster, Erweiterung, Worker), und die ersten Zeichen der
+Nachricht. Das ist ein Eingriff in ein **Sicherheits-Modul, das alle Apps
+teilen** — also:
+
+- geplant, nicht nebenbei; mit eigener Gegenprobe;
+- **KEIN PII ins Protokoll** (Nachrichteninhalt nur gekürzt und gefiltert);
+- Aspekt in `ZERTIFIKAT_ASPEKTE` (Modul 16) mitziehen, Pflicht laut CLAUDE.md;
+- netzweiter Rollout danach, byte-1:1.
+
+---
+
 ## 4. Die offene Frage aus dieser Sitzung
 
 Du hast auf die Symbol-Frage „keine Präferenz" geantwortet — die zweite Hälfte
