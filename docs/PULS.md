@@ -4,6 +4,88 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02: Tastatur-Fokus gerichtet + Katalog-Spore Stufe 2 gebaut
+
+### 1. Die Fokus-Markierung ist zurück (Brief §4.1)
+
+An drei Stellen in `assets/style.css` wurde der Fokusring mit `outline:none`
+entfernt — Eingabefelder, Andock-Wizard, Siegel-Feld. Wer die Seite mit der
+Tabulator-Taste bedient, sah nicht mehr, wo er steht.
+
+Jetzt gibt es einen Token `--focus` (Gold auf Dunkel und Neon, kräftiges Blau
+auf Hell) und eine Regel `:focus-visible{outline:3px …;outline-offset:2px}`.
+`:focus-visible` statt `:focus`: Wer mit der Maus auf einen Knopf klickt, sieht
+die gewohnte Optik; nur bei Tastatur-Bedienung erscheint der Ring.
+
+**Gemessen, nicht geschätzt** — `tests/smoke_fokus.mjs` (15/15) tippt echte
+Tabulator-Tasten und liest die berechnete Rahmenbreite. Drei Gegenproben, alle
+drei rot bekommen. Nebenbefund aus Gegenprobe 2: der Browser-Standardring war
+nur **1 px** breit — genau der gemeldete Mangel, jetzt in Zahlen.
+
+### 2. Katalog-Spore Stufe 2: `sporeUrl` + tägliche Aktualisierung
+
+Jeder Eintrag darf ein Feld `sporeUrl` tragen (die `sbkim/spore.json` im eigenen
+Repo des Anbieters). Eine GitHub-Action liest sie einmal pro Nacht und schreibt
+`listings-vec.json` fort — mit **derselben Spar-Logik** wie der Studio-Knopf:
+ein geänderter Text ergibt eine Einbettung statt vierzehn; ändert sich nichts,
+wird kein Modell geladen und nichts geschrieben.
+
+**Klaus' Richtungsentscheid 2026-08-02:** automatisch übernehmen ja — aber nur,
+wo er es ausdrücklich erlaubt hat.
+
+| am Eintrag | was nachts passiert |
+|---|---|
+| `sporeAuto: true` | die Beschreibung wird übernommen, der Vektor neu gerechnet |
+| kein Haken (Standard) | nur gemeldet; Klaus übernimmt im Studio per Knopf |
+
+Der Standard ist damit die sichere Seite. Der Bericht steht in
+`assets/config/spore-stand.json` und erscheint im Studio als eigener Block —
+wartende Einträge oben, hervorgehoben, mit Knopf. Fremder Text wird
+ausschließlich als `textContent` gesetzt.
+
+### Zwei gemessene Befunde, die Zeit sparen
+
+**1. `raw.githubusercontent.com` liefert für PRIVATE Repos immer 404** — auch
+wenn die Datei da ist. Genau fünf von Klaus' neun Sporen fielen darauf herein
+(BookLedgerPro, Tomys-Hub, Kim-Bell, Privat-Brain, Mein-WorkFloh — alle privat;
+die vier funktionierenden sind alle öffentlich). Diese fünf zeigen jetzt auf die
+Live-Adresse der App, und das Werkzeug nennt den Grund im Bericht mit.
+
+**2. Der `domainVector` aus der Spore wird NICHT übernommen**, obwohl er fertig
+dasteht und mit demselben Modell gerechnet ist. Er gehört nicht sicher zum
+selben Text: `sbkim-init.js` rechnet `embedPassage(beschreibung)`, der
+Siegel-Wizard dagegen `embedPassage(beschreibung + ". " + stichworte)` — und ein
+fremder Knoten darf eine dritte Regel benutzen. Ein übernommener Vektor sähe
+vollständig aus und gehörte zu einem anderen Text. Dieselbe Form wie die vier
+Befunde vom 2026-08-01.
+
+### Was ungeprüft bleibt und auf den ersten Lauf wartet
+
+- **Der Lauf mit dem echten 30-MB-Modell.** Auf dieser Maschine sind
+  `cdn.jsdelivr.net` und `huggingface.co` beide gesperrt (gemessen: „CONNECT
+  tunnel failed, response 403"). Der Test fährt deshalb mit einem Modell-Stub —
+  er beweist alles davor und danach, nicht die Rechnung selbst.
+- **Die fünf Live-Adressen der privaten Repos.** `github.io` ist von hier
+  ebenfalls gesperrt. Der Bericht der ersten Nacht sagt es Eintrag für Eintrag.
+- **Klaus' Browser-Lauf** für den Fokusring und den Sporen-Block im Studio.
+
+### Was Klaus tun muss
+
+Zwei Dateien per WebFTP hochladen (nur diese beiden, `server/` wird nie durch
+einen Merge aktualisiert). Kontrollwort in beiden: **`sporeUrl`** — steht nur in
+der neuen Fassung, in der alten kommt es kein einziges Mal vor.
+
+- `server/einreichung.php`
+- `server/marktplatz-api.php`
+
+Ohne den Upload bleibt alles heil; nur der freiwillige Spore-Link aus dem
+Einreich-Formular kommt dann nicht im Studio an.
+
+Cache-Version steht auf **v76**. Alle 15 Testreihen grün (`smoke_all` 107/107,
+`smoke_fokus` 15/15, `smoke_stufe2_sporen` 38/38).
+
+---
+
 ## ✅ 2026-08-01: Caddy-Regel eingespielt — und eine falsche Erklärung korrigiert
 
 **Die Regel ist am Server scharf und belegt:**
