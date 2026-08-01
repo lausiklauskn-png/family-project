@@ -224,6 +224,35 @@ console.log("\nTeil C — SIEGEL-Lampe löst per Enter dasselbe aus wie per Klic
   await page.close();
 }
 
+/* FREMD-Lampe: Klick UND Enter müssen den Anker von Modul 15 auslösen.
+ * Befund von Klaus 2026-08-01: die Lampe stand im DuckDuckGo-Browser auf Rot,
+ * ließ sich aber nicht anklicken — der Mauszeiger blieb die Verschiebe-Hand.
+ * Die Warnung war da, ihr Grund für niemanden erreichbar. Gemessen wird am
+ * Anker `#lamp-fremd`, nicht am Fenster: ob Modul 15 geladen ist, hängt an der
+ * Seite; ob unser Klick ankommt, hängt an uns. */
+console.log("\nTeil C — die FREMD-Lampe öffnet das Fremdzugriff-Fenster");
+{
+  const page = await seite("/index.html");
+  await page.evaluate(() => {
+    window.__fremdKlicks = 0;
+    let a = document.getElementById("lamp-fremd");
+    if (!a) { a = document.createElement("span"); a.id = "lamp-fremd"; document.body.appendChild(a); }
+    a.addEventListener("click", () => { window.__fremdKlicks++; });
+  });
+  const r = await page.evaluate(LIES, '.fp-sw-lamp[data-slot="fremd"]');
+  ok(!!r, "FREMD-Lampe ist da");
+  ok(r && r.haltbar, "FREMD-Lampe hat einen Tabulator-Halt");
+  ok(r && r.aria.length > 0, "FREMD-Lampe nennt per aria-label, WAS der Druck tut");
+  await page.click('.fp-sw-lamp[data-slot="fremd"]');
+  await page.waitForTimeout(150);
+  ok(await page.evaluate(() => window.__fremdKlicks) === 1, "FREMD — der Klick löst den Anker aus");
+  await page.focus('.fp-sw-lamp[data-slot="fremd"]');
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(150);
+  ok(await page.evaluate(() => window.__fremdKlicks) === 2, "FREMD — Enter löst dasselbe aus");
+  await page.close();
+}
+
 /* „⊕ Status"-Chip: Enter holt das Widget zurück. */
 console.log("\nTeil C — Status-Chip (⊕) holt das Widget per Enter zurück");
 {
