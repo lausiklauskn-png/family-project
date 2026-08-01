@@ -4,6 +4,57 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01: Die neun roten Tests aufgeräumt — `smoke_all` 107/107 grün
+
+Seit Längerem standen neun Zeilen dauerhaft auf rot. Das entwertet jede spätere Prüfung:
+wer gewohnt ist, dass neun rot sind, übersieht die zehnte.
+
+**Zuerst diagnostiziert, dann angefasst.** Jede Zeile einzeln im echten Browser
+nachgemessen — kein Pauschal-Löschen. Ergebnis eindeutig: **kein einziger echter Mangel,
+alle neun waren veraltet.**
+
+| Test | Warum rot | Einordnung |
+|---|---|---|
+| Leer-Hinweis | 14 Einträge → korrekt versteckt | veraltet |
+| SVG · Kopier-Block · Kontakt | neues Pflichtfeld `sbContact`; der Browser blockierte das Absenden, es passierte **gar nichts** | veraltet |
+| Spenden-Platzhalter (2×) | Spenden sind scharf, echter PayPal-Link | veraltet |
+| Bauleiste verborgen | enthält jetzt öffentliche Werkzeuge (Such-Tool, Pinnwand) | veraltet |
+| 🌐-Knopf (2×) | heißt seit dem Modul-23-Rollout `sbkim-rdv-btn`, alle Funktionen da | veraltet |
+
+**Die drei Formular-Tests sind der lehrreichste Fall.** Sie scheiterten nicht an einem
+Fehler, sondern daran, dass ein neues Pflichtfeld das Absenden verhinderte. Der Test klickte,
+nichts geschah, er las ein leeres Ausgabefeld und meldete Fehlschlag — er prüfte seit
+Monaten **nichts mehr** und sah trotzdem aus wie ein Test.
+
+**Umgeschrieben, nicht gelöscht.** Jede Zeile prüft jetzt, was heute richtig ist, teils
+schärfer als vorher:
+
+- Leer-Hinweis → Einträge da **und** Hinweis versteckt (fängt beide Richtungen).
+- Formulare → alle Pflichtfelder gefüllt, POST abgefangen, auf das **Ergebnis** gewartet.
+  Neu dabei: unvollständiger Kontakt darf gar nicht erst rausgehen.
+- Spenden → bei einem **scharfen** Zahlungs-Link zählt anderes: `https`, `target=_blank`
+  mit `rel=noopener`, und die Seite selbst fragt keine Zahlungsdaten ab.
+- Bauleiste → statt „muss versteckt sein" jetzt „nichts Internes drin" (kein `?dev`, kein
+  Studio, kein Postfach).
+- 🌐-Knopf → geprüft wird über die **Beschriftung** statt über die Kennung. Was der Nutzer
+  sieht, überlebt eine Umbenennung des Moduls.
+
+**Gegenprobe (drei echte Fehler gleichzeitig eingebaut):** `rel=noopener` entfernt ·
+Knopf-Kennung verfälscht · Einreich-Endpunkt geleert → **5 Zeilen rot**, genau die
+richtigen. Nach dem Zurücksetzen wieder 107/107.
+
+Der `load()`-Helfer schneidet jetzt POSTs mit, statt sie abzuschicken — ohne das liefe der
+Test in eine echte Einsendung.
+
+### Nebenbefund für Klaus (nicht angefasst — seine Entscheidung)
+
+Der Spenden-Knopf verlinkt PayPal mit **`Klaus-nitzsche@t-online.de` im Klartext**,
+öffentlich lesbar im Quelltext. Kein Fehler (PayPal braucht die Empfängeradresse), aber ein
+Spam-Magnet. Zwei Wege: eine eigene Adresse (`spenden@family-projekt.de`) als zweite
+PayPal-Adresse eintragen, oder ein PayPal.Me-Link. Klaus prüft das.
+
+---
+
 ## ✅ 2026-08-01: Erster echter Vektor-Lauf — und der Befund, den er zutage brachte
 
 **Klaus hat den Knopf gedrückt, und er hat funktioniert.** Commit `4e16ec2` „Studio:

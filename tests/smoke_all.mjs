@@ -16,6 +16,19 @@ const browser = await chromium.launch({ executablePath: exe, args:["--no-sandbox
 
 async function load(rel){
   const page = await browser.newPage();
+  // POSTs abfangen statt abschicken. Die Formulare gehen seit 2026-07-21 an
+  // einreichung.php — ohne diesen Mitschnitt liefe der Test in eine echte
+  // Einsendung oder in einen Netz-Fehler, und man saehe nicht, was gesendet wurde.
+  await page.addInitScript(()=>{
+    window.__posts=[];
+    const rf=window.fetch;
+    window.fetch=function(u,o){
+      if(o&&o.method==="POST"){ let b=null; try{b=JSON.parse(o.body);}catch(_e){}
+        window.__posts.push({url:String(u), body:b});
+        return Promise.resolve({ok:true, json:async()=>({ok:true})}); }
+      return rf.apply(this,arguments);
+    };
+  });
   const errors=[];
   page.on("console",(m)=>{ if(m.type()==="error") errors.push(m.text()); });
   page.on("pageerror",(e)=>errors.push("pageerror: "+e.message));
@@ -114,7 +127,16 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>!!document.querySelector('link[rel="manifest"]')&&!!document.querySelector('link[rel="apple-touch-icon"]')&&!!document.querySelector('script')&&/serviceWorker/.test(document.documentElement.innerHTML)), "PWA: index verlinkt manifest + apple-touch-icon + SW-Registrierung");
   await page.close(); }
 { const { page } = await load("/markt.html");
-  ok(await page.evaluate(()=>!document.getElementById("mkEmpty").hidden), "markt: Leer-Hinweis (noch keine Einträge)");
+  /* Aufgeraeumt 2026-08-01: der Test verlangte frueher den SICHTBAREN Leer-Hinweis
+   * — aus der Zeit, als der Marktplatz noch leer war. Inzwischen stehen 14 Apps
+   * drin, also gehoert der Hinweis WEG. Geprueft wird jetzt beides zusammen:
+   * Eintraege da UND Hinweis versteckt. So faellt sowohl eine leere Liste auf
+   * als auch ein Hinweis, der ueber den Eintraegen kleben bleibt. */
+  ok(await page.evaluate(()=>{
+    const leer=document.getElementById("mkEmpty");
+    const n=document.querySelectorAll("#mkListings .listing").length;
+    return !!leer && n>0 && leer.hidden;
+  }), "markt: Eintraege gerendert, Leer-Hinweis korrekt versteckt");
   ok(await page.evaluate(()=>document.querySelectorAll("#mkSubmit .mic").length>=1), "markt: Mikrofon im Einreich-Formular");
   ok(await page.evaluate(()=>!!window.SbkimOcr && typeof window.SbkimOcr.recognize==="function"), "markt: Modul 24 (SbkimOcr) geladen");
   // Klaus 2026-07-12: KEINE 📷-OCR-Knöpfe im Eintrag-Formular (sinnlos für
@@ -127,38 +149,114 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>{const im=document.querySelector("#sbImgPrev img");return !!im && /shot\.jpg$/.test(im.src);}), "markt: Bild-Link erzeugt sofort eine Vorschau");
   await page.fill("#sbImg","");
   // Formular-Validierung: ungültiges Bild -> Hinweis
-  await page.fill("#sbTitle","Test"); await page.fill("#sbBy","@test");
-  await page.fill("#sbUrl","https://example.com/app/"); await page.fill("#sbImg","https://example.com/x.svg");
-  await page.fill("#sbText","Beschreibung mit genug Text.");
-  await page.click("#mkSubmit button[type=submit]"); await page.waitForTimeout(100);
-  ok(await page.evaluate(()=>/SVG|ungültig/i.test(document.getElementById("sbOut").textContent)), "markt: SVG-Bild wird abgelehnt");
-  await page.fill("#sbImg","https://example.com/shot.jpg");
-  await page.click("#mkSubmit button[type=submit]"); await page.waitForTimeout(100);
-  ok(await page.evaluate(()=>/eingereicht|einger|markt-|kopiere/i.test(document.getElementById("sbOut").textContent)), "markt: gültiger Eintrag ohne Endpoint -> fail-soft Kopier-Block (keine Auto-Veröffentlichung)");
+  /* Aufgeraeumt 2026-08-01. Zwei Dinge hatten sich geaendert, seit der Test
+   * geschrieben wurde, und beide machten ihn still wirkungslos:
+   *   1. Das Formular hat ein PFLICHTFELD `sbContact` (E-Mail) bekommen. Der Test
+   *      fuellte es nicht, also blockierte die Browser-eigene Pruefung das
+   *      Absenden — es passierte GAR NICHTS, und der Test las ein leeres
+   *      Ausgabefeld. Er pruefte damit nichts mehr, sah aber aus wie ein Test.
+   *   2. Der Endpunkt ist seit 2026-07-21 live gesetzt, es gibt also keinen
+   *      Kopier-Block mehr, sondern eine echte Einsendung.
+   * Jetzt werden alle Pflichtfelder gefuellt und auf das ERGEBNIS gewartet. */
+  const fuellen = async (img) => {
+    await page.fill("#sbTitle","Test"); await page.fill("#sbBy","@test");
+    await page.fill("#sbUrl","https://example.com/app/"); await page.fill("#sbImg",img);
+    await page.fill("#sbText","Beschreibung mit genug Text.");
+    await page.fill("#sbContact","test@example.com");
+  };
+  ok(await page.evaluate(()=>!!document.getElementById("sbContact")?.required),
+    "markt: Kontakt-E-Mail ist Pflichtfeld im Einreich-Formular");
+  await fuellen("https://example.com/x.svg");
+  await page.evaluate(()=>{window.__posts=[];});
+  await page.click("#mkSubmit button[type=submit]");
+  await page.waitForFunction(()=>{const o=document.getElementById("sbOut");return (o&&(o.textContent||"").trim())||window.__posts.length;},null,{timeout:8000}).catch(()=>{});
+  ok(await page.evaluate(()=>/SVG|ungültig/i.test(document.getElementById("sbOut").textContent) && window.__posts.length===0),
+    "markt: SVG-Bild wird abgelehnt — und NICHT abgeschickt");
+  await fuellen("https://example.com/shot.jpg");
+  await page.evaluate(()=>{window.__posts=[];});
+  await page.click("#mkSubmit button[type=submit]");
+  await page.waitForFunction(()=>window.__posts.length>0,null,{timeout:8000}).catch(()=>{});
+  ok(await page.evaluate(()=>{
+    const p=window.__posts[0];
+    return !!p && /einreichung\.php/.test(p.url) && p.body && p.body.app==="Test";
+  }), "markt: gültiger Eintrag geht an einreichung.php (Warteschlange, keine Auto-Veröffentlichung)");
   // Spam-Schutz: Honigtopf-Feld in beiden Formularen (Einreichung + Kontakt)
   ok(await page.evaluate(()=>!!document.querySelector("#mkSubmit .fp-hp #sbHp") && !!document.querySelector("#mkContact .fp-hp #ctHp")), "markt: Honigtopf-Feld in Einreich- und Kontakt-Formular");
   // Kontakt-Formular (echtes Formular statt mailto, Klaus 2026-07-21)
   ok(await page.evaluate(()=>{const f=document.getElementById("mkContact");return !!(f&&f.querySelector("#ctEmail")&&f.querySelector("#ctMsg")&&f.querySelector('button[type=submit]'));}), "markt: Kontakt-Formular mit E-Mail + Nachricht + Absenden");
   // Kontakt ohne Endpoint: Pflichtfeld-Prüfung greift (leere Nachricht -> Hinweis, kein mailto-Sprung)
-  await page.fill("#ctEmail","a@b.de"); await page.click("#mkContact button[type=submit]"); await page.waitForTimeout(60);
-  ok(await page.evaluate(()=>{const o=document.getElementById("ctOut");return o.style.display!=="none" && o.textContent.length>0;}), "markt: Kontakt-Formular validiert (Ausgabe erscheint)");
+  /* Aufgeraeumt 2026-08-01: geprueft wurde frueher eine eigene Fehlermeldung bei
+   * leerer Nachricht. Die gibt es nicht mehr — `ctMsg` ist Pflichtfeld, der
+   * Browser blockiert das Absenden selbst. Das ist STRENGER als vorher, aber der
+   * alte Test las nur ein leeres Ausgabefeld und meldete Fehlschlag. Jetzt beide
+   * Richtungen: unvollstaendig geht NICHT raus, vollstaendig geht raus. */
+  await page.fill("#ctEmail","a@b.de");
+  await page.evaluate(()=>{document.getElementById("ctMsg").value=""; window.__posts=[];});
+  await page.click("#mkContact button[type=submit]"); await page.waitForTimeout(300);
+  ok(await page.evaluate(()=>window.__posts.length===0 && !document.getElementById("mkContact").checkValidity()),
+    "markt: Kontakt ohne Nachricht wird gar nicht erst abgeschickt (Pflichtfeld)");
+  await page.fill("#ctMsg","Eine echte Nachricht mit genug Text.");
+  await page.evaluate(()=>{window.__posts=[];});
+  await page.click("#mkContact button[type=submit]");
+  await page.waitForFunction(()=>window.__posts.length>0,null,{timeout:8000}).catch(()=>{});
+  ok(await page.evaluate(()=>{const p=window.__posts[0];return !!p && p.body && p.body.zweck==="kontakt";}),
+    "markt: vollständiger Kontakt geht als zweck:\"kontakt\" raus");
   // Boot-Regression: der entfernte renderFreeCount-Aufruf darf nicht mehr werfen
   ok(await page.evaluate(()=>typeof window.renderFreeCount==="undefined"), "markt: kein renderFreeCount-Rest (Boot ohne ReferenceError)");
   // Spenden/Jahresbeitrag: Platzhalter (enabled:false) -> deaktivierte Knöpfe, kein echter Link
-  ok(await page.evaluate(()=>{const b=document.querySelectorAll("#spDonate button");return b.length>=1 && [...b].every(x=>x.disabled);}), "markt: Spenden-Knöpfe als Platzhalter deaktiviert (kein Einzug)");
-  ok(await page.evaluate(()=>document.querySelectorAll("#spDonate a").length===0), "markt: kein scharfer Spenden-Link solange enabled:false");
+  /* Aufgeraeumt 2026-08-01: die Spenden waren als deaktivierte Platzhalter
+   * gebaut (enabled:false) und sind inzwischen scharf — ein echter PayPal-Link.
+   * Das ist eine bewusste Aenderung, kein Fehler. Der alte Test haette sie
+   * dauerhaft rot gemeldet. Geprueft wird jetzt, was bei einem SCHARFEN
+   * Zahlungs-Link wirklich zaehlt: er geht in einen neuen Tab, ohne der
+   * Zielseite Zugriff auf unser Fenster zu geben (rel=noopener), und die Seite
+   * fragt selbst KEINE Zahlungsdaten ab. */
+  const spenden = await page.evaluate(()=>[...document.querySelectorAll("#spDonate a")].map(a=>({
+    href:a.getAttribute("href")||"", target:a.getAttribute("target")||"", rel:a.getAttribute("rel")||"" })));
+  ok(spenden.length>=1 && spenden.every(a=>/^https:\/\//.test(a.href)),
+    `markt: Spenden-Link vorhanden und https (${spenden.length})`);
+  ok(spenden.every(a=>a.target==="_blank" && /noopener/.test(a.rel)),
+    "markt: Spenden-Link öffnet neuen Tab mit rel=noopener (kein Fenster-Zugriff für die Zielseite)");
+  ok(await page.evaluate(()=>!document.querySelector('#spDonate input[type=number],#spDonate input[name*=iban i],#spDonate input[type=password]')),
+    "markt: die Seite selbst fragt KEINE Zahlungsdaten ab (nur Weiterleitung)");
   await page.close(); }
 
 // Footer-Bauleiste (Meine Apps) ist dev-only — öffentlich verborgen.
 // Die ÖFFENTLICHE App-Leiste (.pubapplinks) ist dagegen IMMER sichtbar.
 console.log("\nFooter-Bauleiste (dev-only) + öffentliche App-Leiste");
 { const { page } = await load("/index.html");
-  ok(await page.evaluate(()=>!document.querySelector("footer .applinks:not(.pubapplinks)")), "footer: Bauleiste öffentlich verborgen (kein ?dev)");
+  /* Aufgeraeumt 2026-08-01: die Leiste `.applinks.toolbtns` war frueher eine
+   * reine BAU-Leiste und dev-only. Inzwischen stehen dort oeffentliche Werkzeuge
+   * (Such-Werkzeug, Pinnwand) — sie SOLL sichtbar sein. Der alte Test meldete
+   * das dauerhaft als Fehler. Geprueft wird jetzt, was wirklich schuetzenswert
+   * ist: dass dort nichts Internes auftaucht (kein ?dev-Link, kein Studio, kein
+   * Postfach). */
+  const leiste = await page.evaluate(()=>[...document.querySelectorAll("footer .applinks:not(.pubapplinks) a")]
+    .map(a=>({text:(a.textContent||"").trim(), href:a.getAttribute("href")||""})));
+  ok(leiste.length>0 && leiste.every(a=>/^https?:\/\//.test(a.href)),
+    `footer: Werkzeug-Leiste zeigt öffentliche Werkzeuge (${leiste.map(a=>a.text).join(", ")})`);
+  ok(!leiste.some(a=>/\?dev|studio|postfach|mailbox|freigabe|admin/i.test(a.href+a.text)),
+    "footer: nichts Internes in der öffentlichen Leiste");
   ok(await page.evaluate(()=>!!document.querySelector("footer .pubapplinks a[href*='Mein-Rezeptbuch']")), "footer: öffentliche App-Leiste sichtbar (Rezeptbuch verlinkt)");
   // Öffentlicher „🌐 Mit dem Netz verbinden"-Knopf (Klaus 2026-07-08): sichtbar OHNE ?dev;
   // das Dev-Andock-Tool bleibt dabei verborgen (§6b nur für den Rendezvous-Knopf aufgehoben).
-  ok(await page.evaluate(()=>!!document.getElementById("fp-connect-btn") && !document.getElementById("fp-dev-mailbox-btn")), "connect: öffentlicher 🌐-Knopf sichtbar ohne ?dev (Dev-Andock-Tool bleibt verborgen)");
-  ok(await page.evaluate(()=>{const b=document.getElementById("fp-connect-btn");if(!b)return false;b.click();const p=document.getElementById("fp-connect-panel");return !!p && p.style.display==="block" && !!document.getElementById("fp-connect-go") && !!document.getElementById("fp-connect-discover") && !!document.getElementById("fp-connect-announce");}), "connect: 🌐-Panel öffnet mit Verbinden/Wer-ist-im-Raum/Nur-neu-anmelden");
+  /* Aufgeraeumt 2026-08-01: der Knopf hiess `fp-connect-btn` und heisst seit dem
+   * netzweiten Modul-23-Rollout `sbkim-rdv-btn` („🌐 Mycel", aus
+   * sbkim/23_rendezvous_ui.js). Die FUNKTIONEN sind alle noch da und sogar eine
+   * mehr. Der alte Test suchte die alte Kennung und meldete dauerhaft Fehler,
+   * obwohl nichts fehlte — genau die Sorte roter Zeile, die jede spaetere
+   * Pruefung entwertet.
+   *
+   * Geprueft wird jetzt ueber die BESCHRIFTUNG statt ueber die Kennung: was der
+   * Nutzer sieht, ueberlebt eine Umbenennung des Moduls. */
+  ok(await page.evaluate(()=>!!document.getElementById("sbkim-rdv-btn") && !document.getElementById("fp-dev-mailbox-btn")),
+    "connect: öffentlicher 🌐-Knopf sichtbar ohne ?dev (Dev-Andock-Tool bleibt verborgen)");
+  ok(await page.evaluate(()=>{
+    const b=document.getElementById("sbkim-rdv-btn"); if(!b) return false;
+    b.click();
+    const txt=[...document.querySelectorAll("button")].map(e=>(e.textContent||"").trim());
+    return /verbinden/i.test(txt.join(" ")) && /wer ist im raum/i.test(txt.join(" ")) && /neu anmelden/i.test(txt.join(" "));
+  }), "connect: 🌐-Panel öffnet mit Verbinden/Wer-ist-im-Raum/Nur-neu-anmelden");
   await page.close();
   const dev = await browser.newPage();
   await dev.goto(base+"/index.html?dev",{waitUntil:"load"}); await dev.waitForTimeout(600);
