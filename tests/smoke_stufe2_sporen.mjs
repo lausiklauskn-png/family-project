@@ -237,6 +237,43 @@ console.log("\n4 — Spore geändert, KEIN sporeAuto (Sicherheit)");
   ok(st && st.eintraege["markt-p3"].neuerText === "Ein Text, den niemand freigegeben hat.", "der Vorschlag steht im Bericht, damit Klaus ihn im Studio übernehmen kann");
 }
 
+/* ── Fall 4b: dieselbe Abweichung an zwei Abenden → nur EINMAL melden ───────
+ * Klaus' Befund vom 2026-08-01: das Studio meldete Nacht für Nacht
+ * „Beschreibung geändert — wartet auf dich", obwohl niemand etwas geändert
+ * hatte. Verglichen wurde die Spore des Anbieters mit Klaus' Marktplatz-Text —
+ * zwei dauerhaft verschiedene Texte. Eine Abweichung, die schon gestern
+ * bestand, ist kein Fund, sondern ein Zustand. */
+console.log("\n4b — dieselbe Abweichung am zweiten Abend: kein neuer Fund");
+{
+  SPOREN = { "/frei.json": spore("Ein Text, den niemand freigegeben hat.") };
+  const e = BASIS.map((x, i) => (i === 2 ? Object.assign({}, x, { sporeUrl: SPORE_BASIS + "/frei.json" }) : x));
+  const dir = baueRepo(e, paketFuer(e));
+
+  await lauf(dir, ["--schreiben"]);
+  const eins = liesJson(dir, "assets/config/spore-stand.json").eintraege["markt-p3"];
+  ok(eins.lage === "geaendert", "erster Abend: geaendert — das ist neu und gehört gemeldet");
+  ok(typeof eins.sporeHash === "string" && eins.sporeHash.length > 0,
+    "und der Fingerabdruck der gelesenen Spore wandert in den Bericht");
+
+  await lauf(dir, ["--schreiben"]);
+  const zwei = liesJson(dir, "assets/config/spore-stand.json").eintraege["markt-p3"];
+  ok(zwei.lage === "abweichend", "zweiter Abend: abweichend statt geaendert — kein neues Ausrufezeichen (" + zwei.lage + ")");
+  ok(zwei.neuerText === "Ein Text, den niemand freigegeben hat.",
+    "der Vorschlag bleibt trotzdem im Bericht — Klaus kann ihn jederzeit übernehmen");
+
+  // Und wenn der Anbieter WIRKLICH etwas ändert, meldet es sich wieder.
+  SPOREN = { "/frei.json": spore("Jetzt hat der Anbieter seinen Text wirklich angefasst.") };
+  await lauf(dir, ["--schreiben"]);
+  const drei = liesJson(dir, "assets/config/spore-stand.json").eintraege["markt-p3"];
+  ok(drei.lage === "geaendert", "dritter Abend mit echter Änderung: wieder geaendert (" + drei.lage + ")");
+  ok(drei.neuerText === "Jetzt hat der Anbieter seinen Text wirklich angefasst.", "mit dem neuen Vorschlag");
+
+  // Vierter Abend, nichts weiter passiert -> wieder Ruhe.
+  await lauf(dir, ["--schreiben"]);
+  ok(liesJson(dir, "assets/config/spore-stand.json").eintraege["markt-p3"].lage === "abweichend",
+    "vierter Abend: wieder ruhig");
+}
+
 /* ── Fall 5: Spore unerreichbar oder unbrauchbar → fail-soft ───────────────── */
 console.log("\n5 — Spore unerreichbar / unbrauchbar / kein https");
 {

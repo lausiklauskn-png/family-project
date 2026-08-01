@@ -67,6 +67,7 @@
       sp_lage_unerreichbar: "nicht erreichbar",
       sp_lage_unbrauchbar: "unbrauchbar",
       sp_lage_ohne_spore: "kein Spore-Link hinterlegt",
+      sp_lage_abweichend: "Beschreibung weicht ab — unverändert seit der letzten Prüfung",
       wa_gruen: "Zielseite in Ordnung",
       wa_gelb: "Zielseite: bitte ansehen",
       wa_rot: "auf Eis gelegt — Link abgeschaltet",
@@ -189,6 +190,7 @@
       sp_lage_unerreichbar: "unreachable",
       sp_lage_unbrauchbar: "unusable",
       sp_lage_ohne_spore: "no spore link on file",
+      sp_lage_abweichend: "description differs — unchanged since the last check",
       wa_gruen: "target site fine",
       wa_gelb: "target site: please review",
       wa_rot: "on hold — link switched off",
@@ -757,6 +759,7 @@
   var LAGE_TEXT = { geaendert: "sp_lage_geaendert", uebernommen: "sp_lage_uebernommen",
                     gleich: "sp_lage_gleich", unerreichbar: "sp_lage_unerreichbar",
                     unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich",
+                    abweichend: "sp_lage_abweichend",
                     ohne_spore: "sp_lage_ohne_spore" };
 
   /* ── Wächter-Ampel (Stufe 3) ───────────────────────────────────────────────
@@ -821,6 +824,10 @@
       var zeile = document.createElement("div");
       zeile.className = "fpst-sporezeile"
         + (w && w.ampel === "rot" ? " is-stop" : "")
+        // `abweichend` faerbt NICHT warm: eine Abweichung, die schon gestern
+        // bestand, ist kein Fund. Genau das hat Klaus am 2026-08-01 gestoert —
+        // jede Nacht dasselbe Ausrufezeichen, ohne dass jemand etwas geaendert
+        // hatte.
         + ((e.lage === "geaendert" || (w && w.ampel === "gelb")) ? " is-warn" : "");
       var name = document.createElement("b");
       var eintrag = findeEintrag(id);
@@ -830,7 +837,9 @@
       var lage = document.createElement("span");
       lage.textContent = T(LAGE_TEXT[e.lage] || "sp_lage_unbrauchbar") + (e.hinweis ? " (" + e.hinweis + ")" : "");
       zeile.appendChild(lage);
-      if (e.lage === "geaendert" && e.neuerText) {
+      // Der Text steht auch bei `abweichend` zum Uebernehmen bereit — Klaus soll
+      // ihn jederzeit holen koennen, nur eben ohne dass ihn jemand darum bittet.
+      if ((e.lage === "geaendert" || e.lage === "abweichend") && e.neuerText) {
         var vor = document.createElement("small");
         vor.textContent = e.neuerText;          // fremder Text — nie als HTML
         zeile.appendChild(vor);
