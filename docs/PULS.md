@@ -90,13 +90,47 @@ am Ende behebt es; im Test steht der Grund.
 
 Cache-Version **v73**.
 
+### ✅ Zweiter Lauf: 14 von 14 — Stufe 1 im Echtbetrieb bewiesen
+
+Klaus hat nach dem Hard-Reload neu gebaut. Commit `05492b6`. Sein PDF-Bericht (der neue
+Knopf, auf Anhieb funktioniert) zeigt: **14 von 14 Einträgen · gebaut am 2026-08-01 ·
+Modell Xenova/multilingual-e5-small · dim 384**, jede Zeile grün „abgedeckt".
+
+Unabhängig nachgerechnet mit dem echten Codec gegen die echte `listings.js`:
+**14 abgedeckt, 0 live nachzurechnen.** Damit ist die Kette vollständig bewiesen —
+Knopf → Server → GitHub → Leseseite.
+
+### Nachtrag: nur rechnen, was sich geändert hat
+
+Klaus' Architektur-Frage: *„Rechnet er dann für tausend Apps jedes Mal alles nach? Das
+wäre ziemlich überflüssig."* Er hatte recht — und die Antwort lag schon im Paket. Jeder
+Vektor trägt den Hash seines Textes. Passt der Hash noch und stimmen Modell und Dimension,
+ist der alte Vektor exakt derselbe, den eine Neuberechnung liefern würde.
+
+Der Knopf lädt jetzt das bestehende Paket mit, übernimmt alles Unveränderte und bettet nur
+Neues/Geändertes ein. Gemessen am Test: **ein geänderter Text → 1 Einbettung statt 14.**
+Bei 1000 Apps und drei Änderungen wären es drei statt tausend. Ändert sich gar nichts, gibt
+es **keinen Commit** und die ehrliche Meldung „Nichts zu tun".
+
+Drei Bedingungen müssen alle stimmen, sonst wird neu gerechnet: gleiches Modell, gleiche
+Dimension, passender Hash. Im Zweifel kostet das Zeit, nie Richtigkeit.
+
+`smoke_studio_vectors.mjs` **41/41**. Gegenprobe: Wiederverwendung abgeschaltet → wieder
+14 statt 1, Proben (27)–(30) rot.
+
+**Test-Falle, die dabei auffiel:** der erste Testblock hatte nie eine Umleitung für
+`listings-vec.json` gesetzt — der neue inkrementelle Bau holte prompt die **echte** Datei
+aus dem Repo und mischte echte Vektoren unter die Stub-Vektoren. Der Code hatte recht, der
+Test war unvollständig. Ein Test, der nicht alles umleitet, was der Code abruft, misst
+irgendwann etwas anderes, als er glaubt.
+
+Cache-Version **v74**.
+
 ### Was Klaus noch tun muss
 
-1. **Vektoren neu bauen** — der erste Lauf ist wegen des Cache-Befunds nur zu 4/14
-   brauchbar. Vorher Hard-Reload, damit der neue Studio-Code ankommt. Ob es geklappt hat,
-   sagt jetzt die Stand-Zeile im Studio selbst; nachrechnen muss niemand mehr.
-2. **Caddy-Regel einspielen** (Punkt 3 oben), sonst wiederholt sich das Muster bei jeder
-   Freigabe.
+1. ~~Vektoren neu bauen~~ **erledigt** — 14/14, unabhängig nachgerechnet.
+2. **Caddy-Regel einspielen** (Punkt 3 oben), sonst erscheint jede künftige Freigabe bis zu
+   eine Woche verzögert. Der einzige offene Punkt aus dieser Sitzung.
 
 ---
 
