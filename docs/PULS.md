@@ -4,6 +4,40 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-01 (Nachtrag): Bewertungs-Fenster statt Aufklapper, mit Nachbesserungen
+
+Klaus' Wunsch nach dem ersten Bau: **ein Knopf an der Karte, ein Fenster zum
+Nachlesen** — nicht ein Aufklapper mitten in der Liste. Und darin soll stehen,
+was der Anbieter nachbessern müsste, „damit jeder sehen kann, wie seine App
+bewertet wird und keiner schummeln kann."
+
+- **Knopf „📊 Bewertung nachlesen"** an jeder gemessenen Karte. Ein Eintrag ohne
+  Zahlen trägt **keinen** Knopf — ein Klick ins Leere wäre schlimmer als keiner.
+- **Natives `<dialog>` mit `showModal()`**, dasselbe Muster wie der Melder:
+  Fokus springt hinein, Tab bleibt drin, Escape schließt, Fokus kehrt auf den
+  Knopf zurück. Liegt in der Top-Layer — schwebt also selbst dann über der
+  Seite, wenn das CSS wegen eines Cache-Hängers fehlt.
+- Das Fenster beantwortet **drei Fragen in dieser Reihenfolge:** wer hat
+  gemessen (und kann der Anbieter schummeln? — nein, gemessen wird von uns, auf
+  einem fremden Rechner, an der öffentlich erreichbaren Seite) · was heißt jede
+  der vier Zahlen für mich · was müsste der Anbieter tun.
+- **Neu im Bericht: `hinweise`** — die Titel der durchgefallenen
+  Lighthouse-Prüfungen, je Kategorie höchstens drei, das Lohnendste zuerst (nach
+  ersparter Zeit). Reine Informations-Prüfungen sind **keine** Mängel und werden
+  ausgefiltert; sonst stünde bei jedem Anbieter etwas, was er gar nicht
+  abstellen kann. Nur die Titel, nie der volle Prüfbericht (der enthält
+  Adressen, Zeilennummern und fremden Quelltext).
+- **Farb-Legende im Fenster:** ab 90 grün, ab 50 gelb, darunter rot — und dabei
+  gesagt, dass das Lighthouses eigene Grenzen sind, keine von uns erfundenen.
+- Die Nachbesserungen bleiben bei den Zahlen: überlebt ein alter Befund einen
+  Fehlschlag, überleben sie mit. Sonst stünde eine Note ohne Begründung da.
+
+`smoke_stufe5_messung` jetzt **75/75** in vier Teilen. Drei weitere Gegenproben
+einzeln rot bekommen (Informations-Prüfungen als Mängel · Deckel je Kategorie
+aufgehoben · Knopf auch ohne Zahlen). Cache-Version **v80 → v81**.
+
+---
+
 ## ✅ 2026-08-01 (später): Stufe 5 gebaut — und die FREMD-Lampe redet jetzt
 
 ### Stufe 5: Lighthouse misst in der eigenen Aktion (Weg A)
