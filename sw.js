@@ -17,12 +17,19 @@
  */
 var CACHE_VERSION = "family-projekt-v74";
 // Versions-Anhang der Asset-Adressen (?v=NN) — MUSS zur Zahl in CACHE_VERSION
-// passen und in ALLEN HTML-Seiten identisch stehen. Grund (Befund 2026-07-31):
-// Caddy liefert CSS/JS mit `max-age=604800` aus, also SIEBEN TAGE Browser-Cache
-// (Caddyfile.example:55), HTML dagegen mit 300 s. Nach einem Deploy kam deshalb
-// die neue markt.html an, die alte assets/style.css aber nicht — der neue
+// passen und in ALLEN HTML-Seiten identisch stehen.
+//
+// Grund (Befund 2026-07-31, Ursache korrigiert am 2026-08-01): Nach einem Deploy
+// kam die neue markt.html an, die alte assets/style.css aber nicht — der neue
 // Melde-Knopf blieb eckig. Ein Service-Worker hilft dagegen nicht, weil der
 // HTTP-Cache VOR ihm greift. Nur eine geänderte Adresse hilft.
+//
+// Die ursprüngliche Erklärung hier lautete „Caddy liefert CSS/JS mit sieben
+// Tagen aus" und berief sich auf Caddyfile.example. Am 2026-08-01 am Server
+// nachgemessen: diese Regel gab es dort nie. Caddy setzt für CSS/JS GAR KEINEN
+// Cache-Header, und dann rät der Browser selbst — üblicherweise ein Zehntel des
+// Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
+// Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
 var ASSET_V = "74";
 var CORE = [

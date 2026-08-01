@@ -136,11 +136,16 @@ sortiert hat nie etwas.)*
    es ist oder ob gerade etwas hakt."* Bei ~30 MB Download ist das der Unterschied
    zwischen „läuft" und „hängt". Jetzt beide Phasen mit Balken, wandernder Balken bei
    unbekannter Länge, Fehlermeldungen bleiben stehen statt als Toast zu verschwinden.
-3. **Caddy-Regel für `/assets/config/*`** in `Caddyfile.example`: 300 s statt 7 Tage. Das
-   sind **Daten**-Dateien, die das Studio ohne Deploy neu schreibt — ein `?v=NN` hilft dort
-   grundsätzlich nicht, weil die Zahl nur beim Deploy steigt. **Muss Klaus am Server
-   einspielen** (Hetzner Cloud, `/opt/relay/Caddyfile`), sonst erscheint eine freigegebene
-   App bis zu eine Woche lang nicht. Im Repo geändert, am Server **ungeprüft**.
+3. **Caddy-Regel für `/assets/config/*`**: 300 s. Das sind **Daten**-Dateien, die das
+   Studio ohne Deploy neu schreibt — ein `?v=NN` hilft dort grundsätzlich nicht, weil die
+   Zahl nur beim Deploy steigt. **✅ Am 2026-08-01 eingespielt und am Server belegt**
+   (`max-age=300` kommt an, Programm-Dateien unverändert).
+
+   Dabei kam heraus: `/opt/relay/Caddyfile` hatte **gar keine** Cache-Regel. Die „sieben
+   Tage" standen nur in `Caddyfile.example` — einer Vorlage, die nie auf den Server kam.
+   Das Problem war echt (ohne Header rät der Browser selbst, etwa ein Zehntel des
+   Datei-Alters), die Erklärung war falsch. **Merke: eine Vorlage im Repo ist kein Beweis
+   für den Server. Messen mit `curl -sI <url> | grep -i cache-control`.**
 
 `tests/smoke_studio_vectors.mjs` steht bei **26/26**, mit zwei neuen Gegenproben belegt:
 Balken ausgebaut → (14)(15)(16) rot; frisches Holen ausgebaut → (20)(21) rot.

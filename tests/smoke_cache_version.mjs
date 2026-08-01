@@ -51,11 +51,16 @@ ok(core.length > 0, `CORE-Liste gelesen (${core.length} Dateien)`);
 ok(core.some((p) => p.startsWith("assets/style.css")), "assets/style.css steht in CORE (wird gecacht)");
 
 /* ---- Versions-Anhang der Assets (?v=NN) -------------------------------------
- * Caddy liefert CSS/JS mit sieben Tagen Browser-Cache aus (Caddyfile.example:55),
- * HTML nur mit 300 s. Ohne geänderte Adresse sieht ein Besucher nach einem Deploy
- * also die neue Seite mit dem ALTEN Aussehen — genau das ist am 2026-07-31
- * passiert. Ein Service-Worker hilft nicht, weil der HTTP-Cache vor ihm greift.
- * Darum: ?v=NN an jeder Asset-Adresse, überall dieselbe Zahl. */
+ * Ohne geänderte Adresse sieht ein Besucher nach einem Deploy die neue Seite mit
+ * dem ALTEN Aussehen — genau das ist am 2026-07-31 passiert. Ein Service-Worker
+ * hilft nicht, weil der HTTP-Cache vor ihm greift. Darum: ?v=NN an jeder
+ * Asset-Adresse, überall dieselbe Zahl.
+ *
+ * Korrektur 2026-08-01: Hier stand „Caddy liefert mit sieben Tagen aus
+ * (Caddyfile.example)". Am Server nachgemessen — diese Regel gab es dort nie.
+ * Caddy setzt für CSS/JS gar keinen Cache-Header, der Browser rät dann selbst
+ * (etwa ein Zehntel des Datei-Alters). Der Test bleibt richtig, nur die
+ * Begründung war es nicht. */
 const assetV = (/var\s+ASSET_V\s*=\s*"(\d+)"/.exec(swNow) || [])[1];
 const verNum = (/(\d+)\s*$/.exec(verNow || "") || [])[1];
 ok(!!assetV, `ASSET_V lesbar (${assetV})`);

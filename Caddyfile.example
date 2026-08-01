@@ -1,99 +1,98 @@
-# Caddyfile-Block für Family Projekt — in die schon laufende Caddy einfügen.
-# Siehe docs/DEPLOY.md für den vollständigen Ablauf (Verzeichnis + git pull +
-# reload). Auto-TLS via Let's Encrypt ist Caddy-Standard.
+# Caddyfile — family-projekt.de
+#
+# ═══ LIES DAS ZUERST (Befund 2026-08-01) ═════════════════════════════════════
+#
+# Diese Datei war eine VORLAGE und kein Abbild des Servers — und das hat Schaden
+# angerichtet. Eine Sitzung las hier eine Cache-Regel mit sieben Tagen, hielt sie
+# für den echten Zustand und erklärte Klaus damit ein Cache-Problem. Auf dem
+# Server gab es diese Regel nie. Die Erklärung klang gut belegt und war falsch.
+#
+# Deshalb steht hier jetzt der TATSÄCHLICHE Stand vom Server
+# (`/opt/relay/Caddyfile`, Caddy im Docker auf der Hetzner Cloud), abgeglichen am
+# 2026-08-01. Wer etwas ändert, ändert es auf dem Server UND hier.
+#
+# Die Lehre ist mehr wert als die Datei: **eine Vorlage im Repo ist kein Beweis
+# für die Wirklichkeit.** Wenn eine Aussage über den Server zählt, wird sie am
+# Server gemessen:
+#
+#     curl -sI https://family-projekt.de/<pfad> | grep -i cache-control
+#
+# ═════════════════════════════════════════════════════════════════════════════
 
-# Kanonische Domain: family-projekt.de (ohne www). www leitet dauerhaft (301)
-# hierher um — sonst würde Google denselben Inhalt unter zwei Adressen sehen
-# (Duplicate Content) und die Ranking-Signale zersplittern.
-family-projekt.de {
+relay.family-projekt.de {
+	reverse_proxy relay:8080
+}
+
+family-projekt.de, www.family-projekt.de {
 	root * /srv/family-project
 	encode zstd gzip
 
 	# ── /server/ sperren — WICHTIG, nicht entfernen ──────────────────────
-	# Diese Caddy führt KEIN PHP aus (kein php_fastcgi in diesem Block).
-	# Ohne die Sperre liefert der file_server jede Datei unter /server/ als
-	# KLARTEXT aus — also den Quelltext von freigabe.php, einreichung.php,
-	# marktplatz-api.php und, sobald sie dort angelegt wird, die echte
-	# freigabe-config.php MIT dem GitHub-Token.
+	# Diese Caddy führt KEIN PHP aus. Ohne die Sperre liefert der file_server
+	# jede Datei unter /server/ als KLARTEXT aus — also den Quelltext von
+	# freigabe.php, einreichung.php, marktplatz-api.php und, sobald sie dort
+	# angelegt würde, die echte freigabe-config.php MIT dem GitHub-Token.
 	#
 	# Das `server/.htaccess` im Repo schützt hier NICHT: .htaccess ist eine
 	# Apache-Datei und wird von Caddy ignoriert. Es bleibt im Repo, weil die
 	# PHP-Endpunkte auf dem separaten Hetzner-Webhosting (Apache) laufen —
 	# dort greift es. Auf DIESER Maschine ist der handle-Block der Schutz.
+	#
+	# Der Block muss VOR dem Auffang-handle stehen; handle-Blöcke schließen
+	# sich gegenseitig aus.
 	handle /server/* {
 		respond 404
 	}
 
-	# Alles Übrige normal ausliefern (bisheriges Verhalten, unverändert).
-	# handle-Blöcke greifen in der Reihenfolge, in der sie hier stehen, und
-	# schließen sich gegenseitig aus — deshalb steht die Sperre oben.
 	handle {
 		try_files {path} {path}/ /index.html
 		file_server
 	}
 
-	# OPTIONAL (empfohlen, nicht nötig): Das Embedding-Modell unter /models/…
-	# echt ausliefern und bei fehlender Datei mit 404 antworten — statt (wie
-	# durch try_files oben) die index.html zurückzugeben. Sonst könnte die
-	# Modell-Bibliothek im Browser die HTML-Startseite als JSON lesen
-	# („Unexpected token '<'“). Die App fängt diesen Fall inzwischen selbst ab
-	# (Body-Probe in sbkim/03_embedding.js) — diese Zeilen sind reine
-	# Zusatz-Härtung. Zum Aktivieren einkommentieren UND nach oben
-	# verschieben: der Block muss VOR dem `handle { … }`-Auffangblock
-	# stehen, sonst greift er nie (handle-Blöcke schließen sich aus).
-	# handle /models/* {
-	# 	file_server
-	# }
-
 	# Korrekte MIME-Typen für JS (ältere Caddy-Versionen)
 	@js path *.js
 	header @js Content-Type "text/javascript; charset=utf-8"
 
-	# Lange Cache-Zeit für statische Assets (schnellere Seite = besseres Ranking).
-	# HTML bleibt kurz, damit Änderungen schnell sichtbar werden.
+	# Daten-Dateien, die das Marktplatz-Studio ohne Deploy neu schreibt.
+	# Eingespielt 2026-08-01, am Server belegt (max-age=300 kommt an).
 	#
-	# AUSGENOMMEN: /assets/config/*. Das sind DATEN-Dateien, keine Programm-
-	# Dateien — das Marktplatz-Studio schreibt sie jederzeit neu, ohne Deploy.
-	# Ein `?v=NN` im HTML hilft dagegen NICHT: die Zahl steigt nur beim Deploy,
-	# das Studio ändert die Datei zwischendurch. Sieben Tage Cache heißt hier
-	# also: eine freigegebene App erscheint bis zu eine Woche lang nicht.
+	# Ohne diese Zeile setzt Caddy GAR KEINEN Cache-Header — dann rät der
+	# Browser selbst, wie lange er eine Datei behält, üblicherweise ein
+	# Zehntel ihres Alters seit der letzten Änderung. Real passiert am
+	# 2026-08-01: Klaus' Browser hielt eine fünf Tage alte `listings.js`
+	# fest, während die Seite live neuere Texte zeigte. Der Vektor-Bau
+	# rechnete daraufhin über Texte, die es nicht mehr gab — 14 Vektoren
+	# gebaut, 4 brauchbar. Nichts stürzte ab, es brachte nur nichts.
 	#
-	# Gemessener Befund 2026-08-01: Klaus' Browser hielt eine listings.js vom
-	# 26.07. fest, während die Seite live die Texte vom 31.07. zeigte. Beim
-	# Vektor-Bau passten deshalb 10 von 14 Hashes nicht. Nichts stürzte ab, der
-	# Hash-Wächter verwarf still und rechnete nach — es funktionierte alles und
-	# brachte nichts. Genau diese Sorte Fehler findet man sonst nie.
+	# Ein `?v=NN` in der HTML-Adresse hilft hier grundsätzlich NICHT: die
+	# Zahl steigt nur beim Deploy, das Studio schreibt die Datei dazwischen.
 	@config path /assets/config/*
 	header @config Cache-Control "public, max-age=300, must-revalidate"
-	@assets {
-		path *.css *.js *.png *.svg *.woff2 *.webp
-		not path /assets/config/*
-	}
-	header @assets Cache-Control "public, max-age=604800, stale-while-revalidate=86400"
-	@html path *.html /
-	header @html Cache-Control "public, max-age=300, must-revalidate"
 
-	# robots.txt und sitemap.xml mit sauberem Content-Type ausliefern
-	@robots path /robots.txt
-	header @robots Content-Type "text/plain; charset=utf-8"
-	@sitemap path /sitemap.xml
-	header @sitemap Content-Type "application/xml; charset=utf-8"
+	@models path /models/*
+	header @models Access-Control-Allow-Origin "*"
 
-	# Etwas Sicherheit (statische Seite, keine fremden Einbettungen)
 	header {
 		X-Content-Type-Options "nosniff"
-		Referrer-Policy "strict-origin-when-cross-origin"
-		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "no-referrer-when-downgrade"
 		-Server
 	}
 }
 
-# www dauerhaft auf die kanonische Domain umleiten (301)
-www.family-projekt.de {
-	redir https://family-projekt.de{uri} permanent
-}
-
-# .com kanonisch auf .de umleiten
 family-projekt.com, www.family-projekt.com {
 	redir https://family-projekt.de{uri} permanent
 }
+
+# ── Bewusst NICHT enthalten ───────────────────────────────────────────────────
+#
+# Eine lange Cache-Zeit für CSS/JS (`max-age=604800`) stand in der alten Vorlage,
+# war aber nie auf dem Server. Sie wäre eine sinnvolle Optimierung — nur müsste
+# dann JEDE Programm-Datei über `?v=NN` versioniert sein, sonst sieht ein
+# Besucher nach einem Deploy die neue Seite mit altem Aussehen. Heute tragen
+# `style.css`, `app.js`, `vec-codec.js` und `studio-markt.js` diesen Anhang,
+# andere Skripte nicht. Wer die Regel einführen will, zieht vorher alle Verweise
+# nach — sonst handelt man sich genau das Problem ein, das oben beschrieben ist.
+#
+# Ebenfalls nicht drin, weil auf dem Server nicht vorhanden: eigene
+# Content-Types für robots.txt/sitemap.xml, X-Frame-Options, und ein separater
+# www-Block (www läuft im selben Site-Block mit).
