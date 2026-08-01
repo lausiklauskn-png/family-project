@@ -48,10 +48,14 @@ Test in eine echte Einsendung.
 
 ### Nebenbefund für Klaus (nicht angefasst — seine Entscheidung)
 
-Der Spenden-Knopf verlinkt PayPal mit **`Klaus-nitzsche@t-online.de` im Klartext**,
-öffentlich lesbar im Quelltext. Kein Fehler (PayPal braucht die Empfängeradresse), aber ein
-Spam-Magnet. Zwei Wege: eine eigene Adresse (`spenden@family-projekt.de`) als zweite
-PayPal-Adresse eintragen, oder ein PayPal.Me-Link. Klaus prüft das.
+Der Spenden-Knopf verlinkte PayPal über einen `_xclick`-Link, der Klaus' **private
+E-Mail-Adresse im Klartext** trug — öffentlich lesbar im Quelltext. Kein Fehler (PayPal
+braucht die Empfängeradresse), aber ein Spam-Magnet.
+
+**✅ Noch am selben Abend behoben:** Klaus hat `paypal.me/familyprojekt` eingerichtet, der
+Link ist umgestellt. Am Geldfluss ändert das nichts; die Adresse ist aus dem öffentlichen
+Netz raus. (Die Adresse steht bewusst auch hier nicht mehr — eine Doku, die den Befund
+festhält, soll ihn nicht selbst wiederholen.)
 
 ---
 
