@@ -159,14 +159,54 @@ console.log("Marktplatz — von Hand eingetragene Messwerte");
   await p.close();
 }
 
-// ── 7) Die echte Datei im Repo ist gueltiges JSON ───────────────────────────
+// ── 7) Eine Messung ANDERER Adresse blockiert die Ablesung nicht ────────────
+// Echter Fehlfall vom 2026-08-02 (Mein Mixarium): gespeichert war eine Messung
+// der Landingpage, abgelesen war die App. Gleiches Datum — und die alte Zahl
+// der falschen Seite gewann. Zwei verschiedene Seiten, zwei verschiedene
+// Zahlen; die eine darf die andere nicht verdraengen.
+{
+  const p = await laden({
+    eintraege: { "markt-mixarium": { messung: { stand: "gemessen", gemessen: "2026-08-02",
+      url: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
+      leistung: 39, bedienbarkeit: 87, gute_praxis: 100, auffindbarkeit: 100 } } }
+  }, { "markt-mixarium": Object.assign({ gemessen: "2026-08-02" }, VIER) });
+  const k = await karte(p, "markt-mixarium");
+  ok(k.zahlen && k.zahlen[0] === 91 && k.hand,
+    "7 Messung einer anderen Adresse blockiert die Ablesung nicht (" + JSON.stringify(k.zahlen) + ")");
+  await p.close();
+}
+
+// ── 8) Gleicher Tag, aber spaeter abgelesen: die Ablesung gewinnt ───────────
+// Morgens gemessen, nachmittags nachgebessert und neu abgelesen — auf Tages-
+// genauigkeit nicht zu unterscheiden. Deshalb darf `gemessen` eine Uhrzeit
+// tragen. Sie ordnet nur; angezeigt wird weiterhin ausschliesslich der Tag.
+{
+  const p = await laden({
+    eintraege: { "markt-kimboard": { messung: { stand: "gemessen", gemessen: "2026-08-02",
+      leistung: 39, bedienbarkeit: 87, gute_praxis: 100, auffindbarkeit: 100 } } }
+  }, { "markt-kimboard": Object.assign({ gemessen: "2026-08-02 15:00" }, VIER) });
+  const k = await karte(p, "markt-kimboard");
+  ok(k.zahlen && k.zahlen[0] === 91 && k.hand,
+    "8a die spaetere Ablesung desselben Tages gewinnt (" + JSON.stringify(k.zahlen) + ")");
+  const datum = await p.evaluate(() => {
+    const btn = document.querySelector('.mk-report[data-id="markt-kimboard"]');
+    const c = btn && btn.closest(".listing");
+    const s = c && c.querySelector(".mk-mess small");
+    return s ? s.textContent : "";
+  });
+  ok(/2026-08-02/.test(datum) && !/15:00/.test(datum),
+    "8b auf der Karte steht nur der Tag, nicht die Uhrzeit (" + JSON.stringify(datum) + ")");
+  await p.close();
+}
+
+// ── 9) Die echte Datei im Repo ist gueltiges JSON ───────────────────────────
 {
   let o = null, fehler = "";
   try { o = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/config/messung-hand.json"), "utf8")); }
   catch (e) { fehler = String(e.message); }
-  ok(o && typeof o === "object", "7a assets/config/messung-hand.json ist gueltiges JSON " + fehler);
+  ok(o && typeof o === "object", "9a assets/config/messung-hand.json ist gueltiges JSON " + fehler);
   ok(o && typeof o._hinweis === "string" && o._hinweis.length > 200,
-    "7b und traegt eine Anleitung, damit niemand raten muss");
+    "9b und traegt eine Anleitung, damit niemand raten muss");
 }
 
 console.log(`\nErgebnis: ${pass} bestanden, ${fail} durchgefallen`);
