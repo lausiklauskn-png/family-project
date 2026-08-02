@@ -4,6 +4,42 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, nachmittags: Lighthouse-Durchgang App 2 — Mein Rezeptbuch
+
+`Mein-Rezeptbuch` (PR #363, gemergt). Gemessene Adresse laut Bericht:
+`lausiklauskn-png.github.io/Mein-Rezeptbuch/` — also die **PWA**, nicht die Page.
+Ausgangswert: Leistung 55, Gute Praxis rot.
+
+**Erstbesuch 9890 → 1476 KiB (−85 %)**, gemessen mit echtem Chromium gegen einen
+Server mit `max-age=600` + ETag + gzip, gezählt in gesendeten Bytes.
+
+| Fund | Ursache | Ersparnis |
+|---|---|---:|
+| `index.html` wurde **3× geladen** | `controllerchange`→`reload()` feuert schon bei der Erstinstallation; dazu `./index.html` in der SW-Vorratsliste, ausgeliefert wird `./` | 5892 KiB |
+| Schein-SVG-Favicon | kein Vektor — ein 512px-PNG in einer SVG-Hülle, doppelt base64 | 691 KiB |
+| 12 iOS-Startbilder | lagen als data-URI **und** byte-gleich als Datei unter `icons/` | 1095 KiB |
+| 3 Beispielbilder der Lightbox | 850×1201, im HTML statt in `assets/` | 1213 KiB |
+| 3 doppelte `apple-touch-icon`-Tags | Versehen, hinter `</style>` | 171 KiB |
+| Zeichensatz bei Byte 953 | der Copyright-Kopf aus `build.py` fraß 93 % des 1024-Byte-Budgets | — |
+
+**Lehre (Klaus, im Lauf gefunden):** eine Farb-Reduktion auf 256 Farben hätte
+weitere 4,3 MB gespart und war schon eingebaut — **Klaus hat im Gold-Verlauf des
+Buch-Symbols Streifen gesehen**, meine Zahlenprüfung (mittlere Abweichung 3/255)
+zeigte sie nicht an. Zurückgenommen; in der gemergten Fassung ist **kein Bild neu
+komprimiert**, alle Bilddaten sind byte-gleich und nur verschoben. Wieder gilt:
+Klaus' Auge schlägt die Kennzahl. Wer künftig Bilder verkleinert, prüft den
+Verlauf **stark vergrößert** — nicht nur die mittlere Abweichung.
+
+**Offen und bei Klaus** (§2 des Sitzungsbriefs, jetzt vier Punkte): der
+Konsolenfehler `wss://relay.family-projekt.de` → `ERR_NAME_NOT_RESOLVED` ist der
+zweite rote Best-Practices-Punkt und ein **netzweites** Thema — das eigene Relais
+löst nicht auf.
+
+**Nicht behebbar auf GitHub Pages** (gilt für alle Apps, nicht nur diese):
+Cache-Verweildauer, CSP, HSTS, COOP, XFO — alles HTTP-Kopfzeilen.
+
+---
+
 ## ✅ 2026-08-02, mittags: zwei Befunde aus Klaus' Browser am fertigen Marktplatz
 
 ### 1. Der Link zu Google lief in eine 404-Seite
