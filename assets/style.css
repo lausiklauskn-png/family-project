@@ -421,6 +421,15 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .mk-ms-dlg-datum{font-family:var(--mono);font-size:.78rem!important;opacity:.75}
 .mk-ms-dlg-technisch{border-left:3px solid var(--gold);padding-left:11px;color:var(--text)!important}
 .mk-ms-dlg-farben{font-size:.8rem!important;opacity:.85}
+/* Von Hand eingetragener Wert. Deutlich sichtbar, aber nicht als Warnung —
+   es ist kein Mangel, sondern eine ehrliche Herkunftsangabe. Gleiche Farbe wie
+   „veraltet", weil beides dasselbe sagt: diese Zahl ist nicht von jetzt und
+   nicht von uns gemessen. */
+.listing .mk-ms-hand{color:#b8860b;font-size:.78rem;margin-top:2px}
+:root[data-theme="dark"] .listing .mk-ms-hand,
+:root[data-theme="neon"] .listing .mk-ms-hand{color:#e8c14a}
+.mk-ms-box .mk-ms-hand{border-left:3px solid #b8860b;padding-left:11px;color:var(--text)!important}
+
 /* Der Hinweis auf der Karte, dass die App bewertet ist und nicht das
    Schaufenster davor. Steht nur bei den Einträgen, die beides haben — bei
    allen anderen gibt es den Unterschied gar nicht (Klaus 2026-08-02). */
