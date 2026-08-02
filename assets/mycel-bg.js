@@ -232,9 +232,43 @@ if (canvas) {
 
   // ---- Schleife ----------------------------------------------------------
   let last = performance.now();
+
+  /* ── Selbst-Bremse (Klaus' Entscheid 2026-08-02) ─────────────────────────
+   * Auf einem Geraet MIT Grafikbeschleunigung kostet ein Bild ~2 ms. Ohne
+   * (alte Handys, und jedes Pruefgeraet bei PageSpeed) sind es 180-255 ms —
+   * gemessen in Klaus' eigenem Bericht, wo ALLE zwanzig laengsten Aufgaben
+   * diese Datei waren, zusammen 40 von 42 Sekunden.
+   *
+   * Dort ruckelt die Bewegung ohnehin nur und blockiert dabei die Bedienung.
+   * Wird es also dauerhaft zu langsam, bleibt ein STATISCHES Bild stehen —
+   * genau dasselbe, das Geraete mit "Bewegung reduzieren" von jeher bekommen.
+   * Der Hintergrund verschwindet nicht, er hoert nur auf, sich zu drehen.
+   *
+   * Auf Klaus' Tablet greift die Bremse nie: dort liegt dt bei ~0,016 s,
+   * die Schwelle bei 0,05 s (20 Bilder/s). Die ersten Bilder zaehlen nicht
+   * mit, weil der erste Aufbau immer teurer ist (Aufwaermen), und ein
+   * einzelner Ausreisser setzt den Zaehler zurueck — es braucht fuenf
+   * langsame Bilder HINTEREINANDER.
+   *
+   * Gemessen (Lighthouse, gedrosselt, ohne Grafik): Blockierzeit
+   * 163.000 ms -> 7.480 ms, Leistung 49 -> 59.                            */
+  const BREMS_SCHWELLE = 0.05;   // Sekunden pro Bild = 20 Bilder/s
+  const BREMS_GEDULD   = 5;      // so viele langsame Bilder hintereinander
+  const AUFWAERM_BILDER = 3;     // erste Bilder nicht bewerten
+  let langsamInFolge = 0, bilderGezaehlt = 0;
+
   function tick() {
     const now = performance.now();
     const dt = (now - last) / 1000; last = now;
+
+    if (bilderGezaehlt++ >= AUFWAERM_BILDER) {
+      if (dt > BREMS_SCHWELLE) langsamInFolge++; else langsamInFolge = 0;
+      if (langsamInFolge >= BREMS_GEDULD) {
+        renderOnce();            // ein letztes, stehendes Bild
+        return;                  // Schleife endet — kein Dauerlauf mehr
+      }
+    }
+
     mat.uniforms.uTime.value = now / 1000;
     mycelGroup.rotation.y += dt * 0.02;
     applyScroll();
