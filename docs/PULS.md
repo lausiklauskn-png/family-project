@@ -4,6 +4,45 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, später Nachmittag: Landingpage, Hand-Eintragung, Mess-Streuung
+
+### Rezeptbuch-Landingpage 53 → 81 (`Mein-Rezeptbuch-Page#17`)
+
+Erstbesuch 3342 → 2718 KiB. Drei Hebel: Bilder −806 KiB (Maße blieben, wo sie
+gebraucht werden; PNG mit Palette **und Dithering**, weil ohne Dithering der
+Gold-Verlauf sichtbar bandet), **three.js nachgeladen** statt fest eingebunden
+(es war mit 645 ms der längste kritische Pfad), und ein **Vorlade-Hinweis für
+das Hero-Bild**, das per JavaScript eingesetzt wird und darum zu spät gefunden
+wurde (182 → 53 ms).
+
+**Eine Vermutung von mir war falsch, und das gehört hier hin:** ich hatte den
+3D-Hintergrund (18 000 Partikel, 41 s Hauptthread) als vermutlichen Grund
+benannt, warum die Seite nicht grün wird. Die Byte- und Ketten-Arbeit allein
+brachte die Punkte — der Hintergrund wurde nicht angefasst. Wer ihn später
+anfasst, tut es für die Reaktionsfähigkeit, nicht für die Note.
+
+### Hand-Eintragung von Messwerten (`family-project#177`)
+
+Neue Datei `assets/config/messung-hand.json`: Klaus liest Werte bei PageSpeed
+ab, sie kommen hinein, und sie sind **mit dem Push live** — ohne Werkzeuglauf,
+ohne einen Tag zu warten. Aufgelegt wird im Browser; die eigene Messung gewinnt,
+sobald sie ein neueres oder gleiches Datum trägt. Ein Hand-Wert ist immer als
+solcher gekennzeichnet („abgelesen", nicht „gemessen").
+
+### ⚠ Lehre: wie genau eine einzelne Messung ist
+
+Dieselbe Seite, **drei Minuten Abstand, nichts geändert: 75 und 81.**
+**Sechs Punkte Streuung.** Wer aus einem Vorher/Nachher-Paar mit weniger
+Abstand einen Erfolg ableitet, liest Rauschen. Konvention beim Nachtragen:
+**die neueste Ablesung gewinnt, nicht die beste** — auch wenn sie nach unten
+zeigt.
+
+Ebenso einzuordnen: Rezeptbuch-App 74 → 73 nach `#364` ist **keine**
+Verschlechterung und war auch keine Verbesserung; die Briefkasten-Kette liegt
+hinter `load` und zahlt auf Wartezeit ein, nicht auf die Note.
+
+---
+
 ## ✅ 2026-08-02, später Nachmittag: Rezeptbuch Runde 2 + Mixarium-App
 
 Auf Klaus' Zuruf („Rezeptbuch noch einmal nachbessern, danach Mixarium
