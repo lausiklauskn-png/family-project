@@ -113,7 +113,7 @@ window.FP_LISTINGS = [
     "text": "Verschlüsselter Tresor für Dateien und Passwörter: alles sicher hinter Passwort und Schlüssel ablegen. Honigtopf-Tarnfach und Datei-Sicherung. Safe, Passwort-Manager, geheime Dateien, Datenschutz. Läuft offline im Browser, echte Verschlüsselung.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Mein-Tresor/",
-    "img": "https://family-projekt.de/assets/apps/mein-tresor.png",
+    "img": "https://family-projekt.de/assets/apps/mein-tresor.webp",
     "category": "Sicherheit",
     "own": true,
     "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/spore.json"
@@ -124,7 +124,7 @@ window.FP_LISTINGS = [
     "text": "Verschlüsselte Bibliothek für JSON-Dateien und Schlüssel: laden, benennen, ordnen, suchen und exportieren, mit Passwort-Verschlüsselung. Von außen ein Tresor, drinnen eine Bibliothek. Safe, Datei-Sammlung, Backup, Datenschutz. Offline im Browser.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
-    "img": "https://family-projekt.de/assets/apps/jasons-tresor.png",
+    "img": "https://family-projekt.de/assets/apps/jasons-tresor.webp",
     "category": "Sicherheit",
     "own": true,
     "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/spore.json"
@@ -146,7 +146,7 @@ window.FP_LISTINGS = [
     "text": "Kosmetikstudio in Hamburg von Alina: professionelle Haarentfernung mit Sugaring, Waxing und Zuckerpaste sowie Kosmetik-Behandlungen, dazu zertifizierte Depilations-Kurse zum Selberlernen. Beauty, Hautpflege, Enthaarung, Wachsen, Gesichtsbehandlung, Wellness. Zweisprachig Deutsch und Russisch, Termin online buchbar.",
     "by": "@alis",
     "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/",
-    "img": "https://family-projekt.de/assets/apps/perfect-skin-beauty.png",
+    "img": "https://family-projekt.de/assets/apps/perfect-skin-beauty.webp",
     "category": "Beauty & Kosmetik",
     "own": true
   },

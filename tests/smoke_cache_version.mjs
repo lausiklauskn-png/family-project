@@ -86,7 +86,14 @@ const wrong = [];
 let refs = 0;
 for (const f of htmlFiles) {
   const t = readFileSync(f, "utf8");
-  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js|status-widget\.js)(\?v=(\d+))?"/g)) {
+  /* mycel-bg.js seit 2026-08-02 mit in der Liste: Die Datei stand weder in
+   * CORE noch trug sie ein ?v= — sie hing frei am HTTP-Cache, den niemand
+   * bustet. Nach dem Einbau der Selbst-Bremse wäre die Änderung auf neun von
+   * zehn Seiten womöglich nie angekommen (Caddy setzt keinen Cache-Header,
+   * dann rät der Browser selbst). Derselbe Fehlertyp wie am 2026-08-01 bei
+   * status-widget.js. Der Pfad-Teil erlaubt ../, weil die Seiten unter
+   * werkzeuge/ eine Ebene tiefer liegen. */
+  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js|status-widget\.js|mycel-bg\.js)(\?v=(\d+))?"/g)) {
     refs++;
     if (m[3] !== assetV) wrong.push(`${f.replace(repoRoot + "/", "")}: assets/${m[1]}${m[2] || " (ohne ?v=)"}`);
   }
