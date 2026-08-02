@@ -13,6 +13,35 @@ Ausgangswert: Leistung 55, Gute Praxis rot.
 **Erstbesuch 9890 → 1476 KiB (−85 %)**, gemessen mit echtem Chromium gegen einen
 Server mit `max-age=600` + ETag + gzip, gezählt in gesendeten Bytes.
 
+### ✅ Nachgemessen von Klaus, 12:37 Uhr — und eine Korrektur
+
+| | vorher | nachher |
+|---|---:|---:|
+| Leistung | 55 | **74** |
+| Barrierefreiheit | 96 | 96 |
+| Gute Praxis | **rot, unter 50** | **96** |
+| Auffindbarkeit | 100 | 100 |
+
+**Korrektur einer eigenen Aussage.** Der Zeichensatz-Fix war als „Härtung, kein
+bewiesener Ursachen-Fix" gemeldet, weil er sich lokal nicht nachstellen ließ
+(Byte 953 lag innerhalb der 1024er-Grenze). Gute Praxis steht jetzt bei 96,
+**obwohl der Relais-Konsolenfehler unverändert besteht** — die zweite
+durchgefallene Prüfung fällt also weiter durch. Der Sprung von unter 50 auf 96
+kann damit nur vom Zeichensatz kommen. Es *war* die Ursache.
+
+**Was das nebenbei beziffert:** der Konsolenfehler kostet rund vier Punkte, nicht
+fünfzig. Das tote Relais bleibt ein echter Ausfall im Netz (§ 2.1 des Briefs),
+ist aber kein Punktzahl-Notfall — diese Einordnung fehlte vorher.
+
+Weitere Belege aus Klaus' Bericht (12:06) gegenüber dem Morgen-Bericht:
+nicht verwendetes JavaScript 2517 → 346 KiB · Time to First Byte 390 → 80 ms ·
+Verzögerung beim Rendering 2030 → 410 ms · `index.html` steht nicht mehr doppelt
+in der Nutzlast-Liste (der Dreifach-Download ist weg).
+
+**Rest bei Rezeptbuch (Leistung 74, noch gelb):** nicht verwendetes JavaScript
+346 KiB und nicht verwendetes CSS 60 KiB — beides im Dokument selbst, also
+app-eigener Code, kein Kanon. Dazu die Briefkasten-Kette.
+
 | Fund | Ursache | Ersparnis |
 |---|---|---:|
 | `index.html` wurde **3× geladen** | `controllerchange`→`reload()` feuert schon bei der Erstinstallation; dazu `./index.html` in der SW-Vorratsliste, ausgeliefert wird `./` | 5892 KiB |
@@ -37,6 +66,37 @@ löst nicht auf.
 
 **Nicht behebbar auf GitHub Pages** (gilt für alle Apps, nicht nur diese):
 Cache-Verweildauer, CSP, HSTS, COOP, XFO — alles HTTP-Kopfzeilen.
+
+### Marktplatz: App und Schaufenster getrennt (PR #174, gemergt)
+
+Klaus' Entscheidung zu § 2.4 des Briefs. Zwei Einträge verlinken eine
+Landingpage; gemessen wurde bisher, worauf der Link zeigt. Wie weit das
+auseinandergeht, zeigt derselbe Tag: **Mixarium-Landingpage 94, Mixarium-App 57.**
+Auf der Karte stand die 94.
+
+Ab jetzt: auf der Karte steht die **App** (neues Feld `appUrl`), das Schaufenster
+wird zusätzlich gemessen und liegt unter `messung[id].schaufenster` — im
+Bewertungs-Fenster beschriftet daneben, mit eigenem Datum und eigenem
+PageSpeed-Link. **Kein Schrägstrich:** bei vier beschrifteten Plaketten zwingt
+„94/57" zum Raten. Sichtbar wird es mit dem nächsten nächtlichen Lauf.
+
+### Vorgemerkt: Mixarium-App ist jetzt der schwächste Wert im Netz
+
+**57** — unter Kimboards 62. Ob die Reihenfolge umgestellt wird, entscheidet
+Klaus (Stand: gefragt, noch nicht beantwortet). Aus seinem Bericht schon bekannt:
+
+- **beide Video-Formate werden geladen** — `mixarium_intro.mp4` 620 KiB *und*
+  `.webm` 290 KiB. Normal holt der Browser nur eins. Erst nachsehen, warum.
+- `mixarium_icon.png` steht **zweimal** in der Nutzlast und ist 512×512 bei
+  231×231 Anzeige (54 KiB).
+- das Dokument steht ebenfalls zweimal (je 895 KiB). Ob echt wie bei Rezeptbuch
+  oder Anzeige-Artefakt des network-first Service Workers: **messen, nicht
+  ableiten** (PR #177 hatte dort schon doppelte Downloads abgestellt).
+- nicht verwendetes JavaScript 388 KiB im Dokument · Briefkasten-Kette 1007 ms ·
+  derselbe Relais-Konsolenfehler.
+
+⚠ Hausregel dort: `index.html` und `QC_Mixarium_*.html` müssen **byte-identisch**
+bleiben (`md5sum`-Pflichtprüfung).
 
 ---
 
