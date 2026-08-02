@@ -47,6 +47,17 @@
  * nicht verbessern, einen benannten Mangel schon; und wer sehen kann, WORAN es
  * liegt, kann die Bewertung nachvollziehen statt sie glauben zu müssen.
  *
+ * WENN EIN SCHAUFENSTER DAVORSTEHT. Zwei von vierzehn Einträgen (Rezeptbuch,
+ * Mixarium) verlinken keine App, sondern eine vorgeschaltete Landingpage. Bis
+ * 2026-08-02 wurde deshalb bei ihnen das Schaufenster gemessen und bei den
+ * anderen zwölf die App — dieselbe Zahlenreihe, zwei verschiedene Dinge, und
+ * für einen Besucher nicht zu unterscheiden. Klaus' Entscheidung: der Eintrag
+ * bekommt ein Feld `appUrl`; gemessen und auf der Karte gezeigt wird dann die
+ * APP (damit alle vierzehn vergleichbar sind), das Schaufenster wird ZUSÄTZLICH
+ * gemessen und landet unter `messung[id].schaufenster` — mit eigener Adresse,
+ * eigenem Datum und eigenem Stand. Im Bewertungs-Fenster stehen beide
+ * beschriftet untereinander. Ohne `appUrl` ändert sich nichts.
+ *
  * SICHERHEIT. Die Zielseite ist `untrusted external data`. Lighthouse lädt sie
  * zwar in einem echten Browser (anders geht eine Messung nicht), aber in einem
  * Wegwerf-Prozess mit eigenem Profil. Aus dem Ergebnis werden ausschließlich die
@@ -335,7 +346,21 @@ export async function messungLaufen(liste, opts) {
   const ziele = [];
   for (const x of liste) {
     if (!x || !x.anchorId) continue;
-    ziele.push({ id: x.anchorId, url: String(x.url || "") });
+    const link = String(x.url || "");
+    const app = String(x.appUrl || "");
+    // Hat ein Eintrag ein SCHAUFENSTER (eine vorgeschaltete Landingpage), dann
+    // ist `url` der Link für den Besucher und `appUrl` die eigentliche App.
+    // Gemessen und auf der Karte gezeigt wird dann die APP — sonst stünde bei
+    // zwei von vierzehn Einträgen die Bewertung des Schaufensters neben der
+    // Bewertung der App der anderen zwölf, und niemand könnte das erkennen
+    // (Klaus' Entscheidung 2026-08-02). Das Schaufenster wird zusätzlich
+    // gemessen und im Bewertungs-Fenster beschriftet danebengestellt.
+    const mitSchaufenster = /^https:\/\//i.test(app) && app !== link;
+    ziele.push({
+      id: x.anchorId,
+      url: mitSchaufenster ? app : link,
+      schaufensterUrl: mitSchaufenster ? link : ""
+    });
   }
   // Nur https-Adressen sind Kandidaten für einen Platz unter dem Deckel. Eine
   // Adresse, die ohnehin nicht messbar ist, soll keinem messbaren Eintrag den
@@ -349,18 +374,38 @@ export async function messungLaufen(liste, opts) {
   if (messbar.length > dran.size) {
     log(`  ! Deckel ${max}: ${messbar.length - dran.size} Eintrag/Einträge kommen heute nicht dran — ihr letzter Befund bleibt mit seinem Datum stehen`);
   }
+  // Der Deckel zählt EINTRÄGE, nicht Läufe. Ein Eintrag mit Schaufenster kostet
+  // zwei Lighthouse-Läufe. Das wird gesagt, nicht verschwiegen — sonst wundert
+  // sich die nächste Sitzung über die Laufzeit.
+  const doppelt = ziele.filter((z) => z.schaufensterUrl && dran.has(z.id)).length;
+  if (doppelt) log(`  · ${doppelt} Eintrag/Einträge haben ein Schaufenster und kosten je zwei Läufe (App + Landingpage)`);
+
+  const ausfall = () => (da
+    ? { ok: false, uebersprungen: true }
+    : { ok: false, hinweis: "Lighthouse ist nicht installiert (npm install lighthouse)" });
 
   const raus = {};
   for (const z of ziele) {
-    const roh = dran.has(z.id)
-      ? await seiteMessen(z.url, o)
-      : (da ? { ok: false, uebersprungen: true }
-            : { ok: false, hinweis: "Lighthouse ist nicht installiert (npm install lighthouse)" });
+    const roh = dran.has(z.id) ? await seiteMessen(z.url, o) : ausfall();
     const m = messungBilden({ vorher: vorher[z.id], roh, heute });
     if (z.url) m.url = z.url;
+
+    // Das Schaufenster bekommt denselben Befund-Aufbau — inklusive „veraltet
+    // mit Datum" und „noch nicht dran". Es ist eine eigene Messung, keine
+    // Fußnote, und wird auch so behandelt.
+    if (z.schaufensterUrl) {
+      const rohS = dran.has(z.id) ? await seiteMessen(z.schaufensterUrl, o) : ausfall();
+      const mS = messungBilden({ vorher: (vorher[z.id] || {}).schaufenster, roh: rohS, heute });
+      mS.url = z.schaufensterUrl;
+      m.schaufenster = mS;
+    }
+
     raus[z.id] = m;
     const zahlen = hatZahlen(m) ? SCHLUESSEL.map((k) => m[k]).join("/") : "—";
-    log(`  · ${z.id.padEnd(28)} ${String(m.stand).padEnd(14)} ${zahlen}${m.grund ? " (" + m.grund + ")" : ""}`);
+    const sf = m.schaufenster
+      ? "  | Schaufenster " + (hatZahlen(m.schaufenster) ? SCHLUESSEL.map((k) => m.schaufenster[k]).join("/") : "—")
+      : "";
+    log(`  · ${z.id.padEnd(28)} ${String(m.stand).padEnd(14)} ${zahlen}${m.grund ? " (" + m.grund + ")" : ""}${sf}`);
   }
   return raus;
 }

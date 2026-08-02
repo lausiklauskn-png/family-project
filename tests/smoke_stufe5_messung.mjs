@@ -778,5 +778,71 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
   s3.close();
 }
 
+/* ── E) Das Schaufenster: zwei Ziele, zwei Befunde ─────────────────────────
+ * Zwei Einträge (Rezeptbuch, Mixarium) verlinken keine App, sondern eine
+ * vorgeschaltete Landingpage. Gemessen und auf der Karte gezeigt wird seit
+ * Klaus' Entscheidung 2026-08-02 die APP; das Schaufenster kommt zusätzlich
+ * unter `.schaufenster`. Belegt am echten Fall: die Mixarium-Landingpage
+ * misst 94, die App dahinter 57 — dieselbe Karte, zwei sehr verschiedene
+ * Dinge. Genau das darf nicht mehr unsichtbar sein.
+ *
+ * Gegenprobe unten: OHNE appUrl darf kein `.schaufenster` entstehen, sonst
+ * würde der Test auch dann grün, wenn die Fallunterscheidung gar nicht greift.
+ */
+{
+  console.log("\nSchaufenster (Landingpage + App)");
+  const { messungLaufen } = await import("../tools/messung.mjs");
+
+  // Ein Lauf, der je Adresse einen Bericht mit erkennbaren Zahlen schreibt.
+  const berichtFuer = (url) => {
+    const app = /Mein-Mixarium\/$/.test(url);
+    const w = app ? { performance: 0.57, accessibility: 0.96, "best-practices": 0.96, seo: 1 }
+                  : { performance: 0.94, accessibility: 0.87, "best-practices": 1, seo: 1 };
+    const cat = {};
+    for (const k of Object.keys(w)) cat[k] = { score: w[k] };
+    return { lighthouseVersion: "13.4.1", categories: cat, audits: {} };
+  };
+  const lauf = (cmd, args) => {
+    // Adresse und Ausgabepfad stehen in denselben Argumenten, die
+    // lighthouseBefehl() gebaut hat — daraus wird der Bericht geschrieben.
+    const url = args.find((a) => /^https:\/\//.test(a));
+    const ziel = args.find((a) => a.startsWith("--output-path="));
+    fs.writeFileSync(ziel.slice("--output-path=".length), JSON.stringify(berichtFuer(url)));
+    return Promise.resolve({});
+  };
+  const o = { cmd: "egal", lauf, heute: "2026-08-02" };
+
+  const mit = await messungLaufen([{
+    anchorId: "markt-mixarium",
+    url: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
+    appUrl: "https://lausiklauskn-png.github.io/Mein-Mixarium/"
+  }], o);
+  const m = mit["markt-mixarium"];
+  ok(m && m.leistung === 57, "E1 auf der Karte steht die APP (Leistung " + (m && m.leistung) + ", erwartet 57)");
+  ok(m && m.url === "https://lausiklauskn-png.github.io/Mein-Mixarium/", "E2 und die gemessene Adresse ist die der App");
+  ok(!!(m && m.schaufenster), "E3 das Schaufenster steht daneben, nicht statt dessen");
+  ok(m && m.schaufenster && m.schaufenster.leistung === 94, "E4 das Schaufenster hat seine EIGENE Zahl (" + (m && m.schaufenster && m.schaufenster.leistung) + ", erwartet 94)");
+  ok(m && m.schaufenster && m.schaufenster.url === "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/", "E5 mit seiner eigenen Adresse");
+  ok(m && m.schaufenster && m.schaufenster.gemessen === "2026-08-02", "E6 und seinem eigenen Datum");
+
+  // Gegenprobe: ohne appUrl bleibt alles wie vorher — ein Ziel, kein Zusatz.
+  const ohne = await messungLaufen([{
+    anchorId: "markt-kimboard",
+    url: "https://lausiklauskn-png.github.io/Kimboard/"
+  }], o);
+  const k = ohne["markt-kimboard"];
+  ok(k && k.leistung === 94, "E7 Gegenprobe: ohne Schaufenster wird die verlinkte Seite gemessen");
+  ok(k && !k.schaufenster, "E8 Gegenprobe: und es entsteht KEIN Schaufenster-Block");
+
+  // Und die Fallunterscheidung darf nicht auf „irgendein appUrl" hereinfallen:
+  // zeigt appUrl auf dieselbe Adresse, gibt es kein zweites Ziel.
+  const gleich = await messungLaufen([{
+    anchorId: "markt-gleich",
+    url: "https://lausiklauskn-png.github.io/Kimboard/",
+    appUrl: "https://lausiklauskn-png.github.io/Kimboard/"
+  }], o);
+  ok(!gleich["markt-gleich"].schaufenster, "E9 gleiche Adresse in url und appUrl ergibt kein zweites Ziel");
+}
+
 console.log(`\nErgebnis: ${pass} bestanden, ${fail} durchgefallen`);
 process.exit(fail ? 1 : 0);

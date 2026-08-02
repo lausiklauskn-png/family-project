@@ -257,6 +257,13 @@
            kurz an der Karte, was gemessen wurde, und ausführlich zum Aufklappen,
            was ein niedriger Wert für ihn konkret bedeutet. */
         mk_ms_keine: "Noch nicht gemessen.",
+        mk_ms_ist_app: "Bewertet ist die App selbst — dem Eintrag ist eine eigene Seite vorgeschaltet.",
+        mk_ms_sf_h: "Diesem Eintrag ist eine eigene Seite vorgeschaltet",
+        mk_ms_sf_txt: "Der Knopf »→ Zur Seite« führt auf ein Schaufenster: eine Seite, die die App vorstellt. Bewertet sind oben die Zahlen der App, denn die ist es, die du am Ende benutzt — und so lässt sich dieser Eintrag mit allen anderen vergleichen. Das Schaufenster wird getrennt gemessen und steht hier daneben. Zwei verschiedene Dinge, zwei verschiedene Zahlen.",
+        mk_ms_sf_app: "Die App selbst",
+        mk_ms_sf_seite: "Das Schaufenster",
+        mk_ms_sf_keine: "Das Schaufenster ist noch nicht gemessen.",
+        mk_ms_dlg_voll_sf: "↗ Schaufenster bei Google öffnen",
         mk_ms_von: "gemessen am ",
         mk_ms_alt: "Diese Zahlen stammen vom letzten geglückten Lauf — die jüngste Messung ist fehlgeschlagen.",
         mk_ms_mehr: "📊 Bewertung nachlesen",
@@ -362,6 +369,13 @@
         mk_wa_rot_sb: "Google Safe Browsing flags this address as dangerous. The link is therefore switched off.",
         mk_wa_seit: "since ",
         mk_ms_keine: "Not measured yet.",
+        mk_ms_ist_app: "These are the app's own scores — this entry has a separate page in front of it.",
+        mk_ms_sf_h: "This entry has a separate page in front of it",
+        mk_ms_sf_txt: "The “→ Visit site” button leads to a shop window: a page that introduces the app. The scores above are the app's own, because the app is what you end up using — and that keeps this entry comparable with all the others. The shop window is measured separately and shown next to it. Two different things, two different sets of numbers.",
+        mk_ms_sf_app: "The app itself",
+        mk_ms_sf_seite: "The shop window",
+        mk_ms_sf_keine: "The shop window has not been measured yet.",
+        mk_ms_dlg_voll_sf: "↗ Open the shop window at Google",
         mk_ms_von: "measured on ",
         mk_ms_alt: "These numbers are from the last successful run — the most recent measurement failed.",
         mk_ms_mehr: "📊 Read the rating",
@@ -508,6 +522,15 @@
       function msSchwaechste(m) {
         return MS_KAT.slice().sort(function (a, b) { return m[a] - m[b]; })[0];
       }
+      /* Die vier Zahlen als knappe Reihe — ohne Wort, nur Sinnbild und Wert.
+       * Gebraucht dort, wo zwei Messungen untereinander stehen und die vollen
+       * Beschriftungen die Zeile sprengen würden. */
+      function msReihe(mm) {
+        return MS_KAT.map(function (k) {
+          return '<span class="mk-ms-w is-' + msStufe(mm[k]) + '">' +
+            '<span aria-hidden="true">' + MS_ICON[k] + '</span> <b>' + esc(String(mm[k])) + '</b></span>';
+        }).join("");
+      }
       function messungBand(x) {
         // ZWEI verschiedene Nichts, und sie sehen unterschiedlich aus (Klaus'
         // Befund 2026-08-01, „ich sehe gar nichts"):
@@ -542,6 +565,11 @@
           '<p class="mk-ms-sum">' + esc(summe) +
             (m.gemessen ? ' <small>(' + esc(FP.t("mk_ms_von")) + esc(m.gemessen) + ')</small>' : '') + '</p>' +
           (m.stand === "veraltet" ? '<p class="mk-ms-alt">' + esc(FP.t("mk_ms_alt")) + '</p>' : '') +
+          // Nur wo es einen Unterschied GIBT, wird er auch benannt. Zwölf von
+          // vierzehn Einträgen verlinken die App direkt — dort wäre der Hinweis
+          // bloß Lärm. Bei den zwei mit vorgeschalteter Seite steht er, damit
+          // niemand die Zahl dem Schaufenster zuschreibt (Klaus 2026-08-02).
+          (m.schaufenster ? '<p class="mk-ms-ziel">' + esc(FP.t("mk_ms_ist_app")) + '</p>' : '') +
           '</div>';
       }
 
@@ -641,6 +669,30 @@
         var kandidat = String((m && m.url) || (eintrag && eintrag.url) || "");
         if (/^https:\/\//i.test(kandidat)) ziel = kandidat;
 
+        /* Hat der Eintrag ein Schaufenster, stehen hier BEIDE Messungen
+         * untereinander, jede mit ihrem eigenen Datum. Auf der Karte oben
+         * steht die App — das ist die Zahl, die zählt, wenn man wissen will,
+         * wie gut das Ding ist, das man am Ende benutzt. Hier wird gesagt,
+         * dass es daneben noch das Schaufenster gibt und wie das abschneidet.
+         * Kein Mittelwert, kein Schrägstrich: zwei Dinge, zwei Zeilen. */
+        var sf = (m && m.schaufenster) || null;
+        var sfZiel = sf && /^https:\/\//i.test(String(sf.url || "")) ? String(sf.url) : "";
+        var sfBlock = sf
+          ? '<section class="mk-ms-sf">' +
+              '<h4>' + esc(FP.t("mk_ms_sf_h")) + '</h4>' +
+              '<p>' + esc(FP.t("mk_ms_sf_txt")) + '</p>' +
+              '<p class="mk-ms-sf-z"><b>' + esc(FP.t("mk_ms_sf_app")) + '</b>' +
+                '<span class="mk-ms-sf-w">' + msReihe(m) +
+                (m.gemessen ? '<small>(' + esc(FP.t("mk_ms_von")) + esc(m.gemessen) + ')</small>' : '') + '</span></p>' +
+              (msZahlen(sf)
+                ? '<p class="mk-ms-sf-z"><b>' + esc(FP.t("mk_ms_sf_seite")) + '</b>' +
+                    '<span class="mk-ms-sf-w">' + msReihe(sf) +
+                    (sf.gemessen ? '<small>(' + esc(FP.t("mk_ms_von")) + esc(sf.gemessen) + ')</small>' : '') + '</span>' +
+                    (sf.stand === "veraltet" ? '<small>' + esc(FP.t("mk_ms_alt")) + '</small>' : '') + '</p>'
+                : '<p class="mk-ms-fix-leer">' + esc(FP.t("mk_ms_sf_keine")) + '</p>') +
+            '</section>'
+          : '';
+
         var d = document.createElement("dialog");
         d.className = "mk-ms-dlg";
         d.id = "mkMessOv";
@@ -654,6 +706,7 @@
             '<p class="mk-ms-dlg-was">' + esc(FP.t("mk_ms_dlg_was")) + '</p>' +
             '<p class="mk-ms-dlg-technisch">' + esc(FP.t("mk_ms_dlg_technisch")) + '</p>' +
             '<p class="mk-ms-dlg-farben">' + esc(FP.t("mk_ms_dlg_farben")) + '</p>' +
+            sfBlock +
             bloecke +
             '<p class="mk-ms-fuss">' + esc(FP.t("mk_ms_dlg_quelle")) + '</p>' +
             // Der Link zum vollen Bericht bei Google. Klaus' Wunsch: „ein Link,
@@ -674,6 +727,13 @@
                 ? '<a class="btn ghost" target="_blank" rel="noopener noreferrer" href="' +
                     esc(PAGESPEED + encodeURIComponent(ziel)) + '">' +
                     esc(FP.t("mk_ms_dlg_voll")) + '</a>'
+                : '') +
+              // Zweiter Link nur, wenn es auch ein zweites Ziel gibt. Sonst
+              // führten beide Knöpfe an dieselbe Adresse.
+              (sfZiel
+                ? '<a class="btn ghost" target="_blank" rel="noopener noreferrer" href="' +
+                    esc(PAGESPEED + encodeURIComponent(sfZiel)) + '">' +
+                    esc(FP.t("mk_ms_dlg_voll_sf")) + '</a>'
                 : '') +
               '<button class="btn ghost" type="button" id="mkMessZu">' + esc(FP.t("mk_ms_dlg_zu")) + '</button>' +
             '</div>' +

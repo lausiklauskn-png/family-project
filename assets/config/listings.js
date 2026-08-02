@@ -7,7 +7,17 @@
  *     anchorId: opake ID (z.B. "markt-0001"),
  *     text:     Bedeutungs-Text für die Suche (mit Alltags-Synonymen),
  *     by:       Anbieter-Handle (KEIN Klarname / kein PII),
- *     url:      Link zur Anbieter-Seite (target=_blank rel=noopener),
+ *     url:      Link zur Anbieter-Seite (target=_blank rel=noopener). Dorthin
+ *               führt der Knopf „→ Zur Seite".
+ *     appUrl:   optional — die eigentliche App, WENN der Eintrag ein
+ *               Schaufenster (eine vorgeschaltete Landingpage) hat. Klaus'
+ *               Entscheidung 2026-08-02: gemessen und auf der Karte gezeigt
+ *               wird dann die APP, damit alle Einträge untereinander
+ *               vergleichbar bleiben — zwölf von vierzehn zeigen ohnehin
+ *               direkt auf die App. Das Schaufenster wird zusätzlich gemessen
+ *               und steht beschriftet im Bewertungs-Fenster, damit niemand
+ *               zwei Zahlen für dieselbe Sache hält. OHNE dieses Feld ändert
+ *               sich nichts: `url` ist dann Link UND Mess-Ziel.
  *     img:      PFLICHT — Bild-Link (https, JPG/PNG/WebP; KEIN SVG),
  *     category: optionale Kategorie,
  *     own:      true = Klaus' eigene Beispiel-App (aus seinen Repos). Zählt
@@ -70,6 +80,7 @@ window.FP_LISTINGS = [
     "text": "Rezeptbuch und Kochbuch für die Küche: eigene Rezepte sammeln, ordnen, suchen und kochen. Zutaten, Mengen, Einkaufsliste und Wochenplan / Menüplan. Läuft offline auf Handy und Tablet, ganz ohne Konto. Essen, Backen, Gerichte, Speisen, Mahlzeiten.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
+    "appUrl": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
     "img": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/icons/icon-book-blue-512.png",
     "category": "Küche",
     "own": true
@@ -80,6 +91,7 @@ window.FP_LISTINGS = [
     "text": "Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol. Bar zuhause, trinken, Rezept, Mixgetränke. Offline nutzbar, kein Konto nötig.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
+    "appUrl": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
     "img": "https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png",
     "category": "Getränke",
     "own": true
