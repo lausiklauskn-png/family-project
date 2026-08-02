@@ -4,6 +4,50 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, mittags: zwei Befunde aus Klaus' Browser am fertigen Marktplatz
+
+### 1. Der Link zu Google lief in eine 404-Seite
+
+`pagespeed.web.dev/analyze?url=…` gibt es nicht — Klaus hatte Googles
+404-Seite im Bild. Der Einstieg, der eine frische Messung anstößt, heißt
+**`/report`**. Geändert, an EINER Stelle (`PAGESPEED`).
+
+**Ehrlich:** von der Bau-Maschine ist `pagespeed.web.dev` nicht erreichbar
+(Proxy) — die neue Adresse ist also **nicht nachgemessen**, sondern gewusst.
+Klaus muss einmal klicken. Der Test pinnt sie, damit eine künftige Änderung
+absichtlich passiert.
+
+### 2. Die Knöpfe standen nicht auf einer Höhe
+
+„→ Zur Seite" saß immer richtig (die Fußzeile klebt per `margin-top:auto` am
+Boden). Der neue Knopf hing im Karten-**Rumpf** und wurde von allem darüber
+mitgeschoben — bei einer Karte mit Wächter-Warnband rund 90 Pixel tiefer als
+nebenan.
+
+Jetzt kleben beide gemeinsam: neuer Block `.listing-actions` mit
+`margin-top:auto`, darin Knopf **und** Fußzeile.
+
+### ⚠ Und die Lehre, die diese Reparatur gekostet hat
+
+Die erste Ausrichtungs-Probe **blieb grün, obwohl der Fehler eingebaut war.**
+Sie verglich Karten aus **verschiedenen** Rasterzeilen — und dort ist jede
+Karte so hoch wie ihr Inhalt, der Knopf sitzt ohnehin am Boden.
+
+Der Fehler entsteht nur bei Karten **nebeneinander**: das Raster zieht sie auf
+gleiche Höhe, und die kürzere bekommt unten Luft, in die der Knopf nicht
+nachrutscht. Genau Klaus' Bild.
+
+> **Bei einer Layout-Probe gehört die LAGE mit aufgebaut, in der der Fehler
+> überhaupt entstehen kann — sonst misst man an ihm vorbei.**
+
+Die Probe baut jetzt eine eigene Lage: die zwei ersten Einträge (nebeneinander
+im Raster), beide gemessen, einer mit Warnband. Gegenprobe scharf: **1096 gegen
+1183 Pixel.**
+
+`smoke_stufe5_messung` **96/96**, Restsuite grün. Cache **v84**.
+
+---
+
 ## ✅ 2026-08-02, 09:07: DER ERSTE ECHTE MESSLAUF IST DA — und ein Befund daraus
 
 ### Es läuft von allein. Belegt, nicht behauptet.
