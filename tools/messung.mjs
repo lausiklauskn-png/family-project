@@ -64,6 +64,7 @@ import { createRequire } from "node:module";
 export const MESSUNG_FRIST = 180000;        // ms je Seite — Lighthouse braucht länger als ein fetch
 export const MESSUNG_MAX_PRO_LAUF = 10;     // Deckel, damit die Aktion nicht in ihre Zeitgrenze läuft
 export const BERICHT_MAX = 40 * 1024 * 1024; // ein Lighthouse-Bericht ist ~1 MB; alles darüber wird nicht gelesen
+export const MESSUNG_SPRACHE = "de";        // Sprache der Prüfungs-Titel (siehe lighthouseBefehl)
 
 /* Die vier Kategorien an EINER Stelle. Der Schlüssel links ist unser Name im
  * Bericht (deutsch, weil er in der Anzeige auftaucht), rechts steht der Name,
@@ -169,6 +170,19 @@ export function lighthouseBefehl(url, berichtDatei, opts) {
     "--quiet",
     "--no-enable-error-reporting",
     "--only-categories=" + KATEGORIEN.map((k) => k.lh).join(","),
+    // Befund aus dem ersten echten Lauf (2026-08-02): ohne diese Zeile kommen
+    // die Titel der Prüfungen auf Englisch zurück („Minify JavaScript",
+    // „Background and foreground colors do not have a sufficient contrast
+    // ratio"). Sie landen wörtlich im Bewertungs-Fenster einer deutschen
+    // Seite. Lighthouse bringt die Übersetzungen mit; man muss sie nur
+    // verlangen.
+    //
+    // EHRLICHE GRENZE: der Bericht wird EINMAL geschrieben und kann deshalb
+    // nur EINE Sprache tragen. Auch wer den Marktplatz auf Englisch stellt,
+    // liest die Nachbesserungen künftig auf Deutsch. Zweimal messen — einmal
+    // je Sprache — würde die Laufzeit verdoppeln, damit ein Zweitnutzen
+    // entsteht, den heute niemand hat. Deutsch, weil die Seite deutsch ist.
+    "--locale=" + MESSUNG_SPRACHE,
     "--max-wait-for-load=45000",
     "--chrome-flags=--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage"
   ];

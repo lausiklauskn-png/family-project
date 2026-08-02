@@ -58,6 +58,9 @@
  *  10. Den Knopf mit eigener Größe/Polster/Rundung gestylt -> Fälle C2d/C2e
  *      fielen durch. Auch Optik lässt sich messen: verglichen wird gegen
  *      „→ Zur Seite" auf DERSELBEN Karte.
+ *  11. `--locale` aus dem Aufruf entfernt -> Fall A9 fiel durch. Der Mangel
+ *      kam aus dem ERSTEN echten Lauf und nicht aus dem Kopf: die Titel der
+ *      Prüfungen standen auf Englisch im deutschen Bewertungs-Fenster.
  *
  * WAS DIESER TEST BEIM BAUEN GELERNT HAT (2026-08-01). Ohne installiertes
  * Lighthouse startete das Werkzeug für JEDEN Eintrag einen eigenen Prozess, der
@@ -84,7 +87,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { zahlenAusBericht, hinweiseAusBericht, messungBilden, reihenfolge, hatZahlen, KATEGORIEN } from "../tools/messung.mjs";
+import { zahlenAusBericht, hinweiseAusBericht, messungBilden, reihenfolge, hatZahlen, lighthouseBefehl, MESSUNG_SPRACHE, KATEGORIEN } from "../tools/messung.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let pass = 0, fail = 0;
@@ -206,6 +209,23 @@ console.log("A — die Regel (tools/messung.mjs)");
   ok(h.every((x) => x.k === "leistung"), "A8e jeder Hinweis weiß, zu welcher Kategorie er gehört");
   ok(hinweiseAusBericht(null).length === 0 && hinweiseAusBericht({}).length === 0,
     "A8f ohne Bericht keine erfundenen Hinweise");
+}
+
+// A9 — die Sprache. Befund aus dem ERSTEN echten Lauf (2026-08-02): die Titel
+// der Prüfungen kamen auf Englisch zurück („Minify JavaScript", „Background and
+// foreground colors do not have a sufficient contrast ratio") und standen so
+// wörtlich im Bewertungs-Fenster einer deutschen Seite.
+{
+  const b = lighthouseBefehl("https://x.example/", "/tmp/x.json", { cmd: "lh" });
+  ok(b.args.indexOf("--locale=" + MESSUNG_SPRACHE) >= 0,
+    "A9 der Aufruf verlangt die Sprache (" + MESSUNG_SPRACHE + ")");
+  ok(MESSUNG_SPRACHE === "de", "A9b und zwar Deutsch, weil die Seite deutsch ist");
+  // Und die Kommandozeile bleibt im Übrigen unverändert — eine Sprache
+  // hinzuzufügen darf nicht heißen, dass etwas anderes verrutscht.
+  for (const pflicht of ["--output=json", "--quiet", "--output-path=/tmp/x.json"]) {
+    ok(b.args.indexOf(pflicht) >= 0, "A9c unverändert: " + pflicht);
+  }
+  ok(b.args[0] === "https://x.example/", "A9d die Adresse steht weiterhin an erster Stelle");
 }
 
 /* ══ B — Der Verbund ═════════════════════════════════════════════════════ */
