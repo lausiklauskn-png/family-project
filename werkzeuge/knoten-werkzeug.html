@@ -8,7 +8,7 @@
   <meta name="description" content="Für Entwickler: mach deine PWA selbst zum Knoten im Mycel — Identität, Handshake, Status, Siegel. Kopier-Bausteine Datei für Datei aus dem offenen SBKIM-Baukasten." />
   <meta name="theme-color" content="#0b0d14" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="../assets/style.css?v=87" />
+  <link rel="stylesheet" href="../assets/style.css?v=88" />
   <script type="importmap">{ "imports": { "three": "../vendor/three.module.min.js" } }</script>
 </head>
 <body>
@@ -23,6 +23,7 @@
         <a href="../index.html" data-i18n="nav_start">Start</a>
         <a href="../werkzeuge.html" class="active" data-i18n="nav_tools">Werkzeuge</a>
         <a href="../markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span class="pill pill-reload" id="fpReload" title="Seite frisch laden, holt die neueste Version (Cache leeren)"><span class="rl-ic" aria-hidden="true">↻</span> Aktualisieren</span>
         <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
         <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
       </nav>
@@ -38,10 +39,10 @@
       <a href="../netzwerk.html" data-i18n="nav_network">Netzwerk</a>
       <a href="../impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
     </div>
-    <div class="wrap" style="margin-top:12px;opacity:.7">© 2026 Family Projekt</div>
+    <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
   </footer>
 
-  <script type="module" src="../assets/mycel-bg.js?v=87"></script>
+  <script type="module" src="../assets/mycel-bg.js?v=88"></script>
   <script>
     window.FP_TOOL = {
       id: "knoten", icon: "🪢",
@@ -140,7 +141,7 @@
       ]
     };
   </script>
-  <script src="../assets/app.js?v=87"></script>
+  <script src="../assets/app.js?v=88"></script>
   <script src="../assets/config/spenden.js"></script>
   <script src="../assets/tool-landing.js"></script>
 </body>
