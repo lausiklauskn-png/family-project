@@ -61,6 +61,19 @@
  *  11. `--locale` aus dem Aufruf entfernt -> Fall A9 fiel durch. Der Mangel
  *      kam aus dem ERSTEN echten Lauf und nicht aus dem Kopf: die Titel der
  *      Prüfungen standen auf Englisch im deutschen Bewertungs-Fenster.
+ *  12. `margin-top:auto` vom Aktions-Block genommen -> Fall C2h fiel durch,
+ *      1096 gegen 1183 Pixel. Siehe die Lehre bei C2f — der erste Anlauf dieser
+ *      Probe blieb grün, weil er Karten aus verschiedenen Zeilen verglich.
+ *  13. Den Link auf `/analyze` zurückgestellt -> Fall C3l2 fiel durch. Klaus
+ *      hatte die Google-404-Seite im Browser; die Adresse heißt `/report`.
+ *
+ * WAS DIESER TEST AM 2026-08-02 GELERNT HAT. Eine Probe über die Ausrichtung
+ * blieb grün, obwohl der Fehler eingebaut war — sie verglich Karten aus
+ * VERSCHIEDENEN Rasterzeilen, und dort ist jede Karte so hoch wie ihr Inhalt.
+ * Der Fehler zeigt sich nur bei Karten NEBENEINANDER, weil das Raster die auf
+ * gleiche Höhe zieht und die kürzere unten Luft bekommt. Lehre: bei einer
+ * Layout-Probe gehört die LAGE mit aufgebaut, in der der Fehler überhaupt
+ * entstehen kann — sonst misst man an ihm vorbei.
  *
  * WAS DIESER TEST BEIM BAUEN GELERNT HAT (2026-08-01). Ohne installiertes
  * Lighthouse startete das Werkzeug für JEDEN Eintrag einen eigenen Prozess, der
@@ -435,7 +448,12 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
         ] } },
       "markt-mein-tresor":   { lage: "gleich", messung: { stand: "gemessen", leistung: 34, bedienbarkeit: 96, gute_praxis: 100, auffindbarkeit: 90, gemessen: "2026-08-02" } },
       "markt-jasons-tresor": { lage: "gleich", messung: { stand: "nicht_gemessen", grund: "noch_nicht_dran" } },
-      "markt-tomys-hub":     { lage: "gleich", messung: { stand: "gemessen", leistung: 95, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 98, gemessen: "2026-08-02" } },
+      // MIT Warnband: dadurch ist der Karten-Rumpf spürbar höher als nebenan.
+      // Genau die Lage aus Klaus' Bildschirmfoto vom 2026-08-02 — ohne sie
+      // könnte die Höhen-Probe den Fehler gar nicht sehen.
+      "markt-tomys-hub":     { lage: "gleich",
+        wache: { ampel: "gelb", grund: "geaendert", seit: "2026-08-02" },
+        messung: { stand: "gemessen", leistung: 95, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 98, gemessen: "2026-08-02" } },
       "markt-kimboard":      { lage: "gleich", messung: { stand: "veraltet", leistung: 91, bedienbarkeit: 30, gute_praxis: 90, auffindbarkeit: 90, gemessen: "2026-07-28", grund: "Seite antwortet nicht" } }
     }
   };
@@ -529,6 +547,56 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       "C2d gleiche Schrift und Größe wie „→ Zur Seite“ (" + (gleich && gleich.m.groesse) + ")");
     ok(!!gleich && gleich.a.rund === gleich.m.rund && gleich.a.polster === gleich.m.polster && gleich.a.fett === gleich.m.fett,
       "C2e gleiche Rundung, gleiches Polster, gleiche Strichstärke");
+
+  }
+
+  /* C2f/C2g — stehen die Knöpfe auf EINER HÖHE?
+   *
+   * Klaus 2026-08-02: „die Buttons sind nicht alle auf einer Höhe." Der Knopf
+   * hing im Karten-Rumpf und wurde von allem darüber mitgeschoben — bei einer
+   * Karte mit Wächter-Warnband über hundert Pixel tiefer als nebenan.
+   *
+   * WAS DIESE PROBE BEIM BAUEN GELERNT HAT: der erste Anlauf verglich einfach
+   * alle Karten mit Knopf. Die lagen aber in VERSCHIEDENEN Zeilen — und dort
+   * ist jede Karte so hoch wie ihr Inhalt, also sitzt der Knopf ohnehin am
+   * Boden. Die Gegenprobe blieb prompt grün. Der Fehler zeigt sich NUR bei
+   * Karten NEBENEINANDER: im Raster werden die auf gleiche Höhe gezogen, und
+   * die kürzere bekommt unten Luft, in die der Knopf nicht nachrutscht.
+   *
+   * Deshalb eine eigene Lage: die zwei ERSTEN Einträge (die stehen im Raster
+   * nebeneinander), beide gemessen, einer mit Warnband. Genau Klaus' Bild. */
+  {
+    const p6 = await browser.newPage({ viewport: { width: 1400, height: 900 } });
+    const messung = { stand: "gemessen", leistung: 94, bedienbarkeit: 88, gute_praxis: 100, auffindbarkeit: 92, gemessen: "2026-08-02" };
+    await p6.route("**/assets/config/spore-stand.json*", (r) => r.fulfill({
+      status: 200, contentType: "application/json",
+      body: JSON.stringify({ eintraege: {
+        "markt-rezeptbuch": { lage: "gleich", messung: messung },
+        "markt-mixarium": { lage: "gleich",
+          wache: { ampel: "gelb", grund: "geaendert", seit: "2026-08-02" },
+          messung: messung }
+      } })
+    }));
+    await p6.goto(base + "/markt.html", { waitUntil: "load" });
+    await p6.waitForSelector(".listing .mk-ms-btn", { timeout: 20000 });
+    const reihe = await p6.evaluate(() => {
+      const raus = [];
+      for (const k of document.querySelectorAll(".listing")) {
+        const b = k.querySelector(".mk-ms-btn");
+        if (!b) continue;
+        const r = k.getBoundingClientRect(), bb = b.getBoundingClientRect();
+        raus.push({ zeile: Math.round(r.top), hoehe: Math.round(r.height),
+                    knopf: Math.round(bb.bottom), band: !!k.querySelector(".mk-wache") });
+      }
+      return raus;
+    });
+    const nebeneinander = reihe.length >= 2 && reihe[0].zeile === reihe[1].zeile;
+    ok(nebeneinander, "C2f zwei Karten stehen wirklich nebeneinander — sonst sagt die Probe nichts aus");
+    ok(nebeneinander && reihe[0].band !== reihe[1].band,
+      "C2g und nur EINE davon trägt ein Warnband — der Fall, in dem es früher verrutschte");
+    ok(nebeneinander && reihe[0].knopf === reihe[1].knopf,
+      "C2h beide Knöpfe stehen auf derselben Höhe (" + reihe.slice(0, 2).map((x) => x.knopf).join(" vs ") + " px)");
+    await p6.close();
   }
 
   // C3 — das Fenster. Es muss die drei Fragen beantworten: wer misst (und kann
@@ -573,8 +641,11 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
                    rel: a.getAttribute("rel"), text: a.textContent } : null;
     });
     ok(!!link, "C3k das Fenster trägt einen Link zum vollen Bericht");
-    ok(!!link && /^https:\/\/pagespeed\.web\.dev\/analyze\?url=https%3A%2F%2F/.test(link.href),
+    // `/analyze` gibt es bei Google NICHT — das war Klaus' 404 vom 2026-08-02.
+    // Der Einstieg, der eine frische Messung anstößt, heißt `/report`.
+    ok(!!link && /^https:\/\/pagespeed\.web\.dev\/report\?url=https%3A%2F%2F/.test(link.href),
       "C3l und er zeigt auf die gemessene Adresse, sauber kodiert (" + (link && link.href.slice(0, 72)) + "…)");
+    ok(!!link && link.href.indexOf("/analyze") < 0, "C3l2 und NICHT mehr auf /analyze — das war eine 404-Seite");
     ok(!!link && link.ziel === "_blank" && /noopener/.test(link.rel) && /noreferrer/.test(link.rel),
       "C3m neuer Tab, mit noopener/noreferrer wie jeder Außen-Link");
     ok(/können die Zahlen ein paar Punkte von unseren abweichen/.test(d.text),

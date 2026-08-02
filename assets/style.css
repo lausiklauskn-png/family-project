@@ -439,6 +439,13 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .listing .ext{font-family:var(--mono);font-size:.82rem}
 /* Fußzeile der Marktplatz-Karte: Öffnen links, Melde-Knopf rechtsbündig mit Abstand. */
 .listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+/* Aktions-Block (Stufe 5): „Bewertung nachlesen" + Fußzeile kleben GEMEINSAM
+   am Boden der Karte. Befund von Klaus 2026-08-02: allein die Fußzeile klebte,
+   der Knopf hing im Rumpf und wurde von allem darüber mitgeschoben — bei einer
+   Karte mit Wächter-Warnband über hundert Pixel tiefer als nebenan. Jetzt
+   stehen beide über alle Karten einer Reihe auf derselben Höhe. */
+.listing-actions{margin-top:auto;display:flex;flex-direction:column;gap:12px}
+.listing-actions .listing-foot{margin-top:0}
 
 /* Melde-Knopf — DREIECKIG mit abgerundeten Ecken (Klaus 2026-07-31).
    Trägt bewusst die echte .btn-Klasse und erbt damit unverändert alles:
