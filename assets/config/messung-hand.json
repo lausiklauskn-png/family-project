@@ -14,6 +14,13 @@
       "gemessen": "2026-08-02 15:00"
     }
   },
+  "markt-kimboard": {
+    "leistung": 92,
+    "bedienbarkeit": 100,
+    "gute_praxis": 96,
+    "auffindbarkeit": 100,
+    "gemessen": "2026-08-02 19:58"
+  },
   "markt-mixarium": {
     "leistung": 76,
     "bedienbarkeit": 92,
