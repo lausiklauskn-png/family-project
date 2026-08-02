@@ -4,6 +4,50 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02: „Wieso wird nicht automatisch gemessen?" — und der Link zum vollen Bericht
+
+### Die Antwort auf die Frage: es wird, der Zeitpunkt war nur noch nicht da
+
+Über die API nachgezählt statt geraten. Die Aktion hat **genau einen** Lauf:
+`run_number: 1`, `event: workflow_dispatch`, 2026-08-01 13:18 UTC — der, den
+Klaus von Hand gestartet hat, **bevor** Stufe 5 gebaut war. Der **planmäßige**
+Lauf ist noch nie gefeuert.
+
+Der Grund ist banal: der Zeitplan steht auf `40 2 * * *` = **02:40 UTC**. Klaus'
+Frage kam um 03:57 Ortszeit (CEST) = 01:59 UTC — also **41 Minuten vor** dem
+ersten planmäßigen Lauf überhaupt. Es ist automatisch, es war nur noch nicht
+so weit.
+
+*Zu wissen für die nächste Sitzung:* GitHub stellt geplante Läufe in eine
+Warteschlange und schiebt sie bei Andrang um Minuten bis über eine Stunde. Ein
+Lauf, der um 02:40 UTC nicht sofort erscheint, ist deshalb noch kein Befund.
+
+### Der Link zum vollen Bericht (Klaus' Wunsch)
+
+> „Es sollte doch eigentlich ein Link sein, der genau anzeigt, wie die Werte
+> zustande kommen und was empfohlen wird."
+
+Im Bewertungs-Fenster steht jetzt **„↗ Vollständigen Bericht bei Google
+öffnen"** — der Link zeigt auf `pagespeed.web.dev/analyze?url=…` mit der
+gemessenen Adresse. Dort läuft dasselbe Lighthouse, und **jede einzelne
+Prüfung** steht mit Begründung und Verbesserungs-Vorschlag da.
+
+Das ist zugleich der ehrlichste Beleg gegen den Schummel-Verdacht: der Besucher
+misst selbst nach, **bei Google, ohne uns**. Dazu steht ehrlich dabei, dass dort
+neu gemessen wird und die Zahlen deshalb ein paar Punkte abweichen können.
+
+Grenzen, die eingebaut sind: nur **https**-Adressen bekommen den Link (eine
+http-Adresse an einen Prüfdienst weiterzureichen hilft niemandem), neuer Tab
+mit `noopener noreferrer`, und aufgerufen wird nur auf Klick — nichts im
+Hintergrund.
+
+`smoke_stufe5_messung` **86/86**. Zwei weitere Gegenproben rot bekommen: den
+https-Filter entfernt (eine http-Adresse ging an Google) und den Knopf mit
+eigener Optik (die Design-Gleichheit wird **gemessen**, nicht behauptet).
+Cache **v83**.
+
+---
+
 ## ✅ 2026-08-01 (Nachtrag 2): drei Befunde aus Klaus' Browser
 
 ### 1. „Ich sehe gar nichts" — und er hatte recht
