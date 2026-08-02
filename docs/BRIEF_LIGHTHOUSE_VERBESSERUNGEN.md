@@ -19,6 +19,11 @@ weder einen Bericht abrufen noch die Live-Seite ansehen.
 **Ja, wenn Klaus sie schickt.** Dann liest die Sitzung sie vollständig. Bester
 Weg, in dieser Reihenfolge:
 
+*Der Weg dorthin ist bestätigt:* der Knopf „↗ Vollständigen Bericht bei Google
+öffnen" im Bewertungs-Fenster zeigt seit dem 2026-08-02 auf
+`pagespeed.web.dev/report?url=…` und **Klaus hat im Browser bestätigt, dass die
+Auswertung dort erscheint** (vorher lief `/analyze` in eine 404-Seite).
+
 1. **JSON-Datei** — in PageSpeed Insights ganz unten „Bericht herunterladen"
    bzw. in Chrome DevTools → Lighthouse → Download-Symbol. Das ist die
    vollständige Fassung mit **allen** Prüfungen, den betroffenen Dateien und
