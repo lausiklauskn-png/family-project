@@ -4,6 +4,56 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, später Nachmittag: Rezeptbuch Runde 2 + Mixarium-App
+
+Auf Klaus' Zuruf („Rezeptbuch noch einmal nachbessern, danach Mixarium
+automatisch starten").
+
+### Rezeptbuch Runde 2 — `Mein-Rezeptbuch#363` → `#364`
+
+Die Briefkasten-Kette war der längste kritische Pfad (1074 ms): eigenes SIGNAL
+plus **fünf** Nachbarn bei `raw.githubusercontent.com`, streng nacheinander.
+Jetzt gleichzeitig (`Promise.all`) und erst nach `load` bei freiem Hauptfaden.
+
+Gemessen mit 300 ms künstlicher Verzögerung je Antwort — sonst sind
+„nacheinander" und „gleichzeitig" nicht zu unterscheiden:
+**vorher 1226 ms Spanne, nachher 3 ms.** Die Vorher-Messung ist die Gegenprobe.
+
+### Mixarium-App — `Mein-Mixarium#178`
+
+**Erstbesuch 4006 → 2500 KiB (−38 %), 57 → 30 Anfragen.** Drei Funde:
+
+1. **Die Seite lud zweimal** — derselbe `controllerchange`→`reload()`-Fehler wie
+   bei Rezeptbuch. `index.html` kam dreimal, jedes Modul doppelt.
+2. **Der Vorrat holte beide Video-Formate.** Der Browser spielt eins; die
+   620 KiB mp4 wurden für ein Format geladen, das auf webm-fähigen Geräten nie
+   läuft. Videos jetzt aus dem Vorrat raus — der Laufzeit-Cache legt das
+   tatsächlich geholte Format ab. Grenze: offline vor dem ersten Abspielen kein
+   Intro; danach immer.
+3. **Briefkasten-Kette** identisch zu Rezeptbuch nachgezogen.
+
+### Die Drift-Frage aus § 2.2 des Briefs ist damit beantwortet
+
+Vor dem Eingriff gemessen: der Block trägt `BYTE-GLEICH lassen`, existierte aber
+**längst in drei Fassungen** — Rezeptbuch+Mixarium teilten eine, Jasons-Tresor
+und Mein-Tresor je eine eigene. Beide des Paares sind jetzt identisch
+nachgezogen (sha `a3208b949084`), die Tresore blieben unangetastet. **Es ist
+keine neue Drift entstanden** — die Kanon-Frage stellt sich für diesen Block
+also gar nicht mehr so, wie der Brief sie stellte.
+
+### ⚠ Eine Abwägung liegt bei Klaus (Mixarium)
+
+`index.html` kommt weiterhin **zweimal** (Navigation + Vorrat mit
+`cache:'reload'`, 888 KiB). Das ist eine ausdrückliche Entscheidung der
+Vorsitzung (v81-Kommentar): ohne `reload` könnte in einer neuen SW-Version
+veralteter HTML-Stand als Offline-Kopie landen. Ohne `reload` wäre der zweite
+Download **umsonst zu haben** (der Browser hat die Navigation im HTTP-Cache);
+Preis wäre eine Offline-Kopie von bis zu 10 Minuten Alter — online sieht der
+Nutzer ohnehin frisches HTML, weil der `navigate`-Zweig network-first arbeitet.
+Ein Abwägen, kein Versehen; nicht im Alleingang umgedreht.
+
+---
+
 ## ✅ 2026-08-02, nachmittags: Lighthouse-Durchgang App 2 — Mein Rezeptbuch
 
 `Mein-Rezeptbuch` (PR #363, gemergt). Gemessene Adresse laut Bericht:
