@@ -88,6 +88,10 @@
   var THEME_KEYS = ["--bg", "--bg2", "--card", "--line", "--text", "--muted", "--accent", "--accent2", "--accent3", "--header-bg", "--glow", "--holo-text", "--holo-border", "--focus"];
   var ti = 0;
   try { var st = parseInt(localStorage.getItem("fp_theme"), 10); if (st >= 0 && st < THEMES.length) ti = st; } catch (_e) {}
+  /* Wird in init() gefüllt. applyTheme() läuft schon vorher (Theme aus dem
+   * Speicher), darum muss es hier stehen und darf nichts tun, solange der
+   * Knopf noch nicht verdrahtet ist. */
+  var themeBtnNachziehen = function () {};
 
   function applyTheme(i) {
     ti = ((i % THEMES.length) + THEMES.length) % THEMES.length;
@@ -98,6 +102,7 @@
     Object.keys(th.vars).forEach(function (k) { root.style.setProperty(k, th.vars[k]); });
     var nameEl = document.getElementById("themeName");
     if (nameEl) nameEl.textContent = th.name;
+    try { themeBtnNachziehen(); } catch (_e) {}   // Vorlese-Name folgt dem neuen Wort
     if (global.MycelBg && typeof global.MycelBg.setTheme === "function") {
       global.MycelBg.setTheme(th.name);
     }
@@ -458,28 +463,53 @@
     setTimeout(done, 2500); // Fallback: nie hängen bleiben
   }
 
+  /* ÜBERNIMMT den Knopf, der im HTML steht — er wird nicht mehr erzeugt.
+   *
+   * Warum das geändert wurde (Befund 2026-08-02, mit Lighthouse 13.4.1
+   * gemessen): Bis hierher wurde die Pille erst zur Laufzeit in die Navleiste
+   * gehängt. Auf einem langsamen Gerät ist die Seite da längst einmal gemalt.
+   * Die Leiste wird durch den neuen Knopf breiter, bricht auf eine Zeile mehr
+   * um, der Kopf wächst — und ALLES darunter rutscht nach. An markt.html war
+   * das nach der Dock-Reserve der letzte verbliebene Sprung (0,164 CLS).
+   *
+   * Jetzt steht die Pille in jeder Seite fest im Markup, mit der deutschen
+   * Beschriftung wie die Nachbar-Pillen auch. Hier wird sie nur noch verdrahtet
+   * und übersetzt. Fehlt sie in einer Seite (Fremd-Kopie, alte Datei), wird sie
+   * wie früher erzeugt — dann springt es dort eben, statt dass der Knopf fehlt.
+   * Ein fehlender Knopf wäre der schlechtere Tausch. */
   function mountReloadButton() {
     var nav = document.querySelector("nav.top");
-    if (!nav || document.getElementById("fpReload")) return;
-    var pill = document.createElement("span");
-    pill.className = "pill pill-reload";
-    pill.id = "fpReload";
+    if (!nav) return;
+    var pill = document.getElementById("fpReload");
+    var neu = !pill;
+    if (neu) {
+      pill = document.createElement("span");
+      pill.className = "pill pill-reload";
+      pill.id = "fpReload";
+    }
+    if (pill.dataset.fpWired === "1") return;   // nicht zweimal verdrahten
+    pill.dataset.fpWired = "1";
     pill.setAttribute("role", "button");
     pill.tabIndex = 0;
     var setLabel = function () {
       var de = getLang() === "de";
-      pill.innerHTML = '<span class="rl-ic" aria-hidden="true">↻</span> ' + (de ? "Aktualisieren" : "Refresh");
+      var wort = de ? "Aktualisieren" : "Refresh";
+      pill.innerHTML = '<span class="rl-ic" aria-hidden="true">↻</span> ' + wort;
       pill.title = de ? "Seite frisch laden, holt die neueste Version (Cache leeren)"
                       : "Reload fresh, get the latest version (clear cache)";
-      pill.setAttribute("aria-label", de ? "Seite frisch laden" : "Reload page fresh");
+      // Sichtbares Wort zuerst — sonst meldet Lighthouse zu Recht, dass
+      // Gelesenes und Vorgelesenes auseinanderfallen (siehe nameMitSichtbarem).
+      pill.setAttribute("aria-label", wort + (de ? " — Seite frisch laden" : " — reload page fresh"));
     };
     setLabel();
     global.addEventListener("fp:lang", setLabel);
     var go = function () { hardReload(pill); };
     pill.addEventListener("click", go);
     pill.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
-    var lb = document.getElementById("langBtn");
-    if (lb && lb.parentNode === nav) nav.insertBefore(pill, lb); else nav.appendChild(pill);
+    if (neu) {
+      var lb = document.getElementById("langBtn");
+      if (lb && lb.parentNode === nav) nav.insertBefore(pill, lb); else nav.appendChild(pill);
+    }
   }
 
   /* Macht aus einem <span> ein richtiges Bedien-Element (Befund 5.1, 2026-08-01).
@@ -497,6 +527,23 @@
    *
    * Die Leertaste braucht `preventDefault`, sonst scrollt der Browser die Seite
    * weg, während er den Knopf bedient. */
+  /* Der Vorlese-Name MUSS den sichtbaren Text enthalten (Befund 2026-08-02).
+   *
+   * Lighthouse meldete auf jeder Seite „label-content-name-mismatch" für die
+   * drei Kopf-Knöpfe: sichtbar stand „DE / EN", vorgelesen wurde „Sprache
+   * umschalten, Deutsch oder Englisch". Wer die Seite mit der Stimme bedient,
+   * sagt aber, was er LIEST — und traf damit keinen dieser Knöpfe. Deshalb
+   * steht der sichtbare Text jetzt vorn, die Erklärung dahinter.
+   *
+   * Der sichtbare Text wird bei jedem Aufruf frisch aus dem Element gelesen
+   * statt mitgeschrieben. Sonst müsste jemand daran denken, ihn nachzuziehen,
+   * wenn sich die Beschriftung ändert (das Thema heißt mal „Dunkel", mal
+   * „Hell") — und genau daran denkt niemand. */
+  function nameMitSichtbarem(el, erklaerung) {
+    var sicht = String((el && el.textContent) || "").replace(/\s+/g, " ").trim();
+    return sicht ? sicht + " — " + erklaerung : erklaerung;
+  }
+
   function alsKnopf(el, aktion, label) {
     if (!el) return;
     el.setAttribute("role", "button");
@@ -514,10 +561,18 @@
   function init() {
     var lb = document.getElementById("langBtn");
     alsKnopf(lb, function () { applyLang(lang === "de" ? "en" : "de"); },
-      function () { return getLang() === "de" ? "Sprache umschalten, Deutsch oder Englisch" : "Switch language, German or English"; });
+      function () { return nameMitSichtbarem(lb, getLang() === "de" ? "Sprache umschalten, Deutsch oder Englisch" : "switch language, German or English"); });
     var tb = document.getElementById("themeBtn");
     alsKnopf(tb, function () { applyTheme(ti + 1); },
-      function () { return getLang() === "de" ? "Farbthema wechseln" : "Switch colour theme"; });
+      function () { return nameMitSichtbarem(tb, getLang() === "de" ? "Farbthema wechseln" : "switch colour theme"); });
+    /* Der Themen-Knopf ändert seinen sichtbaren Text („Dunkel" → „Hell"), ohne
+     * dass die Sprache wechselt. Ohne dieses Nachziehen bliebe der Vorlese-Name
+     * beim alten Wort stehen — dann stimmte er wieder nicht mit dem überein,
+     * was dasteht. `fp:lang` allein reicht dafür nicht. */
+    themeBtnNachziehen = function () {
+      if (tb) tb.setAttribute("aria-label",
+        nameMitSichtbarem(tb, getLang() === "de" ? "Farbthema wechseln" : "switch colour theme"));
+    };
     applyTheme(ti);
     applyLang(lang);
     wireAllMics();

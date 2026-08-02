@@ -121,7 +121,30 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
 #sbkim-siegel-badge{cursor:pointer}
 
 /* Dock-Zone in der Navleiste + andockbares Status-Widget (Modul 17 ersetzt) */
+/* Die Breite wird freigehalten, SOLANGE das Dock leer ist (Befund 2026-08-02).
+ *
+ * Warum: assets/status-widget.js setzt die Lampen-Leiste erst ein, wenn es
+ * geladen und ausgefuehrt ist. Auf einem langsamen Geraet malt der Browser die
+ * Seite vorher schon einmal — mit leerem Dock. Beim Einsetzen wird die
+ * Navleiste 245 px breiter, bricht dadurch auf eine Zeile mehr um, und der
+ * ganze Kopf waechst um 40 px. ALLES darunter rutscht mit: gemessen mit
+ * Lighthouse 13.4.1 an markt.html war das der einzige Sprung der Seite und
+ * allein 0,64 der 0,853 CLS-Punkte.
+ *
+ * 246 px ist gemessen, nicht geschaetzt: die Leiste ist auf allen vier Seiten
+ * und bei 360/412/768/1280 px Fensterbreite exakt 245,1 px breit. Die vier
+ * Beschriftungen (LEBT/VERKEHR/FREMD/SIEGEL) werden nicht uebersetzt und
+ * stehen in einer dicktengleichen Schrift — die Breite haengt also weder an
+ * der Sprache noch am Fenster.
+ *
+ * `:empty` statt einer festen Regel, damit spaeter nichts stehenbleibt:
+ * sobald die Leiste drin ist (245,1 px) ODER der Nutzer sie geschlossen hat
+ * (dann steht der schmale „⊕ Status"-Chip drin), traegt das Dock seine eigene
+ * Breite und die Reserve verschwindet von selbst. Bleibt das Skript ganz aus,
+ * bleibt der Platz leer stehen — das ist der gewollte Fall: lieber eine ruhige
+ * Luecke als ein springender Kopf. */
 .fp-dock{display:inline-flex;align-items:center;min-height:34px}
+.fp-dock:empty{min-width:246px}
 .fp-sw .fp-sw-slots{display:inline-flex;align-items:center;gap:9px}
 .fp-sw-lamp{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:.68rem;color:var(--muted);white-space:nowrap;user-select:none}
 .fp-sw-lamp .dot{width:9px;height:9px;border-radius:50%;background:#444;transition:.3s}
@@ -346,6 +369,27 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* Marktplatz — Listing-Karten + Formular */
 .listings{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:8px}
+/* Platz für die Einträge freihalten, SOLANGE sie noch nicht gezeichnet sind
+ * (Befund 2026-08-02, mit Lighthouse 13.4.1 gemessen).
+ *
+ * Die Karten entstehen erst, wenn das grosse Skript am Seitenende gelaufen
+ * ist — nach rund zwanzig Skripten davor. Auf einem langsamen Geraet malt der
+ * Browser die Seite vorher schon einmal, und dann steht bei leerer Liste der
+ * Kasten „Eigene App gewuenscht?" mitten im Bild. Sobald die Karten kommen,
+ * wird er zehntausend Pixel nach unten geschoben. Das war nach den beiden
+ * Kopfzeilen-Reparaturen der letzte verbliebene Sprung (0,141 CLS).
+ *
+ * 70vh ist bewusst grob: es muss nur reichen, damit unter der Liste im ersten
+ * Bild NICHTS mehr sichtbar ist, was spaeter wegrutscht. Eine genaue Hoehe
+ * liesse sich gar nicht angeben — wie hoch die Liste wird, haengt an der Zahl
+ * der Eintraege und an der Fensterbreite.
+ *
+ * `render()` in markt.html setzt danach die Klasse `gefuellt` und nimmt die
+ * Reserve wieder weg. Auch dann, wenn es GAR KEINE Eintraege gibt — sonst
+ * klaffte ueber dem Hinweis „Noch keine Eintraege" ein halber Bildschirm
+ * Leere. Bleibt das Skript ganz aus, bleibt die Reserve stehen: eine ruhige
+ * leere Flaeche statt einer springenden Seite. */
+.listings:not(.gefuellt){min-height:70vh}
 .listing{padding:0;overflow:hidden;display:flex;flex-direction:column;
   transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
   transition:transform .18s ease,box-shadow .18s}

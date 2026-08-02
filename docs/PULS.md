@@ -4,6 +4,143 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, nachts: der Sprung beim Laden (CLS) — Ursache war eine andere
+
+Klaus' Auftrag: „Fangen wir mit dem Markt an, der sieht am schlimmsten aus."
+`markt.html` stand bei Leistung 45 und einem CLS von **0,853** (grün wäre
+unter 0,1).
+
+### ⚠ Zuerst: der Brief hatte die falsche Ursache benannt
+
+Der Folge-Brief vom Abend schrieb, die beiden Bänder an den Karten (Wächter-
+Ampel + Messwerte) seien schuld: sie kommen 470 ms später und lassen jede
+Karte wachsen. **Das stimmt — und verursacht trotzdem keinen einzigen
+CLS-Punkt.** Gemessen: die Karten wachsen von 446 auf 472–733 px, die Seite
+von 10 985 auf 13 285 px. Aber `#mkListings` beginnt erst bei y = 713 px, das
+Sichtfeld endet bei 823 px. Es wächst also **unterhalb** des ersten Bildes,
+und was dort passiert, zählt für CLS nicht.
+
+Wer das nachlesen will, ohne es noch einmal zu suchen: der Wert, den
+Lighthouse nennt (`<main>`, 0,8535), ist **kein** Wachstum, sondern eine
+**Verschiebung um 40 px**. Das steht nicht im Bericht, sondern erst im Trace
+(`old_rect` → `new_rect`).
+
+### Wie die echte Ursache gefunden wurde
+
+Lighthouse 13.4.1 auf der Bau-Maschine, gegen einen Server, der Caddy
+nachbildet (gzip an, keine Cache-Kopfzeilen). Das traf Klaus' Werte fast
+genau: **Leistung 42 · Barrierefreiheit 96 · Best Practices 96 · SEO 100 ·
+CLS 0,853** gegen Klaus' 45 / 96 / 96 / 100.
+
+Erster Versuch statt Vermutung: `assets/status-widget.js` testweise ausbauen
+→ CLS fiel von 0,853 auf 0,217. Damit war die Richtung klar.
+
+**Eine eigene Messung war vorher ein Zufallstreffer** und hätte fast in die
+Irre geführt: ohne künstliche Verzögerung laden die zwanzig Skripte in
+Nullzeit, dann steht beim ersten Bild schon alles, und CLS ist 0. Genau
+deshalb braucht es Lighthouse selbst — es drosselt den Prozessor vierfach,
+und erst dadurch malt der Browser, bevor seine eigenen Skripte gelaufen sind.
+
+### Drei Ursachen, alle vom selben Bauart-Fehler
+
+Etwas wird **erst vom Skript** in die Seite gehängt — der Browser hat da aber
+längst einmal gemalt.
+
+1. **Die Lampen-Leiste im Kopf.** `assets/status-widget.js` setzt sie in das
+   leere `#fp-dock`. Die Navleiste wird dadurch 245 px breiter, bricht auf
+   eine Zeile mehr um, der Kopf wächst um 40 px — und alles darunter rutscht
+   mit. Allein 0,64 der 0,853 Punkte.
+   → `assets/style.css`: `.fp-dock:empty{min-width:246px}`. Die 246 px sind
+   **gemessen**: die Leiste ist auf allen vier Seiten und bei 360/412/768/
+   1280 px Fensterbreite exakt 245,1 px breit (die vier Beschriftungen werden
+   nicht übersetzt und stehen in einer dicktengleichen Schrift). `:empty`,
+   damit die Reserve von selbst verschwindet, sobald etwas drin steht.
+2. **Der „↻ Aktualisieren"-Knopf.** `assets/app.js` hängte ihn zur Laufzeit in
+   die Navleiste — derselbe Umbruch noch einmal.
+   → Der Knopf steht jetzt in allen elf Seiten mit Navleiste fest im Markup;
+   `mountReloadButton()` **übernimmt** ihn nur noch. Fehlt er (Fremd-Kopie,
+   alte Datei), wird er wie früher erzeugt — dann springt es dort eben, statt
+   dass der Knopf fehlt.
+3. **Die Einträge selbst.** Sie entstehen erst im grossen Skript am
+   Seitenende. Bis dahin ist die Liste leer, und der Kasten „Eigene App
+   gewünscht?" steht mitten im Bild — um danach zehntausend Pixel nach unten
+   geschoben zu werden.
+   → `.listings:not(.gefuellt){min-height:70vh}`, und `render()` setzt die
+   Klasse `gefuellt`. Auch bei null Treffern — sonst klaffte über dem
+   Leer-Hinweis ein halber Bildschirm.
+
+### Dazu zwei echte Barrierefreiheits-Mängel (waren auf `markt.html` offen)
+
+- **Vorlese-Name stimmt nicht mit dem sichtbaren Text überein** bei allen drei
+  Kopf-Knöpfen. Sichtbar stand „DE / EN", vorgelesen „Sprache umschalten,
+  Deutsch oder Englisch". Wer per Stimme bedient, sagt aber, was er **liest**.
+  Jetzt steht der sichtbare Text vorn, die Erklärung dahinter — und er wird
+  bei jedem Aufruf frisch aus dem Element gelesen, nicht mitgeschrieben
+  (das Thema heisst mal „Dunkel", mal „Hell").
+- **Fusszeilen-Kontrast** `opacity:.7` → `.85`, wie an der Startseite am
+  Abend schon gemacht. Betraf neun Seiten.
+
+### Gemessen (gleicher Mess-Server, per `git stash` umgeschaltet)
+
+| Seite | CLS vorher | CLS nachher | Barrierefreiheit |
+|---|---|---|---|
+| `markt.html` | **0,853** | **0** | 96 → **100** |
+| `index.html` | 0,043 | **0** | 100 |
+| `netzwerk.html` | 0,041 | **0** | 96 → **100** |
+| `werkzeuge.html` | **0,853** | **0,188** | 94 → **98** |
+
+**Gegenprobe, jede Reparatur einzeln wieder ausgebaut** (`markt.html`):
+Dock-Reserve raus → 0,304 · Listen-Reserve raus → 0,141 · Aktualisieren-Knopf
+aus dem Markup raus → 0,007. Alle drei tragen, der Knopf am wenigsten.
+
+**Zur Leistungszahl sage ich bewusst nichts.** Sie schwankt auf dieser
+Maschine stark; ein einzelner Lauf zeigte für `index.html` 68, drei Läufe
+danach dreimal 55 — vorher wie nachher identisch. Was die Note macht, sagt
+erst Klaus' nächste PageSpeed-Messung.
+
+### Neuer Wächter `tests/smoke_kein_sprung.mjs` (30 Prüfungen)
+
+Er prüft nicht die CLS-Zahl, sondern die Eigenschaft dahinter: **die Seite muss
+ohne JavaScript schon genauso dastehen wie mit.** Ein Browser mit
+abgeschaltetem JavaScript ist die ehrlichste Nachstellung des ersten Bildes.
+Geprüft für alle elf Seiten mit Navleiste; die freigehaltene Dock-Breite wird
+am echten Widget **nachgemessen**, nicht mitgeschrieben — sie veraltet also
+nicht still, wenn jemand eine Lampe hinzufügt.
+
+**Gegenprobe am Wächter selbst** (Pflicht, sonst beweist er nichts): Dock-
+Reserve raus → 7 rot · Knopf raus → 2 rot · Listen-Reserve raus → 1 rot ·
+alter Vorlese-Name → 1 rot. Alles wieder drin → 30/30 grün.
+
+### Was NICHT gemacht wurde — damit es niemand zweimal sucht
+
+- **Die Bänder an den Karten.** Sie wachsen unterhalb des Sichtfelds und
+  kosten keinen Punkt (siehe oben). Platz dafür freizuhalten wäre auch nicht
+  sauber möglich: die Höhen reichen von 19,7 px („noch nicht gemessen") bis
+  195,6 px. Der Entwurf „Liste sofort, Ampeln gleich danach" bleibt.
+- **`werkzeuge.html` (noch 0,188).** Dieselbe Bauart wie Ursache 3, nur mit
+  `#toolGrid` statt der Liste. Eigener Schritt, damit man sieht, was welche
+  Änderung bewegt.
+- **Die 1.503 KiB Vorschaubilder aus fremden Repos** (BookLedgerPro 777 ·
+  Rezeptbuch 389 · Tomys-Hub 276 · Mixarium 64). Von hier aus nicht behebbar.
+- **Die vorberechneten Vektoren** für die Marktplatz-Suche — offene
+  Bauaufgabe mit eigener Tafel-Entscheidung, kein Lighthouse-Fix.
+- **Cache-Kopfzeilen** — liegen weiter bei Klaus (`docs/CADDY-CACHE.md`).
+
+### Offen für Klaus
+
+1. **Browser-Sichttest am Tablet.** Sieht die Navleiste unverändert aus? Der
+   „↻ Aktualisieren"-Knopf steht jetzt fest im Markup statt nachgereicht —
+   er darf weder doppelt noch verrutscht erscheinen. Hard-Reload nicht
+   vergessen, die Version steht auf `v88`.
+2. **Nächste PageSpeed-Messung** von `markt.html`.
+
+**Nebenbefund, nicht von mir verursacht:** `tests/smoke_markt_melden.mjs`
+meldet „Hintergrund scrollt nicht, solange das Fenster offen ist" als
+durchgefallen — auch auf dem unveränderten Stand von `origin/main` (mit
+`git stash` gegengeprüft). Eigener Fix, eigener Schritt.
+
+---
+
 ## ✅ 2026-08-02, abends: family-projekt.de selbst — die Startseite
 
 Klaus' PageSpeed-Bericht (Mobil): **Leistung 40 · Barrierefreiheit 89 ·
