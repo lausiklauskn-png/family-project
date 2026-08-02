@@ -4,6 +4,69 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, 09:07: DER ERSTE ECHTE MESSLAUF IST DA — und ein Befund daraus
+
+### Es läuft von allein. Belegt, nicht behauptet.
+
+| | |
+|---|---|
+| Lauf | `run_number: 2`, **`event: schedule`** |
+| Start | 2026-08-02 **03:52 UTC** (geplant war 02:40 — **72 Minuten Verzug**) |
+| Dauer | 4 Minuten |
+| Ergebnis | **`success`** |
+| Bericht | `geprueft: 2026-08-02T03:52:44Z`, selbst committet (`af29078`) |
+
+Der Verzug ist GitHubs Warteschlange, kein Fehler bei uns. Um 05:15 war der
+Lauf noch nicht da und es sah nach einem Befund aus — geprüft wurde damals
+alles Konfigurierbare (Workflow `active`, Default-Branch `main`, YAML gültig,
+kein Fork) und **bewusst nichts geändert**, damit ein Eingriff nicht die
+Registrierung des Zeitplans anfasst, während ein verspäteter Lauf noch kommen
+kann. Das war richtig: er kam.
+
+**Für die nächste Sitzung:** 72 Minuten Verzug sind bei GitHub normal. Ein
+fehlender Lauf ist erst dann ein Befund, wenn er auch nach ~2 Stunden fehlt.
+
+### Was gemessen wurde — echte Zahlen, Lighthouse 13.4.1
+
+**10 gemessen, 0 veraltet, 4 „noch nicht dran"** (der Deckel greift wie gebaut;
+die vier kommen heute Nacht dran). Wächter: 12 grün, 2 gelb, 0 rot.
+
+| Eintrag | L / B / G / A | Nachbesserungen |
+|---|---|---|
+| Mixarium | **39** / 87 / 100 / 100 | 6 |
+| Kimboard | 62 / 90 / 96 / 100 | 7 |
+| BookLedgerPro | 65 / 91 / 100 / 100 | 6 |
+| Mein-Tresor | 69 / 84 / 100 / 100 | 6 |
+| Jasons-Tresor | 73 / 92 / 100 / 100 | 6 |
+| Perfect Skin Beauty | 92 / 96 / 100 / 100 | 5 |
+| Kim-Bell | 95 / 100 / 100 / 90 | 4 |
+| Perfect Skin Fashion | 96 / 94 / 96 / 100 | 7 |
+| Kimseek | **99** / 93 / 100 / 100 | 6 |
+| Mycel-Karte | **99** / 87 / 100 / 100 | 5 |
+
+Bedienbarkeit und gute Praxis stehen netzweit gut; die **Leistung** ist die
+Baustelle. Mixarium mit 39 fiele bei einer Regler-Schwelle von 50 heraus.
+
+### ⚠ Der Befund aus dem echten Lauf: die Nachbesserungen kamen auf ENGLISCH
+
+„Minify JavaScript", „Background and foreground colors do not have a sufficient
+contrast ratio" — wörtlich so im Bewertungs-Fenster einer deutschen Seite.
+Lighthouse liefert seine Titel per Voreinstellung auf Englisch; die
+Übersetzungen bringt es mit, man muss sie nur verlangen.
+
+Behoben: `--locale=de` im Aufruf (`MESSUNG_SPRACHE`). Ab dem nächsten Lauf
+stehen die Nachbesserungen auf Deutsch.
+
+*Ehrliche Grenze, im Code festgehalten:* der Bericht wird EINMAL geschrieben und
+kann nur EINE Sprache tragen. Wer den Marktplatz auf Englisch stellt, liest die
+Nachbesserungen trotzdem auf Deutsch. Zweimal messen — einmal je Sprache — würde
+die Laufzeit verdoppeln für einen Nutzen, den heute niemand hat.
+
+`smoke_stufe5_messung` **92/92** (neuer Fall A9). Gegenprobe: `--locale`
+entfernt → A9 rot. Cache **unverändert v83** (nur `tools/` berührt).
+
+---
+
 ## ✅ 2026-08-02: „Wieso wird nicht automatisch gemessen?" — und der Link zum vollen Bericht
 
 ### Die Antwort auf die Frage: es wird, der Zeitpunkt war nur noch nicht da
