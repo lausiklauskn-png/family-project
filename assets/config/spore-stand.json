@@ -1,17 +1,18 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-08-01T13:18:55.498Z",
+  "geprueft": "2026-08-02T03:52:44.892Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "BookLedgerPro",
       "nodeId": "MyHVM7PdwEtNzOXiZNxfP_RcEXiTLjLpAls1oUm5-cQ",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "ab2877e7",
       "neuerText": "Offline-first, verschlüsselte Buchhaltung: Belege, Konten, USt/EÜR, GoBD, Aufträge.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "4d4af8ed58997550",
@@ -19,18 +20,56 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 65,
+        "bedienbarkeit": 91,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Minify JavaScript",
+            "ms": 900
+          },
+          {
+            "k": "leistung",
+            "t": "Largest Contentful Paint"
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Touch targets do not have sufficient size or spacing."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Document does not have a main landmark."
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
       }
     },
     "markt-mein-tresor": {
       "url": "https://raw.githubusercontent.com/lausiklauskn-png/Mein-Tresor/main/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Mein-Tresor",
       "nodeId": "feV3o4qJF58caokPJr_oajm9dcnKwGjVXzBum8M8icM",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "ccca36b1",
       "neuerText": "Mein-Tresor ist ein Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Verwandt mit dem Schwester-Tresor Jasons-Tresor und angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "374019c878d8ce21",
@@ -38,18 +77,56 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 69,
+        "bedienbarkeit": 84,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Minify JavaScript",
+            "ms": 450
+          },
+          {
+            "k": "leistung",
+            "t": "Largest Contentful Paint"
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elements use prohibited ARIA attributes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Select elements do not have associated label elements."
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
       }
     },
     "markt-jasons-tresor": {
       "url": "https://raw.githubusercontent.com/lausiklauskn-png/Jasons-Tresor/main/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Jasons-Tresor",
       "nodeId": "lbUthjt-outt4ns4NJQI2TaMzubX4BzQJGp_Odx_vek",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "efaa71bf",
       "neuerText": "Jasons-Tresor ist Jasons eigener Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Schwester-Knoten von Mein-Tresor, angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "58581e8412bd5033",
@@ -57,18 +134,55 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 73,
+        "bedienbarkeit": 92,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Largest Contentful Paint"
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "leistung",
+            "t": "Improve image delivery"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Select elements do not have associated label elements."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Touch targets do not have sufficient size or spacing."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elements with visible text labels do not have matching accessible names."
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
       }
     },
     "markt-tomys-hub": {
       "url": "https://lausiklauskn-png.github.io/Tomys-Hub/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Tomys Hub",
       "nodeId": "yaerFGfy7yAajFEce-sUiE6jo263TwkUmbsjIS8Js-8",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "aaecfac8",
       "neuerText": "Tomys Hub ist der Werkzeug-Verbund für personalisierten Digitaldruck, Stickerei und Werbeartikel: Druckvorlagen für Tassen, T-Shirts, Handtücher, Kissen und Fotopuzzles selbst gestalten, Aufträge im WorkFloh verwalten, Angebote im BookLedger erstellen und Prompt-Vorlagen für Sublimationsdruck bauen.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "ab0e66f3675b8833",
@@ -76,18 +190,24 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Tomys-Hub/"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "noch_nicht_dran",
+        "url": "https://lausiklauskn-png.github.io/Tomys-Hub/"
       }
     },
     "markt-kim-bell": {
       "url": "https://lausiklauskn-png.github.io/Kim-Bell/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Kim-Bell",
       "nodeId": "Xg1xKoZ9vIgimEKlqeCDL_u4ptbRT6qvKplPAppyJfI",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "cb59a0ec",
       "neuerText": "Kim-Bell — die Glocke, mit der man sich sauber im gemeinsamen SBKIM-Raum anmeldet: eigene stabile Identität, Spore erzeugen, im Raum sichtbar werden und andere Knoten finden. Server-los, direkt im Browser, ohne Anmeldung.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "d996e88d923775a6",
@@ -95,18 +215,48 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 95,
+        "bedienbarkeit": 100,
+        "gute_praxis": 100,
+        "auffindbarkeit": 90,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Reduce unused JavaScript",
+            "ms": 450
+          },
+          {
+            "k": "leistung",
+            "t": "Network dependency tree"
+          },
+          {
+            "k": "leistung",
+            "t": "Render-blocking requests"
+          },
+          {
+            "k": "auffindbarkeit",
+            "t": "Links are not crawlable"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
       }
     },
     "markt-kimseek": {
       "url": "https://raw.githubusercontent.com/lausiklauskn-png/Kimseek/main/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Kimseek",
       "nodeId": "Yd8mwHSDYkcyd1meDe-7DJa5PS4KrY5bsl8VDn6x-TM",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "d9520216",
       "neuerText": "Kimseek — semantisches Such-Werkzeug, das die Bedeutung und Absicht hinter einer Frage versteht (nicht nur Stichwörter). Ordnet Treffer nach Bedeutungs-Nähe, server-los im Browser; optional Spracheingabe, Bild-/Handschrift-Erkennung (OCR) und eine KI-Brücke mit Web-Suche.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "3f7d6c75c511554b",
@@ -114,37 +264,117 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Kimseek/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 99,
+        "bedienbarkeit": 93,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Network dependency tree"
+          },
+          {
+            "k": "leistung",
+            "t": "Page prevented back/forward cache restoration"
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elements use prohibited ARIA attributes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elements with visible text labels do not have matching accessible names."
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Kimseek/"
       }
     },
     "markt-kimboard": {
       "url": "https://raw.githubusercontent.com/lausiklauskn-png/Kimboard/main/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Kimboard",
       "nodeId": "1f9Jb7c3SEI8dUOtGR6_meMaOaPgbz2GWXMLmPCZMv8",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "10dc52a2",
       "neuerText": "Kimboard — semantische Pinnwand: Fragen und Notizen an ein geborgtes „dummes Brett“ (Nostr) heften, geräteübergreifend und nach Bedeutung sortiert. Merken, Notizen, Frage-Antwort — server-los direkt im Browser, ohne Server und ohne Konto.",
       "wache": {
-        "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "ampel": "gelb",
+        "grund": "geaendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "cae86e9eda2e6fee",
-        "pruefsumme": "cae86e9eda2e6fee",
+        "pruefsumme": "825d8d44f0135976",
         "status": 200,
-        "seit": "2026-08-01",
+        "seit": "2026-08-02",
+        "url": "https://lausiklauskn-png.github.io/Kimboard/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 62,
+        "bedienbarkeit": 90,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Minify JavaScript",
+            "ms": 600
+          },
+          {
+            "k": "leistung",
+            "t": "Reduce unused JavaScript",
+            "ms": 150
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Select elements do not have associated label elements."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Touch targets do not have sufficient size or spacing."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Document does not have a main landmark."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Browser errors were logged to the console"
+          }
+        ],
         "url": "https://lausiklauskn-png.github.io/Kimboard/"
       }
     },
     "markt-privat-brain": {
       "url": "https://lausiklauskn-png.github.io/Privat-Brain/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Private Brain",
       "nodeId": "6rmW2Q-53mzEylZiWuW4yNsbnxlyEoLD11860i3y0Cg",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "55b9ac52",
       "neuerText": "Private Brain — dein privates zweites Gehirn: durchsucht deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) nach Bedeutung, offline, ohne dass Originale bewegt werden. Es liest jede Datei einmal, behält nur einen winzigen Bedeutungs-Katalog und lässt die Originale unangetastet — liest nur, schlägt vor, bewegt nichts.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "77182c0ff5ad3ada",
@@ -152,18 +382,24 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "noch_nicht_dran",
+        "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
       }
     },
     "markt-workfloh": {
       "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "WorkFloh",
       "nodeId": "6YOPHbnKWreoF5og4PGc3fre7du1FhVc7dY1d5jZyHs",
       "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "ab9d4f1c",
       "neuerText": "WorkFloh ist ein Endknoten im SBKIM-Mycel und arbeitet auf Grundlage des Sage-Protokolls — semantisch verbunden mit den verwandten Knoten Tomys Hub (Digitaldruck und Werbeartikel), BookLedgerPro (Buchhaltung, Angebot und Rechnung), Kimseek (Bedeutungs-Suche) und dem SB-KIMTool-Point. Sein Kern ist der digitale Auftragszettel eines Betriebs: von der Kundenannahme über die Produktion (Schilder, Folierung, Beschriftung, Druck) bis zur Übergabe, samt Zeiterfassung sowie Angebot und Rechnung. Zugleich ist WorkFloh ein wandelbares Arbeitstool, nicht auf eine Branche festgelegt: jede Firma installiert ihren eigenen, firmenspezifischen Auftragszettel — aus dem Werbetechnik-Zettel wird ebenso der Werkstatt-, Handwerks-, Montage-, Reinigungs- oder Dienstleistungs-Auftrag. Wie die Schwester-Knoten Rezeptbuch und Mixarium ein Baukasten: Kategorien umbenennen, Felder anpassen, ein neues Auftrags-Pake",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "db635778f8bfb664",
@@ -171,13 +407,18 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "noch_nicht_dran",
+        "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
       }
     },
     "markt-rezeptbuch": {
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "23db59c46a31676e",
@@ -185,13 +426,18 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "noch_nicht_dran",
+        "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
       }
     },
     "markt-mixarium": {
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "8e18c5370e2750c6",
@@ -199,19 +445,89 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 39,
+        "bedienbarkeit": 87,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Reduce unused JavaScript",
+            "ms": 450
+          },
+          {
+            "k": "leistung",
+            "t": "Total Blocking Time"
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Links rely on color to be distinguishable."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Missing source maps for large first-party JavaScript"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
       }
     },
     "markt-perfect-skin-beauty": {
       "lage": "ohne_spore",
       "wache": {
-        "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "ampel": "gelb",
+        "grund": "geaendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "a9aec591b6a4e7fb",
-        "pruefsumme": "a9aec591b6a4e7fb",
+        "pruefsumme": "c4da448590ceea57",
         "status": 200,
-        "seit": "2026-08-01",
+        "seit": "2026-08-02",
+        "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 92,
+        "bedienbarkeit": 96,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Avoid multiple page redirects",
+            "ms": 752
+          },
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "leistung",
+            "t": "Forced reflow"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elements with visible text labels do not have matching accessible names."
+          }
+        ],
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/"
       }
     },
@@ -219,7 +535,7 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "8e64345faed62f4d",
@@ -227,13 +543,53 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 96,
+        "bedienbarkeit": 94,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Use efficient cache lifetimes"
+          },
+          {
+            "k": "leistung",
+            "t": "Improve image delivery"
+          },
+          {
+            "k": "leistung",
+            "t": "Network dependency tree"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Heading elements are not in a sequentially-descending order"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elements with visible text labels do not have matching accessible names."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Browser errors were logged to the console"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
       }
     },
     "markt-mycel-karte": {
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "c2ce294cf1f5101b",
@@ -241,12 +597,49 @@
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
+      },
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 99,
+        "bedienbarkeit": 87,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-02",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Network dependency tree"
+          },
+          {
+            "k": "leistung",
+            "t": "Minify JavaScript"
+          },
+          {
+            "k": "leistung",
+            "t": "Minimize main-thread work"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Form elements do not have associated labels"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/mycel-karte/"
       }
     }
   },
   "wacheZaehler": {
-    "gruen": 14,
-    "gelb": 0,
+    "gruen": 12,
+    "gelb": 2,
     "rot": 0
+  },
+  "messungZaehler": {
+    "gemessen": 10,
+    "veraltet": 0,
+    "nicht_gemessen": 4
   }
 }
