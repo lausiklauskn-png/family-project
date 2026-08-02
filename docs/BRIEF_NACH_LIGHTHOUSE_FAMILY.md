@@ -96,6 +96,85 @@ Server. Erst der `curl`-Nachweis zählt.
 
 ---
 
+## 4b. ⭐ HIER GEHT ES WEITER: `markt.html` (Klaus, 2026-08-02 abends)
+
+Klaus hat nach den Merges alle vier Seiten selbst bei PageSpeed gemessen und
+entschieden: **„Fangen wir mit dem Markt an, der sieht am schlimmsten aus."**
+Das ist der Auftrag für die nächste Sitzung.
+
+### Klaus' echte Messwerte (Mobil, 2026-08-02 gegen 23:17 Uhr)
+
+| Seite | Leistung | Barrierefreiheit | Best Practices | SEO |
+|---|---|---|---|---|
+| Startseite | **68** (vorher 40) | **100** (vorher 89) | 96 | 100 |
+| `netzwerk.html` | **98** | 96 | 96 | 100 |
+| `werkzeuge.html` | **60** | 94 | 96 | 100 |
+| **`markt.html`** | **45** ← hier weiter | 96 | 96 | 100 |
+
+Die Startseite ist damit **bestätigt** von 40 auf 68 gestiegen, die
+Barrierefreiheit von 89 auf 100. Das ist Klaus' eigene Messung, keine
+Nachbildung.
+
+**Ein Befund, der die Diagnose stützt:** `netzwerk.html` trägt **denselben**
+three.js-Hintergrund und erreicht trotzdem 98. Sie hat nur kein 2,4-MB-Bild.
+
+### Was an `markt.html` wirklich fehlt — schon gemessen
+
+Nachgemessen am 2026-08-02 auf der Caddy-Nachbildung (Leistung 45, identisch
+mit Klaus' Wert):
+
+| | Wert | Urteil |
+|---|---|---|
+| **CLS (Layout-Sprünge)** | **0,853** | ⚠ **DAS ist der Hauptposten.** Grün wäre unter 0,1. |
+| Blockierzeit | 5.000 ms | Szenen-Aufbau von three.js, siehe § 5 Punkt 1 |
+| LCP | 1,8 s | gut |
+| Erster sichtbarer Inhalt | 1,8 s | gut |
+| Übertragung | 547 KiB | in Ordnung |
+
+**Die Ursache des Sprungs ist eingegrenzt:** Lighthouse benennt `<main>` mit
+einem Anteil von **0,8535**. In `markt.html` Zeile ~89 steht
+
+```html
+<div class="listings" id="mkListings"></div>
+```
+
+— **leer**, gefüllt wird erst später per JavaScript (Zeile ~902,
+`box.innerHTML = view.map(card).join("")`). Bis dahin hat der Container keine
+Höhe; sobald die Einträge kommen, schiebt sich alles darunter nach unten.
+
+**Ansatz:** dem Container vorab Platz reservieren (`min-height` passend zur
+üblichen Anzahl, oder Platzhalter-Karten in der Höhe einer echten Karte).
+**Vorher messen, wie hoch eine Karte tatsächlich ist** — nicht schätzen.
+
+### ⚠ Was an `markt.html` NICHT angefasst werden darf
+
+Die Seite rechnet beim Besuch Vektoren für die Marktplatz-Suche. Dazu gibt es
+eine **eigene Tafel-Entscheidung vom 2026-07-31** (unter ~20 Einträgen bleibt
+es lazy, darüber kommen vorberechnete Vektoren). **Das ist eine offene
+Bauaufgabe, kein Lighthouse-Fix.** Der CLS-Fix oben kommt ohne sie aus.
+
+Ebenfalls dort: `assets/vec-codec.js` und `assets/studio-markt.js` tragen noch
+`?v=84`, absichtlich — sie wurden am 2026-08-02 nicht geändert, ein Cache-Bust
+ohne Änderung wäre unnötig.
+
+### Danach `werkzeuge.html` (60)
+
+Auch schon gemessen. Drei **echte** Barrierefreiheits-Fehler, alle vom selben
+Typ wie die an der Startseite behobenen:
+
+1. **Fußzeilen-Kontrast 4,38:1** — dieselbe Zeile `opacity:.7` wie an der
+   Startseite. Dort auf `.85` gesetzt (5,99:1), hier noch offen. Der gleiche
+   Handgriff steht in `index.html` als Vorlage.
+2. **Überschriften-Sprung** bei `div#toolGrid > a.glass > h3`.
+3. **Sichtbarer Text passt nicht zum Vorlese-Namen** bei drei Knöpfen im Kopf
+   (`#fpReload`, `#langBtn`, `#themeBtn`): das `aria-label` enthält den
+   sichtbaren Text nicht. Beispiel: sichtbar „DE / EN", vorgelesen „Sprache
+   umschalten, Deutsch oder Englisch". Regel: der sichtbare Text muss im
+   Vorlese-Namen **vorkommen**. Diese Knöpfe stehen in **jeder** Seite —
+   einmal richtig gemacht, hilft es überall.
+
+---
+
 ## 5. Wo noch echte Punkte liegen (nach der Messung)
 
 Nach der Selbst-Bremse liegt die Leistung bei ~60. Was übrig bleibt:
