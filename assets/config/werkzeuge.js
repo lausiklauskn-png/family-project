@@ -11,7 +11,7 @@ window.FP_WERKZEUGE = [
     page: "werkzeuge/geschenkbox.html",
     open: "werkzeuge/geschenkbox.html",
     install: "" },
-  { id: "such", name: "Such-Werkzeug", icon: "🔍", iconImg: "assets/appicons/such.png",
+  { id: "such", name: "Such-Werkzeug", icon: "🔍", iconImg: "assets/appicons/such.webp",
     badge: { kind: "app", de: "PWA-App · zum Installieren", en: "PWA app · to install" },
     de: "Findet nach Bedeutung, nicht nach Stichwörtern. Läuft ganz im Browser, ohne Server, ohne Konto. Die reine App zum Installieren, ohne Netz-Anmeldung.",
     en: "Finds by meaning, not by keywords. Runs fully in the browser, no server, no account. The plain app to install, without network sign-in.",
@@ -36,11 +36,11 @@ window.FP_WERKZEUGE = [
    * Zwischen-Landingpage nötig). Rezeptbuch/Mixarium verlinken auf ihre
    * Landingpages (Klaus 2026-07-07); Jasons Tresor + Mein Tresor sind auf Klaus'
    * ausdrücklichen Wunsch (2026-07-07) gelistet. BookLedgerPro/WorkFloh weiter nicht. */
-  { id: "rezeptbuch", name: "Mein Rezeptbuch", icon: "📖", iconImg: "assets/appicons/rezeptbuch.png", external: true,
+  { id: "rezeptbuch", name: "Mein Rezeptbuch", icon: "📖", iconImg: "assets/appicons/rezeptbuch.webp", external: true,
     de: "Rezepte sammeln, ordnen, kochen und teilen. Mit Wochenplan, mehrsprachig, offline. Als App installierbar.",
     en: "Collect, organise, cook and share recipes. Weekly plan, multilingual, offline. Installable as an app.",
     open: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/" },
-  { id: "mixarium", name: "Mein Mixarium", icon: "🍹", iconImg: "assets/appicons/mixarium.png", external: true,
+  { id: "mixarium", name: "Mein Mixarium", icon: "🍹", iconImg: "assets/appicons/mixarium.webp", external: true,
     de: "Dein Getränke-Labor: Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Mehrsprachig, offline.",
     en: "Your drinks lab: cocktails, mocktails, smoothies, lemonades, teas and syrups. Multilingual, offline.",
     open: "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/" },
@@ -52,7 +52,7 @@ window.FP_WERKZEUGE = [
     de: "Die bebilderte Einladung ins Mycel: was das Netzwerk ist, wie es gedacht ist und wie man mitmacht.",
     en: "The illustrated invitation into the mycelium: what the network is and how to join.",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/docs/einladung/" },
-  { id: "kimtoolpoint", name: "SB-KIMTool-Point", icon: "🛰️", iconImg: "assets/appicons/point.png", external: true,
+  { id: "kimtoolpoint", name: "SB-KIMTool-Point", icon: "🛰️", iconImg: "assets/appicons/point.webp", external: true,
     de: "Der öffentliche Knoten-Punkt: Werkzeugkiste und Andock-Stelle, um eine eigene Seite ans Netzwerk zu bringen.",
     en: "The public node point: toolbox and docking station to bring your own site onto the network.",
     open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/" },
@@ -64,7 +64,7 @@ window.FP_WERKZEUGE = [
     de: "Der Dreh-Safe mit 20 Fächern: jedes Fach ein echter AES-Tresor mit eigenem Passwort. Tarnfach und Schlüssel-Teilung inklusive.",
     en: "The dial safe with 20 compartments: each one a real AES vault with its own password. Decoy compartment and key splitting included.",
     open: "https://lausiklauskn-png.github.io/Mein-Tresor/" },
-  { id: "pinnwand", name: "Pinnwand", icon: "📌", iconImg: "assets/appicons/pinnwand.png", external: true,
+  { id: "pinnwand", name: "Pinnwand", icon: "📌", iconImg: "assets/appicons/pinnwand.webp", external: true,
     badge: { kind: "app", de: "PWA-App · zum Installieren", en: "PWA app · to install" },
     de: "Ein offenes Frage-Antwort-Brett. Antworten lassen sich nach Bedeutung sortieren (gratis, als Rangfolge). Optional versteht ein KI-Richter die Absicht, etwa alkoholfrei = wirklich kein Alkohol. Im Browser, ohne Konto. Die reine App zum Installieren, ohne Netz-Anmeldung.",
     en: "An open question-and-answer board. Answers can be sorted by meaning (free, as a ranking). An AI judge optionally grasps intent, e.g. alcohol-free = really no alcohol. In the browser, no account. The plain app to install, without network sign-in.",
@@ -75,17 +75,17 @@ window.FP_WERKZEUGE = [
    * Such-Werkzeug, Kimboard die Pinnwand — beide nun als vollwertige Endknoten;
    * Kim-Bell ist die „Mit dem Netz verbinden"-Glocke. external:true → öffnen die
    * Live-App direkt in einem neuen Tab. */
-  { id: "kimbell", name: "Kim-Bell", icon: "🔔", iconImg: "assets/appicons/kimbell.png", external: true,
+  { id: "kimbell", name: "Kim-Bell", icon: "🔔", iconImg: "assets/appicons/kimbell.webp", external: true,
     badge: { kind: "node", de: "Eigener Knoten im Netz", en: "Its own node in the network" },
     de: "Die Netz-Glocke: melde dich mit einer eigenen, stabilen Identität sauber im gemeinsamen SBKIM-Raum an und finde andere Knoten. Server-los, im Browser.",
     en: "The network bell: sign in cleanly to the shared SBKIM room with your own stable identity and find other nodes. Server-less, in the browser.",
     open: "https://lausiklauskn-png.github.io/Kim-Bell/" },
-  { id: "kimseek", name: "Kimseek", icon: "🔍", iconImg: "assets/appicons/kimseek.png", external: true,
+  { id: "kimseek", name: "Kimseek", icon: "🔍", iconImg: "assets/appicons/kimseek.webp", external: true,
     badge: { kind: "node", de: "Eigener Knoten im Netz", en: "Its own node in the network" },
     de: "Dieselbe Suche wie das Such-Werkzeug, aber als eigener Knoten im Netz. Findet nach Bedeutung, mit Sprache, Bild- und Handschrift-Erkennung und KI-Brücke. Und sie kann selbst andere Knoten fragen.",
     en: "The same search as the Such-Werkzeug, but as its own node in the network. Finds by meaning, with voice, image and handwriting recognition and an AI bridge. And it can query other nodes itself.",
     open: "https://lausiklauskn-png.github.io/Kimseek/" },
-  { id: "kimboard", name: "Kimboard", icon: "📌", iconImg: "assets/appicons/kimboard.png", external: true,
+  { id: "kimboard", name: "Kimboard", icon: "📌", iconImg: "assets/appicons/kimboard.webp", external: true,
     badge: { kind: "node", de: "Eigener Knoten im Netz", en: "Its own node in the network" },
     de: "Dieselbe Pinnwand, aber als eigener Knoten im Netz. Fragen und Notizen an ein geteiltes Brett heften: geräteübergreifend, nach Bedeutung sortiert, mit anderen Knoten verbunden.",
     en: "The same pinboard, but as its own node in the network. Pin questions and notes to a shared board: across devices, sorted by meaning, connected to other nodes.",
@@ -94,7 +94,7 @@ window.FP_WERKZEUGE = [
   /* Referenz-Beispiele (2026-07-06, Klaus): eigene Seite mit live eingebetteten
    * Beispielen neu gebauter Internetseiten aus der Werkstatt. Erste Referenz:
    * Tomys Schaufenster. */
-  { id: "referenzen", name: "Referenz-Beispiele", icon: "🖼️", iconImg: "assets/appicons/tomys.png",
+  { id: "referenzen", name: "Referenz-Beispiele", icon: "🖼️", iconImg: "assets/appicons/tomys.webp",
     de: "So sieht eine neu gebaute Internetseite aus: echte Beispiele aus der Werkstatt, live eingebettet. Den Anfang macht Tomys Schaufenster.",
     en: "What a freshly built web page looks like: real examples from the workshop, embedded live. Tomy's showcase makes the start.",
     page: "referenzen.html",

@@ -14,9 +14,22 @@
  *     Grund unsichtbar zu Weiß verblassen).
  *
  * Lädt als <script type="module"> mit Importmap "three" -> vendor.
+ *
+ * three.js wird NACHGELADEN statt fest eingebunden (Lighthouse 2026-08-02).
+ * Vorher stand hier `import * as THREE from 'three'`. Dadurch hing die
+ * Bibliothek (172 KiB über die Leitung) in der kritischen Kette des
+ * Seitenaufbaus — für einen Hintergrund, der zum ersten Eindruck nichts
+ * beiträgt.
+ *
+ * Gemessen hat das den ersten sichtbaren Inhalt und den Speed-Index verbessert;
+ * die Dauer-Renderschleife weiter unten bleibt davon aber UNBERÜHRT, die ist
+ * ein eigenes Thema (siehe docs/PULS.md, Eintrag 2026-08-02). Ehrlich gesagt:
+ * dieser Umbau allein bewegt die Gesamtnote kaum.
+ *
+ * Schlägt das Nachladen fehl, bleibt die Seite voll benutzbar — nur ohne
+ * bewegten Hintergrund (fail-soft).
  */
-import * as THREE from 'three';
-
+function mycelBgStarten(THREE) {
 const canvas = document.getElementById('bg');
 if (canvas) {
   const reduce = window.matchMedia &&
@@ -235,3 +248,16 @@ if (canvas) {
     requestAnimationFrame(tick);
   }
 }
+}
+
+/* Der Anstoß: erst nach "load", und dann erst, wenn der Hauptfaden Luft hat. */
+(function () {
+  const los = () => import('three')
+    .then((m) => { mycelBgStarten(m); if (window.MycelBg) { try { window.MycelBg.setTheme(); } catch (_e) {} } })
+    .catch(() => {});
+  const gleich = () => (window.requestIdleCallback
+    ? requestIdleCallback(los, { timeout: 2000 })
+    : setTimeout(los, 200));
+  if (document.readyState === 'complete') gleich();
+  else window.addEventListener('load', gleich, { once: true });
+})();
