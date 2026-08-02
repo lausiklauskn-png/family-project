@@ -260,7 +260,9 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .disc-shot{transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg))}
 .disc-shot.flash{box-shadow:var(--glow);transform:perspective(800px) scale(1.02)}
 .disc-info{flex:1;min-width:200px}
-.disc-info h3{margin:0 0 4px;font-size:1.25rem}
+/* h2 mit aufgefuehrt: die Weekly-Ueberschrift ist seit 2026-08-02 eine h2
+   (Gliederungsebene, siehe index.html). Die Optik bleibt damit unveraendert. */
+.disc-info h2,.disc-info h3{margin:0 0 4px;font-size:1.25rem}
 .disc-info p{margin:0 0 12px;color:var(--muted)}
 .disc-fair{font-size:.8rem;color:var(--muted);margin-top:14px}
 

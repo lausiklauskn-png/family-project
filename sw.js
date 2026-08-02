@@ -15,7 +15,7 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v84";
+var CACHE_VERSION = "family-projekt-v85";
 // Versions-Anhang der Asset-Adressen (?v=NN) — MUSS zur Zahl in CACHE_VERSION
 // passen und in ALLEN HTML-Seiten identisch stehen.
 //
@@ -31,13 +31,29 @@ var CACHE_VERSION = "family-projekt-v84";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "84";
+var ASSET_V = "85";
+// Absichtlich NICHT mehr im Vorrat (Messung 2026-08-02):
+//
+// 1. "og-image.png" (386 KiB). Das ist das Vorschaubild für geteilte Links.
+//    Die Seite ZEIGT es nie — Facebook/WhatsApp/Google holen es sich selbst
+//    vom Server, wenn jemand den Link teilt. Im Vorrat kostete es bei jedem
+//    Erstbesuch 386 KiB für nichts. Wird es doch einmal angefragt, legt der
+//    fetch-Handler weiter unten es ganz normal ab.
+//
+// 2. "./" — dieselbe Datei wie "index.html", nur unter anderer Adresse. Für
+//    den Cache sind das ZWEI Einträge, also zwei Downloads derselben 36 KiB.
+//    Der navigate-Rückfall unten sucht deshalb beide Schreibweisen ab.
+//
+// Ehrlich dazugesagt: das verbessert den Lighthouse-Wert NICHT. Lighthouse
+// misst den ersten Seitenaufbau, und der Service-Worker legt erst danach los.
+// Es spart echten Erstbesuchern rund 420 KiB Datenvolumen — mehr nicht, aber
+// auch nicht weniger.
 var CORE = [
-  "./", "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
+  "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=84", "assets/app.js?v=84", "assets/status-widget.js?v=84",
+  "assets/style.css?v=85", "assets/app.js?v=85", "assets/status-widget.js?v=85",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
-  "manifest.json", "icon-192.png", "icon-512.png", "og-image.png"
+  "manifest.json", "icon-192.png", "icon-512.png"
 ];
 
 self.addEventListener("install", function (e) {
@@ -97,6 +113,26 @@ self.addEventListener("fetch", function (e) {
         }
         return res;
       }).catch(function () { return caches.match(req); })
+    );
+    return;
+  }
+
+  // Seitenaufrufe: offline der Reihe nach "index.html" UND "./" absuchen.
+  // Nötig, seit "./" nicht mehr im Vorrat steht (siehe CORE oben) — sonst
+  // stünde ein Aufruf von "/" offline vor einem leeren Speicher.
+  if (req.mode === "navigate") {
+    e.respondWith(
+      fetch(req).then(function (res) {
+        if (res && res.ok && res.type === "basic") {
+          var clone = res.clone();
+          caches.open(CACHE_VERSION).then(function (c) { c.put(req, clone); });
+        }
+        return res;
+      }).catch(function () {
+        return caches.match(req)
+          .then(function (h) { return h || caches.match("index.html"); })
+          .then(function (h) { return h || caches.match("./"); });
+      })
     );
     return;
   }

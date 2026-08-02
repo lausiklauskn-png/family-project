@@ -4,6 +4,105 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-02, abends: family-projekt.de selbst — die Startseite
+
+Klaus' PageSpeed-Bericht (Mobil): **Leistung 40 · Barrierefreiheit 89 ·
+Best Practices 96 · SEO 100.**
+
+### Die Ursache stand NICHT in Googles Vorschlagsliste
+
+Lighthouse schlug „JavaScript komprimieren" (870 ms) und „nicht verwendetes
+JavaScript" (450 ms) vor. Beides zusammen: gut eine Sekunde. Die eigentliche
+Last lag woanders:
+
+**`assets/mycel-bg.js` verursachte 40.411 ms von 41.800 ms Hauptthread-Arbeit.**
+In Klaus' Bericht sind **alle zwanzig** längsten Aufgaben dieselbe Datei, je
+180–255 ms, über vierzig Sekunden verteilt. Das ist nicht das Laden von
+three.js, das ist die **Dauer-Renderschleife**: auf einem Prüfgerät ohne
+Grafikbeschleunigung wird jedes einzelne Bild zu einer langen Aufgabe.
+
+Gegengeprüft durch Ausbauen: ohne den Hintergrund springt die Leistung von
+30 auf 68 und die Blockierzeit von 156.000 ms auf 120 ms.
+
+### Was das für die Lehre der Vorsitzung bedeutet
+
+Der Brief warnte zu Recht: die Kimboard-Lehre („doppelte Downloads sind mit
+Cache-Kopfzeilen harmlos") galt hier nicht ungeprüft. **Klaus' Bericht hat es
+am echten Server bestätigt: Cache-TTL steht bei JEDER Datei auf „None".**
+Caddy setzt keinen einzigen Cache-Header. Das ist kein Repo-Problem — es liegt
+bei Klaus (Ein-Zeilen-Befehl unten).
+
+Ebenso hat sich eine Zahl aus dem Brief korrigiert: three.js wiegt **nicht**
+656 KiB über die Leitung, sondern 172 KiB — Caddy komprimiert. Der Verdacht
+war richtig, die Größenordnung nicht.
+
+### Umgesetzt (gemessen, gleicher Mess-Server, per `git stash` umgeschaltet)
+
+|  | vorher | nachher |
+|---|---|---|
+| Leistung | 31 | 49 |
+| Barrierefreiheit | 89 | **100** |
+| Erster sichtbarer Inhalt | 3,0 s | 1,1 s |
+| Größter Inhalt (LCP) | 16,5 s | 4,2 s |
+| Übertragung Erstbesuch | 2960 KiB | **698 KiB** |
+| Blockierzeit | 161.640 ms | 163.010 ms (unverändert) |
+
+1. **Bild des Tages: 2393 → 206 KiB.** Es war das LCP-Element und allein
+   82 % der gesamten Übertragung — geliefert in 1983 × 793, angezeigt in
+   644 × 258. Jetzt WebP mit 1536 Punkten Breite, PNG bleibt als Rückfall.
+   Der Unterschied zum Original wurde gemessen (mittlere Abweichung 3,4 von
+   255, PSNR 31,5), nicht behauptet. Anleitung: `docs/BILDER-VERKLEINERN.md`.
+2. **App-Symbole: 668 → 135 KiB** (`point.png` 96 → 18 KiB). Sie erscheinen
+   zufällig in der Weekly Discovery — deshalb sah Klaus `point.png` und die
+   Messung hier `mixarium.png`. Alle zehn umgestellt, mit PNG-Rückfall.
+3. **Bild steht jetzt im HTML** statt per JavaScript nachgetragen. Es wurde
+   380 ms zu spät gefunden („LCP-Anfrageerkennung"), dazu `fetchpriority`.
+4. **16 SBKIM-Skripte auf `defer`** (1.220 ms rendering-blockierend).
+   **Nicht** verschoben wurden `app.js`, `status-widget.js` und die beiden
+   Konfig-Dateien: der große Inline-Block braucht `FP.getLang()` und
+   `FP_TAGESBILD` synchron. Die Gegenprobe hat das bestätigt — mit `app.js`
+   auf `defer` bricht die Seite mit `FP is not defined`.
+5. **Drei echte Barrierefreiheits-Fehler behoben** → Wert von 89 auf 100:
+   Fußzeilen-Kontrast 4,39:1 → 5,99:1 (nachgerechnet), verstecktes
+   WorkFloh-Extra aus dem Vorlese-Baum genommen (es hatte ein leeres
+   `aria-label`), Weekly-Überschrift von `h3` auf `h2` (Gliederungssprung).
+6. **Service-Worker-Vorrat entschlackt:** `og-image.png` (386 KiB, wird auf
+   der Seite nie gezeigt) und die Dublette `"./"` heraus, dafür sucht der
+   Offline-Rückfall jetzt beide Schreibweisen ab. **Ehrlich: das bewegt die
+   Lighthouse-Zahl nicht** — der Service-Worker startet erst nach der
+   Messung. Es spart echten Erstbesuchern rund 420 KiB.
+7. **three.js wird nachgeladen** statt fest eingebunden. Allein gemessen
+   bringt das wenig (30 → 33), weil die Renderschleife bleibt; zusammen mit
+   dem Rest hilft es dem ersten sichtbaren Inhalt.
+
+### Was NICHT gemacht wurde — und warum
+
+- **„JavaScript komprimieren" (133 KiB).** Betrifft fast nur `sbkim/*.js`.
+  Das sind **byte-gleiche Kopien aus dem Sage-Kanon**; minifizieren erzeugt
+  Drift. Wenn, dann in Sage und von dort zurückgeholt — nicht hier.
+- **„Nicht verwendetes JavaScript" (100 KiB).** Ausschließlich three.js.
+  Wegzuschneiden bräuchte einen Bau-Schritt; die Seite ist bau-frei.
+- **Die Renderschleife selbst.** Größter Posten, aber sie ändert das
+  Verhalten → laut Brief § 6 Klaus' Entscheidung. Zahlen liegen vor
+  (siehe unten).
+- **Nicht zusammengesetzte Animationen** (Holo-Schrift). Optik der Marke,
+  und der Prüfpunkt ist unbewertet — kostet keine Punkte.
+- **Cache-Kopfzeilen.** Server-Einstellung, kein Repo-Thema.
+
+### Offen für Klaus
+
+1. **Caddy-Cache-Kopfzeilen** — 2.984 KiB bei jedem Wiederbesuch. Befehl
+   liegt vor.
+2. **Renderschleife:** gemessen wurde eine Selbst-Bremse (bei schwacher
+   Grafik bleibt ein statisches Bild stehen, auf Klaus' Tablet ändert sich
+   nichts): Leistung 49 → 59, Blockierzeit 163.000 → 7.480 ms.
+   Zum Vergleich Hintergrund ganz aus: 68.
+
+**Die Zahlen oben sind meine Messung auf einer nachgebildeten Auslieferung.
+Was wirklich zählt, ist Klaus' nächste PageSpeed-Messung.**
+
+---
+
 ## ✅ 2026-08-02, später Nachmittag: Landingpage, Hand-Eintragung, Mess-Streuung
 
 ### Rezeptbuch-Landingpage 53 → 81 (`Mein-Rezeptbuch-Page#17`)
