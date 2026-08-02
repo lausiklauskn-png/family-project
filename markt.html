@@ -542,7 +542,39 @@
        * verschwindet von allein, niemand muss aufräumen.
        *
        * Und er sieht nie aus wie eine eigene Messung: `stand` ist "von_hand",
-       * Karte und Fenster schreiben das hin. */
+       * Karte und Fenster schreiben das hin.
+       *
+       * ── Zwei Nachbesserungen vom 2026-08-02 (echter Fehlfall) ────────────
+       * Beobachtet an Mein Mixarium: die Karte zeigte hartnäckig Leistung 39,
+       * obwohl von Hand 76 eingetragen war. Zwei Ursachen, beide hier:
+       *
+       * 1. ANDERE ADRESSE. Die gespeicherte eigene Messung galt der
+       *    LANDINGPAGE (Mein-Mixarium-Page), der Eintrag misst inzwischen aber
+       *    die APP (appUrl). Zwei Zahlen über zwei verschiedene Seiten — die
+       *    ältere darf die neuere nicht verdrängen, nur weil sie „eigen" ist.
+       *    Jetzt gewinnt eine eigene Messung nur, wenn sie DIESELBE Adresse
+       *    gemessen hat. Sobald der nächtliche Lauf die App misst, passt die
+       *    Adresse und er gewinnt wieder von allein.
+       *
+       * 2. GLEICHER TAG. Beide Werte trugen 2026-08-02 — der eine von morgens
+       *    (vor den Verbesserungen), der andere von nachmittags. Auf Tages-
+       *    genauigkeit ist das nicht zu unterscheiden. Deshalb darf `gemessen`
+       *    jetzt eine Uhrzeit tragen ("2026-08-02 15:10"). Der Vergleich ist
+       *    weiterhin ein schlichter Zeichenketten-Vergleich, und der ordnet
+       *    das von selbst richtig: "2026-08-02" < "2026-08-02 15:10" (kürzer
+       *    kommt zuerst), und "2026-08-03" schlägt beide. Es braucht also
+       *    keinen Datums-Rechner.
+       *
+       * Beides macht den Hand-Wert NICHT stärker als eine frische eigene
+       * Messung — es verhindert nur, dass eine veraltete oder auf etwas
+       * anderes gerichtete Messung ihn blockiert. */
+      function msGleicheAdresse(a, b) {
+        // Ohne Adresse auf einer Seite lässt sich nichts vergleichen → als
+        // „passt" werten, damit sich das Verhalten von früher nicht ändert.
+        if (!a || !b) return true;
+        var norm = function (u) { return String(u).replace(/\/+$/, "").toLowerCase(); };
+        return norm(a) === norm(b);
+      }
       function handAuflegen(hand) {
         var n = 0;
         for (var id in hand) {
@@ -550,14 +582,17 @@
           var h = hand[id];
           if (!h || typeof h !== "object" || !msZahlen(h)) continue;
           var da = MESSUNG[id];
-          // Gleiches Datum → die eigene Messung gewinnt. Sie ist die bessere
-          // Quelle, wenn beide gleich alt sind.
-          if (msZahlen(da) && String(da.gemessen || "") >= String(h.gemessen || "")) continue;
-          var m = { stand: "von_hand", gemessen: String(h.gemessen || "") };
-          for (var i = 0; i < MS_KAT.length; i++) m[MS_KAT[i]] = h[MS_KAT[i]];
           var eintrag = null;
           for (var a = 0; a < ALL.length; a++) if (ALL[a] && ALL[a].anchorId === id) { eintrag = ALL[a]; break; }
-          m.url = h.url || (da && da.url) || (eintrag && (eintrag.appUrl || eintrag.url)) || "";
+          var ziel = h.url || (eintrag && (eintrag.appUrl || eintrag.url)) || "";
+          // Die eigene Messung gewinnt nur, wenn sie dieselbe Adresse gemessen
+          // hat UND nicht älter ist als die Ablesung.
+          if (msZahlen(da)
+              && msGleicheAdresse(da.url, ziel)
+              && String(da.gemessen || "") >= String(h.gemessen || "")) continue;
+          var m = { stand: "von_hand", gemessen: String(h.gemessen || "") };
+          for (var i = 0; i < MS_KAT.length; i++) m[MS_KAT[i]] = h[MS_KAT[i]];
+          m.url = ziel || (da && da.url) || "";
           if (h.schaufenster && msZahlen(h.schaufenster)) {
             var s = { stand: "von_hand", gemessen: String(h.schaufenster.gemessen || h.gemessen || "") };
             for (var j = 0; j < MS_KAT.length; j++) s[MS_KAT[j]] = h.schaufenster[MS_KAT[j]];
@@ -577,6 +612,12 @@
        * von Hand eingetragener Wert wurde nicht gemessen, und das Wort dafuer
        * darf nicht so tun. */
       function msDatumWort(mm) { return FP.t(mm && mm.stand === "von_hand" ? "mk_ms_von_hand" : "mk_ms_von"); }
+      /* Angezeigt wird immer NUR der Tag. `gemessen` darf intern eine Uhrzeit
+       * tragen ("2026-08-02 15:00"), aber ausschließlich, um zwei Ablesungen
+       * DESSELBEN Tages in die richtige Reihenfolge zu bringen. Sie ist keine
+       * Behauptung über die Minute und hat deshalb auf der Karte nichts zu
+       * suchen — sonst stünde dort eine Genauigkeit, die niemand geprüft hat. */
+      function msDatum(s) { return String(s || "").slice(0, 10); }
       function msReihe(mm) {
         return MS_KAT.map(function (k) {
           return '<span class="mk-ms-w is-' + msStufe(mm[k]) + '">' +
@@ -615,7 +656,7 @@
         return '<div class="mk-mess">' +
           '<p class="mk-ms-zeile">' + werte + '</p>' +
           '<p class="mk-ms-sum">' + esc(summe) +
-            (m.gemessen ? ' <small>(' + esc(msDatumWort(m)) + esc(m.gemessen) + ')</small>' : '') + '</p>' +
+            (m.gemessen ? ' <small>(' + esc(msDatumWort(m)) + esc(msDatum(m.gemessen)) + ')</small>' : '') + '</p>' +
           (m.stand === "veraltet" ? '<p class="mk-ms-alt">' + esc(FP.t("mk_ms_alt")) + '</p>' : '') +
           // Ein von Hand eingetragener Wert wird als solcher ausgewiesen. Er
           // darf nie aussehen wie eine eigene Messung — sonst waere die Zahl
@@ -745,11 +786,11 @@
               '<p>' + esc(FP.t("mk_ms_sf_txt")) + '</p>' +
               '<p class="mk-ms-sf-z"><b>' + esc(FP.t("mk_ms_sf_app")) + '</b>' +
                 '<span class="mk-ms-sf-w">' + msReihe(m) +
-                (m.gemessen ? '<small>(' + esc(msDatumWort(m)) + esc(m.gemessen) + ')</small>' : '') + '</span></p>' +
+                (m.gemessen ? '<small>(' + esc(msDatumWort(m)) + esc(msDatum(m.gemessen)) + ')</small>' : '') + '</span></p>' +
               (msZahlen(sf)
                 ? '<p class="mk-ms-sf-z"><b>' + esc(FP.t("mk_ms_sf_seite")) + '</b>' +
                     '<span class="mk-ms-sf-w">' + msReihe(sf) +
-                    (sf.gemessen ? '<small>(' + esc(msDatumWort(sf)) + esc(sf.gemessen) + ')</small>' : '') + '</span>' +
+                    (sf.gemessen ? '<small>(' + esc(msDatumWort(sf)) + esc(msDatum(sf.gemessen)) + ')</small>' : '') + '</span>' +
                     (sf.stand === "veraltet" ? '<small>' + esc(FP.t("mk_ms_alt")) + '</small>' : '') + '</p>'
                 : '<p class="mk-ms-fix-leer">' + esc(FP.t("mk_ms_sf_keine")) + '</p>') +
             '</section>'
@@ -762,7 +803,7 @@
         d.innerHTML =
           '<div class="mk-ms-box">' +
             '<h3 id="mkMessH">' + esc(FP.t("mk_ms_dlg_h")) + ' — ' + esc((eintrag && eintrag.label) || id) + '</h3>' +
-            '<p class="mk-ms-dlg-datum">' + (m.gemessen ? esc(msDatumWort(m)) + esc(m.gemessen) : "") +
+            '<p class="mk-ms-dlg-datum">' + (m.gemessen ? esc(msDatumWort(m)) + esc(msDatum(m.gemessen)) : "") +
               (m.werkzeug ? ' · Lighthouse ' + esc(m.werkzeug) : '') + '</p>' +
             (m.stand === "veraltet" ? '<p class="mk-ms-alt">' + esc(FP.t("mk_ms_alt")) + '</p>' : '') +
             (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t("mk_ms_hand_lang")) + '</p>' : '') +

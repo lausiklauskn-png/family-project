@@ -464,6 +464,14 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
   const s3 = http.createServer((req, res) => {
     const p = decodeURIComponent(req.url.split("?")[0]);
     if (p === "/assets/config/spore-stand.json") { res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify(BERICHT)); return; }
+    // Auch die HAND-Datei wird abgefangen, und zwar LEER. Ohne das läse der
+    // Test die echte assets/config/messung-hand.json mit — und prüfte dann
+    // nicht mehr sein Thema, sondern den Tagesstand von Klaus' Ablesungen.
+    // (Genau so wurde er rot, als die ersten Hand-Werte eingetragen waren:
+    // „12 von 14 Karten sagen 'noch nicht gemessen'" — die zwei fehlenden
+    // waren die mit Hand-Wert.) Wer die Hand-Werte prüfen will, hat dafür
+    // tests/smoke_messung_hand.mjs.
+    if (p === "/assets/config/messung-hand.json") { res.writeHead(200, { "content-type": "application/json" }); res.end("{}"); return; }
     if (p === "/assets/config/listings.js") { res.writeHead(200, { "content-type": "text/javascript" }); res.end(listingsTest); return; }
     const fp = path.join(ROOT, p === "/" ? "/index.html" : p);
     if (!fp.startsWith(ROOT) || !fs.existsSync(fp) || fs.statSync(fp).isDirectory()) { res.writeHead(404); res.end("404"); return; }
