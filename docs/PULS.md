@@ -13,9 +13,12 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 **`/report`**. Geändert, an EINER Stelle (`PAGESPEED`).
 
 **Ehrlich:** von der Bau-Maschine ist `pagespeed.web.dev` nicht erreichbar
-(Proxy) — die neue Adresse ist also **nicht nachgemessen**, sondern gewusst.
-Klaus muss einmal klicken. Der Test pinnt sie, damit eine künftige Änderung
-absichtlich passiert.
+(Proxy) — die neue Adresse war also **nicht nachgemessen**, sondern gewusst.
+Der Test pinnt sie, damit eine künftige Änderung absichtlich passiert.
+
+**✅ Bestätigt (Klaus, 2026-08-02): „bei Google erscheint die Auswertung."** Der
+Knopf führt jetzt zum vollen Lighthouse-Bericht. Damit ist der letzte offene
+Punkt aus Stufe 5 geschlossen.
 
 ### 2. Die Knöpfe standen nicht auf einer Höhe
 
