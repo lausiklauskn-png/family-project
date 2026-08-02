@@ -36,7 +36,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=82" />
+  <link rel="stylesheet" href="assets/style.css?v=83" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -270,6 +270,8 @@
         mk_ms_dlg_fix_spar: "spart rund ",
         mk_ms_dlg_quelle: "Gemessen mit Google Lighthouse in der Handy-Ansicht über Mobilfunk, einmal je Nacht. Eine Messung ist eine Momentaufnahme und schwankt — ein paar Punkte Unterschied bedeuten nichts. Der vollständige Bericht liegt öffentlich unter assets/config/spore-stand.json; jeder kann nachrechnen.",
         mk_ms_dlg_zu: "Schließen",
+        mk_ms_dlg_voll: "↗ Vollständigen Bericht bei Google öffnen",
+        mk_ms_dlg_voll_hint: "Öffnet Googles PageSpeed Insights für diese Adresse — dasselbe Lighthouse, aber frisch gemessen. Dort steht jede einzelne Prüfung mit Begründung und Verbesserungs-Vorschlag. Weil dort neu gemessen wird, können die Zahlen ein paar Punkte von unseren abweichen; das ist normal und genau der Punkt: du musst uns nicht glauben, du kannst nachsehen.",
         mk_ms_k_leistung: "Leistung",
         mk_ms_k_bedienbarkeit: "Bedienbarkeit",
         mk_ms_k_gute_praxis: "Gute Praxis",
@@ -373,6 +375,8 @@
         mk_ms_dlg_fix_spar: "saves roughly ",
         mk_ms_dlg_quelle: "Measured with Google Lighthouse in mobile view over mobile data, once a night. A measurement is a snapshot and it fluctuates — a few points of difference mean nothing. The full report is public at assets/config/spore-stand.json; anyone can check the maths.",
         mk_ms_dlg_zu: "Close",
+        mk_ms_dlg_voll: "↗ Open the full report at Google",
+        mk_ms_dlg_voll_hint: "Opens Google PageSpeed Insights for this address — the same Lighthouse, measured fresh. Every single audit is listed there with its reasoning and how to improve it. Because it measures anew, the numbers may differ from ours by a few points; that is normal, and exactly the point: you do not have to take our word for it, you can look.",
         mk_ms_k_leistung: "Performance",
         mk_ms_k_bedienbarkeit: "Accessibility",
         mk_ms_k_gute_praxis: "Best practices",
@@ -408,9 +412,9 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/app.js?v=82"></script>
-  <script src="assets/vec-codec.js?v=82"></script>
-  <script src="assets/status-widget.js?v=82"></script>
+  <script src="assets/app.js?v=83"></script>
+  <script src="assets/vec-codec.js?v=83"></script>
+  <script src="assets/status-widget.js?v=83"></script>
   <script>
     (function () {
       function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -603,6 +607,13 @@
           '</section>';
         }).join("");
 
+        // Die Adresse, die gemessen wurde. Sie steht im Bericht (der Wächter
+        // schreibt sie mit); fehlt sie, wird der Eintrag genommen. Nur https —
+        // ein Link zu einem Prüfdienst mit einer krummen Adresse wäre nutzlos.
+        var ziel = "";
+        var kandidat = String((m && m.url) || (eintrag && eintrag.url) || "");
+        if (/^https:\/\//i.test(kandidat)) ziel = kandidat;
+
         var d = document.createElement("dialog");
         d.className = "mk-ms-dlg";
         d.id = "mkMessOv";
@@ -618,7 +629,25 @@
             '<p class="mk-ms-dlg-farben">' + esc(FP.t("mk_ms_dlg_farben")) + '</p>' +
             bloecke +
             '<p class="mk-ms-fuss">' + esc(FP.t("mk_ms_dlg_quelle")) + '</p>' +
+            // Der Link zum vollen Bericht bei Google. Klaus' Wunsch: „ein Link,
+            // der genau anzeigt, wie die Werte zustande kommen und was empfohlen
+            // wird." Genau das ist PageSpeed Insights — dasselbe Lighthouse, jede
+            // einzelne Prüfung mit Begründung. Und es ist der ehrlichste Beleg
+            // gegen den Schummel-Verdacht: der Besucher misst selbst nach, bei
+            // Google, ohne uns.
+            //
+            // rel="noopener noreferrer" wie bei jedem Außen-Link, target="_blank"
+            // damit der Marktplatz offen bleibt. Aufgerufen wird nur, wenn jemand
+            // klickt — kein Aufruf im Hintergrund.
+            (ziel
+              ? '<p class="mk-ms-dlg-vollhint">' + esc(FP.t("mk_ms_dlg_voll_hint")) + '</p>'
+              : '') +
             '<div class="mk-ms-dlg-actions">' +
+              (ziel
+                ? '<a class="btn ghost" target="_blank" rel="noopener noreferrer" href="' +
+                    esc("https://pagespeed.web.dev/analyze?url=" + encodeURIComponent(ziel)) + '">' +
+                    esc(FP.t("mk_ms_dlg_voll")) + '</a>'
+                : '') +
               '<button class="btn ghost" type="button" id="mkMessZu">' + esc(FP.t("mk_ms_dlg_zu")) + '</button>' +
             '</div>' +
           '</div>';
@@ -1207,6 +1236,6 @@
   <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
        App-spezifischer Speicher-Präfix; Token nur im Browser. -->
   <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
-  <script src="assets/studio-markt.js?v=82" defer></script>
+  <script src="assets/studio-markt.js?v=83" defer></script>
 </body>
 </html>

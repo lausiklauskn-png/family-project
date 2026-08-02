@@ -52,6 +52,12 @@
  *      Nachbesserung gelesen werden — sonst steht bei jedem Anbieter etwas, was
  *      er gar nicht abstellen kann.
  *   8. Den Deckel je Kategorie aufgehoben -> Fall A8 fiel durch.
+ *   9. Den https-Filter vor dem Link zum Prüfdienst entfernt -> Fall C3l fiel
+ *      durch: eine http-Adresse wurde an Google weitergereicht. Gegengeprüft
+ *      mit einer echten http-Adresse im Bericht, nicht nur behauptet (C4d).
+ *  10. Den Knopf mit eigener Größe/Polster/Rundung gestylt -> Fälle C2d/C2e
+ *      fielen durch. Auch Optik lässt sich messen: verglichen wird gegen
+ *      „→ Zur Seite" auf DERSELBEN Karte.
  *
  * WAS DIESER TEST BEIM BAUEN GELERNT HAT (2026-08-01). Ohne installiertes
  * Lighthouse startete das Werkzeug für JEDEN Eintrag einen eigenen Prozess, der
@@ -536,6 +542,24 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       "C3h und die stehen wirklich drin (" + (d.fixPunkte[0] || "—") + ")");
     ok(d.leer >= 1, "C3i wo nichts offen ist, steht das auch — kein leerer Kasten");
     ok(/spart rund/.test(d.text), "C3j und wo Lighthouse eine Ersparnis nennt, steht sie dabei");
+
+    // Klaus 2026-08-02: „es sollte doch eigentlich ein Link sein, der genau
+    // anzeigt, wie die Werte zustande kommen und was empfohlen wird."
+    // Das ist Googles PageSpeed Insights — dasselbe Lighthouse, jede einzelne
+    // Prüfung mit Begründung, und unabhängig von uns nachmessbar.
+    const link = await page.evaluate(() => {
+      const a = document.querySelector("#mkMessOv a[href*='pagespeed']");
+      return a ? { href: a.getAttribute("href"), ziel: a.getAttribute("target"),
+                   rel: a.getAttribute("rel"), text: a.textContent } : null;
+    });
+    ok(!!link, "C3k das Fenster trägt einen Link zum vollen Bericht");
+    ok(!!link && /^https:\/\/pagespeed\.web\.dev\/analyze\?url=https%3A%2F%2F/.test(link.href),
+      "C3l und er zeigt auf die gemessene Adresse, sauber kodiert (" + (link && link.href.slice(0, 72)) + "…)");
+    ok(!!link && link.ziel === "_blank" && /noopener/.test(link.rel) && /noreferrer/.test(link.rel),
+      "C3m neuer Tab, mit noopener/noreferrer wie jeder Außen-Link");
+    ok(/können die Zahlen ein paar Punkte von unseren abweichen/.test(d.text),
+      "C3n und es steht ehrlich dabei, dass Google neu misst und leicht abweichen kann");
+
   }
 
   // C3b — Escape schließt, der Fokus kehrt zum Knopf zurück.
@@ -547,6 +571,29 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     }));
     ok(zu.weg, "C4 Escape schließt das Fenster und räumt es aus dem Dokument");
     ok(/mk-ms-btn/.test(zu.fokus), "C4b und der Fokus kehrt auf den Knopf zurück, der geöffnet hat");
+  }
+
+  // C4c — eine unverschlüsselte Adresse bekommt GAR KEINEN Link zum Prüfdienst.
+  // Ein Marktplatz, der http-Adressen an einen Dienst weiterreicht, hilft
+  // niemandem — und der Wächter meldet so einen Eintrag ohnehin schon gelb.
+  {
+    const p5 = await browser.newPage();
+    await p5.route("**/assets/config/spore-stand.json*", (r) => r.fulfill({
+      status: 200, contentType: "application/json",
+      body: JSON.stringify({ eintraege: { "markt-bookledgerpro": { lage: "gleich", messung: {
+        stand: "gemessen", leistung: 90, bedienbarkeit: 90, gute_praxis: 90, auffindbarkeit: 90,
+        gemessen: "2026-08-02", url: "http://unverschluesselt.example/" } } } })
+    }));
+    await p5.goto(base + "/markt.html", { waitUntil: "load" });
+    await p5.waitForSelector(".listing .mk-ms-btn", { timeout: 20000 });
+    await p5.click(".listing .mk-ms-btn");
+    await p5.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
+    const l = await p5.evaluate(() => ({
+      link: !!document.querySelector("#mkMessOv a[href*='pagespeed']"),
+      zahlen: /90/.test(document.getElementById("mkMessOv").textContent)
+    }));
+    ok(l.zahlen && !l.link, "C4d bei einer http-Adresse: Zahlen ja, Link zum Prüfdienst nein");
+    await p5.close();
   }
 
   // C5 — der Schieberegler. GEGENPROBE 4 hing hier.
