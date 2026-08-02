@@ -69,6 +69,38 @@ family-projekt.de, www.family-projekt.de {
 	@config path /assets/config/*
 	header @config Cache-Control "public, max-age=300, must-revalidate"
 
+	# ── Cache-Kopfzeilen für alles Übrige ────────────────────────────────
+	# ⚠ STAND: im Repo eingetragen 2026-08-02, am Server NOCH NICHT bestätigt.
+	# Wer das liest und es nicht selbst nachgemessen hat: eine Vorlage im Repo
+	# ist kein Beweis für den Server (dieselbe Falle wie 2026-08-01, als hier
+	# "sieben Tage" stand, die es am Server nie gab). Nachweis-Befehl steht in
+	# docs/CADDY-CACHE.md.
+	#
+	# Befund aus Klaus' PageSpeed-Bericht vom 2026-08-02: Cache-TTL stand bei
+	# JEDER Datei auf "None" — 2.984 KiB wurden bei jedem Wiederbesuch neu
+	# geholt. Die Matcher unten überschneiden sich ABSICHTLICH nicht mit
+	# @config oben; bei zwei zutreffenden header-Regeln wäre sonst unklar,
+	# welche gewinnt.
+	#
+	# Bilder ändern sich praktisch nie und tragen keine Versionsnummer im
+	# Namen -> 30 Tage.
+	@bilder path /assets/appicons/* /assets/tagesbilder/* /assets/*.svg /icon-*.png /og-image.png
+	header @bilder Cache-Control "public, max-age=2592000"
+
+	# Code: nur EIN Tag, und das mit Absicht. Die Dateien unter /sbkim/ und
+	# /vendor/ tragen KEIN ?v=NN in der Adresse — bei 30 Tagen käme eine
+	# Modul-Änderung dort einen Monat lang nicht an. Die versionierten
+	# Dateien (style.css, app.js, status-widget.js, mycel-bg.js) sind davon
+	# unberührt: deren Adresse ändert sich beim Deploy ohnehin.
+	@code path /sbkim/* /vendor/* /assets/style.css /assets/app.js /assets/status-widget.js /assets/mycel-bg.js /assets/tool-landing.js /assets/vec-codec.js /assets/studio-markt.js
+	header @code Cache-Control "public, max-age=86400"
+
+	# HTML bewusst NICHT lang cachen: sonst sieht ein Wiederbesucher nach
+	# einem Deploy die alte Seite. must-revalidate heisst: kurz nachfragen,
+	# ob es etwas Neues gibt — das ist billig und hält die Seite frisch.
+	@seiten path *.html /
+	header @seiten Cache-Control "public, max-age=0, must-revalidate"
+
 	@models path /models/*
 	header @models Access-Control-Allow-Origin "*"
 
