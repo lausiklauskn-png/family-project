@@ -421,6 +421,25 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .mk-ms-dlg-datum{font-family:var(--mono);font-size:.78rem!important;opacity:.75}
 .mk-ms-dlg-technisch{border-left:3px solid var(--gold);padding-left:11px;color:var(--text)!important}
 .mk-ms-dlg-farben{font-size:.8rem!important;opacity:.85}
+/* Der Hinweis auf der Karte, dass die App bewertet ist und nicht das
+   Schaufenster davor. Steht nur bei den Einträgen, die beides haben — bei
+   allen anderen gibt es den Unterschied gar nicht (Klaus 2026-08-02). */
+.listing .mk-ms-ziel{font-size:.78rem;opacity:.8;margin-top:2px}
+
+/* Beide Messungen untereinander im Bewertungs-Fenster. Bewusst zwei Zeilen
+   und kein Schrägstrich: „92/55" zwingt zum Raten, welche Zahl wozu gehört. */
+.mk-ms-sf{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
+.mk-ms-sf h4{margin:0 0 7px;font-size:.95rem}
+/* Beschriftung auf eigener Zeile, Zahlen darunter nebeneinander. Am Handy
+   (412 px) passen vier Plaketten sonst nicht in eine Zeile neben das Wort —
+   sie brechen um, dehnen sich und die Beschriftung steht neben einer einzigen
+   Zahl. Nachgesehen, nicht angenommen (Sichtprobe 2026-08-02). */
+.mk-ms-sf-z{margin-bottom:11px!important}
+.mk-ms-sf-z b{display:block;color:var(--text);font-size:.83rem;margin-bottom:5px}
+.mk-ms-sf-w{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mk-ms-sf-w .mk-ms-w{flex:0 0 auto}
+.mk-ms-sf-z small{opacity:.7;font-family:var(--mono);font-size:.76rem}
+
 .mk-ms-kat{border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
 .mk-ms-kat h4{margin:0 0 7px;font-size:.95rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .mk-ms-fix-h{font-weight:600;color:var(--text)!important;margin-bottom:5px!important;font-size:.83rem!important}
