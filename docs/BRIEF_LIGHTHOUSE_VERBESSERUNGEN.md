@@ -182,6 +182,44 @@ ersten Zeile Code die `CLAUDE.md` des Repos lesen.** Die wichtigsten:
 neuen Laufzeit-Abhängigkeiten. Eine App, die zehn Punkte gewinnt und dafür
 online sein muss, hat verloren.
 
+### 5.1 ⚠ Die Falle, die schon zugeschnappt ist: `width`/`height` ohne `height:auto`
+
+**Passiert bei Mixarium am 2026-08-02, gefunden von Klaus, nicht von einer Prüfung.**
+
+Lighthouse verlangt „Bildmaße angeben" — also `width="500" height="500"` ans Bild.
+Sobald diese Attribute dastehen, gelten sie aber als **feste Maße**, solange das CSS
+nicht widerspricht. Und typisches CSS für ein Bild in einer Karte sieht so aus:
+
+```css
+.proofrow img{width:100%; …}     /* Breite gesetzt, Höhe NICHT */
+```
+
+Ergebnis am Handy: Breite schrumpft auf die Spalte (157 px), Höhe bleibt starr bei
+500 px. Das Bild wird dreifach hochgezogen. Die **Messzahl wird besser, die Seite
+wird schlechter** — das ist der schlimmste Fall, weil es niemandem auffällt, der nur
+auf die Zahl schaut.
+
+**Pflicht ab sofort:** Wer `width`/`height` an ein Bild schreibt, sucht die
+zugehörige CSS-Regel und stellt sicher, dass dort `height:auto` steht. Dann nimmt der
+Browser die beiden Attribute nur noch als **Seitenverhältnis** — der Platz wird
+weiterhin vorab freigehalten (der CLS-Gewinn bleibt), das Bild bleibt unverzerrt.
+
+Faustregel: `width:100%` ohne `height:auto` und mit Maß-Attributen = kaputt.
+Ausnahmen sind Regeln, die Breite **und** Höhe setzen (`.gal img{width:100%;height:150px;
+object-fit:cover}`) — die sind unbedenklich, dort schneidet `object-fit` sauber zu.
+
+**So wird es geprüft** (echter Browser, keine Behauptung): Seite mit
+`python3 -m http.server` ausliefern, mit dem vorhandenen Chromium in Handy-Breite
+(412 px) öffnen, für jedes Bild `getBoundingClientRect()` gegen `naturalWidth/Height`
+vergleichen. Weicht das Verhältnis um mehr als 0,02 ab, ist das Bild verzerrt.
+Zwei Dinge dabei nicht vergessen:
+
+1. `loading="lazy"` erst auf `eager` setzen, sonst ist `naturalWidth` schlicht `0`
+   und die Prüfung misst Luft.
+2. **Gegenprobe machen** — `height:auto` testweise wieder herausnehmen und
+   nachsehen, ob die Prüfung wirklich rot wird. Eine Prüfung, die den Fehler nicht
+   anzeigt, ist keine Prüfung.
+
 ---
 
 ## 6. Was erfahrungsgemäß am meisten bringt
