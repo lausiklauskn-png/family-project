@@ -89,14 +89,44 @@ war richtig, die Größenordnung nicht.
   und der Prüfpunkt ist unbewertet — kostet keine Punkte.
 - **Cache-Kopfzeilen.** Server-Einstellung, kein Repo-Thema.
 
+### Nachtrag: Selbst-Bremse eingebaut (Klaus' Entscheid, gleicher Abend)
+
+Klaus hat sich für die Selbst-Bremse entschieden. Die Renderschleife misst
+sich jetzt selbst: bleiben **fünf Bilder hintereinander** unter 20 Bildern
+je Sekunde, bleibt ein **statisches Bild** stehen — dasselbe, das Geräte mit
+„Bewegung reduzieren" seit jeher bekommen. Der Hintergrund verschwindet
+nicht, er hört nur auf, sich zu drehen.
+
+| | vorher | mit Bremse |
+|---|---|---|
+| Leistung (drei Läufe) | 31 | **60 / 60 / 59** |
+| Blockierzeit | 161.640 ms | **6.610–7.880 ms** |
+| Hauptthread | 180.000 ms | 9.529 ms |
+
+**Auf Klaus' Tablet ändert sich nichts** — dort liegt die Bildzeit bei
+~0,016 s, die Schwelle bei 0,05 s. Ein einzelner Aussetzer (Tab-Wechsel)
+bremst nicht, weil der Zähler bei jedem schnellen Bild zurückgesetzt wird.
+
+Neuer Wächter `tests/smoke_bremse.mjs` (16 Prüfungen) hält die Regel fest:
+bei 21+ Bildern/s darf sie **nie** greifen, bei 0,2 s je Bild **muss** sie.
+Er liest die Zahlen aus der echten Datei, veraltet also nicht still.
+
+**Was der Wächter NICHT kann, ehrlich gesagt:** Er prüft die Regel, nicht
+das Erlebnis. Ob der Hintergrund auf Klaus' Tablet weiter flüssig läuft,
+sieht nur Klaus — diese Maschine hat keinen Grafikchip und kann es nicht
+nachstellen.
+
+`assets/mycel-bg.js` hat zudem ein `?v=86` bekommen. Die Datei stand weder
+in CORE noch trug sie eine Versionsnummer — die Änderung wäre im Browser
+womöglich nie angekommen (derselbe Fehlertyp wie 2026-08-01 bei
+`status-widget.js`). **Offen:** `tests/smoke_cache_version.mjs` prüft nur
+`style.css`/`app.js`/`status-widget.js`, `mycel-bg.js` also nicht.
+
 ### Offen für Klaus
 
 1. **Caddy-Cache-Kopfzeilen** — 2.984 KiB bei jedem Wiederbesuch. Befehl
-   liegt vor.
-2. **Renderschleife:** gemessen wurde eine Selbst-Bremse (bei schwacher
-   Grafik bleibt ein statisches Bild stehen, auf Klaus' Tablet ändert sich
-   nichts): Leistung 49 → 59, Blockierzeit 163.000 → 7.480 ms.
-   Zum Vergleich Hintergrund ganz aus: 68.
+   liegt im Folge-Brief.
+2. **Browser-Sichttest** am Tablet: dreht sich der Hintergrund noch?
 
 **Die Zahlen oben sind meine Messung auf einer nachgebildeten Auslieferung.
 Was wirklich zählt, ist Klaus' nächste PageSpeed-Messung.**
