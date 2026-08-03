@@ -93,7 +93,14 @@ for (const f of htmlFiles) {
    * dann rät der Browser selbst). Derselbe Fehlertyp wie am 2026-08-01 bei
    * status-widget.js. Der Pfad-Teil erlaubt ../, weil die Seiten unter
    * werkzeuge/ eine Ebene tiefer liegen. */
-  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js|status-widget\.js|mycel-bg\.js)(\?v=(\d+))?"/g)) {
+  /* studio-markt.js + vec-codec.js seit 2026-08-03 mit in der Liste — dritter
+   * Fall desselben Fehlers. Beide standen fest auf ?v=84, während alles andere
+   * bei 89 war, und keine der beiden steht in CORE. Sie hingen damit frei am
+   * HTTP-Cache. Real passiert: das Studio bekam die Fähigkeit, von Hand
+   * eingetragene Werte anzuzeigen — im Browser blieb die alte Datei, und Klaus
+   * sah dort weiter Leistung 46, während die Karte daneben 94 zeigte. Der Test
+   * war grün, weil er genau diese zwei Dateien nicht ansah. */
+  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js|status-widget\.js|mycel-bg\.js|studio-markt\.js|vec-codec\.js)(\?v=(\d+))?"/g)) {
     refs++;
     if (m[3] !== assetV) wrong.push(`${f.replace(repoRoot + "/", "")}: assets/${m[1]}${m[2] || " (ohne ?v=)"}`);
   }
