@@ -89,7 +89,7 @@
       ms_leistung: "Leistung", ms_bedienbarkeit: "Bedienbarkeit",
       ms_gute_praxis: "Gute Praxis", ms_auffindbarkeit: "Auffindbarkeit",
       ms_st_gemessen: "gemessen", ms_st_veraltet: "veraltet (letzte Messung fehlgeschlagen)",
-      ms_st_nicht_gemessen: "nicht gemessen",
+      ms_st_nicht_gemessen: "nicht gemessen", ms_st_von_hand: "von Hand eingetragen",
       ms_am: "am ",
       ms_g_noch_nicht_dran: "war noch nicht an der Reihe (Deckel je Lauf)",
       ms_regler_h: "Ab welchem Leistungswert wird gelistet?",
@@ -212,7 +212,7 @@
       ms_leistung: "Performance", ms_bedienbarkeit: "Accessibility",
       ms_gute_praxis: "Best practices", ms_auffindbarkeit: "Findability",
       ms_st_gemessen: "measured", ms_st_veraltet: "stale (last measurement failed)",
-      ms_st_nicht_gemessen: "not measured",
+      ms_st_nicht_gemessen: "not measured", ms_st_von_hand: "entered by hand",
       ms_am: "on ",
       ms_g_noch_nicht_dran: "not its turn yet (per-run cap)",
       ms_regler_h: "From which performance value on is an entry listed?",
@@ -756,6 +756,11 @@
    * Alles aus dieser Datei ist fremder Text und wird ausschließlich über
    * textContent gesetzt, nie als HTML. */
   var SPORENSTAND = null;
+  /* Getrennt vom Sporen-Stand: die Messwerte MIT daraufgelegten Hand-Werten.
+   * Bewusst eine eigene Struktur — in die Sporen-Liste gehoert ein Eintrag, der
+   * nur einen Hand-Messwert hat, gerade NICHT hinein (er haette dort weder Lage
+   * noch Ampel und stuende faelschlich als „unbrauchbar" da). */
+  var MESSSTAND = null;
   var LAGE_TEXT = { geaendert: "sp_lage_geaendert", uebernommen: "sp_lage_uebernommen",
                     gleich: "sp_lage_gleich", unerreichbar: "sp_lage_unerreichbar",
                     unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich",
@@ -792,13 +797,62 @@
     return 3;
   }
 
+  /* ── Hand-Werte auch hier einblenden (Befund 2026-08-03) ───────────────────
+   * `markt.html` legt seit dem 2026-08-02 die von Hand eingetragenen Werte aus
+   * assets/config/messung-hand.json ueber die naechtliche Messung. Das Studio
+   * tat das NICHT — es las nur spore-stand.json. Folge: Klaus sah auf der Karte
+   * den frischen Wert und im Studio daneben noch den alten (Tomys Hub: 94 gegen
+   * 46). Nicht falsch gerechnet, nur eine Quelle zu wenig gelesen.
+   *
+   * Dieselben zwei Regeln wie drueben, damit beide Seiten dasselbe zeigen:
+   * die eigene Messung gewinnt nur, wenn sie DIESELBE Adresse gemessen hat UND
+   * nicht aelter ist als die Ablesung. Der Hand-Wert verschwindet damit von
+   * allein, sobald der naechtliche Lauf nachzieht — aufraeumen muss niemand. */
+  function msGleicheAdresse(a, b) {
+    // Ohne Adresse auf einer Seite laesst sich nichts vergleichen → als „passt"
+    // werten, damit sich das Verhalten von frueher nicht aendert.
+    if (!a || !b) return true;
+    var norm = function (u) { return String(u).replace(/\/+$/, "").toLowerCase(); };
+    return norm(a) === norm(b);
+  }
+  function messStandBauen(st, hand) {
+    var out = { eintraege: {} };
+    var e = (st && st.eintraege) || {};
+    for (var k in e) if (e[k] && e[k].messung) out.eintraege[k] = { messung: e[k].messung };
+    if (!hand || typeof hand !== "object") return out;
+    for (var id in hand) {
+      if (id.charAt(0) === "_") continue;            // _hinweis ueberspringen
+      var h = hand[id];
+      if (!h || typeof h !== "object" || !msZahlen(h)) continue;
+      var da = out.eintraege[id] && out.eintraege[id].messung;
+      var eintrag = findeEintrag(id);
+      // Hat der Eintrag ein Schaufenster, ist `appUrl` das Mess-Ziel — genau
+      // die Adresse, die auch tools/messung.mjs misst.
+      var ziel = h.url || (eintrag && (eintrag.appUrl || eintrag.url)) || "";
+      if (msZahlen(da) && msGleicheAdresse(da.url, ziel)
+          && String(da.gemessen || "") >= String(h.gemessen || "")) continue;
+      var m = { stand: "von_hand", gemessen: String(h.gemessen || ""), url: ziel };
+      for (var i = 0; i < MS_KAT.length; i++) m[MS_KAT[i]] = h[MS_KAT[i]];
+      out.eintraege[id] = { messung: m };
+    }
+    return out;
+  }
+
   function sporenLaden() {
     var box = panel && panel.querySelector("[data-role=sporen]");
     if (!box) return Promise.resolve();
-    return fetch("assets/config/spore-stand.json?ts=" + Date.now(), { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .catch(function () { return null; })
-      .then(function (st) { SPORENSTAND = st; renderSporen(st); renderMessung(st); reglerAnzeigen(); });
+    var hol = function (datei) {
+      return fetch("assets/config/" + datei + "?ts=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .catch(function () { return null; });
+    };
+    return Promise.all([hol("spore-stand.json"), hol("messung-hand.json")])
+      .then(function (beides) {
+        var st = beides[0], hand = beides[1];
+        SPORENSTAND = st;                        // Sporen-Liste bleibt unberuehrt
+        MESSSTAND = messStandBauen(st, hand);    // Messwerte mit Hand-Werten
+        renderSporen(st); renderMessung(MESSSTAND); reglerAnzeigen();
+      });
   }
 
   function renderSporen(st) {
@@ -938,7 +992,9 @@
     var wirk = panel.querySelector("[data-role=msreglerwirkung]");
     if (out) out.textContent = MIN_LEISTUNG > 0 ? (T("ms_regler_ab") + MIN_LEISTUNG) : T("ms_regler_aus");
     if (wirk) {
-      var n = msZaehleRaus(SPORENSTAND);
+      // Die ueberlagerten Werte zaehlen, nicht die rohen — sonst wuerde der
+      // Regler eine Seite wegnehmen, die auf der Karte laengst gut dasteht.
+      var n = msZaehleRaus(MESSSTAND || SPORENSTAND);
       wirk.textContent = n === 0 ? T("ms_regler_wirkung_0")
         : n + (n === 1 ? T("ms_regler_wirkung_1") : T("ms_regler_wirkung_n"));
     }
