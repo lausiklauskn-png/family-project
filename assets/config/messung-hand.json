@@ -34,5 +34,19 @@
       "auffindbarkeit": 100,
       "gemessen": "2026-08-02 15:00"
     }
+  },
+  "markt-tomys-hub": {
+    "leistung": 94,
+    "bedienbarkeit": 96,
+    "gute_praxis": 96,
+    "auffindbarkeit": 100,
+    "gemessen": "2026-08-03 18:36",
+    "schaufenster": {
+      "leistung": 98,
+      "bedienbarkeit": 100,
+      "gute_praxis": 100,
+      "auffindbarkeit": 100,
+      "gemessen": "2026-08-03 18:29"
+    }
   }
 }
