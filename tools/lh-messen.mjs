@@ -15,7 +15,15 @@ import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+/* Standardmäßig dieses Repo. Mit LH_ROOT lässt sich ein ANDERES Repo messen,
+ * ohne das Werkzeug zu kopieren — die Abhängigkeiten (lighthouse,
+ * playwright-core) liegen nur hier, darum wird es immer VON HIER aufgerufen:
+ *   cd /home/user/family-project
+ *   LH_ROOT=/home/user/Tomys-Hub node tools/lh-messen.mjs index.html --trace
+ * (Am 2026-08-03 lag kurzzeitig eine zweite, bis auf diese Zeile identische
+ * Kopie daneben. Zwei Werkzeuge, die dasselbe tun, driften auseinander —
+ * darum wieder eines.) */
+const ROOT = process.env.LH_ROOT || path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SEITE = process.argv[2] || "werkzeuge.html";
 const MIT_TRACE = process.argv.includes("--trace");
 const LAEUFE = Number((process.argv.find((a) => a.startsWith("--laeufe=")) || "").split("=")[1] || 1);
