@@ -28,6 +28,12 @@ Auf dein **Hetzner-Webhosting per WebFTP**, in **denselben Ordner** wie
 
 2. **`marktplatz-api.php` per WebFTP** neben `einreichung.php` / `freigabe.php` laden.
 
+> **Nachtrag 2026-08-03 — einmal neu hochladen.** `marktplatz-api.php` hat die Aktion
+> `commit_wache` dazubekommen (Studio-Knopf „✓ Gesehen — Seite ist in Ordnung"). Ohne die
+> neue Fassung auf dem Server bleibt der Knopf im Studio zwar sichtbar, das Veröffentlichen
+> meldet dann aber einen Fehler. Die Konfig muss **nicht** angefasst werden: fehlt
+> `wache_path`, nimmt die Datei von selbst `assets/config/wache-hand.json`.
+
 Fertig. Im Studio (Langdruck aufs Copyright) oben bei **„📥 Eingereicht"** dein
 Studio-Passwort eintragen (Haken „merken") → **„Vom Server holen"**.
 
@@ -45,6 +51,12 @@ Studio-Passwort eintragen (Haken „merken") → **„Vom Server holen"**.
   (`hash_equals`). Kontakt-Anfragen bleiben `freigabe.php` vorbehalten.
 - `commit_listings` schreibt nie eine leere/kaputte Datei (Schutz-Prüfung), `commit_image`
   nur ins Depot `assets/apps/`.
+- `commit_wache` hat den **schärfsten** Prüfer, weil es die Ampel berührt: erlaubt ist je
+  Eintrag **ausschließlich `gesehen`** (eine Hex-Prüfsumme). `ampel`, `grund` und alles
+  andere werden **abgelehnt**, nicht still entfernt. Eine Seite **sperren oder freigeben**
+  kann man über den Browser also **nicht** — das bleibt Handarbeit in
+  `assets/config/wache-hand.json`. Quittiert wird nur „ich habe hingesehen, die Seite ist in
+  Ordnung"; ändert sich die Seite erneut, meldet der Wächter wieder.
 - Eine Warteschlange (`warteschlange.jsonl`) für Formular, `freigabe.php` und Studio —
   keine Dopplung. Der `.htaccess`-Schutz (Warteschlange/Config) gilt wie gehabt.
 

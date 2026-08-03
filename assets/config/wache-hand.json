@@ -1,3 +1,15 @@
 {
-  "_hinweis": "Handschalter des Wächters (Stufe 3). Je Eintrag die anchorId als Schlüssel. ampel: rot sperrt, gelb warnt, gruen gibt frei (auch für eine Seite, die gerade nicht antwortet) — die Hand gewinnt über die Automatik, mit EINER Ausnahme: einen Safe-Browsing-Treffer kann sie nicht grün schalten. gesehen: Prüfsumme, die als in Ordnung quittiert ist; ein Gelb wegen Änderung ist damit erledigt, bis die Seite sich erneut ändert. grund: wird im Marktplatz und im Studio angezeigt, also verständlich formulieren. Beispiel: \"markt-beispiel\": { \"ampel\": \"rot\", \"grund\": \"Zielseite verlangt plötzlich eine Anmeldung.\" }"
+  "_hinweis": "Handschalter des Wächters (Stufe 3). Je Eintrag die anchorId als Schlüssel. ampel: rot sperrt, gelb warnt, gruen gibt frei (auch für eine Seite, die gerade nicht antwortet) — die Hand gewinnt über die Automatik, mit EINER Ausnahme: einen Safe-Browsing-Treffer kann sie nicht grün schalten. gesehen: Prüfsumme, die als in Ordnung quittiert ist; ein Gelb wegen Änderung ist damit erledigt, bis die Seite sich erneut ändert. grund: wird im Marktplatz und im Studio angezeigt, also verständlich formulieren. Beispiel: \"markt-beispiel\": { \"ampel\": \"rot\", \"grund\": \"Zielseite verlangt plötzlich eine Anmeldung.\" }",
+  "markt-kimboard": {
+    "gesehen": "7656fee65be280c8"
+  },
+  "markt-rezeptbuch": {
+    "gesehen": "103072b040aeb496"
+  },
+  "markt-mixarium": {
+    "gesehen": "a7534e183560d44f"
+  },
+  "markt-perfect-skin-beauty": {
+    "gesehen": "eb41ea6ed82528ca"
+  }
 }

@@ -126,6 +126,25 @@ if (!base) {
   const touchedCore = changed.filter((f) => core.includes(f));
   const swChanged = changed.includes("sw.js");
 
+  /* ---- Geänderte ?v=-Assets, die NICHT in CORE stehen ---------------------
+   * Der Wächter oben prüft nur die CORE-Liste. studio-markt.js und
+   * vec-codec.js stehen dort nicht — sie hängen allein an ihrer ?v=-Adresse.
+   * Ändert man ihren Inhalt, ohne ASSET_V zu erhöhen, bleibt die Adresse
+   * gleich und der Browser liefert weiter die alte Datei aus. Genau das ist am
+   * 2026-08-03 passiert (die neue Studio-Fassung kam nie an) — und beinahe ein
+   * zweites Mal in derselben Sitzung. Ohne diese Prüfung merkt es niemand:
+   * jeder andere Test ist grün, weil er ohne HTTP-Cache läuft. */
+  const versAssets = ["assets/studio-markt.js", "assets/vec-codec.js"];
+  const touchedVers = changed.filter((f) => versAssets.includes(f) && !core.includes(f));
+  if (touchedVers.length) {
+    let assetVBase = null;
+    try { assetVBase = (/var\s+ASSET_V\s*=\s*"(\d+)"/.exec(git("show", `${base}:sw.js`)) || [])[1]; }
+    catch { /* egal */ }
+    console.log(`  · geänderte ?v=-Assets ausserhalb CORE: ${touchedVers.join(", ")}`);
+    ok(assetVBase != null && assetV !== assetVBase,
+      `ASSET_V erhöht (${assetVBase} → ${assetV}) — sonst käme die Änderung nie an`);
+  }
+
   if (touchedCore.length === 0) {
     console.log("  · keine CORE-Datei gegenüber origin/main geändert — nichts zu prüfen");
     ok(true, "kein Cache-Bump nötig");

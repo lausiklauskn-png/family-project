@@ -20,6 +20,11 @@ return [
   // Ziel der vorberechneten Such-Vektoren (Studio-Knopf „Vektoren bauen").
   // Optional — fehlt die Zeile, nimmt marktplatz-api.php genau diesen Wert.
   'vectors_path' => 'assets/config/listings-vec.json',
+  // Ziel der Wächter-Quittungen (Studio-Knopf „✓ Gesehen — Seite ist in
+  // Ordnung"). Über diesen Weg kann NUR `gesehen` geschrieben werden; rot/grün
+  // schalten bleibt Handarbeit in der Datei. Optional — fehlt die Zeile, nimmt
+  // marktplatz-api.php genau diesen Wert.
+  'wache_path'   => 'assets/config/wache-hand.json',
   // Absenderadresse für Ablehnungs-Mails (Adresse auf DIESER Maschine).
   'mail_from'    => 'noreply@family-projekt.de',
   // Muss auf dieselbe Warteschlange zeigen wie einreichung.php.

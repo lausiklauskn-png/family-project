@@ -177,6 +177,51 @@ if ($action === 'commit_vectors') {
   out($ok ? array('ok' => true, 'info' => $info, 'count' => count($pack['vectors'])) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);
 }
 
+/* ============================ commit_wache (Quittungen des Wächters) ============================ */
+/*
+ * Schwester von commit_listings, aber mit dem SCHÄRFSTEN Prüfer von allen —
+ * denn hier geht es um die Ampel, die einen Eintrag öffentlich sperren kann.
+ *
+ * Warum es diese Aktion überhaupt gibt (2026-08-03): das gelbe „Inhalt hat sich
+ * geändert" steht öffentlich auf der Karte, verschwindet nie von selbst, und war
+ * ohne Datei-Bearbeitung nicht loszuwerden. Der Betreiber konnte eine Warnung
+ * über die eigene Seite nicht abstellen — und gewöhnt sich dann an, alle
+ * Warnungen zu übersehen.
+ *
+ * Die Grenze bleibt aber hart: über diesen Weg darf NUR quittiert werden.
+ *   - erlaubt je Eintrag ausschliesslich "gesehen" (eine Hex-Prüfsumme),
+ *   - "ampel", "grund" und alles andere werden ABGELEHNT, nicht etwa still
+ *     entfernt: eine Sperre soll niemand aus dem Browser setzen oder lösen.
+ *     Wer rot/grün schalten will, bearbeitet die Datei weiterhin von Hand.
+ *   - Schlüssel müssen wie eine anchorId aussehen; "_hinweis" bleibt erlaubt,
+ *     damit die Erklärung in der Datei nicht verloren geht.
+ * Ein bestehender Eintrag mit "ampel" kann also nicht per Browser verändert
+ * werden — das Studio schickt ihn unverändert mit, und genau das lehnt der
+ * Prüfer ab, wenn jemand daran gedreht hat.
+ */
+if ($action === 'commit_wache') {
+  require_key($STUDIO_KEY, $B);
+  $content = (string) req($B, 'content', '');
+  if (strlen($content) > 64000) out(array('ok' => false, 'error' => 'too_large'), 422);
+  $data = json_decode($content, true);
+  if (!is_array($data)) out(array('ok' => false, 'error' => 'content_not_json'), 422);
+  $n = 0;
+  foreach ($data as $id => $eintrag) {
+    if ($id === '_hinweis') { if (!is_string($eintrag)) out(array('ok' => false, 'error' => 'hinweis_invalid'), 422); continue; }
+    if (!preg_match('~^[a-z0-9-]{3,64}$~', (string) $id)) out(array('ok' => false, 'error' => 'bad_key'), 422);
+    if (!is_array($eintrag)) out(array('ok' => false, 'error' => 'entry_invalid'), 422);
+    foreach ($eintrag as $feld => $wert) {
+      if ($feld !== 'gesehen') out(array('ok' => false, 'error' => 'field_not_allowed'), 422);
+      if (!is_string($wert) || !preg_match('~^[0-9a-f]{8,64}$~', $wert)) out(array('ok' => false, 'error' => 'bad_checksum'), 422);
+    }
+    $n++;
+  }
+  $wachePath = isset($CFG['wache_path']) && $CFG['wache_path'] !== ''
+    ? (string) $CFG['wache_path'] : 'assets/config/wache-hand.json';
+  list($ok, $info) = gh_put_file($CFG, $wachePath, base64_encode($content), 'Studio: Wächter-Quittungen aktualisiert');
+  out($ok ? array('ok' => true, 'info' => $info, 'count' => $n) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);
+}
+
 /* ============================ commit_image (Bild ins Depot) ============================ */
 if ($action === 'commit_image') {
   require_key($STUDIO_KEY, $B);
