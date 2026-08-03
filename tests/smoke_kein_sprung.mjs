@@ -13,6 +13,12 @@
  *   3. markt.html zeichnet die Einträge erst am Seitenende → bis dahin steht
  *      der Kasten „Eigene App gewünscht?" im Bild und wird dann weggeschoben.
  *
+ * Am 2026-08-03 kam derselbe Fall auf werkzeuge.html dazu (CLS 0,188): dort
+ * ist es `#toolGrid`, und weggeschoben wird die FUSSZEILE. Der Trace nannte
+ * genau ein Ereignis — alt [0,488,412,155] → neu [0,0,0,0]. Dazu geprüft:
+ * die Überschriften-Ebenen, weil die Karten eine h3 direkt unter der h1
+ * trugen und damit eine Ebene übersprangen.
+ *
  * Der Test prüft nicht die CLS-Zahl (dafür bräuchte es Lighthouse), sondern
  * die EIGENSCHAFT, aus der sie folgt: die Seite muss OHNE JavaScript schon
  * genauso dastehen wie mit. Ein Browser mit abgeschaltetem JavaScript ist
@@ -87,12 +93,26 @@ async function miss(rel, mitJs) {
       const naechster = abschnitt && abschnitt.nextElementSibling;
       if (naechster) nachListe = Math.round(naechster.getBoundingClientRect().top);
     }
+    // Dasselbe für das Werkzeug-Raster. Dort steht als Nächstes die
+    // Fusszeile — und genau die nannte der Trace am 2026-08-03 als das
+    // Element, das springt (alt [0,488,412,155] → neu [0,0,0,0]).
+    const raster = document.getElementById("toolGrid");
+    let nachRaster = null, rasterKacheln = null;
+    if (raster) {
+      const fuss = document.querySelector("footer");
+      if (fuss) nachRaster = Math.round(fuss.getBoundingClientRect().top);
+      rasterKacheln = raster.children.length;
+    }
     return {
       kopfHoehe: kopf ? Math.round(kopf.height) : null,
       dockBreite: dock ? Math.round(dock.width * 10) / 10 : null,
       leisteBreite: leiste ? Math.round(leiste.width * 10) / 10 : null,
       reloadDa: !!document.getElementById("fpReload"),
-      nachListe, sichtHoehe: h
+      nachListe, nachRaster, rasterKacheln,
+      rasterGefuellt: raster ? raster.classList.contains("gefuellt") : null,
+      ueberschriften: Array.from(document.querySelectorAll("main h1,main h2,main h3,main h4,main h5,main h6"))
+        .map((el) => Number(el.tagName.slice(1))),
+      sichtHoehe: h
     };
   }, HOEHE);
   await ctx.close();
@@ -129,6 +149,30 @@ console.log("\nMarktplatz: unter der Liste steht beim ersten Bild nichts im Sich
   ok(ohne.nachListe !== null, "Abschnitt nach der Liste gefunden");
   ok(ohne.nachListe >= ohne.sichtHoehe,
     `beginnt bei ${ohne.nachListe} px, Sichtfeld endet bei ${ohne.sichtHoehe} px`);
+}
+
+console.log("\nWerkzeuge: unter dem Raster steht beim ersten Bild nichts im Sichtfeld");
+{
+  const ohne = await miss("werkzeuge.html", false);
+  const mit = await miss("werkzeuge.html", true);
+  ok(ohne.rasterKacheln === 0, "ohne JavaScript ist das Raster leer (nur so kann es springen)");
+  ok(mit.rasterKacheln > 0, `mit JavaScript stehen ${mit.rasterKacheln} Kacheln darin`);
+  ok(ohne.nachRaster !== null, "Fusszeile gefunden — sie steht als Nächstes unter dem Raster");
+  ok(ohne.nachRaster >= ohne.sichtHoehe,
+    `beginnt bei ${ohne.nachRaster} px, Sichtfeld endet bei ${ohne.sichtHoehe} px`);
+  // Und die Reserve muss wieder verschwinden, sobald gezeichnet wurde —
+  // sonst klebte unter dem Raster dauerhaft eine leere Fläche.
+  ok(mit.rasterGefuellt === true, "nach dem Zeichnen ist die Klasse `gefuellt` gesetzt");
+}
+
+console.log("\nÜberschriften ohne übersprungene Ebene (WCAG 1.3.1)");
+for (const rel of ["werkzeuge.html", "markt.html", "index.html"]) {
+  const mit = await miss(rel, true);
+  const h = mit.ueberschriften;
+  let sprung = null;
+  for (let i = 1; i < h.length; i++) if (h[i] > h[i - 1] + 1) sprung = `h${h[i - 1]} → h${h[i]}`;
+  ok(h.length > 0 && !sprung,
+    `${rel}: ${h.map((n) => "h" + n).join(" ")}${sprung ? ` — Sprung ${sprung}` : ""}`);
 }
 
 console.log("\nVorlese-Name enthält den sichtbaren Text (WCAG 2.5.3)");

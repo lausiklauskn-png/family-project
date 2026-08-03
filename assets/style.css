@@ -291,6 +291,30 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* Drei Bereiche / Karten-Raster */
 .areas{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+/* Platz für das Werkzeug-Raster freihalten, SOLANGE es noch nicht gezeichnet
+ * ist (Befund 2026-08-03, mit Lighthouse 13.4.1 gemessen: CLS 0,188).
+ *
+ * Gleiche Bauart wie bei den Marktplatz-Einträgen unten, nur mit `#toolGrid`.
+ * Der Trace nannte genau ein Sprung-Ereignis, und zwar die FUSSZEILE:
+ * alt [0,488,412,155] → neu [0,0,0,0]. Sie steht beim ersten Bild bei
+ * y = 488 px mitten im Sichtfeld (823 px) und wird aus dem Bild geschoben,
+ * sobald das Raster entsteht — es wird je nach Fensterbreite 1925 bis
+ * 4844 px hoch.
+ *
+ * Die nötige Reserve ist nachgemessen, nicht geschätzt: 224 px bei 360er
+ * Breite, 335 px bei 412, 627 px bei 768, 533 px bei 1280. `70vh` deckt alle
+ * vier (518 / 576 / 717 / 630 px) und bleibt zugleich weit unter der echten
+ * Rasterhöhe — es kann also nie zurückschrumpfen.
+ *
+ * Nach `#toolGrid` gezielt, NICHT nach `.areas`: dasselbe Raster steht auch
+ * auf der Startseite, dort aber fest im Markup gefüllt. Eine Reserve wäre da
+ * eine reine Lücke.
+ *
+ * `render()` in werkzeuge.html setzt danach die Klasse `gefuellt` und nimmt
+ * die Reserve wieder weg — auch bei null Werkzeugen, sonst klaffte ein halber
+ * Bildschirm Leere. Bleibt das Skript ganz aus, bleibt die Reserve stehen:
+ * eine ruhige leere Fläche statt einer springenden Seite. */
+#toolGrid:not(.gefuellt){min-height:70vh}
 .area{padding:18px;display:block;color:inherit;
   transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
   transition:transform .18s ease,box-shadow .18s}
@@ -300,7 +324,11 @@ h2{font-size:1.55rem;margin:0 0 6px}
   opacity:0;transition:opacity .25s;mix-blend-mode:screen}
 .area:hover::after{opacity:1}
 .area .ico{font-size:1.7rem}
-.area h3{margin:10px 0 4px;font-size:1.15rem}
+/* h2 mit aufgeführt: auf werkzeuge.html folgen die Karten direkt auf die h1
+   der Seite, dort ist h2 die richtige Gliederungsebene (Befund 2026-08-03,
+   „heading-order"). Auf der Startseite stehen sie unter einer h2 und bleiben
+   h3. Die Optik ist in beiden Fällen dieselbe. */
+.area h2,.area h3{margin:10px 0 4px;font-size:1.15rem}
 .area p{margin:0;color:var(--muted);font-size:.93rem}
 .area .go{display:inline-block;margin-top:12px;color:var(--accent);font-family:var(--mono);font-size:.86rem}
 
