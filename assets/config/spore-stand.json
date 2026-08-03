@@ -1,6 +1,6 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-08-02T03:52:44.892Z",
+  "geprueft": "2026-08-03T03:53:27.169Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
@@ -27,13 +27,13 @@
         "bedienbarkeit": 91,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-02",
+        "gemessen": "2026-08-03",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Minify JavaScript",
-            "ms": 900
+            "t": "JavaScript komprimieren",
+            "ms": 1050
           },
           {
             "k": "leistung",
@@ -41,19 +41,19 @@
           },
           {
             "k": "leistung",
-            "t": "Use efficient cache lifetimes"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
           },
           {
             "k": "bedienbarkeit",
-            "t": "Touch targets do not have sufficient size or spacing."
+            "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
           },
           {
             "k": "bedienbarkeit",
-            "t": "Document does not have a main landmark."
+            "t": "Dokument hat keine Hauptmarkierung."
           }
         ],
         "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
@@ -80,17 +80,17 @@
       },
       "messung": {
         "stand": "gemessen",
-        "leistung": 69,
+        "leistung": 68,
         "bedienbarkeit": 84,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-02",
+        "gemessen": "2026-08-03",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Minify JavaScript",
-            "ms": 450
+            "t": "JavaScript komprimieren",
+            "ms": 600
           },
           {
             "k": "leistung",
@@ -98,19 +98,19 @@
           },
           {
             "k": "leistung",
-            "t": "Use efficient cache lifetimes"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Elements use prohibited ARIA attributes"
+            "t": "Elemente verwenden unzulässige ARIA-Attribute"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
           },
           {
             "k": "bedienbarkeit",
-            "t": "Select elements do not have associated label elements."
+            "t": "select-Elemente haben keine zugehörigen label-Elemente."
           }
         ],
         "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
@@ -137,36 +137,36 @@
       },
       "messung": {
         "stand": "gemessen",
-        "leistung": 73,
+        "leistung": 99,
         "bedienbarkeit": 92,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-02",
+        "gemessen": "2026-08-03",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Largest Contentful Paint"
+            "t": "Netzwerkabhängigkeitsbaum"
           },
           {
             "k": "leistung",
-            "t": "Use efficient cache lifetimes"
+            "t": "Aufwand für Hauptthread minimieren"
           },
           {
             "k": "leistung",
-            "t": "Improve image delivery"
+            "t": "Time to Interactive"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Select elements do not have associated label elements."
+            "t": "select-Elemente haben keine zugehörigen label-Elemente."
           },
           {
             "k": "bedienbarkeit",
-            "t": "Touch targets do not have sufficient size or spacing."
+            "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
           },
           {
             "k": "bedienbarkeit",
-            "t": "Elements with visible text labels do not have matching accessible names."
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
           }
         ],
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
@@ -192,8 +192,37 @@
         "url": "https://lausiklauskn-png.github.io/Tomys-Hub/"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "noch_nicht_dran",
+        "stand": "gemessen",
+        "leistung": 46,
+        "bedienbarkeit": 96,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-03",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren",
+            "ms": 750
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript",
+            "ms": 450
+          },
+          {
+            "k": "leistung",
+            "t": "Total Blocking Time"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+          }
+        ],
         "url": "https://lausiklauskn-png.github.io/Tomys-Hub/"
       }
     },
@@ -218,29 +247,29 @@
       },
       "messung": {
         "stand": "gemessen",
-        "leistung": 95,
+        "leistung": 94,
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 90,
-        "gemessen": "2026-08-02",
+        "gemessen": "2026-08-03",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Reduce unused JavaScript",
+            "t": "Reduziere nicht verwendetes JavaScript",
             "ms": 450
           },
           {
             "k": "leistung",
-            "t": "Network dependency tree"
+            "t": "Netzwerkabhängigkeitsbaum"
           },
           {
             "k": "leistung",
-            "t": "Render-blocking requests"
+            "t": "Anfragen zum Blockieren des Renderings"
           },
           {
             "k": "auffindbarkeit",
-            "t": "Links are not crawlable"
+            "t": "Links können nicht gecrawlt werden"
           }
         ],
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
@@ -271,32 +300,32 @@
         "bedienbarkeit": 93,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-02",
+        "gemessen": "2026-08-03",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Network dependency tree"
+            "t": "Netzwerkabhängigkeitsbaum"
           },
           {
             "k": "leistung",
-            "t": "Page prevented back/forward cache restoration"
+            "t": "Seite hat die Wiederherstellung des Back-Forward-Caches verhindert"
           },
           {
             "k": "leistung",
-            "t": "Use efficient cache lifetimes"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Elements use prohibited ARIA attributes"
+            "t": "Elemente verwenden unzulässige ARIA-Attribute"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Background and foreground colors do not have a sufficient contrast ratio."
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
           },
           {
             "k": "bedienbarkeit",
-            "t": "Elements with visible text labels do not have matching accessible names."
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
           }
         ],
         "url": "https://lausiklauskn-png.github.io/Kimseek/"
@@ -316,49 +345,40 @@
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "cae86e9eda2e6fee",
-        "pruefsumme": "825d8d44f0135976",
+        "pruefsumme": "7656fee65be280c8",
         "status": 200,
         "seit": "2026-08-02",
         "url": "https://lausiklauskn-png.github.io/Kimboard/"
       },
       "messung": {
         "stand": "gemessen",
-        "leistung": 62,
-        "bedienbarkeit": 90,
+        "leistung": 97,
+        "bedienbarkeit": 97,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-02",
+        "gemessen": "2026-08-03",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Minify JavaScript",
-            "ms": 600
-          },
-          {
-            "k": "leistung",
-            "t": "Reduce unused JavaScript",
+            "t": "Reduziere nicht verwendetes JavaScript",
             "ms": 150
           },
           {
             "k": "leistung",
-            "t": "Use efficient cache lifetimes"
+            "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "leistung",
+            "t": "Aufwand für Hauptthread minimieren"
           },
           {
             "k": "bedienbarkeit",
-            "t": "Select elements do not have associated label elements."
-          },
-          {
-            "k": "bedienbarkeit",
-            "t": "Touch targets do not have sufficient size or spacing."
-          },
-          {
-            "k": "bedienbarkeit",
-            "t": "Document does not have a main landmark."
+            "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
           },
           {
             "k": "gute_praxis",
-            "t": "Browser errors were logged to the console"
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
         "url": "https://lausiklauskn-png.github.io/Kimboard/"
@@ -384,8 +404,44 @@
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "noch_nicht_dran",
+        "stand": "gemessen",
+        "leistung": 89,
+        "bedienbarkeit": 91,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-03",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript",
+            "ms": 150
+          },
+          {
+            "k": "leistung",
+            "t": "Verursacher von Layout Shifts"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Dokument hat keine Hauptmarkierung."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          }
+        ],
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
       }
     },
@@ -409,49 +465,144 @@
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "noch_nicht_dran",
+        "stand": "gemessen",
+        "leistung": 89,
+        "bedienbarkeit": 96,
+        "gute_praxis": 100,
+        "auffindbarkeit": 82,
+        "gemessen": "2026-08-03",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Mehrere Weiterleitungen auf die Seite vermeiden",
+            "ms": 1812
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript",
+            "ms": 1050
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren",
+            "ms": 600
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "auffindbarkeit",
+            "t": "Dokument enthält keine Meta-Beschreibung"
+          },
+          {
+            "k": "auffindbarkeit",
+            "t": "Links können nicht gecrawlt werden"
+          }
+        ],
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
       }
     },
     "markt-rezeptbuch": {
       "lage": "ohne_spore",
       "wache": {
-        "ampel": "gruen",
-        "grund": "unveraendert",
+        "ampel": "gelb",
+        "grund": "geaendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "23db59c46a31676e",
-        "pruefsumme": "23db59c46a31676e",
+        "pruefsumme": "103072b040aeb496",
         "status": 200,
-        "seit": "2026-08-01",
+        "seit": "2026-08-03",
         "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "noch_nicht_dran",
-        "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
+        "stand": "gemessen",
+        "leistung": 67,
+        "bedienbarkeit": 96,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-08-03",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript",
+            "ms": 1050
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "leistung",
+            "t": "Aufwand für Hauptthread minimieren"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+        "schaufenster": {
+          "stand": "gemessen",
+          "leistung": 51,
+          "bedienbarkeit": 94,
+          "gute_praxis": 100,
+          "auffindbarkeit": 100,
+          "gemessen": "2026-08-03",
+          "werkzeug": "13.4.1",
+          "hinweise": [
+            {
+              "k": "leistung",
+              "t": "Reduziere nicht verwendetes JavaScript",
+              "ms": 450
+            },
+            {
+              "k": "leistung",
+              "t": "Total Blocking Time"
+            },
+            {
+              "k": "leistung",
+              "t": "Effiziente Verweildauer im Cache verwenden"
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+            },
+            {
+              "k": "gute_praxis",
+              "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+            }
+          ],
+          "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
+        }
       }
     },
     "markt-mixarium": {
       "lage": "ohne_spore",
       "wache": {
-        "ampel": "gruen",
-        "grund": "unveraendert",
+        "ampel": "gelb",
+        "grund": "geaendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "8e18c5370e2750c6",
-        "pruefsumme": "8e18c5370e2750c6",
+        "pruefsumme": "a7534e183560d44f",
         "status": 200,
-        "seit": "2026-08-01",
+        "seit": "2026-08-03",
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
       },
       "messung": {
-        "stand": "gemessen",
         "leistung": 39,
         "bedienbarkeit": 87,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-02",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -481,7 +632,12 @@
             "t": "Missing source maps for large first-party JavaScript"
           }
         ],
-        "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
+        "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+        "schaufenster": {
+          "stand": "nicht_gemessen",
+          "grund": "noch_nicht_dran",
+          "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
+        }
       }
     },
     "markt-perfect-skin-beauty": {
@@ -492,17 +648,17 @@
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "grundlage": "a9aec591b6a4e7fb",
-        "pruefsumme": "c4da448590ceea57",
+        "pruefsumme": "eb41ea6ed82528ca",
         "status": 200,
         "seit": "2026-08-02",
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/"
       },
       "messung": {
-        "stand": "gemessen",
         "leistung": 92,
         "bedienbarkeit": 96,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-02",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -545,11 +701,11 @@
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
       },
       "messung": {
-        "stand": "gemessen",
         "leistung": 96,
         "bedienbarkeit": 94,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-02",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -599,11 +755,11 @@
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
       },
       "messung": {
-        "stand": "gemessen",
         "leistung": 99,
         "bedienbarkeit": 87,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-02",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -633,13 +789,13 @@
     }
   },
   "wacheZaehler": {
-    "gruen": 12,
-    "gelb": 2,
+    "gruen": 10,
+    "gelb": 4,
     "rot": 0
   },
   "messungZaehler": {
-    "gemessen": 10,
+    "gemessen": 14,
     "veraltet": 0,
-    "nicht_gemessen": 4
+    "nicht_gemessen": 0
   }
 }
