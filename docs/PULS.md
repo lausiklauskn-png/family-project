@@ -4,6 +4,272 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-03, früh: `werkzeuge.html` — der Sprung beim Laden (CLS 0,188 → 0)
+
+Fortsetzung des Marktplatz-Durchgangs von der Nacht. Die Seite stand bei
+**CLS 0,188** und **Barrierefreiheit 98**.
+
+### Die Ursache wurde geprüft, nicht angenommen
+
+Der Brief vermutete dieselbe Bauart wie auf `markt.html` — und hat damit
+recht behalten. **Wichtig ist trotzdem, wie das festgestellt wurde**, denn der
+Bericht allein hätte es nicht gezeigt: Lighthouse nennt nur `body > footer`.
+Erst der Trace sagt, ob etwas gewachsen oder verschoben ist:
+
+```
+score 0,1883   alt [0,488,412,155] → neu [0,0,0,0]
+```
+
+Die **Fußzeile** steht beim ersten Bild bei y = 488 px mitten im Sichtfeld
+(823 px) und wird vollständig aus dem Bild geschoben, sobald `#toolGrid`
+gezeichnet ist. Genau ein Sprung-Ereignis, kein zweites. Damit ist es
+dieselbe Bauart wie Ursache 3 auf `markt.html`, nur mit dem Raster statt der
+Liste — bestätigt, nicht vorausgesetzt.
+
+### Die Reserve ist nachgemessen, nicht geschätzt
+
+An vier Fensterbreiten, jeweils mit und ohne JavaScript:
+
+| Breite | Raster leer → Fußzeile bei | nötige Reserve | Rasterhöhe gefüllt |
+|---|---|---|---|
+| 360 × 740 | 516 px | 224 px | 4844 px |
+| 412 × 823 | 488 px | 335 px | 4558 px |
+| 768 × 1024 | 397 px | 627 px | 2409 px |
+| 1280 × 900 | 367 px | 533 px | 1925 px |
+
+`70vh` deckt alle vier (518 / 576 / 717 / 630 px) und bleibt zugleich weit
+unter der echten Rasterhöhe — die Reserve kann also nie zurückschrumpfen.
+Derselbe Wert wie bei den Marktplatz-Einträgen.
+
+Gezielt nach `#toolGrid`, **nicht** nach `.areas`: dasselbe Raster steht auch
+auf der Startseite, dort aber fest im Markup gefüllt. Eine Reserve wäre da
+eine reine Lücke. `render()` setzt danach `gefuellt` und gibt sie wieder ab —
+auch bei null Werkzeugen.
+
+### Dazu der offene Barrierefreiheits-Mangel
+
+Die Karten trugen eine **h3 direkt unter der h1** der Seite und übersprangen
+damit eine Ebene (`heading-order`, `div#toolGrid > a.glass > h3`). Jetzt h2.
+Auf der Startseite stehen dieselben Karten unter einer h2 und bleiben h3 —
+`.area h2` teilt sich die CSS-Regel mit `h3`, die Optik ist unverändert.
+
+### Gemessen (drei Läufe, Mess-Server bildet Caddy nach)
+
+| | vorher | nachher |
+|---|---|---|
+| CLS | **0,188** | **0** · **0** · **0** |
+| Sprung-Ereignisse im Trace | 1 | **0** |
+| Barrierefreiheit | 98 | **100** |
+
+**Zur Leistungszahl sage ich wieder nichts** — sie lag vorher bei 55, nachher
+bei 64 / 62 / 63. Das ist Rauschen dieser Maschine, kein Befund. Was die Note
+macht, sagt erst Klaus' nächste PageSpeed-Messung.
+
+**Gegenprobe, jede Reparatur einzeln wieder ausgebaut:** Reserve raus → CLS
+zurück auf exakt 0,188 mit identischem Trace · h2 → h3 zurück →
+Barrierefreiheit zurück auf 98, gleicher Selektor. Beide Reparaturen tragen.
+
+### Wächter erweitert — und ebenfalls gegengeprüft
+
+`tests/smoke_kein_sprung.mjs` von 30 auf **38 Prüfungen**: Raster-Reserve
+(die Fußzeile darf beim ersten Bild nicht im Sichtfeld stehen), die Klasse
+`gefuellt` nach dem Zeichnen, und die Überschriften-Ebenen auf drei Seiten.
+
+**Gegenprobe am Wächter** (Pflicht, sonst beweist er nichts): Reserve raus →
+1 rot · `gefuellt` raus → 1 rot · h2 → h3 → 1 rot. Alles wieder drin →
+**38/38 grün**. Suite `smoke_all.mjs` **107/107**.
+
+### Neu im Repo: `tools/lh-messen.mjs`
+
+Damit die nächste Sitzung nicht wieder einen eigenen Messaufbau baut und
+dabei 0 misst. Bildet Caddy nach (gzip an, keine Cache-Kopfzeilen), gibt auf
+Wunsch die Trace-Ereignisse mit `old_rect`/`new_rect` aus und prüft die
+üblichen Barrierefreiheits-Punkte gleich mit.
+
+```bash
+npm install lighthouse@13.4.1 playwright-core --no-save   # beide zusammen
+node tools/lh-messen.mjs werkzeuge.html --trace --laeufe=3
+```
+
+`ASSET_V` / `CACHE_VERSION` **v88 → v89**, alle `?v=`-Verweise mitgezogen.
+
+### Was NICHT gemacht wurde
+
+- **Der `defer`-Umbau** für `werkzeuge.html` und `markt.html`. Er stand im
+  Brief als eigener Punkt und hat mit dem Sprung nichts zu tun; `app.js` darf
+  dabei **nicht** verschoben werden (der Inline-Block braucht `FP.getLang()`
+  synchron). Eigener Schritt, eigene Gegenprobe.
+- **`index.html`, Aufbau der three.js-Szene** (~7–8 s Hauptthread). Der Ansatz
+  wäre weniger Partikel auf schwachen Geräten — **das ändert das Aussehen,
+  also Klaus fragen**, nicht selbst entscheiden.
+- **Der Nebenbefund** aus `tests/smoke_markt_melden.mjs` („Hintergrund scrollt
+  nicht") besteht unverändert und stammt weiterhin nicht aus diesen Änderungen.
+
+---
+
+## 📋 2026-08-03, früh: Klaus' Messungen — notiert, noch nicht bearbeitet
+
+Klaus hat drei PageSpeed-Berichte geschickt („Notieren").
+
+| Adresse | Datum | L / B / G / S |
+|---|---|---|
+| `family-projekt.de/markt.html` | 02.08. 23:19 | 45 / 96 / 96 / 100 |
+| `…github.io/Tomys-Hub/workfloh/` | 03.08. 07:05 | 95 / 92 / 96 / 100 |
+| `…github.io/Tomys-Hub/showcase/` | 03.08. 07:03 | **62 / 89** / 100 / 100 |
+
+**Der Marktplatz-Bericht ist die Messung VOR der Reparatur** — 23:19 Uhr, der
+Merge von PR #189 war um 00:14. Er bestätigt genau die Ausgangswerte, die im
+Brief stehen, zeigt aber die Wirkung noch **nicht**. Eine frische Messung von
+`markt.html` steht weiterhin aus.
+
+Zu `showcase` sagt Klaus: **„das geht besser."** Das ist die nächste App.
+
+### ⚠ Warum diese zwei Werte NICHT in FP.de nachgetragen wurden
+
+Klaus' Bitte: „neu gemessene Werte in FP.de nachtragen". **Das geht hier nicht
+ehrlich** — und der Grund ist wichtig genug, um ihn festzuhalten:
+
+Der Marktplatz führt Tomys Hub unter **einer** Adresse, dem Hub selbst
+(`…github.io/Tomys-Hub/`), ohne `appUrl`. Klaus hat aber **zwei Unterseiten**
+gemessen: `/showcase/` und `/workfloh/`. Für Unterseiten gibt es im
+Marktplatz-Datenmodell **keinen Platz** — nur `url` und optional `schaufenster`
+(die vorgeschaltete Landingpage, die es bei Tomys Hub nicht gibt). Einen
+Unterseiten-Wert unter `markt-tomys-hub` einzutragen hieße zu behaupten, der
+Hub stehe bei 62 oder 95. Das wäre falsch.
+
+Dazu kommt: **die Werte sind ohnehin schon da.** Der nächtliche Lauf hat am
+2026-08-03 alle vierzehn Einträge frisch gemessen, jeden an seiner gelisteten
+Adresse. Ein Hand-Wert springt laut `messung-hand.json` nur ein, **bis** für
+dieselbe Adresse wirklich gemessen wurde — er würde also gar nicht angezeigt.
+
+| Eintrag | gelistete Adresse | eigene Messung 03.08. |
+|---|---|---|
+| `markt-tomys-hub` | `…/Tomys-Hub/` | **46** / 96 / 100 / 100 |
+| `markt-workfloh` | `…/Mein-WorkFloh/` (Klaus' WorkFloh) | 89 / 96 / 100 / 82 |
+
+**Und das ist der eigentliche Befund:** die Karte zeigt für Tomys Hub eine
+**46** — schlechter als beide von Klaus gemessenen Unterseiten (62 und 95).
+Der Hub selbst ist also das schwächste Glied, nicht `showcase`. Seine eigenen
+Hinweise (aus derselben Messung): *JavaScript komprimieren* 750 ms · *nicht
+verwendetes JavaScript* 450 ms · *Total Blocking Time* · *Farbkontrast* ·
+*fehlende Quellzuordnungen*.
+
+⚠ **`markt-workfloh` ist NICHT Tomys WorkFloh.** Der Eintrag zeigt auf Klaus'
+`Mein-WorkFloh`. Klaus' Messung von `/Tomys-Hub/workfloh/` gehört dort also
+auch nicht hinein — zwei verschiedene Apps mit demselben Namen.
+
+**Offene Frage an Klaus** (siehe Chat): soll `showcase` die Marktplatz-Adresse
+von Tomys Hub werden, oder bleibt es der Hub? Das ist eine Änderung an
+`listings.js` und seine Entscheidung, nicht meine.
+
+**Cache-Verweildauer bei Tomys Hub, 402 KiB** (Klaus hat die Liste
+mitgeschickt; sie kam zwischen den beiden Tomys-Berichten, welche der beiden
+Seiten sie betrifft, geht aus dem Text nicht sicher hervor): `vendor/
+three.module.min.js` 166 KiB · `assets/demo-poster.jpg` 108 KiB ·
+`assets/tomy-handschlag.webp` 80 KiB · `assets/workfloh-demo-poster.jpg`
+59 KiB · `tomy-ui/theme.css` 9 KiB · dazu `tomy-data/produkte.js`,
+`tomy-ui/mycel-bg.js`, `tomy-ui/theme.js`, `tomy-ui/effects.js`,
+`ty-freigabe.js`. **Bei allen zehn steht Cache-TTL auf 10 Minuten.**
+
+Das ist der Fall aus Arbeitsordnung § 3: **die zehn Minuten setzt GitHub
+Pages, dort gibt es keine Konfiguration dafür.** Nicht reparierbar, ohne
+umzuziehen — und der Prüfpunkt ist bei Google ohnehin „Nicht bewertet".
+
+### Und dann die drei Listen, die wirklich etwas sagen (Tomys Hub `showcase`)
+
+**1. Hauptthread 40,7 s — davon „Other" 40.190 ms.**
+
+| Kategorie | Zeit |
+|---|---|
+| Other | **40.190 ms** |
+| Script Evaluation | 335 ms |
+| Rendering | 49 ms |
+| Style & Layout | 45 ms |
+| Script Parsing & Compilation | 26 ms |
+| Parse HTML & CSS | 8 ms |
+
+Das ist **exakt dieselbe Signatur**, die am 2026-08-02 abends an der eigenen
+Startseite gefunden wurde: `assets/mycel-bg.js` verursachte dort 40.411 ms von
+41.800 ms. Nicht das Laden von three.js (Script Evaluation sind nur 335 ms),
+sondern die **Dauer-Renderschleife** — auf einem Prüfgerät ohne
+Grafikbeschleunigung wird jedes einzelne Bild zu einer langen Aufgabe. Tomys
+Hub fährt eine Kopie davon als `tomy-ui/mycel-bg.js`.
+
+**Das ist ein starker Verdacht, kein Befund** — die Vorsitzung hat ihn an der
+eigenen Seite durch **Ausbauen** bewiesen (ohne Hintergrund: Leistung 30 → 68,
+Blockierzeit 156.000 → 120 ms). Genau so gehört er auch dort geprüft, bevor
+etwas geändert wird.
+
+**2. Bildübermittlung, 192 KiB.** Alle drei liefern viel mehr Pixel als sie
+zeigen:
+
+| Bild | geliefert | angezeigt | Ersparnis |
+|---|---|---|---|
+| `assets/demo-poster.jpg` | 1280 × 720 · 107,8 KiB | 669 × 376 | 78,4 KiB |
+| `assets/tomy-handschlag.webp` | 640 × 735 · 79,4 KiB | 215 × 247 | 70,7 KiB |
+| `assets/workfloh-demo-poster.jpg` | 1280 × 720 · 58,7 KiB | 669 × 376 | 42,7 KiB |
+
+Das ist derselbe Handgriff wie beim „Bild des Tages" (2393 → 206 KiB) und beim
+Marktplatz (1726 → 207 KiB). Rezept steht in `docs/BILDER-VERKLEINERN.md`.
+⚠ **Und dabei gilt Arbeitsordnung § 5.1:** wer `width`/`height` ans Bild
+schreibt, muss `height:auto` im CSS sicherstellen. `tomy-handschlag.webp` hat
+es bereits inline (`height:auto`) — die beiden Poster tragen eine Klasse
+`.vposter`, die vorher nachzusehen ist.
+
+**3. Rendering-blockierend: `tomy-ui/theme.css`**, 9,0 KiB, 150 ms Dauer,
+geschätzte Ersparnis 300 ms. Eine einzige kleine Datei im kritischen Pfad.
+
+**4. Nicht verwendetes JavaScript, 95,1 KiB** — ausschließlich
+`vendor/three.module.min.js` (164,8 KiB übertragen). **Derselbe Punkt, der auf
+family-projekt.de bewusst liegen blieb:** wegzuschneiden bräuchte einen
+Bau-Schritt, und diese Seiten sind bau-frei. Der lohnende Hebel ist nicht,
+three.js kleiner zu machen, sondern zu klären, **ob die Showcase-Seite es
+überhaupt braucht** — und wenn ja, ob es erst nach dem ersten Bild kommen darf.
+
+**5. Bildmaße fehlen** bei `assets/tomy-handschlag.webp` (zählt auf CLS ein).
+Das ist der **saubere** Fall aus Arbeitsordnung § 5.1: das Bild trägt bereits
+`height:auto` in seinem eigenen `style`-Attribut. `width`/`height` dazu-
+zuschreiben ist dort also gefahrlos — der Browser nimmt sie nur als
+Seitenverhältnis. Bei den beiden `.vposter`-Bildern gilt das **nicht
+ungeprüft**; dort erst die CSS-Regel nachsehen.
+
+**6. Farbkontrast (das ist die Barrierefreiheit 89).** Klaus hat die volle
+Liste geschickt — **sieben Fundstellen in drei Gruppen**:
+
+| Gruppe | Fundstellen |
+|---|---|
+| `div.sub` | „Echter Durchlauf durch das Vorlagen-Werkzeug — mit Erklärungen" · „Ein Klick öffnet das Werkzeug mit dem passenden Produkt" · „Ergebnisse — neue Stücke erscheinen hier, sobald sie eingetragen sind" |
+| `div.bigbrand` | „Tomy" |
+| Links | `<a href="../">` „Werkzeugkasten" · `<a href="../promptgenerator/">` „Vorlagen-Werkzeug" · `<a href="../impressum.html">` „Impressum & Datenschutz" |
+
+Das sind vermutlich **drei CSS-Regeln**, nicht sieben Handgriffe — die drei
+Links sehen nach einer gemeinsamen Fuß-/Navigations-Regel aus (genau der Fall,
+der hier im Repo mit `opacity:.7 → .85` gelöst wurde). Billigster Punkt im
+ganzen Bericht, und er hilft echten Menschen. Vorlage außerdem: die Rechnung
+am Widget (Modul 17, 2026-08-01).
+
+⚠ **Nicht raten:** den Wert ausrechnen, bis das Verhältnis ≥ 4,5 : 1 steht
+(bzw. ≥ 3 : 1 bei großer Schrift — `.bigbrand` fällt vermutlich darunter), und
+danach nachmessen.
+
+**7. Überschriften-Sprung — derselbe Mangel wie hier gerade behoben.**
+Fundstelle: `<h4>` „1 · Produkt aussuchen". Eine h4 an einer Stelle, an der die
+Gliederung noch nicht so tief ist. **Vorlage steht in diesem Repo**: heute an
+`werkzeuge.html` gelöst, indem die Karten-Überschrift von h3 auf h2 ging und
+die CSS-Regel beide Ebenen bedient (`.area h2,.area h3{…}`) — die Optik bleibt
+damit unverändert. Auch die Prüfung dafür liegt fertig da
+(`tests/smoke_kein_sprung.mjs`, Abschnitt „Überschriften ohne übersprungene
+Ebene"). ⚠ **Erst die ganze Kette der Seite ansehen** (h1 → h2 → …), nicht nur
+die eine gemeldete h4 — sonst rutscht der Sprung nur eine Stelle weiter.
+
+**8. Fehlende Quellzuordnungen** bei `vendor/three.module.min.js`. Das ist der
+Fall aus Arbeitsordnung § 3: **nicht lohnend.** Es ist eine fremde,
+mitgelieferte Bibliothek ohne eigenen Bau-Schritt; eine Source-Map müsste von
+three.js selbst kommen. Der Prüfpunkt ist zudem „Nicht bewertet". **Liegen
+lassen und Klaus sagen, warum.**
+
+---
+
 ## ✅ 2026-08-02, nachts: der Sprung beim Laden (CLS) — Ursache war eine andere
 
 Klaus' Auftrag: „Fangen wir mit dem Markt an, der sieht am schlimmsten aus."
