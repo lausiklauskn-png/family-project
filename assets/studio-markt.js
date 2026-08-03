@@ -90,6 +90,11 @@
       ms_gute_praxis: "Gute Praxis", ms_auffindbarkeit: "Auffindbarkeit",
       ms_st_gemessen: "gemessen", ms_st_veraltet: "veraltet (letzte Messung fehlgeschlagen)",
       ms_st_nicht_gemessen: "nicht gemessen", ms_st_von_hand: "von Hand eingetragen",
+      wa_gesehen: "✓ Gesehen — Seite ist in Ordnung",
+      wa_gesehen_ok: "✓ quittiert — noch veröffentlichen",
+      wa_gesehen_datei: "✓ quittiert — verschwindet beim nächsten nächtlichen Lauf",
+      wa_quittiert: "✓ Quittiert — jetzt noch auf Veröffentlichen drücken.",
+      wa_keine_summe: "Für diesen Eintrag liegt keine Prüfsumme vor — nichts zu quittieren.",
       ms_am: "am ",
       ms_g_noch_nicht_dran: "war noch nicht an der Reihe (Deckel je Lauf)",
       ms_regler_h: "Ab welchem Leistungswert wird gelistet?",
@@ -213,6 +218,11 @@
       ms_gute_praxis: "Best practices", ms_auffindbarkeit: "Findability",
       ms_st_gemessen: "measured", ms_st_veraltet: "stale (last measurement failed)",
       ms_st_nicht_gemessen: "not measured", ms_st_von_hand: "entered by hand",
+      wa_gesehen: "✓ Reviewed — site is fine",
+      wa_gesehen_ok: "✓ acknowledged — still needs publishing",
+      wa_gesehen_datei: "✓ acknowledged — clears with the next nightly run",
+      wa_quittiert: "✓ Acknowledged — now press Publish.",
+      wa_keine_summe: "No checksum for this entry — nothing to acknowledge.",
       ms_am: "on ",
       ms_g_noch_nicht_dran: "not its turn yet (per-run cap)",
       ms_regler_h: "From which performance value on is an entry listed?",
@@ -555,7 +565,9 @@
   }
   function markDirty() {
     var b = panel && panel.querySelector("[data-role=dirty]");
-    if (b) b.textContent = dirty ? T("dirty_badge") : "";
+    // wacheDirty zaehlt mit: sonst stuende der Knopf auf "nichts zu tun",
+    // waehrend eine Quittung unveroeffentlicht in der Arbeitskopie haengt.
+    if (b) b.textContent = (dirty || wacheDirty) ? T("dirty_badge") : "";
   }
 
   // Ein Studio-Passwort (studio_key) ist die einzige Zugangsdaten — der Server
@@ -571,13 +583,24 @@
         return apiPost("commit_image", { path: p, base64: UPLOADS[p] }).then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "Bild"); });
       });
     });
-    return chain.then(function () { return apiPost("commit_listings", { content: serialize() }); })
-      .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_listings"); UPLOADS = {}; dirty = false; markDirty(); return true; });
+    /* Eintraege nur schicken, wenn wirklich welche geaendert wurden. Bisher
+     * ging der Commit immer raus - das war folgenlos, weil publish() ohnehin
+     * nur bei dirty/Bildern erreichbar war. Mit der Quittung gaebe es sonst
+     * einen Eintraege-Commit mit identischem Inhalt. */
+    if (dirty || imgPaths.length) {
+      chain = chain.then(function () { return apiPost("commit_listings", { content: serialize() }); })
+        .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_listings"); UPLOADS = {}; dirty = false; });
+    }
+    if (wacheDirty) {
+      chain = chain.then(function () { return apiPost("commit_wache", { content: JSON.stringify(WACHEHAND, null, 2) + "\n" }); })
+        .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_wache"); wacheDirty = false; });
+    }
+    return chain.then(function () { markDirty(); return true; });
   }
   function publish() {
     if (!API) { toast(T("q_noapi"), false); return; }
     if (!srvKeyVal()) { toast(T("need_srvkey"), false); var se = panel.querySelector("[data-f=srvkey]"); if (se) se.focus(); return; }
-    if (!dirty && !Object.keys(UPLOADS).length) { toast(T("nothing")); return; }
+    if (!dirty && !wacheDirty && !Object.keys(UPLOADS).length) { toast(T("nothing")); return; }
     var btn = panel.querySelector("[data-role=publish]");
     if (btn) { btn.disabled = true; btn.textContent = T("publishing"); }
     publishViaServer()
@@ -761,6 +784,15 @@
    * nur einen Hand-Messwert hat, gerade NICHT hinein (er haette dort weder Lage
    * noch Ampel und stuende faelschlich als „unbrauchbar" da). */
   var MESSSTAND = null;
+  /* Arbeitskopie von assets/config/wache-hand.json. `wacheDirty` ist bewusst
+   * getrennt von `dirty`: eine Quittung ist keine Änderung an den Einträgen,
+   * und sie soll keinen Einträge-Commit auslösen, wenn sonst nichts anliegt. */
+  var WACHEHAND = {};
+  /* Der Stand, wie er in der Datei steht. Nur so laesst sich sagen, ob ein Haken
+   * schon veroeffentlicht ist oder noch auf den Knopf wartet — sonst stuende an
+   * einem laengst gespeicherten Haken weiter "noch veroeffentlichen". */
+  var WACHEHAND_DATEI = {};
+  var wacheDirty = false;
   var LAGE_TEXT = { geaendert: "sp_lage_geaendert", uebernommen: "sp_lage_uebernommen",
                     gleich: "sp_lage_gleich", unerreichbar: "sp_lage_unerreichbar",
                     unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich",
@@ -768,10 +800,25 @@
                     ohne_spore: "sp_lage_ohne_spore" };
 
   /* ── Wächter-Ampel (Stufe 3) ───────────────────────────────────────────────
-   * Der Wächter schreibt in denselben Bericht. Hier wird er nur ANGEZEIGT —
-   * gesperrt und freigegeben wird über assets/config/wache-hand.json, damit
-   * eine Sperre eine nachlesbare Datei ist und nicht ein Klick, den später
-   * niemand mehr erklären kann.
+   * Der Wächter schreibt in denselben Bericht. GESPERRT und FREIGEGEBEN
+   * (rot/grün) wird weiterhin nur über assets/config/wache-hand.json von Hand —
+   * eine Sperre soll eine nachlesbare Datei sein und nicht ein Klick, den
+   * später niemand mehr erklären kann.
+   *
+   * SEIT 2026-08-03 gibt es EINE Ausnahme: das gelbe „Inhalt hat sich geändert"
+   * lässt sich hier quittieren. Grund (Klaus' Befund): diese Warnung steht
+   * ÖFFENTLICH auf der Karte, sie verschwindet NIE von selbst — und es gab
+   * keinen Weg, sie ohne Datei-Bearbeitung loszuwerden. Klaus hat vier Seiten
+   * selbst geändert (Jason-Datei, neue Internetseite, neuer Text) und klickte
+   * ratlos auf „Beschreibung übernehmen", was gegen eine ganz andere Meldung
+   * hilft. Eine Warnung, die der Betreiber nicht abstellen kann, erzieht ihn
+   * dazu, alle Warnungen zu übersehen.
+   *
+   * Die Trennung bleibt gewahrt: quittieren heißt „ich habe hingesehen, die
+   * Seite ist in Ordnung" — es setzt `gesehen` auf die aktuelle Prüfsumme, NIE
+   * eine Ampel. Ändert sich die Seite erneut, wird sie wieder gelb. Rot und
+   * Grün bleiben Handarbeit, und das Ergebnis landet in derselben nachlesbaren
+   * Datei wie vorher, nur eben über einen Knopf.
    * `handgrund` ist Klaus' eigener Text, wird aber wie jeder andere über
    * textContent gesetzt — eine Regel, die keine Ausnahme verträgt. */
   var AMPEL_ZEICHEN = { gruen: "●", gelb: "▲", rot: "⛔" };
@@ -846,11 +893,17 @@
         .then(function (r) { return r.ok ? r.json() : null; })
         .catch(function () { return null; });
     };
-    return Promise.all([hol("spore-stand.json"), hol("messung-hand.json")])
-      .then(function (beides) {
-        var st = beides[0], hand = beides[1];
+    return Promise.all([hol("spore-stand.json"), hol("messung-hand.json"), hol("wache-hand.json")])
+      .then(function (alle) {
+        var st = alle[0], hand = alle[1], wh = alle[2];
         SPORENSTAND = st;                        // Sporen-Liste bleibt unberuehrt
         MESSSTAND = messStandBauen(st, hand);    // Messwerte mit Hand-Werten
+        /* Nur neu laden, solange nichts Unveroeffentlichtes offen ist — sonst
+         * wuerfe ein Neu-Aufbau der Liste Klaus' Quittungen weg. */
+        if (!wacheDirty) {
+          WACHEHAND = (wh && typeof wh === "object") ? wh : {};
+          WACHEHAND_DATEI = JSON.parse(JSON.stringify(WACHEHAND));
+        }
         renderSporen(st); renderMessung(MESSSTAND); reglerAnzeigen();
       });
   }
@@ -888,6 +941,25 @@
       name.textContent = (eintrag && eintrag.label) || id;
       zeile.appendChild(name);
       if (w) zeile.appendChild(ampelZeile(w));
+
+      /* Quittier-Knopf NUR beim gelben „geaendert" und nur, wenn eine
+       * Prüfsumme vorliegt — ohne sie gäbe es nichts zu quittieren. Für
+       * „antwortet_nicht", „kein_https" oder eine Hand-Sperre erscheint er
+       * bewusst nicht: die verlangen eine echte Entscheidung, keinen Haken. */
+      if (w && w.ampel === "gelb" && w.grund === "geaendert" && w.pruefsumme) {
+        var quittiert = !!(WACHEHAND[id] && WACHEHAND[id].gesehen === w.pruefsumme);
+        var inDatei = !!(WACHEHAND_DATEI[id] && WACHEHAND_DATEI[id].gesehen === w.pruefsumme);
+        var gb = document.createElement("button");
+        gb.type = "button"; gb.className = "fpst-btn";
+        // drei Zustaende: offen · quittiert und wartet aufs Veroeffentlichen ·
+        // laengst in der Datei (dann steht die Warnung nur noch da, weil der
+        // naechtliche Lauf sie noch nicht neu gerechnet hat).
+        gb.textContent = !quittiert ? T("wa_gesehen")
+                       : (inDatei ? T("wa_gesehen_datei") : T("wa_gesehen_ok"));
+        gb.disabled = quittiert;
+        gb.setAttribute("data-wagesehen", id);
+        zeile.appendChild(gb);
+      }
       var lage = document.createElement("span");
       lage.textContent = T(LAGE_TEXT[e.lage] || "sp_lage_unbrauchbar") + (e.hinweis ? " (" + e.hinweis + ")" : "");
       zeile.appendChild(lage);
@@ -1016,6 +1088,25 @@
   /* Übernehmen ist bewusst NUR ein Vorschlag in die Arbeitsliste: veröffentlicht
    * wird erst mit dem vorhandenen Knopf. So sieht Klaus die Änderung vorher in
    * der Liste, und ein Fehlgriff ist eine Verwerfung entfernt. */
+  /* „Gesehen" quittieren: schreibt die AKTUELLE Prüfsumme als `gesehen`. Damit
+   * gilt die heutige Fassung der Seite als in Ordnung; ändert sie sich erneut,
+   * meldet der Wächter wieder. Es wird KEINE Ampel gesetzt — Rot und Grün
+   * bleiben Handarbeit in der Datei. Wie überall im Studio ist das zunächst nur
+   * die Arbeitskopie; scharf wird es mit „Veröffentlichen". */
+  function wacheGesehen(anchorId) {
+    var st = SPORENSTAND && SPORENSTAND.eintraege && SPORENSTAND.eintraege[anchorId];
+    var w = st && st.wache;
+    if (!w || !w.pruefsumme) { toast(T("wa_keine_summe"), false); return; }
+    var vorher = WACHEHAND[anchorId] && typeof WACHEHAND[anchorId] === "object" ? WACHEHAND[anchorId] : {};
+    var neu = {};
+    for (var k in vorher) neu[k] = vorher[k];   // Sperre/Grund NICHT anfassen
+    neu.gesehen = String(w.pruefsumme);
+    WACHEHAND[anchorId] = neu;
+    wacheDirty = true; markDirty();
+    renderSporen(SPORENSTAND);
+    toast(T("wa_quittiert"));
+  }
+
   function sporeUebernehmen(anchorId) {
     var st = SPORENSTAND && SPORENSTAND.eintraege && SPORENSTAND.eintraege[anchorId];
     if (!st || !st.neuerText) return;
@@ -1469,6 +1560,7 @@
     var sb = panel.querySelector("[data-role=sporen]");
     if (sb) sb.addEventListener("click", function (e) {
       var b = e.target.closest("[data-sptake]"); if (b) sporeUebernehmen(b.getAttribute("data-sptake"));
+      var g = e.target.closest("[data-wagesehen]"); if (g) wacheGesehen(g.getAttribute("data-wagesehen"));
     });
     var vp = panel.querySelector("[data-role=vecreport]"); if (vp) vp.addEventListener("click", vecBericht);
     var mr = panel.querySelector("[data-role=msregler]");
