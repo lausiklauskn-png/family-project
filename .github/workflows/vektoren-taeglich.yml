@@ -125,6 +125,25 @@ jobs:
         continue-on-error: true
         run: node tools/forschung.mjs --nachtragen
 
+      # Und die Seiten, die NICHT im Marktplatz stehen (Klaus 2026-08-04:
+      # „kein Repo auslassen, was dazu geeignet wäre, geprüft zu werden“).
+      # Eigene Zielliste in forschung/messziele.json — der Marktplatz ist Klaus'
+      # kuratiertes Schaufenster und bleibt davon unberührt.
+      #
+      # Eigener Deckel, weil diese Messungen ZUSÄTZLICH zu den Marktplatz-
+      # Messungen laufen und die Zeitgrenze des Jobs geteilt wird. Wer heute
+      # nicht drankommt, kommt beim nächsten Mal zuerst dran (ältester Befund
+      # zuerst); der Lauf sagt, wie viele das waren.
+      - name: Eigene Ziele messen (Forschungsstation)
+        continue-on-error: true
+        env:
+          PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
+          FORSCHUNG_MAX: "6"
+        run: |
+          set -euo pipefail
+          if [ -x /usr/bin/google-chrome ]; then export CHROME_PATH=/usr/bin/google-chrome; fi
+          node tools/forschung.mjs --messen
+
       - name: Ergebnis committen
         run: |
           set -euo pipefail

@@ -66,12 +66,37 @@ prüft `tests/smoke_forschung.mjs` vor allem **Erhaltung**, nicht Ausgabe —
 Gegenprobe beim Bauen: schreibt man das Journal komplett neu statt oben
 anzufügen, fällt genau diese Probe.
 
-## Noch nicht abgedeckt
+## Zwei Quellen, ein Einsortier-Pfad
 
-Die Reihe misst heute die **17 Seiten**, die der Marktplatz führt (14 Einträge,
-davon drei mit Schaufenster). Es gibt weitere Seiten von Klaus, die messbar
-wären und noch nicht dabei sind — unter anderem Sage-Protokol, SB-KIMTool-Point,
-family-projekt.de selbst und die Muttis-Seiten. Sie aufzunehmen braucht eine
-eigene Zielliste neben den Marktplatz-Einträgen (der Marktplatz ist Klaus'
-kuratiertes Schaufenster und soll nicht durch Mess-Ziele verwässert werden).
-Das ist der nächste Ausbauschritt, ausdrücklich noch offen.
+Gemessen wird aus **zwei** Richtungen:
+
+1. **Der Marktplatz** — die 17 Seiten, die `assets/config/listings.js` führt
+   (14 Einträge, drei davon mit Schaufenster als eigenes Ziel). Die misst der
+   bestehende Nacht-Lauf; `--nachtragen` sortiert seinen Bericht ein.
+2. **Die eigenen Ziele** — `messziele.json`. Klaus 2026-08-04: *„wir wollen
+   bitte kein Repo auslassen, was dazu geeignet wäre, geprüft zu werden."*
+   Hier stehen die Seiten, die **nicht** im Marktplatz sind: family-projekt.de
+   selbst, Sage-Protokol samt Such-Tool und Pinnwand, SB-KIMTool-Point,
+   Alis Moderaum, Company Brain, Küchenzettel, Muttis Rezeptbuch und die
+   WorkFloh-Seite. `--messen` misst sie.
+
+**Der Marktplatz bleibt unberührt.** Er ist Klaus' kuratiertes Schaufenster und
+soll nicht durch Mess-Ziele verwässert werden — deshalb eine getrennte Liste.
+
+Einsortiert wird beides über **denselben** Pfad. Zwei Einsortier-Wege wären zwei
+Wahrheiten, die auseinanderlaufen; man merkt es erst an einem Verlauf, der an
+einer Stelle Lücken hat und an einer anderen doppelte Punkte.
+
+Sechs Repos stehen in `messziele.json` mit `aktiv: false` und einem **Grund** —
+sie haben (Stand 2026-08-04) kein `index.html` in der Wurzel von `main`, es gäbe
+also nichts zu messen. Sie sind bewusst aufgeführt statt weggelassen: so sieht
+man, dass sie geprüft und nicht vergessen wurden. Legt Klaus dort eine Seite an,
+genügt `aktiv: true`.
+
+## Deckel
+
+Ohne PSI-Schlüssel dauert jede Messung rund eine Minute. `FORSCHUNG_MAX`
+(Standard 6) begrenzt, wie viele eigene Ziele pro Nacht drankommen; wer heute
+nicht drankommt, kommt beim nächsten Mal **zuerst** dran (ältester Befund
+zuerst). Der Lauf sagt, wie viele übersprungen wurden — ein stiller halber
+Durchgang liest sich sonst wie ein ganzer.
