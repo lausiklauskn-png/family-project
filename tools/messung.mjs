@@ -1,4 +1,4 @@
-/* Katalog-Spore Stufe 5 — die Messung (Lighthouse, Weg A).
+/* Katalog-Spore Stufe 5 — die Messung (Lighthouse, Weg A oder Weg B).
  *
  * Kein eigener Lauf und kein zweites Format: dieses Modul wird von
  * tools/vektoren-bauen.mjs aufgerufen und hängt seinen Befund als Feld
@@ -6,11 +6,19 @@
  * nächtliche Aktion schon schreibt — neben `wache`. Genau die Form, die der
  * Wächter vorgegeben hat.
  *
- * WEG A (Klaus' Entscheidung 2026-08-01). Lighthouse läuft in der EIGENEN
- * Aktion auf GitHubs Rechnern, NICHT über Googles PageSpeed-API. Das kostet
- * Laufzeit (grob eine halbe bis eine Minute je Eintrag) und spart dafür
- * zweierlei: es braucht keinen Schlüssel, und die Liste der geprüften Adressen
- * geht nicht an Google. In einem nächtlichen Lauf ist die Zeit ohne Belang.
+ * WEG A (Klaus' Entscheidung 2026-08-01) — Lighthouse läuft in der EIGENEN
+ * Aktion auf GitHubs Rechnern. Das kostet Laufzeit (grob eine halbe bis eine
+ * Minute je Eintrag) und spart dafür zweierlei: es braucht keinen Schlüssel,
+ * und die Liste der geprüften Adressen geht nicht an Google.
+ *
+ * WEG B (Klaus' Entscheidung 2026-08-04) — Googles PageSpeed Insights liefert
+ * die Zahl, damit sie mit dem verlinkten Bericht übereinstimmt. Greift, sobald
+ * PSI_API_KEY gesetzt ist; ohne Schlüssel bleibt Weg A. Begründung und
+ * Abwägung stehen bei `psiMessen`.
+ *
+ * WELCHER WEG ES WAR, steht in jedem Befund unter `quelle` (`google`/`eigen`)
+ * und wird auf der Karte gezeigt. Eine Zahl ohne ihre Quelle war genau das
+ * Problem, das Klaus am 2026-08-04 gefunden hat.
  *
  * VIER ZAHLEN, KEINE FÜNFTE. Gemessen werden die vier Lighthouse-Kategorien:
  * Leistung, Bedienbarkeit, gute Praxis, Auffindbarkeit. Es wird KEINE
@@ -222,11 +230,100 @@ export function werkzeugDa(opts) {
 /* ── Eine Seite messen ─────────────────────────────────────────────────────
  * Rückgabe immer ein Objekt, nie ein Wurf: eine Seite, die sich nicht messen
  * lässt, darf den nächtlichen Lauf nicht anhalten. */
+/* ── Weg B: Googles PageSpeed Insights fragen ──────────────────────────────
+ * Klaus' Vorgabe 2026-08-04: „Die Werte müssen mit den Messwerten auf der
+ * verlinkten Seite übereinstimmen."
+ *
+ * Der Grund dafür ist echt. Am 2026-08-04 zeigte die Karte für Mein-Mixarium
+ * eine 37, Googles Bericht für dieselbe Adresse am selben Tag eine 76. Wer auf
+ * „Vollständigen Bericht bei Google öffnen" tippt, sah das Doppelte und musste
+ * uns für schlampig halten. Zwei Quellen für dieselbe Zahl gehen nicht.
+ *
+ * Es ist NICHT die Maschine — das Schaufenster derselben App traf mit 63 gegen
+ * 65. Es ist die Einzelmessung einer schweren Seite: zwei Läufe hintereinander
+ * ergaben 33 und 51. Solche Seiten kann man nur dann vergleichbar messen, wenn
+ * ALLE dieselbe Quelle benutzen. Also fragen wir die, auf die wir verlinken.
+ *
+ * WAS DAS KOSTET, ehrlich benannt: die geprüften Adressen gehen an Google.
+ * Das war 2026-08-01 der Grund für Weg A. Es ist heute weniger schwer, weil
+ * derselbe Knopf im Bewertungs-Fenster diese Adresse ohnehin an Google gibt,
+ * sobald jemand nachsehen will, und weil es öffentliche Marktplatz-Einträge
+ * sind. Klaus hat es abgewogen und so entschieden.
+ *
+ * OHNE SCHLÜSSEL GEHT ES NICHT VERLÄSSLICH. Ohne Schlüssel teilt man sich ein
+ * Kontingent mit aller Welt; ein Versuch von der Bau-Maschine kam sofort mit
+ * HTTP 429 („zu viele Anfragen") zurück. Auf GitHubs Rechnern, deren Adressen
+ * noch stärker geteilt sind, wäre es schlimmer.
+ *
+ * IST KEIN SCHLÜSSEL DA, wird weiter selbst gemessen (Weg A) — die Seite bliebe
+ * sonst ganz ohne Zahlen, und das wäre schlechter. Aber NICHT stillschweigend:
+ * jeder Befund trägt jetzt ein Feld `quelle` (`google` oder `eigen`), und die
+ * Karte schreibt es hin. Der Unterschied, über den Klaus gestolpert ist, war
+ * nicht die Abweichung selbst — es war, dass man ihr nicht ansehen konnte,
+ * woher sie kam.
+ *
+ * Das Antwortformat passt: unter `lighthouseResult` steckt derselbe Bericht,
+ * den auch das Programm schreibt. `zahlenAusBericht` und `hinweiseAusBericht`
+ * lesen ihn unverändert. */
+export const PSI_ENDPUNKT = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
+
+export function psiAdresse(url, schluessel) {
+  const p = new URLSearchParams();
+  p.set("url", url);
+  p.set("strategy", "mobile");          // wie im verlinkten Bericht: Handy-Ansicht
+  p.set("locale", MESSUNG_SPRACHE);
+  for (const k of KATEGORIEN) p.append("category", k.lh);
+  if (schluessel) p.set("key", schluessel);
+  return PSI_ENDPUNKT + "?" + p.toString();
+}
+
+export async function psiMessen(url, opts) {
+  const o = opts || {};
+  const schluessel = o.psiSchluessel || process.env.PSI_API_KEY || "";
+  if (!schluessel) {
+    return { ok: false, hinweis: "PSI_API_KEY fehlt — ohne Schlüssel greift Googles Kontingent (HTTP 429)" };
+  }
+  const holen = o.holen || ((adr, frist) => {
+    const ab = new AbortController();
+    const t = setTimeout(() => ab.abort(), frist);
+    return fetch(adr, { signal: ab.signal }).finally(() => clearTimeout(t));
+  });
+  let antwort;
+  try {
+    antwort = await holen(psiAdresse(url, schluessel), o.frist || MESSUNG_FRIST);
+  } catch (e) {
+    return { ok: false, hinweis: ("PageSpeed nicht erreichbar: " + String((e && e.message) || e)).slice(0, 160) };
+  }
+  if (!antwort || !antwort.ok) {
+    const code = (antwort && antwort.status) || "?";
+    return { ok: false, hinweis: ("PageSpeed antwortete HTTP " + code).slice(0, 160) };
+  }
+  let daten;
+  try { daten = await antwort.json(); }
+  catch (_e) { return { ok: false, hinweis: "PageSpeed-Antwort ist kein gültiges JSON" }; }
+  const lhr = daten && daten.lighthouseResult;
+  if (!lhr) return { ok: false, hinweis: "PageSpeed-Antwort ohne lighthouseResult" };
+  const zahlen = zahlenAusBericht(lhr);
+  if (!zahlen) return { ok: false, hinweis: "PageSpeed-Bericht ohne vollständige Bewertung" };
+  return {
+    ok: true, zahlen, quelle: "google",
+    werkzeug: typeof lhr.lighthouseVersion === "string" ? lhr.lighthouseVersion : "",
+    hinweise: hinweiseAusBericht(lhr)
+  };
+}
+
 export async function seiteMessen(url, opts) {
   const o = opts || {};
   if (!/^https:\/\//i.test(String(url || ""))) {
     return { ok: false, hinweis: "kein https-Link" };
   }
+  /* Weg B, sobald ein Schlüssel da ist — dann stammt die Zahl aus derselben
+   * Quelle wie der verlinkte Bericht. Ohne Schlüssel bleibt Weg A, damit die
+   * Seite nicht ganz ohne Zahlen dasteht; welcher Weg es war, steht danach im
+   * Feld `quelle`. `psiAus` schaltet Weg B für Tests ab, die den Programm-Pfad
+   * prüfen. */
+  const schluessel = o.psiSchluessel || process.env.PSI_API_KEY || "";
+  if (schluessel && !o.psiAus) return psiMessen(url, o);
   const lauf = o.lauf || standardLauf;
   const dir = fs.mkdtempSync(path.join(o.tmp || os.tmpdir(), "fp-mess-"));
   const datei = path.join(dir, "bericht.json");
@@ -248,7 +345,7 @@ export async function seiteMessen(url, opts) {
     const zahlen = zahlenAusBericht(lhr);
     if (!zahlen) return { ok: false, hinweis: "Bericht ohne vollständige Bewertung" };
     const werkzeug = typeof lhr.lighthouseVersion === "string" ? lhr.lighthouseVersion : "";
-    return { ok: true, zahlen, werkzeug, hinweise: hinweiseAusBericht(lhr) };
+    return { ok: true, zahlen, quelle: "eigen", werkzeug, hinweise: hinweiseAusBericht(lhr) };
   } finally {
     try { fs.rmSync(dir, { recursive: true, force: true }); } catch (_e) {}
   }
@@ -281,6 +378,10 @@ export function messungBilden(a) {
     m.stand = "gemessen";
     for (const k of SCHLUESSEL) m[k] = roh.zahlen[k];
     m.gemessen = heute;
+    /* Woher die Zahl stammt, gehört neben die Zahl. Sonst kann niemand
+     * einordnen, warum eine eigene Nachmessung abweicht — und genau daran
+     * hat sich Klaus am 2026-08-04 gestoßen. */
+    if (roh.quelle) m.quelle = String(roh.quelle).slice(0, 16);
     if (roh.werkzeug) m.werkzeug = String(roh.werkzeug).slice(0, 40);
     if (Array.isArray(roh.hinweise) && roh.hinweise.length) m.hinweise = roh.hinweise;
     return m;
@@ -293,6 +394,7 @@ export function messungBilden(a) {
       for (const k of SCHLUESSEL) m[k] = vorher[k];
       m.stand = vorher.stand === "gemessen" ? "gemessen" : "veraltet";
       if (vorher.gemessen) m.gemessen = vorher.gemessen;
+      if (vorher.quelle) m.quelle = vorher.quelle;
       if (vorher.werkzeug) m.werkzeug = vorher.werkzeug;
       if (vorher.grund) m.grund = vorher.grund;
       if (Array.isArray(vorher.hinweise)) m.hinweise = vorher.hinweise;
@@ -308,6 +410,7 @@ export function messungBilden(a) {
     for (const k of SCHLUESSEL) m[k] = vorher[k];
     m.stand = "veraltet";
     if (vorher.gemessen) m.gemessen = vorher.gemessen;
+    if (vorher.quelle) m.quelle = vorher.quelle;
     if (vorher.werkzeug) m.werkzeug = vorher.werkzeug;
     // Die Nachbesserungen gehören zu den Zahlen: bleiben die stehen, bleiben
     // auch sie stehen. Sonst hätte ein Anbieter plötzlich eine Note ohne

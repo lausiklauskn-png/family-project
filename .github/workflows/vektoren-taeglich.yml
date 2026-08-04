@@ -86,6 +86,14 @@ jobs:
           # Zum Scharfschalten: Settings -> Secrets and variables -> Actions ->
           # New repository secret, Name SAFE_BROWSING_KEY.
           SAFE_BROWSING_KEY: ${{ secrets.SAFE_BROWSING_KEY }}
+          # Stufe 5, Weg B (Klaus 2026-08-04): mit Schlüssel liefert Googles
+          # PageSpeed Insights die Zahl — dieselbe Quelle wie der Bericht, auf
+          # den das Bewertungs-Fenster verlinkt. Ohne Schlüssel wird weiter
+          # selbst gemessen (Weg A); welcher Weg es war, steht danach im Feld
+          # `quelle` und auf der Karte. Zum Scharfschalten: Settings -> Secrets
+          # and variables -> Actions -> New repository secret, Name PSI_API_KEY.
+          # Der Schlüssel ist bei Google kostenlos (PageSpeed Insights API).
+          PSI_API_KEY: ${{ secrets.PSI_API_KEY }}
         run: |
           set -euo pipefail
           # Lighthouse startet Chrome selbst. Auf ubuntu-latest liegt in der
