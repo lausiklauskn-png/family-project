@@ -100,7 +100,7 @@ import os from "node:os";
 import path from "node:path";
 import { execFile } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { zahlenAusBericht, hinweiseAusBericht, messungBilden, reihenfolge, hatZahlen, lighthouseBefehl, MESSUNG_SPRACHE, KATEGORIEN } from "../tools/messung.mjs";
+import { zahlenAusBericht, hinweiseAusBericht, messungBilden, reihenfolge, hatZahlen, lighthouseBefehl, MESSUNG_SPRACHE, KATEGORIEN, psiAdresse, psiMessen, seiteMessen } from "../tools/messung.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let pass = 0, fail = 0;
@@ -343,6 +343,77 @@ const standVon = (dir) => JSON.parse(fs.readFileSync(path.join(dir, "assets/conf
     "B1f mit Titel und ersparter Zeit (" + JSON.stringify(m.hinweise[0]) + ")");
   ok(!JSON.stringify(m).includes("Nur zur Information"),
     "B1g und ohne die reinen Informations-Prüfungen");
+}
+
+/* ── G — Weg B: Googles PageSpeed als Quelle (Klaus 2026-08-04) ────────────
+ * Der Anlass: die Karte zeigte für Mein-Mixarium 37, Googles Bericht für
+ * dieselbe Adresse am selben Tag 76. Solange zwei Quellen dieselbe Zahl
+ * liefern sollen, kann sie nicht stimmen. Geprüft wird deshalb dreierlei:
+ * die Adresse ist richtig gebaut, die Antwort wird richtig gelesen, und die
+ * Quelle steht danach im Befund. */
+{
+  const adr = psiAdresse("https://beispiel.de/app/", "GEHEIM");
+  ok(adr.startsWith("https://www.googleapis.com/pagespeedonline/v5/runPagespeed?"),
+    "G1 die Adresse zeigt auf Googles PageSpeed-Dienst");
+  ok(adr.includes("url=https%3A%2F%2Fbeispiel.de%2Fapp%2F"),
+    "G1b mit der geprüften Seite als Parameter");
+  ok(adr.includes("strategy=mobile"),
+    "G1c und in der Handy-Ansicht — wie im verlinkten Bericht, sonst vergliche man Äpfel mit Birnen");
+  ok(KATEGORIEN.every((k) => adr.includes("category=" + k.lh)),
+    "G1d alle vier Kategorien werden angefordert");
+  ok(adr.includes("locale=" + MESSUNG_SPRACHE), "G1e und die Prüfungs-Titel auf Deutsch");
+  ok(adr.includes("key=GEHEIM"), "G1f der Schlüssel hängt dran");
+  ok(!psiAdresse("https://beispiel.de/", "").includes("key="),
+    "G1g ohne Schlüssel steht auch kein leeres key= in der Adresse");
+}
+{
+  // Ohne Schlüssel wird gar nicht erst gefragt — und der Grund steht dabei.
+  const r = await psiMessen("https://beispiel.de/", { psiSchluessel: "" });
+  ok(!r.ok && /PSI_API_KEY fehlt/.test(r.hinweis || ""),
+    "G2 ohne Schlüssel wird nicht gefragt, und der Bericht sagt warum");
+}
+{
+  // Die Antwort von Google trägt den Bericht unter `lighthouseResult` — in
+  // genau dem Format, das die vorhandenen Auswerter schon lesen.
+  const lhr = {
+    lighthouseVersion: "13.4.1",
+    categories: {
+      performance: { score: 0.76, auditRefs: [{ id: "a1" }] },
+      accessibility: { score: 1 }, "best-practices": { score: 0.96 }, seo: { score: 1 }
+    },
+    audits: { a1: { score: 0, scoreDisplayMode: "numeric", title: "Nicht verwendetes JavaScript",
+                    details: { overallSavingsMs: 1200 } } }
+  };
+  const r = await psiMessen("https://beispiel.de/", {
+    psiSchluessel: "K",
+    holen: async () => ({ ok: true, status: 200, json: async () => ({ lighthouseResult: lhr }) })
+  });
+  ok(r.ok && r.zahlen.leistung === 76 && r.zahlen.bedienbarkeit === 100
+     && r.zahlen.gute_praxis === 96 && r.zahlen.auffindbarkeit === 100,
+    "G3 die vier Zahlen kommen aus Googles Bericht (" + JSON.stringify(r.zahlen) + ")");
+  ok(r.quelle === "google", "G3b und der Befund sagt, dass Google gemessen hat");
+  ok(r.hinweise.length === 1 && r.hinweise[0].ms === 1200,
+    "G3c die Nachbesserungen werden mitgelesen");
+  const m = messungBilden({ roh: r, heute: "2026-08-04" });
+  ok(m.quelle === "google", "G3d und die Quelle steht im fertigen Befund");
+}
+{
+  // Antwortet Google nicht, wird das gesagt — nicht geraten.
+  const r = await psiMessen("https://beispiel.de/", {
+    psiSchluessel: "K", holen: async () => ({ ok: false, status: 429 })
+  });
+  ok(!r.ok && /HTTP 429/.test(r.hinweis || ""),
+    "G4 ein abgewiesener Aufruf wird als solcher gemeldet");
+}
+{
+  // Ohne Schlüssel bleibt Weg A — die Seite steht nicht ohne Zahlen da.
+  const r = await seiteMessen("https://beispiel.de/", {
+    psiSchluessel: "",
+    lauf: async () => ({ fehler: "kein Lighthouse" })
+  });
+  ok(!r.ok, "G5 ohne Schlüssel läuft der Programm-Pfad (Weg A) weiter");
+  ok(!/PSI_API_KEY/.test(r.hinweis || ""),
+    "G5b und meldet nicht fälschlich den fehlenden Schlüssel");
 }
 
 // B2 — kein Lighthouse da. Der Steckplatz schweigt ehrlich.
