@@ -1,0 +1,405 @@
+{
+ "_hinweis": "Messreihe der Forschungsstation. Wird von tools/forschung.mjs fortgeschrieben — NICHT von Hand bearbeiten. Aufbau: je Ziel eine Liste von Punkten; ein Punkt gilt von `von` bis `bis` (beide Tage eingeschlossen). Ändert sich an einem Tag nichts, wächst nur `bis` des letzten Punktes — die Datei bleibt klein, ohne dass ein Tag verloren geht. Wer den Wert an einem beliebigen Tag wissen will, sucht den Punkt, dessen Spanne diesen Tag enthält: node tools/forschung.mjs --zeigen --seit=2026-08-01",
+ "fassung": 1,
+ "reihen": {
+  "markt-bookledgerpro": {
+   "name": "BookLedgerPro",
+   "url": "https://lausiklauskn-png.github.io/BookLedgerPro/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  },
+  "markt-mein-tresor": {
+   "name": "Mein-Tresor",
+   "url": "https://lausiklauskn-png.github.io/Mein-Tresor/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 72,
+     "bedienbarkeit": 84,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute",
+      "bedienbarkeit: select-Elemente haben keine zugehörigen label-Elemente.",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Largest Contentful Paint"
+     ]
+    }
+   ]
+  },
+  "markt-jasons-tresor": {
+   "name": "Jasons-Tresor",
+   "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 83,
+     "bedienbarkeit": 92,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: select-Elemente haben keine zugehörigen label-Elemente.",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch"
+     ]
+    }
+   ]
+  },
+  "markt-tomys-hub": {
+   "name": "Tomys Hub",
+   "url": "https://lausiklauskn-png.github.io/Tomys-Hub/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  },
+  "markt-tomys-hub--schaufenster": {
+   "name": "Tomys Hub (Schaufenster)",
+   "url": "https://lausiklauskn-png.github.io/Tomys-Hub/showcase/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  },
+  "markt-kim-bell": {
+   "name": "Kim-Bell",
+   "url": "https://lausiklauskn-png.github.io/Kim-Bell/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 97,
+     "bedienbarkeit": 96,
+     "gute_praxis": 96,
+     "auffindbarkeit": 90,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "auffindbarkeit: Links können nicht gecrawlt werden",
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Anfragen zum Blockieren des Renderings",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "markt-kimseek": {
+   "name": "Kimseek",
+   "url": "https://lausiklauskn-png.github.io/Kimseek/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 99,
+     "bedienbarkeit": 93,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "markt-kimboard": {
+   "name": "Kimboard",
+   "url": "https://lausiklauskn-png.github.io/Kimboard/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 98,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: JavaScript komprimieren"
+     ]
+    }
+   ]
+  },
+  "markt-privat-brain": {
+   "name": "Private Brain",
+   "url": "https://lausiklauskn-png.github.io/Privat-Brain/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 74,
+     "bedienbarkeit": 91,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Dokument hat keine Hauptmarkierung.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "markt-workfloh": {
+   "name": "WorkFloh",
+   "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 78,
+     "bedienbarkeit": 91,
+     "gute_praxis": 96,
+     "auffindbarkeit": 80,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "auffindbarkeit: Dokument enthält keine Meta-Beschreibung",
+      "auffindbarkeit: Links können nicht gecrawlt werden",
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: JavaScript komprimieren",
+      "leistung: Mehrere Weiterleitungen auf die Seite vermeiden",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "markt-rezeptbuch": {
+   "name": "Mein-Rezeptbuch",
+   "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 73,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "markt-rezeptbuch--schaufenster": {
+   "name": "Mein-Rezeptbuch (Schaufenster)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 56,
+     "bedienbarkeit": 94,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Reduziere nicht verwendetes JavaScript",
+      "leistung: Total Blocking Time"
+     ]
+    }
+   ]
+  },
+  "markt-mixarium": {
+   "name": "Mein-Mixarium",
+   "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 37,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "markt-mixarium--schaufenster": {
+   "name": "Mein-Mixarium (Schaufenster)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 63,
+     "bedienbarkeit": 87,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Links sind durch Farbe erkennbar.",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Total Blocking Time"
+     ]
+    }
+   ]
+  },
+  "markt-perfect-skin-beauty": {
+   "name": "Perfect-Skin-Beauty",
+   "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 89,
+     "bedienbarkeit": 96,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Latenz der Dokumentanfrage",
+      "leistung: Mehrere Weiterleitungen auf die Seite vermeiden"
+     ]
+    }
+   ]
+  },
+  "markt-perfect-skin-fashion": {
+   "name": "Perfect-Skin-Fashion",
+   "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 99,
+     "bedienbarkeit": 94,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Überschriftenelemente sind nicht in einer fortlaufenden absteigenden Reihenfolge angeordnet",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  },
+  "markt-mycel-karte": {
+   "name": "mycel-karte",
+   "url": "https://lausiklauskn-png.github.io/mycel-karte/",
+   "punkte": [
+    {
+     "von": "2026-08-04",
+     "bis": "2026-08-04",
+     "leistung": 100,
+     "bedienbarkeit": 87,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Die Formularelemente sind nicht mit Labels verknüpft",
+      "leistung: Aufwand für Hauptthread minimieren",
+      "leistung: JavaScript komprimieren",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  }
+ },
+ "gepflegt": "2026-08-04"
+}

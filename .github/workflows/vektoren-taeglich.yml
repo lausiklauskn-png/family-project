@@ -12,7 +12,10 @@ name: Sporen lesen und Vektoren fortschreiben (täglich)
 #      keine Adressliste an Google) und die vier Zahlen als `messung` in
 #      denselben Bericht schreiben,
 #   5. die vorberechneten Vektoren fortschreiben, mit derselben Spar-Logik wie
-#      der Studio-Knopf: gerechnet wird nur, was sich geändert hat.
+#      der Studio-Knopf: gerechnet wird nur, was sich geändert hat,
+#   6. den Befund in die Messreihe der Forschungsstation einsortieren
+#      (forschung/messreihe.json + JOURNAL.md) — der Bericht kennt nur das
+#      Heute, die Reihe behält den Verlauf.
 #
 # Der Studio-Knopf bleibt daneben als Hand-Auslöser; beide schreiben dieselbe
 # Datei nach demselben Vertrag.
@@ -109,16 +112,30 @@ jobs:
           fi
           node tools/vektoren-bauen.mjs --schreiben
 
+      # Forschungsstation (Klaus 2026-08-04). Der Schritt oben schreibt einen
+      # SCHNAPPSCHUSS — er kennt nur das Heute und überschreibt sich jede Nacht
+      # selbst. Hier wird derselbe Befund zusätzlich in eine Reihe einsortiert,
+      # die den Verlauf behält, und ein Journal-Eintrag angelegt, wo etwas
+      # gesprungen ist. Das „Warum“ trägt danach eine Sitzung von Hand nach.
+      #
+      # Läuft NACH der Messung und ist bewusst fehlertolerant: eine Störung in
+      # der Buchführung darf die nächtliche Arbeit nicht anhalten. Ohne neue
+      # Messung schreibt der Lauf schlicht nichts.
+      - name: Forschungsstation fortschreiben
+        continue-on-error: true
+        run: node tools/forschung.mjs --nachtragen
+
       - name: Ergebnis committen
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Nur diese drei Dateien — nie versehentlich das Modell oder
+          # Nur diese fünf Dateien — nie versehentlich das Modell oder
           # node_modules. `git add <pfad>` statt `git add -A`.
           # wache-hand.json steht bewusst NICHT dabei: der Lauf liest sie nur.
           # Was von Hand gesperrt wird, entscheidet Klaus, nicht die Aktion.
-          git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json
+          git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json \
+              forschung/messreihe.json forschung/JOURNAL.md
           if git diff --cached --quiet; then
             echo "Keine Änderung."
             exit 0
