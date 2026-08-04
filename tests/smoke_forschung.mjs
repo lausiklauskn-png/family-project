@@ -129,6 +129,46 @@ const sicht = lauf("--zeigen", "--seit=2026-08-04");
 ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
   "--seit blendet ältere Spannen aus");
 
+/* ---- 7 · Die eigene Zielliste -------------------------------------------- */
+/* `messziele.json` ist von Hand gepflegt. Ein Tippfehler darin fällt sonst erst
+ * in der Nacht auf, und dann nur als eine Zeile in einem Aktions-Protokoll,
+ * das niemand liest. */
+{
+  const liste = JSON.parse(fs.readFileSync(path.join(ROOT, "forschung", "messziele.json"), "utf8"));
+  const ziele = liste.ziele || [];
+  ok(ziele.length > 0, `messziele.json führt ${ziele.length} Ziele`);
+
+  const ids = ziele.map((z) => z.id);
+  ok(new Set(ids).size === ids.length, "jede Kennung kommt genau einmal vor");
+  ok(ziele.every((z) => z.id && z.name && z.url && z.repo),
+    "jedes Ziel hat Kennung, Name, Adresse und Repo");
+  ok(ziele.every((z) => /^https:\/\//.test(z.url)),
+    "jede Adresse ist https — alles andere wäre gar nicht messbar");
+
+  /* Ein abgeschaltetes Ziel OHNE Grund ist genau die stille Lücke, die Klaus
+   * vermeiden wollte: es sähe aus wie „vergessen“ statt wie „geprüft und
+   * bewusst nicht gemessen“. */
+  const ohneGrund = ziele.filter((z) => z.aktiv === false && !z.grund);
+  ok(ohneGrund.length === 0,
+    `jedes abgeschaltete Ziel nennt seinen Grund${ohneGrund.length ? " — fehlt bei: " + ohneGrund.map((z) => z.id).join(", ") : ""}`);
+
+  /* Die eigenen Ziele dürfen sich nicht mit dem Marktplatz überschneiden —
+   * sonst stünde dieselbe Seite zweimal in der Rangliste, einmal je Quelle,
+   * und man hielte sie für zwei verschiedene. */
+  /* Verglichen wird gegen die ZIELADRESSEN des Marktplatzes, nicht gegen den
+   * Dateitext. Ein blosses `includes` meldet Fehlalarm, sobald eine Adresse
+   * Anfang einer anderen ist — `https://family-projekt.de/` steckt in jeder
+   * Bild-Adresse `https://family-projekt.de/assets/apps/….webp`. Beim Bauen
+   * genau so passiert. */
+  const marktText = fs.readFileSync(path.join(ROOT, "assets", "config", "listings.js"), "utf8");
+  const marktAdressen = new Set(
+    [...marktText.matchAll(/"(?:url|appUrl)"\s*:\s*"([^"]+)"/g)].map((m) => m[1].replace(/\/+$/, ""))
+  );
+  const doppelt = ziele.filter((z) => z.aktiv !== false && marktAdressen.has(z.url.replace(/\/+$/, "")));
+  ok(doppelt.length === 0,
+    `kein eigenes Ziel steht schon im Marktplatz${doppelt.length ? " — doppelt: " + doppelt.map((z) => z.id).join(", ") : ""}`);
+}
+
 fs.rmSync(buehne, { recursive: true, force: true });
 console.log(`\n${fail === 0 ? "✓" : "✗"} smoke_forschung: ${pass} grün, ${fail} rot`);
 process.exit(fail === 0 ? 0 : 1);

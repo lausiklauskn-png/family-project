@@ -1,0 +1,153 @@
+{
+  "_hinweis": "Zusätzliche Mess-Ziele der Forschungsstation — Seiten, die NICHT im Marktplatz stehen. Klaus 2026-08-04: „wir wollen bitte kein Repo auslassen, was dazu geeignet wäre, geprüft zu werden.“ Der Marktplatz (assets/config/listings.js) ist Klaus' kuratiertes Schaufenster und wird davon NICHT berührt — er bleibt, wie er ist. Diese Liste ist reine Forschung. Gemessen wird mit node tools/forschung.mjs --messen (nachts automatisch).",
+  "_felder": {
+    "id": "Kennung in der Messreihe. Bleibt stabil, auch wenn sich der Name ändert — sonst reißt der Verlauf ab.",
+    "name": "Anzeigename in Rangliste und Journal.",
+    "url": "Was gemessen wird.",
+    "repo": "Woher die Seite kommt — damit man weiß, wo man nachbessert.",
+    "aktiv": "false = bekannt, aber bewusst nicht gemessen. `grund` sagt warum.",
+    "grund": "Warum nicht gemessen. Wird in der Ausgabe genannt, nicht verschwiegen."
+  },
+  "ziele": [
+    {
+      "id": "eigen-family-projekt",
+      "name": "family-projekt.de (Start)",
+      "url": "https://family-projekt.de/",
+      "repo": "family-project",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-family-markt",
+      "name": "family-projekt.de (Marktplatz)",
+      "url": "https://family-projekt.de/markt.html",
+      "repo": "family-project",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-family-werkzeuge",
+      "name": "family-projekt.de (Werkzeuge)",
+      "url": "https://family-projekt.de/werkzeuge.html",
+      "repo": "family-project",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-sage",
+      "name": "Sage-Protokol",
+      "url": "https://lausiklauskn-png.github.io/Sage-Protokol/",
+      "repo": "Sage-Protokol",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-sage-suchtool",
+      "name": "Sage · Such-Tool",
+      "url": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
+      "repo": "Sage-Protokol",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-sage-pinnwand",
+      "name": "Sage · Pinnwand",
+      "url": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
+      "repo": "Sage-Protokol",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-kimtool-point",
+      "name": "SB-KIMTool-Point",
+      "url": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",
+      "repo": "SB-KIMTool-Point",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-alis-moderaum",
+      "name": "Alis Moderaum",
+      "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/",
+      "repo": "Alis-Moderaum",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-company-brain",
+      "name": "Company Brain",
+      "url": "https://lausiklauskn-png.github.io/Company-Brain/",
+      "repo": "Company-Brain",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-kuechenzettel",
+      "name": "Küchenzettel",
+      "url": "https://lausiklauskn-png.github.io/Kuechenzettel/",
+      "repo": "Kuechenzettel",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-muttis-rezeptbuch",
+      "name": "Muttis Rezeptbuch",
+      "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/",
+      "repo": "Muttis-Rezeptbuch",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-workfloh-page",
+      "name": "WorkFloh (Schaufenster)",
+      "url": "https://lausiklauskn-png.github.io/Mein-Workfloh-Page/",
+      "repo": "Mein-Workfloh-Page",
+      "aktiv": true
+    },
+    {
+      "id": "eigen-new-psb",
+      "name": "New Perfect Skin Beauty",
+      "url": "https://lausiklauskn-png.github.io/New-Perfect-Skin-Beauty-/",
+      "repo": "New-Perfect-Skin-Beauty-",
+      "aktiv": true
+    },
+
+    {
+      "id": "eigen-kim-sync",
+      "name": "Kim-sync",
+      "url": "https://lausiklauskn-png.github.io/Kim-sync/",
+      "repo": "Kim-sync",
+      "aktiv": false,
+      "grund": "kein index.html in der Wurzel von main (Stand 2026-08-04) — es gäbe nichts zu messen. Sobald dort eine Seite liegt: aktiv auf true."
+    },
+    {
+      "id": "eigen-kimhub",
+      "name": "Kimhub",
+      "url": "https://lausiklauskn-png.github.io/Kimhub/",
+      "repo": "Kimhub",
+      "aktiv": false,
+      "grund": "kein index.html in der Wurzel von main (Stand 2026-08-04)."
+    },
+    {
+      "id": "eigen-me-mixarium",
+      "name": "Me-Mixarium",
+      "url": "https://lausiklauskn-png.github.io/Me-Mixarium/",
+      "repo": "Me-Mixarium",
+      "aktiv": false,
+      "grund": "kein index.html in der Wurzel von main (Stand 2026-08-04)."
+    },
+    {
+      "id": "eigen-in-and-out",
+      "name": "Meine In-and-Out-Book",
+      "url": "https://lausiklauskn-png.github.io/Meine-In-and-Out-Book/",
+      "repo": "Meine-In-and-Out-Book",
+      "aktiv": false,
+      "grund": "kein index.html in der Wurzel von main (Stand 2026-08-04)."
+    },
+    {
+      "id": "eigen-muttis-seite",
+      "name": "Muttis Rezeptbuch (Seite)",
+      "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch-Seite/",
+      "repo": "Muttis-Rezeptbuch-Seite",
+      "aktiv": false,
+      "grund": "kein index.html in der Wurzel von main (Stand 2026-08-04)."
+    },
+    {
+      "id": "eigen-sp-fp-speicher",
+      "name": "SP-FP-md-Speicher",
+      "url": "https://lausiklauskn-png.github.io/SP-FP-md-Speicher/",
+      "repo": "SP-FP-md-Speicher",
+      "aktiv": false,
+      "grund": "Ablage für Markdown-Dateien, keine Seite — nichts zu messen."
+    }
+  ]
+}

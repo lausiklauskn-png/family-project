@@ -17,7 +17,8 @@
  *   forschung/LEHREN.md       — was wir daraus gelernt haben. Reine Handarbeit.
  *
  * Aufrufe:
- *   node tools/forschung.mjs --nachtragen        neue Messung einsortieren (nachts)
+ *   node tools/forschung.mjs --messen            eigene Ziele messen (nachts)
+ *   node tools/forschung.mjs --nachtragen        Marktplatz-Messung einsortieren (nachts)
  *   node tools/forschung.mjs --zeigen [--ziel=X] [--seit=YYYY-MM-DD] [--bis=…]
  *   node tools/forschung.mjs --offen             Einträge ohne „Warum“ — die Kontrollliste
  *   node tools/forschung.mjs --rangliste         wo stehen wir gerade, wer bewegt sich
@@ -111,6 +112,14 @@ const gleich = (a, b) =>
 function nachtragen() {
   const stand = lesen(STAND, null);
   if (!stand) { console.error("Kein Tagesbericht gefunden — nichts einzusortieren."); process.exit(1); }
+  einsortieren(stand);
+}
+
+/* Ein einziger Einsortier-Pfad für BEIDE Quellen — den Marktplatz-Tagesbericht
+ * und die eigenen Ziele. Zwei Pfade wären zwei Wahrheiten, die auseinander-
+ * laufen; man merkt es erst an einem Verlauf, der an einer Stelle Lücken hat
+ * und an einer anderen doppelte Punkte. */
+function einsortieren(stand) {
   const reihe = lesen(REIHE, { fassung: 1, reihen: {} });
   reihe.reihen = reihe.reihen || {};
 
@@ -308,16 +317,85 @@ function rangliste() {
   console.log(`   Wo das ein Punkt ist, steht ·  — dann gibt es noch keinen Verlauf.\n`);
 }
 
+/* ---- Eigene Ziele messen (die, die NICHT im Marktplatz stehen) ------------ */
+
+/* Klaus 2026-08-04: „wir wollen bitte kein Repo auslassen, was dazu geeignet
+ * wäre, geprüft zu werden.“ Der Marktplatz ist Klaus' kuratiertes Schaufenster
+ * und soll nicht durch Mess-Ziele verwässert werden — darum eine EIGENE Liste
+ * (forschung/messziele.json), die nur die Forschungsstation kennt.
+ *
+ * Gemessen wird mit demselben `seiteMessen` wie der Marktplatz: mit hinterlegtem
+ * Schlüssel über Googles PageSpeed Insights, sonst selbst. Der Weg steht danach
+ * in jedem Punkt im Feld `quelle`. */
+async function messen() {
+  const liste = lesen(path.join(WURZEL, "forschung", "messziele.json"), null);
+  if (!liste) { console.error("forschung/messziele.json fehlt."); process.exit(1); }
+  const alle = liste.ziele || [];
+  const aus = alle.filter((z) => z.aktiv === false);
+  const an = alle.filter((z) => z.aktiv !== false);
+
+  const { seiteMessen, messungBilden, reihenfolge, werkzeugDa, hatZahlen } =
+    await import("./messung.mjs");
+
+  /* Ohne Schlüssel misst jede Seite rund eine Minute. Der Deckel hält den
+   * nächtlichen Lauf in seiner Zeitgrenze; wer heute nicht drankommt, kommt
+   * beim nächsten Mal zuerst dran (ältester Befund zuerst). Das wird GESAGT,
+   * nicht verschwiegen — sonst liest sich ein halber Durchgang wie ein ganzer. */
+  const deckel = Number(process.env.FORSCHUNG_MAX || 6);
+  const reihe = lesen(REIHE, { fassung: 1, reihen: {} });
+  reihe.reihen = reihe.reihen || {};
+
+  if (!werkzeugDa({})) {
+    console.log("Lighthouse ist nicht verfügbar und kein PSI-Schlüssel gesetzt — es wird nicht gemessen.");
+    if (!process.env.PSI_API_KEY) return;
+  }
+
+  const vorher = {};
+  for (const z of an) {
+    const p = (reihe.reihen[z.id] || {}).punkte;
+    if (p && p.length) vorher[z.id] = { gemessen: p[p.length - 1].bis };
+  }
+  const dran = reihenfolge(an, vorher).slice(0, deckel);
+  if (an.length > dran.length) {
+    console.log(`Deckel ${deckel}: ${an.length - dran.length} Ziel(e) kommen heute nicht dran — ` +
+      `ihr letzter Befund bleibt mit seinem Datum stehen.`);
+  }
+  for (const z of aus) console.log(`  · ${z.name}: nicht gemessen — ${z.grund || "kein Grund vermerkt"}`);
+
+  const tag = heute();
+  const frisch = { eintraege: {} };
+  for (const z of dran) {
+    const roh = await seiteMessen(z.url, {});
+    const m = messungBilden({ vorher: undefined, roh, heute: tag });
+    m.url = z.url;
+    if (!hatZahlen(m)) {
+      console.log(`  ! ${z.name}: nicht gemessen (${m.hinweis || roh.hinweis || "kein Grund genannt"})`);
+      continue;
+    }
+    console.log(`  ✓ ${z.name}: ${m.leistung}/${m.bedienbarkeit}/${m.gute_praxis}/${m.auffindbarkeit}` +
+      ` (${m.quelle === "google" ? "Google" : "eigen"})`);
+    frisch.eintraege[z.id] = { nodeName: z.name, messung: m };
+  }
+
+  /* Einsortiert wird über denselben Weg wie die Marktplatz-Zahlen — ein zweiter
+   * Einsortier-Pfad wäre eine zweite Wahrheit, die auseinanderläuft. */
+  const gemessen = Object.keys(frisch.eintraege).length;
+  if (!gemessen) { console.log("Nichts Neues zu verbuchen."); return; }
+  einsortieren(frisch);
+}
+
 /* ---- Einstieg ------------------------------------------------------------- */
 
-if (hat("nachtragen")) nachtragen();
+if (hat("messen")) await messen();
+else if (hat("nachtragen")) nachtragen();
 else if (hat("offen")) offen();
 else if (hat("rangliste")) rangliste();
 else if (hat("zeigen")) zeigen();
 else {
   console.log(`Forschungsstation — Messwerte über die Zeit.
 
-  node tools/forschung.mjs --nachtragen                 neue Messung einsortieren
+  node tools/forschung.mjs --messen                     eigene Ziele messen (forschung/messziele.json)
+  node tools/forschung.mjs --nachtragen                 Marktplatz-Messung einsortieren
   node tools/forschung.mjs --zeigen                     alle Ziele, ganzer Verlauf
   node tools/forschung.mjs --zeigen --ziel=mixarium     nur ein Ziel
   node tools/forschung.mjs --zeigen --seit=2026-08-01   ab einem Datum
