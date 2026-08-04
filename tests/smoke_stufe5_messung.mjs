@@ -656,8 +656,17 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     ok(!!link && link.href.indexOf("/analyze") < 0, "C3l2 und NICHT mehr auf /analyze — das war eine 404-Seite");
     ok(!!link && link.ziel === "_blank" && /noopener/.test(link.rel) && /noreferrer/.test(link.rel),
       "C3m neuer Tab, mit noopener/noreferrer wie jeder Außen-Link");
-    ok(/können die Zahlen ein paar Punkte von unseren abweichen/.test(d.text),
-      "C3n und es steht ehrlich dabei, dass Google neu misst und leicht abweichen kann");
+    /* Bis 2026-08-04 stand hier „ein paar Punkte" — und der Test hat genau das
+     * festgehalten. Gemessen ist es mehr: für Mein-Mixarium lieferte unser
+     * nächtlicher Lauf 37, Klaus' PageSpeed am selben Tag 76. Die Ursache ist
+     * nicht die Maschine (das Schaufenster derselben App traf mit 63 gegen 65),
+     * sondern die Einzelmessung einer schweren Seite: zwei Läufe hintereinander
+     * ergaben hier 33 und 51. Der Text sagt das jetzt, und der Wächter hält
+     * fest, dass er es sagt — samt der Einschränkung auf die Leistungszahl. */
+    ok(/Leistungszahl deutlich abweichen/.test(d.text),
+      "C3n und es steht ehrlich dabei, dass besonders die Leistungszahl deutlich abweichen kann");
+    ok(/übrigen drei Zahlen stimmen/.test(d.text),
+      "C3n2 und dass die anderen drei Zahlen erfahrungsgemäß übereinstimmen");
 
   }
 
