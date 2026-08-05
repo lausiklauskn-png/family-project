@@ -52,6 +52,26 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>document.querySelectorAll("#toolGrid .area").length===(window.FP_WERKZEUGE||[]).length && (window.FP_WERKZEUGE||[]).length>=8), "werkzeuge: alle Tool-/App-Karten gerendert");
   ok(await page.evaluate(()=>!!document.querySelector('#toolGrid a[href*="Mein-Rezeptbuch"][target="_blank"]')), "werkzeuge: öffentliche App-Karte (Rezeptbuch) extern verlinkt");
   await page.close(); }
+// Seit 2026-08-05 stehen die Listen ZUSAETZLICH statisch im HTML (tools/
+// statische-listen.mjs). `render()` setzt innerHTML und ERSETZT sie damit —
+// das ist gewollt. Die Gefahr ist das Gegenteil: anhaengen statt ersetzen,
+// dann stuende jeder Eintrag zweimal da. Genau dagegen zaehlen diese zwei
+// Pruefungen. Der HTML-Waechter (smoke_statische_listen.mjs) kann das nicht
+// sehen — er laesst bewusst kein JavaScript laufen.
+{ const { page } = await load("/markt.html");
+  ok(await page.evaluate(()=>document.querySelectorAll("#mkListings .listing").length===(window.FP_LISTINGS||[]).length && (window.FP_LISTINGS||[]).length>=10),
+    "markt: jeder Eintrag steht genau einmal (statisch ersetzt, nicht ergaenzt)");
+  ok(await page.evaluate(()=>{
+    const hrefs=[...document.querySelectorAll('#mkListings a.ext')].map(a=>a.getAttribute("href"));
+    return hrefs.length===new Set(hrefs).size;
+  }), "markt: keine Adresse doppelt verlinkt");
+  await page.close(); }
+{ const { page } = await load("/werkzeuge.html");
+  ok(await page.evaluate(()=>{
+    const hrefs=[...document.querySelectorAll('#toolGrid a')].map(a=>a.getAttribute("href"));
+    return hrefs.length===new Set(hrefs).size;
+  }), "werkzeuge: keine Adresse doppelt verlinkt");
+  await page.close(); }
 { const { page } = await load("/werkzeuge/such-werkzeug.html");
   ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .feat .f").length===4), "such-werkzeug: 4 Vorteils-Kacheln");
   ok(await page.evaluate(()=>!!document.querySelector("#toolMain .price")), "such-werkzeug: Preis-Block");

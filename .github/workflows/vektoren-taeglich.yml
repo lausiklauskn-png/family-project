@@ -150,17 +150,40 @@ jobs:
         continue-on-error: true
         run: node tools/tabelle-bauen.mjs
 
+      # Die statischen Listen in markt.html und werkzeuge.html neu setzen.
+      #
+      # DIE REIHENFOLGE IST HIER DER GANZE PUNKT. Der Schritt muss NACH dem
+      # Wächter laufen, denn er liest dessen Ampel aus spore-stand.json: rot
+      # heißt „kein statischer Link". Liefe er davor, fröre er die Ampel von
+      # gestern ein — und eine Seite, die Klaus heute Nacht auf Eis gelegt hat,
+      # bliebe im ausgelieferten HTML verlinkt, bis jemand von Hand nachbaut.
+      # Genau deshalb steht er hier unten, an derselben Stelle wie die Tabelle,
+      # und nicht weiter oben bei den Vektoren.
+      #
+      # NICHT continue-on-error: schlägt das fehl, sind die Seiten und die
+      # Datendateien auseinander, und der Wächter würde beim nächsten Lauf rot.
+      # Das soll auffallen, nicht durchrutschen.
+      - name: Statische Listen neu setzen
+        run: node tools/statische-listen.mjs
+
       - name: Ergebnis committen
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Nur diese sechs Dateien — nie versehentlich das Modell oder
+          # Nur diese acht Dateien — nie versehentlich das Modell oder
           # node_modules. `git add <pfad>` statt `git add -A`.
           # wache-hand.json steht bewusst NICHT dabei: der Lauf liest sie nur.
           # Was von Hand gesperrt wird, entscheidet Klaus, nicht die Aktion.
+          #
+          # markt.html und werkzeuge.html stehen seit 2026-08-05 dabei: der
+          # Schritt „Statische Listen neu setzen" schreibt in sie hinein. Ohne
+          # sie hier liefe der Bau jede Nacht ins Leere — die Änderung entstünde
+          # auf dem Rechner der Aktion und wäre mit ihm wieder weg, und der
+          # Wächter fiele beim nächsten Lauf über die Abweichung.
           git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json \
-              forschung/messreihe.json forschung/JOURNAL.md forschung/tabelle.html
+              forschung/messreihe.json forschung/JOURNAL.md forschung/tabelle.html \
+              markt.html werkzeuge.html
           if git diff --cached --quiet; then
             echo "Keine Änderung."
             exit 0

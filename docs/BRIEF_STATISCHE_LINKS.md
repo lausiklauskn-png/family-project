@@ -56,6 +56,35 @@ baut nach und vergleicht.
 4. Ein Wächter `tests/smoke_statische_listen.mjs`
 5. Der nächtliche Lauf baut mit
 
+> **Korrektur 2026-08-05, beim Umsetzen nachgeprüft — Punkt 2 stimmte nicht.**
+> Zwei Fehler steckten darin, und beide hätten Schaden angerichtet:
+>
+> **a) Falsche Quelldatei.** `werkzeuge.html` füllt sein `#toolGrid` aus
+> `window.FP_WERKZEUGE` (`assets/config/werkzeuge.js`, **16** Einträge — 11
+> Links nach außen und 5 auf Klaus' eigene Unterseiten), nicht aus
+> `meineapps.js`/`publicapps.js`. Die beiden werden auf der Seite zwar geladen,
+> füllen aber die schmalen Knopfleisten im **Fuß jeder Seite**, gerendert aus
+> `assets/app.js`. Wer den Brief wörtlich befolgt, baut die falschen Einträge
+> an die falsche Stelle und lässt die richtigen liegen.
+>
+> **b) 11 der 19 sind absichtlich zugesperrt.** `renderAppLinks()` in
+> `assets/app.js` beginnt mit `if (!isDev()) return;` — die `meineapps`-Leiste
+> erscheint nur mit `?dev` in der Adresse, und `meineapps.js` sagt im Kopf
+> warum („vor dem öffentlichen Launch ausblenden oder dev-only schalten"). Sie
+> statisch zu schreiben hätte diese Absperrung aufgehoben, für Besucher **und**
+> für Google.
+>
+> **Gebaut wurde daher** (Klaus' Entscheidung 2026-08-05): `listings.js` (14)
+> + `werkzeuge.js` (16), Link-Ziel `page` wo vorhanden, sonst `open`.
+> `meineapps.js` und `publicapps.js` bleiben unangetastet.
+>
+> **Dazu ein Nebenbefund**, der nicht im Brief stand und die vermutlich größte
+> Wirkung hat: `sitemap.xml` führte genau **4** Adressen — und die Search
+> Console meldete genau 4 indexierte Seiten. Acht fertige Seiten (Impressum,
+> Sicherheit, Referenzen, Mycelkarte, die vier Werkzeug-Unterseiten) standen
+> nirgends, und im ganzen ausgelieferten HTML gab es **einen** Link auf eine
+> von ihnen. Google kam auf zwei Arten nicht hin. Die Sitemap führt jetzt 12.
+
 ---
 
 ## Sieben Punkte, an denen es schiefgeht
@@ -79,7 +108,11 @@ statischer Link**, genau wie im JavaScript (`if (w && w.ampel === "rot") url = "
 
 Heute hält `.listings:not(.gefuellt)` bzw. `#toolGrid:not(.gefuellt)` Platz
 frei, weil der Bereich beim ersten Bild leer ist (siehe `assets/style.css`
-Z. ~297 und die Lehre 1 in `forschung/LEHREN.md`).
+Z. 420 bzw. 317 und die Lehre 1 in `forschung/LEHREN.md`).
+
+> **Korrektur 2026-08-05, beim Umsetzen nachgeprüft.** Der Brief nannte hier
+> Z. ~297 — dort steht der Kommentar zu `#toolGrid`, die Regel selbst steht in
+> Z. 317, `.listings:not(.gefuellt)` in Z. 420.
 
 Ist der Bereich **von Anfang an gefüllt**, ist diese Reserve überflüssig — aber
 nur, wenn die statische Liste **genauso hoch** ist wie die gezeichnete. Ist sie

@@ -43,6 +43,25 @@ wird, bekommt von Anfang an eine Mindesthöhe, die beim Füllen wieder freigegeb
 wird. Nicht per Klassen-Sammelbegriff (`.areas`), sondern **auf die eine ID
 gemünzt** — sonst reserviert man auch dort Platz, wo schon Inhalt steht.
 
+### 1b. Ein leerer Kasten verbirgt den Sprung, der unter ihm liegt
+
+**Gemessen:** `markt.html`, CLS 0 → 0,006 → 0, drei Läufe je Stand.
+
+Am 2026-08-05 bekam `markt.html` ihre Einträge zusätzlich als statisches HTML.
+Vorher war der Bereich beim ersten Bild leer, CLS lag bei 0. Danach lag er bei
+0,006 — und der Trace zeigte, dass sich **nicht** die neue Liste bewegt hatte,
+sondern die Zeile darüber (`#mkCount`, leer → „14 / 14", +31 px).
+
+Dieser Sprung war die ganze Zeit da. Chrome zählt aber nur, was **gemalt** wird:
+ein leerer Kasten, der sich verschiebt, malt nichts. Die Null davor war also
+keine Abwesenheit des Fehlers, sondern seine Verdeckung.
+
+**Regel:** wer einen bisher leeren Bereich füllt, misst danach neu — auch wenn
+der Wert vorher schon 0 war. Eine 0 an einem leeren Container ist kein Beweis,
+dass darüber alles ruhig steht. Und die Reserve aus Regel 1 gilt auch für
+**eine einzelne Textzeile**, die erst ein Skript setzt; sie ist nicht nur etwas
+für grosse Raster.
+
 ## 2. Zuerst den Trace lesen, dann die Ursache benennen
 
 **Erfahrung, zweimal teuer bezahlt.** Der Lighthouse-*Bericht* nennt bei einem
