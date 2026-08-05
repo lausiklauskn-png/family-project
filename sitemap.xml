@@ -29,4 +29,64 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Die vier Werkzeug-Unterseiten. Bis 2026-08-05 standen sie hier nicht,
+       und im ganzen ausgelieferten HTML gab es genau EINEN Link auf eine von
+       ihnen (netzwerk.html → knoten-werkzeug.html) — alle anderen Wege dorthin
+       baute erst JavaScript. Google kam auf zwei Arten nicht hin. Seit
+       tools/statische-listen.mjs stehen die Links auch statisch auf
+       werkzeuge.html; hier ist der zweite Weg. -->
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/geschenkbox.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/such-werkzeug.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/andock-werkzeug.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/knoten-werkzeug.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Und die vier eigenständigen Seiten, die es längst gibt. -->
+  <url>
+    <loc>https://family-projekt.de/referenzen.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/sicherheit.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/mycelkarte.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/impressum.html</loc>
+    <lastmod>2026-08-05</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <!-- Bewusst NICHT hier (Klaus 2026-08-05): forschung/tabelle.html ist die
+       interne Messtabelle, google9616…html ist Googles Bestätigungsdatei.
+       Beide gehören keinem Suchenden vorgesetzt. -->
 </urlset>
