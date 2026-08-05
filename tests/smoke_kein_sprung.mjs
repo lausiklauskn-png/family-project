@@ -19,6 +19,17 @@
  * die Überschriften-Ebenen, weil die Karten eine h3 direkt unter der h1
  * trugen und damit eine Ebene übersprangen.
  *
+ * Am 2026-08-05 ist der dritte Fall an der Wurzel behoben worden: die Listen
+ * stehen seither ZUSÄTZLICH als echtes HTML in der Seite
+ * (tools/statische-listen.mjs). Wo dieser Test vorher verlangte, dass die
+ * Bereiche ohne JavaScript LEER sind (damit die Reserve überhaupt einen Sinn
+ * hat), verlangt er jetzt das Gegenteil: sie sind schon gefüllt, und das
+ * Skript ersetzt nur. Dabei kam ein vierter, lange unsichtbarer Sprung ans
+ * Licht — `#mkCount` („14 / 14") ist beim ersten Bild leer und schob die
+ * Liste um 31 px nach unten, sobald sie Text bekam. Solange der Kasten
+ * darunter leer war, malte nichts und Chrome zählte es nicht; mit Inhalt
+ * wurde daraus CLS 0,006. Behoben mit einer Zeilenreserve in style.css.
+ *
  * Der Test prüft nicht die CLS-Zahl (dafür bräuchte es Lighthouse), sondern
  * die EIGENSCHAFT, aus der sie folgt: die Seite muss OHNE JavaScript schon
  * genauso dastehen wie mit. Ein Browser mit abgeschaltetem JavaScript ist
@@ -109,6 +120,7 @@ async function miss(rel, mitJs) {
       leisteBreite: leiste ? Math.round(leiste.width * 10) / 10 : null,
       reloadDa: !!document.getElementById("fpReload"),
       nachListe, nachRaster, rasterKacheln,
+      listeKarten: liste ? liste.querySelectorAll(".listing").length : null,
       rasterGefuellt: raster ? raster.classList.contains("gefuellt") : null,
       ueberschriften: Array.from(document.querySelectorAll("main h1,main h2,main h3,main h4,main h5,main h6"))
         .map((el) => Number(el.tagName.slice(1))),
@@ -146,17 +158,33 @@ console.log("\nFreigehaltene Dock-Breite deckt die echte Lampen-Leiste");
 console.log("\nMarktplatz: unter der Liste steht beim ersten Bild nichts im Sichtfeld");
 {
   const ohne = await miss("markt.html", false);
+  const mit = await miss("markt.html", true);
   ok(ohne.nachListe !== null, "Abschnitt nach der Liste gefunden");
   ok(ohne.nachListe >= ohne.sichtHoehe,
     `beginnt bei ${ohne.nachListe} px, Sichtfeld endet bei ${ohne.sichtHoehe} px`);
+  /* Seit 2026-08-05 steht die Liste schon im ausgelieferten HTML. */
+  ok(ohne.listeKarten > 0,
+    `ohne JavaScript stehen schon ${ohne.listeKarten} Einträge in der Liste (statisch)`);
+  ok(mit.listeKarten === ohne.listeKarten,
+    `mit JavaScript dieselbe Zahl (${mit.listeKarten}) — ersetzt, nicht ergänzt`);
 }
 
 console.log("\nWerkzeuge: unter dem Raster steht beim ersten Bild nichts im Sichtfeld");
 {
   const ohne = await miss("werkzeuge.html", false);
   const mit = await miss("werkzeuge.html", true);
-  ok(ohne.rasterKacheln === 0, "ohne JavaScript ist das Raster leer (nur so kann es springen)");
-  ok(mit.rasterKacheln > 0, `mit JavaScript stehen ${mit.rasterKacheln} Kacheln darin`);
+  /* Bis 2026-08-05 stand hier: „ohne JavaScript ist das Raster leer (nur so
+   * kann es springen)". Das stimmt nicht mehr, und zwar zum Guten:
+   * tools/statische-listen.mjs schreibt die Kacheln jetzt ins ausgelieferte
+   * HTML. Der Test wurde nicht abgeschaltet, sondern auf die STÄRKERE
+   * Eigenschaft umgestellt — vorher war der Bereich beim ersten Bild leer und
+   * musste durch eine Reserve gehalten werden, jetzt steht der Inhalt schon
+   * da. Eine leere Erwartung stehen zu lassen wäre ein grüner Haken ohne
+   * Deckung gewesen (Lehre 5). */
+  ok(ohne.rasterKacheln > 0,
+    `ohne JavaScript stehen schon ${ohne.rasterKacheln} Kacheln im Raster (statisch)`);
+  ok(mit.rasterKacheln === ohne.rasterKacheln,
+    `mit JavaScript sind es dieselbe Zahl (${mit.rasterKacheln}) — ersetzt, nicht ergänzt`);
   ok(ohne.nachRaster !== null, "Fusszeile gefunden — sie steht als Nächstes unter dem Raster");
   ok(ohne.nachRaster >= ohne.sichtHoehe,
     `beginnt bei ${ohne.nachRaster} px, Sichtfeld endet bei ${ohne.sichtHoehe} px`);

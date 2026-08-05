@@ -418,6 +418,23 @@ h2{font-size:1.55rem;margin:0 0 6px}
  * Leere. Bleibt das Skript ganz aus, bleibt die Reserve stehen: eine ruhige
  * leere Flaeche statt einer springenden Seite. */
 .listings:not(.gefuellt){min-height:70vh}
+
+/* Die Zaehlzeile ueber der Liste („14 / 14"). Sie ist beim ersten Bild LEER und
+ * bekommt ihren Text erst von `render()` — eine leere Zeile wird zu einer
+ * vollen und schiebt alles darunter um 31 px nach unten.
+ *
+ * Diesen Sprung gab es schon immer. Sichtbar wurde er erst am 2026-08-05, als
+ * die Liste darunter statisch gefuellt wurde: vorher war der Kasten leer, und
+ * ein leerer Kasten, der sich verschiebt, malt nichts — Chrome zaehlt ihn
+ * nicht. Gemessen: CLS 0 -> 0,006, im Trace ein einziges Ereignis,
+ * `div#mkListings`, Δy = +31, Hoehe -31. Also nicht die neue Liste selbst,
+ * sondern die Zeile darueber.
+ *
+ * Reserviert wird genau eine Zeilenhoehe — nach Lehre 1: was Platz braucht,
+ * bekommt ihn vorher. Anders als bei `.listings` wird diese Reserve NICHT
+ * wieder abgegeben; sie ist so hoch wie der Inhalt, der hineinkommt, und
+ * stoert deshalb auch dann nicht, wenn die Zeile leer bleibt (null Eintraege). */
+#mkCount{min-height:1.5em}
 .listing{padding:0;overflow:hidden;display:flex;flex-direction:column;
   transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
   transition:transform .18s ease,box-shadow .18s}
