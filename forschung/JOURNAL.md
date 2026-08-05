@@ -31,7 +31,21 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung neu: leistung: JavaScript komprimieren
 - Beanstandung neu: leistung: Largest Contentful Paint
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** **Gar nicht.** An der Seite wurde nichts geändert — der letzte Commit
+auf `main` ist vom **2026-08-03 22:32**, also vor *beiden* Messungen. Gemessen
+wurde beide Male bei Google. Der Absturz um 19 Punkte ist **reines Rauschen**.
+
+Das ist der wertvollste Befund der ersten Nacht, weil er eine Annahme widerlegt:
+ich hatte gedacht, Googles Zahl sei stabiler als eine eigene Messung. Ist sie
+nicht. Vier weitere unveränderte Seiten in derselben Nacht, ebenfalls zweimal
+Google: Kimboard −6, Kim-Bell −1, Mein-Tresor −1, Kimseek ±0. Die Streuung
+reicht also bis 19.
+
+**Folge:** die Schwelle für einen Journal-Eintrag ist von 14 auf **20** gesetzt
+worden — gemessen, nicht geschätzt. Und eine geänderte Beanstandungsliste allein
+löst keinen Eintrag mehr aus (siehe die vier Einträge unter diesem hier).
+
+→ Lehre 6 in `LEHREN.md`, jetzt mit Zahlen statt Vermutung.
 
 ### 2026-08-05 · Kim-Bell
 
@@ -40,7 +54,17 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung weg: leistung: Anfragen zum Blockieren des Renderings
 - Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** **Rauschen, kein Ereignis.** Keine Zahl hat sich bewegt (Leistung
+97 → 96); es hat nur die Beanstandungsliste gewackelt. „Erzwungener dynamischer
+Umbruch" ist in derselben Nacht bei Kim-Bell, Kimseek und mycel-karte **neu
+aufgetaucht** und bei Kimboard und Jasons-Tresor **verschwunden** — ohne dass
+an einer dieser fünf Seiten etwas geändert wurde. Die Liste wackelt an ihren
+eigenen Schwellen.
+
+Solche Wechsel bekommen ab jetzt **keinen eigenen Eintrag** mehr; sie stehen
+weiter in der Messreihe und als Begleitinformation in echten Einträgen. Vier
+von sechs Einträgen dieser ersten Nacht waren genau das — so hätte das Journal
+das Signal binnen einer Woche erstickt.
 
 ### 2026-08-05 · Kimseek
 
@@ -49,7 +73,8 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung weg: leistung: Effiziente Verweildauer im Cache verwenden
 - Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** Dasselbe wie bei Kim-Bell — Listen-Wackler ohne Bewegung in den
+Zahlen (Leistung 99 → 99). Kein eigener Eintrag mehr ab jetzt.
 
 ### 2026-08-05 · Kimboard
 
@@ -58,7 +83,9 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
 - Beanstandung neu: leistung: Reduziere nicht verwendetes JavaScript
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** Dasselbe Muster, andere Richtung: hier ist „Erzwungener dynamischer
+Umbruch" **verschwunden**, während er bei drei anderen Seiten auftauchte.
+Leistung 98 → 92, also unter der neuen Schwelle. Kein Ereignis.
 
 ### 2026-08-05 · Mein-Mixarium
 
@@ -69,7 +96,22 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung neu: gute_praxis: Es wurden Browserfehler in der Konsole protokolliert
 - Beanstandung neu: leistung: Bildübermittlung verbessern
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** **Nicht die App — die Messquelle.** Am 4. August lag für Mixarium noch
+eine **eigene** Messung vor (37), am 5. August hat es Googles PageSpeed Insights
+gemessen (75). An der App wurde in der Zwischenzeit nichts geändert.
+
+Genau davor warnt Lehre 7, und genau hier ist es passiert: Mixarium kam beim
+Lauf am 4. August nicht mehr unter den Zehner-Deckel und behielt deshalb seinen
+alten, selbst gemessenen Wert; erst in der Nacht darauf war es dran. Der
+„Sprung" ist der Wechsel.
+
+**Folge:** das Werkzeug erkennt einen Quellwechsel jetzt selbst und schreibt eine
+Warnung an den Anfang des Eintrags. Ohne die liest sich eine Umstellung wie ein
+Erfolg — und ich hätte Klaus fast einen gemeldet.
+
+Was der neue Wert **wirklich** sagt: Mixarium steht bei Leistung 75, nicht bei
+37. Die App ist also nie so schlecht gewesen, wie die Karte monatelang behauptet
+hat.
 
 ### 2026-08-05 · mycel-karte
 
@@ -78,7 +120,10 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung weg: leistung: Aufwand für Hauptthread minimieren
 - Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** Auch hier ein Quellwechsel (eigene Messung 100 → Google 99), aber ohne
+nennenswerten Unterschied — die Karte ist schnell, egal wer misst. Der Eintrag
+entstand nur durch den Listen-Wackler („Erzwungener dynamischer Umbruch"), der
+in dieser Nacht durch das halbe Netz ging. Kein Ereignis.
 
 <!-- Ab hier schreibt das Werkzeug. Alles UNTERHALB der Trennlinie
      „Vor der Station“ ist von Hand nachgetragene Vorgeschichte. -->

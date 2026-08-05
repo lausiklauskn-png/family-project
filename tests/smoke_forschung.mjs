@@ -129,6 +129,56 @@ const sicht = lauf("--zeigen", "--seit=2026-08-04");
 ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
   "--seit blendet ältere Spannen aus");
 
+/* ---- 6b · Rauschen macht kein Ereignis ----------------------------------- */
+/* Die erste echte Nacht (4. → 5. August) lieferte sechs Journal-Einträge, von
+ * denen VIER reine Listen-Wackler waren: „Erzwungener dynamischer Umbruch“
+ * verschwand bei zwei Seiten und tauchte bei drei anderen auf, ohne dass sich
+ * eine Zahl bewegte oder jemand etwas gebaut hätte. Solche Einträge ersticken
+ * das Signal. */
+{
+  const vorZahl = journal().split("### ").length;
+  bericht({ leistung: 86, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-07",
+    ["Kontrast zu schwach", "Erzwungener dynamischer Umbruch"]);
+  lauf("--nachtragen");
+  ok(journal().split("### ").length === vorZahl,
+    "eine geänderte Beanstandungsliste OHNE Sprung bekommt keinen eigenen Eintrag");
+  ok(punkte()[punkte().length - 1].mangel.includes("leistung: Erzwungener dynamischer Umbruch"),
+    "in der Messreihe steht die Änderung trotzdem — verschwiegen wird nichts");
+
+  /* Und ein Sprung unter der Schwelle ebensowenig: an unveränderten Seiten
+   * schwankte Googles Zahl gemessen um bis zu 19 Punkte. */
+  bericht({ leistung: 70, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-08",
+    ["Kontrast zu schwach", "Erzwungener dynamischer Umbruch"]);
+  lauf("--nachtragen");
+  ok(journal().split("### ").length === vorZahl,
+    "ein Sprung von 16 Punkten bleibt unter der Schwelle und macht keinen Eintrag");
+}
+
+/* ---- 6c · Ein Quellwechsel wird als solcher benannt ----------------------- */
+/* Real passiert: Mein Mixarium sprang über Nacht von 37 auf 75, ohne dass eine
+ * Zeile geändert wurde — gemessen wurde vorher selbst, nachher bei Google. Ohne
+ * diesen Hinweis liest sich eine Umstellung wie ein Erfolg. */
+{
+  fs.writeFileSync(path.join(buehne, "assets", "config", "spore-stand.json"), JSON.stringify({
+    geprueft: "2026-08-09T02:40:00.000Z",
+    eintraege: {
+      "probe-seite": {
+        nodeName: "Probe-Seite",
+        messung: {
+          stand: "gemessen", leistung: 30, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100,
+          gemessen: "2026-08-09", quelle: "eigen", werkzeug: "13.4.1",
+          hinweise: [], url: "https://beispiel.invalid/probe/"
+        }
+      }
+    }
+  }));
+  lauf("--nachtragen");
+  const j = journal();
+  ok(/Die Messquelle hat gewechselt/.test(j), "der Eintrag warnt vor dem Quellwechsel");
+  ok(/Wer ihn als Verbesserung liest, irrt/.test(j),
+    "und sagt ausdrücklich, dass der Sprung nichts über die Seite aussagt");
+}
+
 /* ---- 7 · Die eigene Zielliste -------------------------------------------- */
 /* `messziele.json` ist von Hand gepflegt. Ein Tippfehler darin fällt sonst erst
  * in der Nacht auf, und dann nur als eine Zeile in einem Aktions-Protokoll,
