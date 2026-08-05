@@ -81,6 +81,37 @@ jeden Folgeeintrag, sonst schreiben wir uns hier einen Erfolg zurecht.
 **Nächster Blick:** frühestens 2026-08-19 (zwei Wochen), mit denselben vier
 Zahlen aus der Tabelle oben.
 
+**Nachtrag am selben Tag, nach dem Bau.** Die vierte Erwartung ist als
+einzige sofort prüfbar, und sie ist zuerst **nicht** eingetreten:
+
+| | vorher | nach dem Bau | nach der Reparatur |
+|---|---|---|---|
+| `markt.html` CLS | 0 · 0 · 0 | **0,006 · 0,006 · 0,006** | 0 · 0 · 0 |
+| `markt.html` Leistung | 65 · 59 · 61 | 58 · 57 · 61 | 59 · 59 · 56 |
+| `werkzeuge.html` CLS | 0 · 0 · 0 | — | 0 · 0 · 0 |
+| `werkzeuge.html` Leistung | 62 · 62 · 62 | — | 61 · 62 · 61 |
+
+Der Trace nannte genau ein Ereignis: `div#mkListings`, Δy = +31, Höhe −31.
+Also **nicht** die neue Liste, sondern etwas darüber. Darüber steht
+`<p id="mkCount">` — beim ersten Bild leer, danach „14 / 14". Eine leere Zeile
+wird zu einer vollen und schiebt alles darunter 31 px nach unten.
+
+**Diesen Sprung gab es schon immer.** Sichtbar wurde er erst jetzt: solange der
+Kasten darunter leer war, malte er nichts, und ein Element ohne gemalten Inhalt
+zählt Chrome nicht als verschoben. Die statische Liste hat den Fehler nicht
+verursacht — sie hat ihn **aufgedeckt**. Behoben mit einer Zeilenreserve
+(`#mkCount{min-height:1.5em}`), danach wieder 0 in allen drei Läufen und null
+Ereignisse im Trace.
+
+Die Leistungszahlen bewegen sich innerhalb des Rauschens; die Schwelle der
+Station steht aus gutem Grund bei 20 (Lehre 6). Aus 65 · 59 · 61 gegen
+59 · 59 · 56 lässt sich nichts ableiten, und ich leite auch nichts ab.
+
+**Was dieser Nachtrag über die Methode sagt:** hätte ich nur vorher gemessen
+und danach „müsste besser sein" geschrieben, stünde hier jetzt eine
+Verschlechterung, die niemand bemerkt hätte. Der Punkt 2 des Briefes —
+*„CLS vorher/nachher MESSEN"* — hat sich innerhalb eines Tages bezahlt gemacht.
+
 ### 2026-08-05 · Perfect Skin Beauty — die Messreihe wechselt die Adresse
 
 <https://perfectskinbeauty.de/> · von Hand eingetragen, nicht vom Werkzeug
