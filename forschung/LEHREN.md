@@ -9,8 +9,10 @@ ohne dass jemand sie nachbessern musste. Jede Regel hier beantwortet die Frage:
 *was hat diese Seite von Anfang an richtig gemacht, das eine andere erst nach
 drei Nachbesserungen gelernt hat?*
 
-> **Stand 2026-08-04.** Die Reihe ist heute angelegt worden; die Regeln unten
-> stammen aus den Bauten der letzten Wochen, nicht aus einem langen Verlauf.
+> **Stand 2026-08-05.** Die Reihe läuft seit dem 4. August. Die erste Nacht hat
+> gleich zwei Regeln unten geschärft (6 und 7) und eine dritte hinzugefügt (6b) —
+> alle drei aus gemessenen Daten, nicht aus Vermutung. Genau dafür ist die
+> Station da.
 > Wo eine Regel noch nicht durch einen gemessenen Vorher/Nachher-Vergleich
 > gedeckt ist, steht das ausdrücklich dabei. Ehrlichkeit vor Vollständigkeit —
 > eine erfundene Regel wäre schlimmer als eine fehlende.
@@ -102,14 +104,49 @@ Reparatur einbauen (Wächter muss auch rot werden). Erst dann zählt sein Grün.
 
 ## 6. Eine einzelne Messung einer schweren Seite ist keine Zahl, sondern eine Stichprobe
 
-**Gemessen:** Sage-Protokol lieferte in drei Läufen hintereinander, auf
-demselben Rechner, dieselbe Datei: **49 · 67 · 36** bei „Leistung“.
+**Gemessen, zweimal, mit zwei verschiedenen Messgeräten.**
 
-Deshalb misst die Forschungsstation nicht jeden Wackler als Ereignis, sondern
-erst ab **14 Punkten** Unterschied. Und deshalb ist eine Verbesserung erst
-belegt, wenn sie **mehrere Läufe** überlebt.
+Erstens auf unserem Rechner: Sage-Protokol lieferte in drei Läufen
+hintereinander, dieselbe Datei, **49 · 67 · 36** bei „Leistung“.
 
-**Regel:** drei Läufe, und bei Leistungszahlen nie den einen guten nennen.
+Zweitens — und das war die Überraschung — **bei Google genauso**. In der Nacht
+vom 4. auf den 5. August lagen fünf Seiten vor, die sich nachweislich nicht
+geändert hatten (letzter Commit vom 3. August, also vor beiden Messungen),
+beide Male von Googles PageSpeed Insights gemessen:
+
+| Seite | vorher | nachher | |
+|---|---|---|---|
+| Jasons-Tresor | 83 | 64 | **−19** |
+| Kimboard | 98 | 92 | −6 |
+| Kim-Bell | 97 | 96 | −1 |
+| Mein-Tresor | 72 | 71 | −1 |
+| Kimseek | 99 | 99 | ±0 |
+
+Ich hatte angenommen, Googles Zahl sei stabiler als eine eigene Messung. **Ist
+sie nicht.** Die Streuung an einer unveränderten Seite reicht bis 19 Punkte.
+
+Deshalb steht die Schwelle der Forschungsstation auf **20** — gemessen, nicht
+geschätzt. Wer sie senkt, holt sich das Journal voll mit Sprüngen, die keine
+sind.
+
+**Regel:** drei Läufe, bei Leistungszahlen nie den einen guten nennen — und ein
+Sprung unter 20 Punkten ist erst dann eine Verbesserung, wenn er die **nächste**
+Messung übersteht.
+
+## 6b. Auch die Mängelliste wackelt — ein neuer Befund ist noch kein neuer Fehler
+
+**Gemessen, dieselbe Nacht.** „Erzwungener dynamischer Umbruch“ tauchte bei
+Kim-Bell, Kimseek und mycel-karte **neu auf** und verschwand gleichzeitig bei
+Kimboard und Jasons-Tresor. An keiner der fünf Seiten war etwas geändert worden.
+Die Liste wackelt an ihren eigenen Schwellen, genau wie die Zahl.
+
+Vier von sechs Journal-Einträgen der ersten Nacht waren genau das. Ohne
+Gegenmaßnahme hätte das Rauschen binnen einer Woche das Signal erstickt.
+
+**Regel:** eine geänderte Beanstandungsliste **allein** ist kein Ereignis. Sie
+wird aufgezeichnet und als Begleitinformation gezeigt, löst aber keinen
+Journal-Eintrag aus. Handeln erst, wenn ein Befund **mehrere** Messungen lang
+stehen bleibt.
 
 ## 7. Woher die Zahl kommt, gehört zur Zahl
 
@@ -120,6 +157,15 @@ auflösen kann.
 
 **Regel:** jede gespeicherte Messung trägt ihre Quelle mit (`quelle`), und die
 Anzeige nennt sie. In der Messreihe steht sie in jedem Punkt.
+
+**Und es ist prompt wieder passiert.** In der ersten Nacht sprang Mein Mixarium
+von **37 auf 75** — ohne dass eine Zeile geändert wurde. Am 4. August lag noch
+eine eigene Messung vor, am 5. August hatte Google gemessen. Ich hätte das
+beinahe als Erfolg gemeldet.
+
+Deshalb erkennt das Werkzeug einen Quellwechsel jetzt **selbst** und schreibt
+eine Warnung an den Anfang des Eintrags. Eine Regel, die nur in einer Doku steht,
+hilft in dem Moment nicht, in dem man sie braucht — sie muss im Werkzeug sitzen.
 
 ---
 

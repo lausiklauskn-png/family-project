@@ -45,12 +45,24 @@ const TITEL = {
   auffindbarkeit: "Auffindbarkeit"
 };
 
-/* Ab welchem Sprung ein Eintrag ins Journal wandert. Kleiner gewählt wäre das
- * Journal nach einer Woche Rauschen unlesbar: dieselbe Seite auf demselben
- * Rechner schwankt bei „Leistung“ real um zweistellige Beträge (Sage-Protokol
- * lieferte am 2026-08-04 in drei Läufen hintereinander 49, 67 und 36). Fünf
- * Punkte sind also KEIN Ereignis. Vierzehn sind eines. */
-const SCHWELLE = 14;
+/* Ab welchem Sprung ein Eintrag ins Journal wandert.
+ *
+ * Zuerst auf 14 geschätzt, nach der ERSTEN Nacht auf 20 korrigiert — und zwar
+ * gemessen, nicht geraten. In der Nacht vom 4. auf den 5. August lagen fünf
+ * Seiten vor, die sich NACWEISLICH nicht geändert hatten (letzter Commit
+ * 2026-08-03, also vor beiden Messungen), zweimal von derselben Quelle
+ * (Google) gemessen:
+ *
+ *   Jasons-Tresor  83 → 64   (−19)
+ *   Kimboard       98 → 92   ( −6)
+ *   Kim-Bell       97 → 96   ( −1)
+ *   Mein-Tresor    72 → 71   ( −1)
+ *   Kimseek        99 → 99   (  0)
+ *
+ * An unveränderten Seiten schwankt also auch Googles Zahl um bis zu 19 Punkte.
+ * Ein Schwellwert darunter erklärt Rauschen zum Ereignis. Wer ihn wieder senkt,
+ * holt sich das Journal voll mit Sprüngen, die keine sind. */
+const SCHWELLE = 20;
 
 const arg = (name, ersatz) => {
   const t = process.argv.find((a) => a.startsWith(`--${name}=`));
@@ -165,9 +177,25 @@ function einsortieren(stand) {
       .filter((x) => Math.abs(x.d) >= SCHWELLE);
     const weg = (letzt.mangel || []).filter((x) => !m.mangel.includes(x));
     const dazu = m.mangel.filter((x) => !(letzt.mangel || []).includes(x));
-    if (sprung.length || weg.length || dazu.length) {
-      ereignisse.push({ ziel: m.id, name: m.name, url: m.url, datum: m.gemessen, sprung, weg, dazu, quelle: m.quelle });
-    }
+
+    /* NUR ein Sprung macht ein Ereignis — eine geänderte Beanstandungsliste
+     * allein nicht. In der ersten Nacht waren vier von sechs Journal-Einträgen
+     * genau das: „Erzwungener dynamischer Umbruch“ verschwand bei zwei Seiten
+     * und tauchte bei drei anderen auf, ohne dass sich eine Zahl bewegte oder
+     * jemand etwas gebaut hätte. Die Liste wackelt an ihren eigenen Schwellen.
+     * Solche Wechsel sind trotzdem interessant — sie stehen weiter IM Eintrag
+     * als Begleitinformation, bekommen aber keinen eigenen mehr. */
+    if (!sprung.length) continue;
+
+    /* Wechselt die Messquelle, ist der Sprung mit hoher Wahrscheinlichkeit die
+     * Quelle und nicht die Seite. Das gehört an den Anfang des Eintrags, sonst
+     * liest sich eine Umstellung wie ein Erfolg — real passiert: Mein Mixarium
+     * sprang über Nacht von 37 auf 75, ohne dass eine Zeile geändert wurde. */
+    const quellwechsel = (letzt.quelle || "eigen") !== m.quelle
+      ? { von: letzt.quelle || "eigen", nach: m.quelle }
+      : null;
+
+    ereignisse.push({ ziel: m.id, name: m.name, url: m.url, datum: m.gemessen, sprung, weg, dazu, quelle: m.quelle, quellwechsel });
   }
 
   reihe.gepflegt = heute();
@@ -194,6 +222,13 @@ function journalSchreiben(ereignisse) {
     zeilen.push("");
     zeilen.push(`<${e.url}> · Quelle der Zahlen: ${e.quelle === "google" ? "Google PageSpeed Insights" : "eigene Messung"}`);
     zeilen.push("");
+    if (e.quellwechsel) {
+      const n = (q) => (q === "google" ? "Google PageSpeed Insights" : "eigene Messung");
+      zeilen.push(`> ⚠ **Die Messquelle hat gewechselt** (${n(e.quellwechsel.von)} → ` +
+        `${n(e.quellwechsel.nach)}). Der Sprung sagt hier zuerst etwas über die ` +
+        `**Messung** aus, nicht über die Seite. Wer ihn als Verbesserung liest, irrt.`);
+      zeilen.push("");
+    }
     for (const s of e.sprung) {
       const pfeil = s.d > 0 ? "↑" : "↓";
       zeilen.push(`- **${TITEL[s.k]} ${s.alt} → ${s.neu}** (${pfeil} ${Math.abs(s.d)})`);
