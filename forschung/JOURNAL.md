@@ -21,6 +21,65 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-05 · Jasons-Tresor
+
+<https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 83 → 64** (↓ 19)
+- Beanstandung weg: leistung: Bildübermittlung verbessern
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Largest Contentful Paint
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-05 · Kim-Bell
+
+<https://lausiklauskn-png.github.io/Kim-Bell/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- Beanstandung weg: leistung: Anfragen zum Blockieren des Renderings
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-05 · Kimseek
+
+<https://lausiklauskn-png.github.io/Kimseek/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- Beanstandung weg: leistung: Effiziente Verweildauer im Cache verwenden
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-05 · Kimboard
+
+<https://lausiklauskn-png.github.io/Kimboard/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: Reduziere nicht verwendetes JavaScript
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-05 · Mein-Mixarium
+
+<https://lausiklauskn-png.github.io/Mein-Mixarium/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 37 → 75** (↑ 38)
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung neu: gute_praxis: Es wurden Browserfehler in der Konsole protokolliert
+- Beanstandung neu: leistung: Bildübermittlung verbessern
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-05 · mycel-karte
+
+<https://lausiklauskn-png.github.io/mycel-karte/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- Beanstandung weg: leistung: Aufwand für Hauptthread minimieren
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+
+**Warum:** _(noch nicht eingetragen)_
+
 <!-- Ab hier schreibt das Werkzeug. Alles UNTERHALB der Trennlinie
      „Vor der Station“ ist von Hand nachgetragene Vorgeschichte. -->
 
