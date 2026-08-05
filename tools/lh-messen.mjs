@@ -85,18 +85,41 @@ for (let lauf = 1; lauf <= LAEUFE; lauf++) {
     }
   }
 
-  /* ALLE durchgefallenen Prüfungen der Barrierefreiheit nennen, nicht eine
+  /* ALLE durchgefallenen Prüfungen nennen, in ALLEN vier Kategorien — keine
    * hier gepflegte Auswahl. Eine feste Liste versteckt genau die Beanstandung,
-   * die man noch nicht kennt — und dann sucht man bei 97 statt 100 im Dunkeln
-   * (real passiert, Sage-Protokol 2026-08-04). Die Kategorie sagt selbst,
-   * welche Prüfungen zu ihr gehören. */
-  const kategorie = r.categories.accessibility;
-  for (const ref of (kategorie && kategorie.auditRefs) || []) {
-    const a = r.audits[ref.id];
-    if (!a || a.score === null || a.score >= 1) continue;
-    console.log(`\n⚠ ${ref.id} (Gewicht ${ref.weight}): ${a.title}`);
-    for (const it of (a.details && a.details.items) || []) {
-      console.log(`    ${(it.node && it.node.selector) || JSON.stringify(it).slice(0, 160)}`);
+   * die man noch nicht kennt, und dann sucht man bei 97 statt 100 im Dunkeln.
+   *
+   * Zweimal in zwei Tagen an dieselbe Wand gelaufen: erst zeigte das Werkzeug
+   * nur neun fest verdrahtete Prüfungen (Sage-Protokol, 2026-08-04), danach nur
+   * noch die Barrierefreiheit — und als Klaus nach der AUFFINDBARKEIT von
+   * WorkFloh fragte, stand da 82 und keine einzige Zeile dazu (2026-08-05).
+   * Eine Auswahl ist immer die falsche. Die Kategorien sagen selbst, welche
+   * Prüfungen zu ihnen gehören. */
+  const KATS = [
+    ["performance", "Leistung"],
+    ["accessibility", "Barrierefreiheit"],
+    ["best-practices", "Gute Praxis"],
+    ["seo", "Auffindbarkeit"]
+  ];
+  for (const [schluessel, titel] of KATS) {
+    const kategorie = r.categories[schluessel];
+    if (!kategorie) continue;
+    const durchgefallen = (kategorie.auditRefs || []).filter((ref) => {
+      const a = r.audits[ref.id];
+      /* Nur echte Bestanden/Durchgefallen-Prüfungen. Die reinen Zahlenwerte
+       * (LCP, TBT …) stehen schon oben in der Kopfzeile; sie hier nochmal als
+       * „durchgefallen" aufzuführen macht die Liste lang und die echten Befunde
+       * unauffindbar. */
+      return a && a.score !== null && a.score < 1 && a.scoreDisplayMode !== "numeric";
+    });
+    if (!durchgefallen.length) continue;
+    console.log(`\n── ${titel} (${Math.round(kategorie.score * 100)}) ──`);
+    for (const ref of durchgefallen) {
+      const a = r.audits[ref.id];
+      console.log(`\n⚠ ${ref.id} (Gewicht ${ref.weight}): ${a.title}`);
+      for (const it of (a.details && a.details.items) || []) {
+        console.log(`    ${(it.node && it.node.selector) || JSON.stringify(it).slice(0, 160)}`);
+      }
     }
   }
 

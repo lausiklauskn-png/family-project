@@ -37,6 +37,26 @@ Ein Eintrag mit Schaufenster (vorgeschaltete Landingpage) wird als **zwei**
 Ziele geführt. Das sind zwei verschiedene Seiten mit zwei verschiedenen
 Bauweisen, und genau der Unterschied ist interessant.
 
+## Die Tabelle zum Anschauen
+
+`tabelle.html` ist Klaus' Ansicht der Reihe — **eine Datei, alles drin**. Sie läuft
+aus dem Download-Ordner genauso wie von der Seite; die Zahlen sind eingebettet,
+nicht nachgeladen. Über `http(s)` sieht sie zusätzlich nach, ob es inzwischen
+frischere gibt.
+
+- **Sortieren** über die Spaltenköpfe, **suchen** über das Feld oben.
+- **Klick auf einen Namen** öffnet Verlauf, letzte Beanstandungen und ein
+  **Notizfeld**.
+- **Die Notizen liegen im Browser, nicht in der Datei.** Anders ginge es nicht:
+  die nächtliche Aktion baut die Datei neu, und jede Notiz darin wäre am nächsten
+  Morgen weg. Zum Mitnehmen auf ein anderes Gerät: *Notizen sichern* /
+  *Notizen einlesen* (das Einlesen **führt zusammen**, es ersetzt nicht — sonst
+  löschte eine alte Sicherung still weg, was inzwischen dazugekommen ist).
+
+Gebaut mit `node tools/tabelle-bauen.mjs`; die nächtliche Aktion macht das selbst.
+Bewacht von `tests/smoke_tabelle.mjs` — der prüft ausdrücklich über `file://`,
+weil eine Datei, die nur auf dem Server läuft, Klaus' Kopie tot wäre.
+
 ## Bedienung
 
 ```bash

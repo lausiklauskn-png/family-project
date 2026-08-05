@@ -144,17 +144,23 @@ jobs:
           if [ -x /usr/bin/google-chrome ]; then export CHROME_PATH=/usr/bin/google-chrome; fi
           node tools/forschung.mjs --messen
 
+      # Klaus' Tabelle neu bauen, gleich nachdem gemessen wurde — sonst zeigt sie
+      # gestrige Zahlen und sieht dabei aus, als wären es heutige.
+      - name: Tabelle für Klaus neu bauen
+        continue-on-error: true
+        run: node tools/tabelle-bauen.mjs
+
       - name: Ergebnis committen
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Nur diese fünf Dateien — nie versehentlich das Modell oder
+          # Nur diese sechs Dateien — nie versehentlich das Modell oder
           # node_modules. `git add <pfad>` statt `git add -A`.
           # wache-hand.json steht bewusst NICHT dabei: der Lauf liest sie nur.
           # Was von Hand gesperrt wird, entscheidet Klaus, nicht die Aktion.
           git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json \
-              forschung/messreihe.json forschung/JOURNAL.md
+              forschung/messreihe.json forschung/JOURNAL.md forschung/tabelle.html
           if git diff --cached --quiet; then
             echo "Keine Änderung."
             exit 0
