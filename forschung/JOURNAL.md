@@ -21,6 +21,66 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-05 · family-projekt.de — statische Links, Ausgangsstand vor dem Bau
+
+<https://family-projekt.de/> · von Hand eingetragen, nicht vom Werkzeug
+
+**Dieser Eintrag ist vor dem Bau geschrieben.** Das ist Absicht: wer erst
+hinterher aufschreibt, was er erwartet hat, hat nichts gemessen, sondern sich
+etwas zurechtgelegt.
+
+**Ausgangsstand** (Google Search Console, Property family-projekt.de, Stand
+2026-08-05):
+
+| | |
+|---|---|
+| indexierte Seiten | **4** |
+| Klicks im Monat | **8** |
+| Adressen in `sitemap.xml` | **4** |
+| statische Links nach außen im ausgelieferten HTML | **0** auf `index`, `werkzeuge`, `markt`; **1** auf `netzwerk` |
+
+**Was gebaut wird:** die Marktplatz-Einträge (14 aus `listings.js`) und die
+Werkzeug-Kacheln (16 aus `werkzeuge.js`) stehen zusätzlich als echtes HTML in
+der ausgelieferten Datei, erzeugt von `tools/statische-listen.mjs`. Das
+JavaScript überschreibt sie beim Zeichnen wie bisher. Dazu kommen die acht
+fehlenden Adressen in die `sitemap.xml`.
+
+**Was ich erwarte:**
+
+1. **Die Zahl der indexierten Seiten steigt** — von 4 auf bis zu 12. Das ist
+   die einzige Erwartung hier, die eine klare Ober­grenze hat: es gibt genau
+   zwölf Adressen, die hinein sollen. Ursache wäre zu zwei Teilen die Sitemap
+   und zu einem Teil, dass die vier Werkzeug-Unterseiten erstmals einen
+   statischen Link von einer Seite bekommen, die Google schon kennt.
+2. **Bei den verlinkten Apps kommt mehr an.** Sichtbar wird das in der Search
+   Console **jeder einzelnen App** als Verweis von family-projekt.de — nicht
+   hier und nicht in Lighthouse. Ohne die `noreferrer`-Änderung (eigene Apps)
+   wäre es überhaupt nicht sichtbar.
+3. **Die Klickzahl der Startseite selbst ändert sich kaum.** Es kommt kein
+   Inhalt dazu, nur Verweise nach außen.
+4. **CLS bleibt 0.** Vorher gemessen, drei Läufe je Seite, mit Trace:
+   `markt.html` CLS 0 · 0 · 0 (Leistung 65 · 59 · 61), `werkzeuge.html`
+   CLS 0 · 0 · 0 (Leistung 62 · 62 · 62), in allen sechs Läufen **null**
+   `LayoutShift`-Ereignisse. Die Platz-Reserve (`min-height:70vh`) bleibt
+   deshalb stehen: sie kostet nichts, sobald echter Inhalt darüber steht, und
+   ein Ausbau könnte nur schaden. Nachher wird identisch nachgemessen.
+
+**Was das hier NICHT ist:** ein Beweis. Es gibt **keine Kontrollgruppe**. Ich
+kann die Seite nicht gleichzeitig mit und ohne statische Links betreiben, und
+niemand hält Google in der Zwischenzeit an. Was in den nächsten Wochen an
+Zahlen kommt, ist ein **Hinweis** — vereinbar mit der Erwartung oder nicht,
+mehr nicht. Parallel laufen mindestens drei andere Einflüsse, die dieselben
+Zahlen bewegen können: das Alter der Seite, Googles eigene Umstellungen und
+alles, was in derselben Zeit sonst an den Apps gebaut wird.
+
+**Und es dauert.** Wochen, nicht eine Nacht. Wer nach drei Tagen nachsieht und
+nichts findet, hat nichts widerlegt. Wer nach zwei Wochen einen Anstieg sieht,
+hat ihn nicht verursacht — er hat ihn beobachtet. Der Unterschied gehört in
+jeden Folgeeintrag, sonst schreiben wir uns hier einen Erfolg zurecht.
+
+**Nächster Blick:** frühestens 2026-08-19 (zwei Wochen), mit denselben vier
+Zahlen aus der Tabelle oben.
+
 ### 2026-08-05 · Perfect Skin Beauty — die Messreihe wechselt die Adresse
 
 <https://perfectskinbeauty.de/> · von Hand eingetragen, nicht vom Werkzeug
