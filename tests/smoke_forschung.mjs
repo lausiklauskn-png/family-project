@@ -215,6 +215,34 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
     [...marktText.matchAll(/"(?:url|appUrl)"\s*:\s*"([^"]+)"/g)].map((m) => m[1].replace(/\/+$/, ""))
   );
   const doppelt = ziele.filter((z) => z.aktiv !== false && marktAdressen.has(z.url.replace(/\/+$/, "")));
+
+  /* Hat eine App eine EIGENE Domain (CNAME im Repo), muss der Marktplatz auch
+   * dorthin verlinken — nicht auf die GitHub-Pages-Adresse.
+   *
+   * Real passiert (2026-08-05): Perfect Skin Beauty hat seit jeher
+   * `perfectskinbeauty.de`, verlinkt war `lausiklauskn-png.github.io/...`.
+   * Das kostete gleich dreifach — der Link zeigte auf die Adresse, die das
+   * `canonical` der Seite verwirft; Besucher landeten auf einer
+   * Entwickler-Adresse statt auf der Domain des Geschäfts; und die
+   * Forschungsstation maß monatelang die falsche Seite.
+   *
+   * Geprüft wird gegen die Repos, die hier im Container liegen. Fehlt einer,
+   * wird er übersprungen statt zu meckern — der Wächter soll nicht rot werden,
+   * weil ein Klon fehlt. */
+  const eigeneDomains = [];
+  for (const a of marktAdressen) {
+    const m = /^https:\/\/lausiklauskn-png\.github\.io\/([^/]+)/.exec(a);
+    if (!m) continue;
+    const cname = path.join("/home/user", m[1], "CNAME");
+    if (!fs.existsSync(cname)) continue;                    // Repo nicht da → nichts zu sagen
+    const domain = fs.readFileSync(cname, "utf8").trim();
+    if (domain) eigeneDomains.push({ verlinkt: a, statt: `https://${domain}/` });
+  }
+  ok(eigeneDomains.length === 0,
+    eigeneDomains.length
+      ? `Marktplatz verlinkt github.io, obwohl es eine eigene Domain gibt: ` +
+        eigeneDomains.map((e) => `${e.verlinkt} → ${e.statt}`).join(", ")
+      : "kein Marktplatz-Eintrag verlinkt github.io, wo es eine eigene Domain gibt");
   ok(doppelt.length === 0,
     `kein eigenes Ziel steht schon im Marktplatz${doppelt.length ? " — doppelt: " + doppelt.map((z) => z.id).join(", ") : ""}`);
 }

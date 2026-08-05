@@ -21,6 +21,40 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-05 · Perfect Skin Beauty — die Messreihe wechselt die Adresse
+
+<https://perfectskinbeauty.de/> · von Hand eingetragen, nicht vom Werkzeug
+
+- Gemessene Adresse: `lausiklauskn-png.github.io/Perfect-Skin-Beauty/` → **`perfectskinbeauty.de`**
+
+**Warum:** Beim Einrichten der Search Console ist aufgefallen, dass der
+Marktplatz auf die **falsche** Adresse zeigte. Die Seite hat seit jeher eine
+eigene Domain (`CNAME` = `perfectskinbeauty.de`), verlinkt war aber die
+GitHub-Pages-Adresse.
+
+Das hatte drei Folgen auf einmal:
+
+1. **Der Link half nicht.** Seit dem 2026-08-05 sagt das `canonical` der Seite,
+   dass `perfectskinbeauty.de` die gültige Adresse ist — Google verwirft die
+   github.io-Fassung also. Der Marktplatz verlinkte damit ausgerechnet die
+   Adresse, die verworfen wird.
+2. **Besucher landeten auf der falschen Adresse** — nicht auf der Domain des
+   Geschäfts, sondern auf einer Entwickler-Adresse.
+3. **Wir haben die falsche Seite gemessen.** Alle Werte dieses Eintrags bis
+   einschließlich 2026-08-05 stammen von der github.io-Fassung.
+
+**Für spätere Sitzungen wichtig:** ab dem nächsten Lauf misst dieser Eintrag
+eine **andere Adresse**. Ein Sprung in den Zahlen wäre also weder eine
+Verbesserung noch eine Verschlechterung, sondern der Wechsel. Die Kennung
+bleibt `markt-perfect-skin-beauty`, damit der Verlauf nicht abreißt — der
+Bruch steht dafür hier.
+
+**Netzweit prüfen:** Perfect-Skin-Beauty ist das einzige Repo mit eigener
+Domain (`node tools/netz-check.mjs`, CNAME-Spalte). Sollte Klaus weiteren Apps
+eine eigene Domain geben, muss der Marktplatz-Eintrag mitwandern — sonst
+entsteht derselbe Fehler noch einmal.
+
+
 ### 2026-08-05 · Jasons-Tresor
 
 <https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
