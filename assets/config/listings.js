@@ -146,7 +146,7 @@ window.FP_LISTINGS = [
     "anchorId": "markt-perfect-skin-beauty",
     "text": "Kosmetikstudio in Hamburg von Alina: professionelle Haarentfernung mit Sugaring, Waxing und Zuckerpaste sowie Kosmetik-Behandlungen, dazu zertifizierte Depilations-Kurse zum Selberlernen. Beauty, Hautpflege, Enthaarung, Wachsen, Gesichtsbehandlung, Wellness. Zweisprachig Deutsch und Russisch, Termin online buchbar.",
     "by": "@alis",
-    "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Beauty/",
+    "url": "https://perfectskinbeauty.de/",
     "img": "https://family-projekt.de/assets/apps/perfect-skin-beauty.webp",
     "category": "Beauty & Kosmetik",
     "own": true
