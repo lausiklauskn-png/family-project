@@ -112,7 +112,12 @@ console.log("\nmarkt.html");
     if (!l) continue;
     const hatNofollow = /\bnofollow\b/.test(l.rel) && /\bugc\b/.test(l.rel);
     const hatNoopener = /\bnoopener\b/.test(l.rel);
-    const hatNoreferrer = /\breferrer\b/.test(l.rel);
+    /* `\bnoreferrer\b`, NICHT `\breferrer\b`. Vor „referrer" steht in
+     * „noreferrer" ein „o" — also keine Wortgrenze, und der Ausdruck trifft
+     * nie. Mit ihm waren die zwei noreferrer-Prüfungen hier wirkungslos: sie
+     * konnten gar nicht rot werden. Gefunden hat das nicht der grüne Lauf,
+     * sondern die Gegenprobe (Lehre 5). */
+    const hatNoreferrer = /\bnoreferrer\b/.test(l.rel);
     if (!hatNoopener) { relOk = false; relFehler.push(`${e.label}: noopener fehlt`); }
     if (e.eigen && hatNofollow) { relOk = false; relFehler.push(`${e.label}: eigen, aber nofollow`); }
     if (e.eigen && hatNoreferrer) { relOk = false; relFehler.push(`${e.label}: eigen, aber noreferrer`); }
@@ -163,7 +168,7 @@ console.log("\nwerkzeuge.html");
       : "alle externen Werkzeug-Adressen liegen auf Klaus' eigenen Hosts");
 
   const aussen = gefunden.filter((l) => /^https?:/i.test(l.href));
-  ok(aussen.every((l) => /\bnoopener\b/.test(l.rel) && !/\breferrer\b/.test(l.rel)),
+  ok(aussen.every((l) => /\bnoopener\b/.test(l.rel) && !/\bnoreferrer\b/.test(l.rel)),
     "externe Werkzeug-Links: noopener, kein noreferrer (eigene Apps)");
   ok(gefunden.filter((l) => !/^https?:/i.test(l.href)).every((l) => !l.target),
     "interne Links ohne target — sie bleiben auf der Seite");
