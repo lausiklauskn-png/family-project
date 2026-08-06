@@ -100,7 +100,7 @@ heile
 
 echo; echo "I · Der Sichttest-Schalter wirkt AUCH OHNE Parameter"
 echo "     (dann stuenden erfundene Zahlen auf der echten Seite -- der schlimmste Fall)"
-bricht "if (!/[?&]sichttest=halt\\\\b/.test(location.search)) return;|||if (false) return;" "$H"
+bricht 'if (!/[?&]sichttest=halt\b/.test(location.search)) return;|||if (false) return;' "$H"
 lauf "Vorschau ohne Parameter aktiv" rot
 heile
 
