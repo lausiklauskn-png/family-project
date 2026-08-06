@@ -61,7 +61,32 @@ const TITEL = {
  *
  * An unveränderten Seiten schwankt also auch Googles Zahl um bis zu 19 Punkte.
  * Ein Schwellwert darunter erklärt Rauschen zum Ereignis. Wer ihn wieder senkt,
- * holt sich das Journal voll mit Sprüngen, die keine sind. */
+ * holt sich das Journal voll mit Sprüngen, die keine sind.
+ *
+ * ── UND DIE 20 HAT NICHT GEREICHT (2026-08-06) ────────────────────────────
+ * Zwei Nächte später lieferte DIESELBE unveränderte Seite — Jasons-Tresor, seit
+ * dem 2026-08-03 kein Commit — 83 · 64 · 97. Das sind 33 Punkte Spanne, und der
+ * Sprung 64 → 97 ist glatt durch diesen Filter gelaufen und stand als Erfolg im
+ * Journal, obwohl niemand etwas gebaut hatte.
+ *
+ * Die Lehre daraus ist NICHT „dann eben 35". Eine Schwelle, die aus dem
+ * bisherigen Maximum abgeleitet wird, ist immer zu niedrig: sie kennt nur die
+ * Ausreißer, die schon vorgekommen sind. Die 19 war kein Naturgesetz, die 33
+ * ist es genauso wenig.
+ *
+ * Klaus' Entscheid vom 2026-08-06: **ein Sprung wird erst gemeldet, wenn ihn
+ * die NÄCHSTE Messung hält.** Die Schwelle bleibt bei 20 und sagt weiterhin,
+ * was überhaupt groß genug ist, um hinzusehen — aber sie entscheidet nicht mehr
+ * allein. Rauschen ist per Definition das, was beim nächsten Mal weg ist; ein
+ * echter Bau bleibt stehen. Das trifft die Ursache statt das Symptom und
+ * braucht keine geratene Zahl.
+ *
+ * Kosten, ehrlich benannt: der Eintrag kommt einen Tag später, und wenn eine
+ * Seite genau einmal gemessen und danach nie wieder, bleibt ihr Sprung für
+ * immer Verdacht. Beides ist weniger schlimm als ein Journal voller Erfolge,
+ * die keine sind.
+ *
+ * Gegenprobe: tests/gegenprobe_forschung_bestaetigung.sh */
 const SCHWELLE = 20;
 
 const arg = (name, ersatz) => {
@@ -137,7 +162,7 @@ function einsortieren(stand) {
 
   const neu = messungenSammeln(stand);
   const ereignisse = [];
-  let angelegt = 0, fortgeschrieben = 0, verlaengert = 0;
+  let angelegt = 0, fortgeschrieben = 0, verlaengert = 0, verdaechtig = 0, verworfen = 0;
 
   for (const m of neu) {
     const r = reihe.reihen[m.id] || (reihe.reihen[m.id] = { name: m.name, url: m.url, punkte: [] });
@@ -152,6 +177,27 @@ function einsortieren(stand) {
     };
 
     if (!letzt) { r.punkte.push(punkt); angelegt++; continue; }
+
+    /* ── Steht ein Verdacht offen? Dann ist DIESE Messung sein Richter. ──────
+     * Muss VOR der „gleich"-Abkürzung weiter unten stehen. Eine Messung, die
+     * denselben Wert nochmal liefert, springt dort mit `continue` heraus — und
+     * genau die ist die STÄRKSTE Bestätigung, die es gibt. Stünde die Prüfung
+     * darunter, bliebe ein gehaltener Sprung ewig Verdacht. */
+    const urteil = verdachtPruefen(r, m);
+    if (urteil) {
+      delete r.verdacht;
+      if (urteil.gehalten.length) {
+        ereignisse.push({
+          ziel: m.id, name: m.name, url: m.url,
+          datum: urteil.gesehen, bestaetigt: m.gemessen,
+          sprung: urteil.gehalten, weg: urteil.weg, dazu: urteil.dazu,
+          quelle: urteil.quelle, quellwechsel: urteil.quellwechsel
+        });
+      } else {
+        verworfen++;
+        console.log(`  · ${m.name}: Verdacht vom ${urteil.gesehen} hat nicht gehalten — kein Eintrag.`);
+      }
+    }
 
     /* Eine Messung, die dasselbe sagt wie die letzte, verlängert deren Spanne.
      * Ein neuer Punkt für einen unveränderten Tag wäre kein Erkenntnisgewinn,
@@ -172,8 +218,23 @@ function einsortieren(stand) {
     }
     fortgeschrieben++;
 
+    /* Nach einem VERWORFENEN Verdacht wird nicht gegen den Ausreißer gerechnet,
+     * sondern gegen den Stand, der vor ihm galt.
+     *
+     * Ohne das dreht sich eine schwankende Seite selbst einen Eintrag an: bei
+     * 50 → 90 → 50 wird der Ausschlag auf 90 zu Recht verworfen — aber die
+     * Rückkehr auf 50 wäre gegenüber `letzt` (90) wieder ein Sprung von 40 und
+     * würde beim nächsten Mal bestätigt. Das Journal meldete dann „90 → 50",
+     * obwohl die Seite die ganze Zeit bei 50 stand und nur einmal verrauscht
+     * war. Der Ausreißer darf nicht zum Maßstab werden, an dem alles Weitere
+     * gemessen wird. */
+    const basis = (urteil && !urteil.gehalten.length)
+      ? Object.fromEntries(urteil.alle.map((s) => [s.k, s.alt]))
+      : null;
+    const vonWo = (k) => (basis && typeof basis[k] === "number" ? basis[k] : letzt[k]);
+
     const sprung = MASSE
-      .map((k) => ({ k, alt: letzt[k], neu: m.werte[k], d: m.werte[k] - letzt[k] }))
+      .map((k) => ({ k, alt: vonWo(k), neu: m.werte[k], d: m.werte[k] - vonWo(k) }))
       .filter((x) => Math.abs(x.d) >= SCHWELLE);
     const weg = (letzt.mangel || []).filter((x) => !m.mangel.includes(x));
     const dazu = m.mangel.filter((x) => !(letzt.mangel || []).includes(x));
@@ -195,7 +256,13 @@ function einsortieren(stand) {
       ? { von: letzt.quelle || "eigen", nach: m.quelle }
       : null;
 
-    ereignisse.push({ ziel: m.id, name: m.name, url: m.url, datum: m.gemessen, sprung, weg, dazu, quelle: m.quelle, quellwechsel });
+    /* KEIN Eintrag — nur ein gemerkter Verdacht. Er wandert nach
+     * forschung/messreihe.json und wartet auf die nächste Messung. Die Datei
+     * steht in der `git add`-Liste der Aktion, der Verdacht überlebt die Nacht
+     * also. Was hier festgehalten wird, ist der Stand VOR dem Sprung (`alt`) —
+     * daran wird morgen gemessen, nicht am Sprungwert. */
+    r.verdacht = { gesehen: m.gemessen, sprung, weg, dazu, quelle: m.quelle, quellwechsel };
+    verdaechtig++;
   }
 
   reihe.gepflegt = heute();
@@ -203,8 +270,37 @@ function einsortieren(stand) {
 
   const geschrieben = journalSchreiben(ereignisse);
   console.log(`Messreihe: ${angelegt} neu, ${fortgeschrieben} fortgeschrieben, ${verlaengert} unverändert (Spanne verlängert).`);
+  if (verdaechtig) console.log(`Verdacht gemerkt: ${verdaechtig} — wartet auf die nächste Messung, noch kein Eintrag.`);
+  if (verworfen) console.log(`Verdacht verworfen: ${verworfen} — Sprung hat nicht gehalten.`);
   console.log(`Journal: ${geschrieben} neue(r) Eintrag/Einträge.`);
   if (geschrieben) console.log(`  → node tools/forschung.mjs --offen  zeigt, wo das „Warum“ noch fehlt.`);
+}
+
+/* Der Richter über einen offenen Verdacht.
+ *
+ * Gemessen wird gegen `alt` — den Stand VOR dem Sprung —, nicht gegen den
+ * Sprungwert. Der Unterschied ist der ganze Punkt: die Frage lautet nicht „ist
+ * die Zahl heute dieselbe wie gestern?", sondern „ist sie immer noch DORT, wo
+ * sie hingesprungen ist?". Eine Seite, die von 83 auf 97 springt und dann auf
+ * 95 zurückgeht, hat sich verbessert; eine, die auf 84 zurückfällt, hat nur
+ * gerauscht — obwohl der zweite Fall dem ersten von Tag zu Tag ähnlicher sieht.
+ *
+ * Die Richtung muss stimmen. Ein Sprung nach oben, der beim nächsten Mal ebenso
+ * weit UNTEN liegt, ist keine Bestätigung, sondern ein zweites Rauschen. */
+function verdachtPruefen(r, m) {
+  const v = r.verdacht;
+  if (!v) return null;
+  /* Wird derselbe Tag nachgezogen (eigene Messung → Google), ist das keine
+   * zweite Nacht. Der Verdacht bleibt stehen und wird unten neu gerechnet. */
+  if (!(m.gemessen > v.gesehen)) return null;
+  const gehalten = v.sprung.filter((s) => {
+    const jetzt = m.werte[s.k];
+    if (typeof jetzt !== "number") return false;
+    const d = jetzt - s.alt;
+    return Math.abs(d) >= SCHWELLE && (d > 0) === (s.d > 0);
+  }).map((s) => Object.assign({}, s, { haelt: m.werte[s.k] }));
+  return { gesehen: v.gesehen, weg: v.weg, dazu: v.dazu, quelle: v.quelle, quellwechsel: v.quellwechsel,
+           gehalten, alle: v.sprung };
 }
 
 /* ---- Journal -------------------------------------------------------------- */
@@ -231,7 +327,17 @@ function journalSchreiben(ereignisse) {
     }
     for (const s of e.sprung) {
       const pfeil = s.d > 0 ? "↑" : "↓";
-      zeilen.push(`- **${TITEL[s.k]} ${s.alt} → ${s.neu}** (${pfeil} ${Math.abs(s.d)})`);
+      const halt = (e.bestaetigt && typeof s.haelt === "number") ? `, am ${e.bestaetigt} noch ${s.haelt}` : "";
+      zeilen.push(`- **${TITEL[s.k]} ${s.alt} → ${s.neu}** (${pfeil} ${Math.abs(s.d)}${halt})`);
+    }
+    /* Warum das dasteht: der Eintrag ist auf den Tag des Sprungs datiert, wurde
+     * aber später geschrieben. Ohne diese Zeile sähe es aus, als hätte das
+     * Werkzeug einen Tag geschlafen. */
+    if (e.bestaetigt) {
+      zeilen.push("");
+      zeilen.push(`> Gesehen am ${e.datum}, **bestätigt durch die Messung vom ${e.bestaetigt}**. ` +
+        `Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen ` +
+        `(Klaus 2026-08-06, siehe \`LEHREN.md\` Lehre 6c).`);
     }
     for (const w of e.weg) zeilen.push(`- Beanstandung weg: ${w}`);
     for (const d of e.dazu) zeilen.push(`- Beanstandung neu: ${d}`);

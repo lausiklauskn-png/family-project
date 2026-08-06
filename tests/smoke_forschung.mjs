@@ -9,7 +9,8 @@
  * Deshalb prüft dieser Wächter vor allem Erhaltung, nicht Ausgabe:
  *   1. ein einmal geschriebener Journal-Eintrag überlebt jeden weiteren Lauf,
  *   2. eine unveränderte Messung verlängert die Spanne, statt Punkte zu stapeln,
- *   3. eine geänderte Messung legt einen neuen Punkt UND einen Journal-Eintrag an,
+ *   3. eine geänderte Messung legt einen neuen Punkt an — und einen Journal-
+ *      Eintrag erst, wenn die NÄCHSTE Messung den Sprung hält (Klaus 2026-08-06),
  *   4. eine korrigierte Messung DESSELBEN Tages ersetzt den Punkt, statt zwei
  *      Wahrheiten für einen Tag stehen zu lassen,
  *   5. der Verlauf beantwortet die Frage „was galt am Tag X?“.
@@ -51,6 +52,16 @@ const bericht = (werte, tag, hinweise) => {
   }));
 };
 
+const bericht2 = (tag, leistung) => {
+  fs.writeFileSync(path.join(buehne, "assets", "config", "spore-stand.json"), JSON.stringify({
+    geprueft: `${tag}T02:40:00.000Z`,
+    eintraege: { "probe-seite": { nodeName: "Probe-Seite", messung: {
+      stand: "gemessen", leistung, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100,
+      gemessen: tag, quelle: "eigen", werkzeug: "13.4.1", hinweise: [],
+      url: "https://beispiel.invalid/probe/" } } }
+  }));
+};
+
 const lauf = (...args) =>
   execFileSync(process.execPath, [path.join(buehne, "tools", "forschung.mjs"), ...args],
     { cwd: buehne, encoding: "utf8" });
@@ -78,18 +89,40 @@ ok(punkte()[0].bis === "2026-08-03", `die Spanne wächst bis zum letzten Tag (${
 ok(!fs.existsSync(path.join(buehne, "forschung", "JOURNAL.md")),
   "ohne Änderung entsteht kein Journal-Eintrag");
 
-/* ---- 3 · Sprung: neuer Punkt + Journal ------------------------------------ */
+/* ---- 3 · Sprung: neuer Punkt sofort, Journal-Eintrag erst nach Bestätigung -
+ * Klaus' Entscheid vom 2026-08-06. Auslöser war Jasons-Tresor: 83 · 64 · 97 an
+ * drei Nächten, letzter Commit vom 3. August — der Sprung 64 → 97 lief durch die
+ * Schwelle 20 und stand als Erfolg im Journal, obwohl niemand etwas gebaut
+ * hatte. Rauschen ist per Definition das, was beim nächsten Mal weg ist. */
 bericht({ leistung: 86, bedienbarkeit: 90, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-04", []);
-lauf("--nachtragen");
+const a1 = lauf("--nachtragen");
 ok(punkte().length === 2, `ein Sprung legt einen zweiten Punkt an (${punkte().length})`);
 ok(punkte()[0].bis === "2026-08-03" && punkte()[1].von === "2026-08-04",
   "der alte Punkt endet, wo der neue beginnt — keine Lücke, keine Überlappung");
+ok(!fs.existsSync(path.join(buehne, "forschung", "JOURNAL.md")),
+  "ein UNBESTÄTIGTER Sprung schreibt noch keinen Eintrag");
+ok(/Verdacht gemerkt: 1/.test(a1), "der Lauf sagt, dass er einen Verdacht gemerkt hat");
+{
+  const v = reihe().reihen["probe-seite"].verdacht;
+  ok(v && v.gesehen === "2026-08-04", "der Verdacht liegt in messreihe.json und überlebt damit die Nacht");
+  ok(v && v.sprung[0].alt === 50, "gemerkt wird der Stand VOR dem Sprung — daran wird morgen gemessen");
+}
+
+/* Die nächste Messung hält den Wert (hier sogar unverändert — der stärkste
+ * Fall, und zugleich der, der beinahe durchgerutscht wäre: eine gleiche Messung
+ * springt im Werkzeug mit `continue` heraus, bevor irgendetwas geprüft wird). */
+bericht({ leistung: 86, bedienbarkeit: 90, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-05", []);
+lauf("--nachtragen");
 const j1 = journal();
-ok(/Leistung 50 → 86/.test(j1), "das Journal nennt den Sprung mit alter und neuer Zahl");
+ok(/Leistung 50 → 86/.test(j1), "nach der Bestätigung nennt das Journal den Sprung mit alter und neuer Zahl");
+ok(/bestätigt durch die Messung vom 2026-08-05/.test(j1),
+  "und sagt dazu, dass er bestätigt wurde — der Eintrag ist auf den Sprungtag datiert, nicht auf heute");
+ok(/### 2026-08-04 · /.test(j1), "datiert auf den Tag des Sprungs, nicht auf den der Bestätigung");
 ok(/Beanstandung weg: leistung: Bilder verkleinern/.test(j1),
   "das Journal nennt die verschwundene Beanstandung");
 ok(/noch nicht eingetragen/.test(j1), "der neue Eintrag verlangt ein „Warum“");
 ok(/1 Eintrag\/Einträge ohne/.test(lauf("--offen")), "--offen findet den fehlenden Grund");
+ok(!reihe().reihen["probe-seite"].verdacht, "der erledigte Verdacht ist aus der Messreihe verschwunden");
 
 /* ---- 4 · Die Erklärung überlebt weitere Läufe ----------------------------- */
 /* Das ist der Kern. Eine Sitzung trägt den Grund nach; die nächsten Nächte
@@ -100,6 +133,11 @@ fs.writeFileSync(path.join(buehne, "forschung", "JOURNAL.md"),
 bericht({ leistung: 86, bedienbarkeit: 90, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-05", []);
 lauf("--nachtragen");
 bericht({ leistung: 86, bedienbarkeit: 40, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-06", ["Kontrast zu schwach"]);
+lauf("--nachtragen");
+/* Auch dieser Einbruch braucht seine Bestätigung. 42 statt 40 — nah genug, um
+ * den Sprung zu halten, aber ein eigener Punkt statt einer verlängerten Spanne;
+ * so bleibt der Korrektur-Fall in Abschnitt 5 darunter prüfbar. */
+bericht({ leistung: 86, bedienbarkeit: 42, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-07", ["Kontrast zu schwach"]);
 lauf("--nachtragen");
 const j2 = journal();
 ok(/Hintergrundbild erst nach `load` geladen\./.test(j2),
@@ -113,7 +151,7 @@ ok(j2.indexOf("Bedienbarkeit 90 → 40") < j2.indexOf("Leistung 50 → 86"),
  * umgestellt wurden: derselbe Tag, andere Zahl. Zwei Punkte für einen Tag
  * wären zwei Wahrheiten. */
 const vorher = punkte().length;
-bericht({ leistung: 86, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-06", ["Kontrast zu schwach"]);
+bericht({ leistung: 86, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-07", ["Kontrast zu schwach"]);
 lauf("--nachtragen");
 ok(punkte().length === vorher, `eine Korrektur desselben Tages ersetzt den Punkt (${vorher} → ${punkte().length})`);
 ok(punkte()[punkte().length - 1].bedienbarkeit === 55, "der korrigierte Wert steht drin");
@@ -137,7 +175,7 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
  * das Signal. */
 {
   const vorZahl = journal().split("### ").length;
-  bericht({ leistung: 86, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-07",
+  bericht({ leistung: 86, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-08",
     ["Kontrast zu schwach", "Erzwungener dynamischer Umbruch"]);
   lauf("--nachtragen");
   ok(journal().split("### ").length === vorZahl,
@@ -147,7 +185,7 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
 
   /* Und ein Sprung unter der Schwelle ebensowenig: an unveränderten Seiten
    * schwankte Googles Zahl gemessen um bis zu 19 Punkte. */
-  bericht({ leistung: 70, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-08",
+  bericht({ leistung: 70, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-09",
     ["Kontrast zu schwach", "Erzwungener dynamischer Umbruch"]);
   lauf("--nachtragen");
   ok(journal().split("### ").length === vorZahl,
@@ -160,23 +198,68 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
  * diesen Hinweis liest sich eine Umstellung wie ein Erfolg. */
 {
   fs.writeFileSync(path.join(buehne, "assets", "config", "spore-stand.json"), JSON.stringify({
-    geprueft: "2026-08-09T02:40:00.000Z",
+    geprueft: "2026-08-10T02:40:00.000Z",
     eintraege: {
       "probe-seite": {
         nodeName: "Probe-Seite",
         messung: {
           stand: "gemessen", leistung: 30, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100,
-          gemessen: "2026-08-09", quelle: "eigen", werkzeug: "13.4.1",
+          gemessen: "2026-08-10", quelle: "eigen", werkzeug: "13.4.1",
           hinweise: [], url: "https://beispiel.invalid/probe/"
         }
       }
     }
   }));
   lauf("--nachtragen");
+  /* Auch der Quellwechsel-Sprung braucht seine Bestaetigung: die naechste
+   * Messung derselben (neuen) Quelle haelt den Wert. */
+  bericht2("2026-08-11", 32);
+  lauf("--nachtragen");
   const j = journal();
   ok(/Die Messquelle hat gewechselt/.test(j), "der Eintrag warnt vor dem Quellwechsel");
   ok(/Wer ihn als Verbesserung liest, irrt/.test(j),
     "und sagt ausdrücklich, dass der Sprung nichts über die Seite aussagt");
+}
+
+/* ---- 6d · Der Fall, fuer den die Regel gebaut wurde -----------------------
+ * Ein Sprung, der beim naechsten Mal nicht mehr da ist. Vorher haette er einen
+ * Journal-Eintrag erzeugt, der wie ein Erfolg aussieht -- genau das war
+ * Jasons-Tresor am 2026-08-06. */
+{
+  const vorher = journal();
+  bericht({ leistung: 80, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-12", []);
+  const b1 = lauf("--nachtragen");
+  ok(/Verdacht gemerkt: 1/.test(b1), "ein Einbruch ist gross genug fuer einen Verdacht");
+  ok(journal() === vorher, "aber noch kein Eintrag");
+
+  // Und zurueck auf den alten Stand: der Einbruch war Rauschen.
+  bericht({ leistung: 34, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-13", []);
+  const b2 = lauf("--nachtragen");
+  ok(/Verdacht verworfen: 1/.test(b2), "der Lauf sagt ausdruecklich, dass er den Verdacht verwirft");
+  ok(journal() === vorher, "ein Sprung, der nicht haelt, hinterlaesst KEINEN Eintrag");
+
+  /* Und der Ausreisser darf nicht zum neuen Massstab werden: 32 -> 80 -> 34
+   * ist EIN Zacken, keine Verschlechterung von 80 auf 34. Wuerde gegen den
+   * Ausreisser gerechnet, stuende beim naechsten Lauf "80 -> 34" im Journal. */
+  bericht({ leistung: 33, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-14", []);
+  lauf("--nachtragen");
+  ok(journal() === vorher,
+    "nach dem Zacken zurueck auf den alten Stand: immer noch kein Eintrag (kein Ersatz-Verdacht gegen den Ausreisser)");
+}
+
+/* ---- 6e · Richtung zaehlt: ein Rueckschlag ist keine Bestaetigung ---------
+ * Der Wert faellt weit, und beim naechsten Mal liegt er ebenso weit auf der
+ * ANDEREN Seite. Ohne Richtungspruefung wuerde ein Ausschlag nach unten durch
+ * einen Ausschlag nach oben "bestaetigt" -- Abstand allein genuegt nicht. */
+{
+  const vorher = journal();
+  bericht({ leistung: 5, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-15", []);
+  lauf("--nachtragen");
+  bericht({ leistung: 100, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-16", []);
+  const c1 = lauf("--nachtragen");
+  ok(/Verdacht verworfen: 1/.test(c1),
+    "ein Ausschlag nach unten wird von einem Ausschlag nach oben NICHT bestaetigt");
+  ok(journal() === vorher, "und erzeugt keinen Eintrag");
 }
 
 /* ---- 7 · Die eigene Zielliste -------------------------------------------- */
