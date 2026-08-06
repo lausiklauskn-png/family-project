@@ -579,7 +579,15 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       "markt-tomys-hub":     { lage: "gleich",
         wache: { ampel: "gelb", grund: "geaendert", seit: "2026-08-02" },
         messung: { stand: "gemessen", leistung: 95, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 98, gemessen: "2026-08-02" } },
-      "markt-kimboard":      { lage: "gleich", messung: { stand: "veraltet", leistung: 91, bedienbarkeit: 30, gute_praxis: 90, auffindbarkeit: 90, gemessen: "2026-07-28", grund: "Seite antwortet nicht" } }
+      "markt-kimboard":      { lage: "gleich", messung: { stand: "veraltet", leistung: 91, bedienbarkeit: 30, gute_praxis: 90, auffindbarkeit: 90, gemessen: "2026-07-28", grund: "Seite antwortet nicht" } },
+      // Zurueckgehaltener Wert (Klaus 2026-08-06): die Karte zeigt die
+      // aeltere, bessere Messung, weil die neueren schlechter waren. Genau
+      // die Lage von Jasons-Tresor am 2026-08-05.
+      "markt-rezeptbuch":    { lage: "gleich", messung: {
+        stand: "gemessen", leistung: 83, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 100,
+        gemessen: "2026-08-04", quelle: "google",
+        zurueckgehalten: { zahl: 2, noetig: 3, seit: "2026-08-05" },
+        frisch: { leistung: 64, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 100, gemessen: "2026-08-06", quelle: "google" } } }
     }
   };
   const SCHWELLE = 50;
@@ -621,6 +629,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     summe: (e.querySelector(".mk-ms-sum") || {}).textContent || "",
     leer: !!e.querySelector(".mk-mess--leer"),
     alt: (e.querySelector(".mk-ms-alt") || {}).textContent || "",
+    halt: (e.querySelector(".mk-ms-halt") || {}).textContent || "",
     schwach: e.querySelectorAll(".mk-ms-w.is-schwach").length
   })));
 
@@ -642,6 +651,21 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       "C1f ein Ausreißer nach unten wird benannt und rot markiert (" + (s && s.summe.replace(/\s+/g, " ")) + ")");
     ok(!!s && /letzten geglückten Lauf/.test(s.alt || ""),
       "C1g und veraltete Zahlen sagen, dass sie veraltet sind");
+
+    /* C1h — ein zurueckgehaltener Wert sagt es auf der Karte.
+     * Das ist die dritte der drei Ehrlichkeits-Bedingungen aus LEHREN.md 6d:
+     * der frische Wert darf nicht verschluckt werden. Stuende hier nur die 83,
+     * waere die Karte eine Zahl, zu der es stillschweigend eine neuere,
+     * schlechtere gibt -- und aus Entprellung wuerde Schoenfaerberei. */
+    const h = karten.find((x) => /Rezeptbuch/i.test(x.titel));
+    ok(!!h && /83/.test(h.zeile), "C1h die gehaltene (bessere) Zahl steht auf der Karte");
+    ok(!!h && /2 von 3/.test(h.halt || ""),
+      "C1h2 und darunter steht, dass neuere Messungen schlechter waren (" + (h && h.halt.replace(/\s+/g, " ")) + ")");
+    ok(!!h && /gemessen am 2026-08-04/.test(h.summe),
+      "C1h3 das Datum ist das der GEZEIGTEN Messung, nicht das von heute");
+    const ohne = karten.find((x) => /Tomy/i.test(x.titel));
+    ok(!!ohne && ohne.halt === "",
+      "C1h4 wo nichts gehalten wird, steht auch keine Zeile — kein Laerm auf jeder Karte");
   }
 
   // C2 — der Knopf. Klaus' Wunsch: nachlesen über einen Klick, nicht über
@@ -735,7 +759,12 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
   // C3 — das Fenster. Es muss die drei Fragen beantworten: wer misst (und kann
   // der Anbieter schummeln?), was heißt die Zahl, was müsste er tun?
   {
-    await page.click(".listing .mk-ms-btn");
+    /* Die Karte wird ausdruecklich benannt, nicht ueber ".listing .mk-ms-btn"
+     * die erste genommen: sonst haengt der Test daran, welcher Eintrag zufaellig
+     * oben steht. Genau so ist er am 2026-08-06 rot geworden, als ein neuer
+     * Eintrag oben einsortiert wurde -- der Test prueft aber die Nachbesserungs-
+     * Liste, und die hat nur BookLedgerPro. */
+    await page.click('.listing [data-msid="markt-bookledgerpro"]');
     await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const d = await page.evaluate(() => {
       const el = document.getElementById("mkMessOv");
@@ -763,6 +792,28 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       "C3h und die stehen wirklich drin (" + (d.fixPunkte[0] || "—") + ")");
     ok(d.leer >= 1, "C3i wo nichts offen ist, steht das auch — kein leerer Kasten");
     ok(/spart rund/.test(d.text), "C3j und wo Lighthouse eine Ersparnis nennt, steht sie dabei");
+
+    /* C3k — im Fenster steht der GANZE Grund, samt der neueren Zahl selbst.
+     * An der Karte muss es kurz sein, hier darf es vollstaendig sein: warum
+     * gehalten wird, wie oft schon, und welchen Wert die neuere Messung hatte.
+     * Wer nachliest, soll nicht suchen muessen. */
+    await page.evaluate(() => document.getElementById("mkMessOv").close());
+    await page.click('.listing [data-msid="markt-rezeptbuch"]');
+    await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
+    const dh = await page.evaluate(() => {
+      const el = document.getElementById("mkMessOv");
+      const h = el.querySelector(".mk-ms-halt");
+      return { text: h ? h.textContent : "", da: !!h };
+    });
+    ok(dh.da && /2 von 3 Mal hintereinander/.test(dh.text),
+      "C3k das Fenster nennt den Stand der Zaehlung");
+    ok(/83, 64 und 97/.test(dh.text),
+      "C3k2 und begruendet die Regel mit der gemessenen Streuung statt mit einer Behauptung");
+    ok(/64/.test(dh.text) && /2026-08-06/.test(dh.text),
+      "C3k3 und nennt die neuere, schlechtere Zahl mit ihrem Datum — nicht verschwiegen");
+    await page.evaluate(() => document.getElementById("mkMessOv").close());
+    await page.click('.listing [data-msid="markt-bookledgerpro"]');
+    await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
 
     // Klaus 2026-08-02: „es sollte doch eigentlich ein Link sein, der genau
     // anzeigt, wie die Werte zustande kommen und was empfohlen wird."
@@ -914,6 +965,29 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     ok(r.anzahl1 === 1 && r.anzahl2 === 1, "D3 auch nach dem zweiten Durchgang steht die Zeile GENAU EINMAL drin (" + r.anzahl1 + "/" + r.anzahl2 + ")");
     ok(/\/\* Kopf \*\//.test(r.zwei) && (r.zwei.match(/FP_MARKT_API/g) || []).length === 1, "D3b und der eigentliche Kopf überlebt den Rundlauf unversehrt");
     await p4.close();
+  }
+
+  /* C6 — und im Studio, wo Klaus nachsieht, warum eine Zahl steht.
+   * Die Karte sagt es dem Besucher, das Studio dem Betreiber. Beides ist
+   * noetig: wer den gehaltenen Wert nur an der Karte sieht, weiss noch nicht,
+   * ob er handeln muss. */
+  {
+    await page.evaluate(() => { const d = document.getElementById("mkMessOv"); if (d && d.open) d.close(); });
+    await page.waitForFunction(() => !!window.FPStudio, null, { timeout: 20000 });
+    await page.evaluate(() => window.FPStudio.open());
+    await page.waitForSelector("[data-role=messung] .fpst-sporezeile", { timeout: 20000 }).catch(() => {});
+    const st = await page.evaluate(() => Array.from(
+      document.querySelectorAll("[data-role=messung] .fpst-sporezeile")).map((e) => ({
+        name: (e.querySelector("b") || {}).textContent || "",
+        halt: (e.querySelector(".fpst-halt") || {}).textContent || ""
+      })));
+    const z = st.find((x) => /Rezeptbuch/i.test(x.name));
+    ok(!!z && /2\/3/.test(z.halt),
+      "C6 das Studio zeigt den Stand der Zaehlung (" + (z && z.halt.replace(/\s+/g, " ")) + ")");
+    ok(!!z && /64/.test(z.halt) && /2026-08-06/.test(z.halt),
+      "C6b samt der neueren, schlechteren Zahl und ihrem Datum");
+    const o = st.find((x) => !/Rezeptbuch/i.test(x.name));
+    ok(!!o && o.halt === "", "C6c und wo nichts gehalten wird, steht auch nichts");
   }
 
   await browser.close();
