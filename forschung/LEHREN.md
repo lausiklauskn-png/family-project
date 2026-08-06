@@ -144,13 +144,56 @@ beide Male von Googles PageSpeed Insights gemessen:
 Ich hatte angenommen, Googles Zahl sei stabiler als eine eigene Messung. **Ist
 sie nicht.** Die Streuung an einer unveränderten Seite reicht bis 19 Punkte.
 
-Deshalb steht die Schwelle der Forschungsstation auf **20** — gemessen, nicht
+Deshalb stand die Schwelle der Forschungsstation auf **20** — gemessen, nicht
 geschätzt. Wer sie senkt, holt sich das Journal voll mit Sprüngen, die keine
 sind.
 
 **Regel:** drei Läufe, bei Leistungszahlen nie den einen guten nennen — und ein
 Sprung unter 20 Punkten ist erst dann eine Verbesserung, wenn er die **nächste**
 Messung übersteht.
+
+### 6c. Die 19 waren zu wenig — dieselbe Seite schwankt um 33
+
+**Gemessen, 2026-08-06, an der Seite, die schon die 19 geliefert hat.**
+Jasons-Tresor, seit dem **2026-08-03** unverändert, dreimal von Google mit
+derselben Werkzeug-Fassung gemessen:
+
+| gemessen | Leistung | Bedienbarkeit | gute Praxis | Auffindbarkeit |
+|---|---|---|---|---|
+| 2026-08-04 | 83 | 92 | 100 | 100 |
+| 2026-08-05 | **64** | 92 | 100 | 100 |
+| 2026-08-06 | **97** | 92 | 96 | 100 |
+
+Die Schwelle 20 war aus einer Streuung von 19 abgeleitet. Zwei Nächte später
+lieferte **dieselbe unveränderte Seite 33 Punkte Spanne** und erzeugte damit
+einen Journal-Eintrag, der wie eine gelungene Verbesserung aussah. Der Filter
+hat also nicht gehalten — und er hat ausgerechnet dort nicht gehalten, wo die
+Zahl herkam, die ihn festgelegt hat.
+
+Zwei Dinge daran sind wichtiger als die Zahl selbst:
+
+**Erstens: es ist allein die Leistung.** Bedienbarkeit stand dreimal auf 92,
+Auffindbarkeit dreimal auf 100, gute Praxis wich einmal um 4 ab. Eine einzige
+Schwelle für alle vier Maße behandelt eine ruhige Zahl wie eine unruhige. Wer
+sie global anhebt, macht die drei stabilen Maße blind für echte Änderungen.
+
+**Zweitens: eine Streuungs-Obergrenze aus wenigen Nächten ist selbst eine
+Stichprobe.** Die 19 war kein Naturgesetz, sondern der größte Wert, den drei
+Nächte hergegeben hatten. Die 33 ist es genauso wenig. Eine Schwelle, die aus
+dem bisherigen Maximum abgeleitet wird, ist immer zu niedrig — sie kennt nur
+die Ausreißer, die schon vorgekommen sind.
+
+**Regel:** keine Zahl allein als Filter. Ein Sprung wird erst zum Ereignis,
+wenn er **bestätigt** ist — durch eine zweite Messung, die ihn hält. Und wo
+eine Schwelle doch nötig ist, gehört sie **je Maß** gesetzt, nicht pauschal.
+
+> **Stand 2026-08-06:** `SCHWELLE = 20` in `tools/forschung.mjs` ist bewusst
+> **noch nicht** geändert. Es gibt mehrere gleich vernünftige Wege, und jeder
+> kostet etwas: eine höhere Zahl verschluckt echte Verbesserungen, ein
+> Bestätigungs-Lauf meldet einen Tag später. Die Wahl liegt bei Klaus —
+> `docs/BRIEF_SCHWELLE_UND_TERMIN.md`. Bis dahin gilt: ein Journal-Eintrag über
+> einen Leistungssprung ist ein **Verdacht**, kein Befund, solange nicht
+> nachgesehen wurde, ob überhaupt etwas gebaut wurde.
 
 ## 6b. Auch die Mängelliste wackelt — ein neuer Befund ist noch kein neuer Fehler
 
