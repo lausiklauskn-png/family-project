@@ -185,6 +185,60 @@ console.log("A — die Regel (tools/messung.mjs)");
     "A6b übersprungen ohne Vorgeschichte: nicht_gemessen mit nachlesbarem Grund");
 }
 
+// A6c — HALTEFRIST fuer schlechtere Werte (Klaus 2026-08-06).
+// "Keiner soll schlechter abschneiden, als wenn er selber nachmisst." Ein
+// besserer Wert gilt sofort, ein schlechterer erst nach DREI Messungen
+// hintereinander. Anlass: Jasons-Tresor lieferte 83 / 64 / 97 an drei Naechten,
+// ohne dass seit dem 2026-08-03 jemand eine Zeile angefasst hatte.
+{
+  const roh = (leistung, tag) => ({ ok: true, zahlen: { leistung, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 100 }, quelle: "google", werkzeug: "13.4.1" });
+  const alt = { stand: "gemessen", leistung: 83, bedienbarkeit: 92, gute_praxis: 100, auffindbarkeit: 100, gemessen: "2026-08-04", quelle: "google" };
+
+  // 1. schlechtere Messung: die Karte bleibt stehen.
+  const m1 = messungBilden({ vorher: alt, roh: roh(64), heute: "2026-08-05" });
+  ok(m1.leistung === 83, "A6c der erste schlechtere Wert aendert die Karte NICHT (" + m1.leistung + ")");
+  ok(m1.gemessen === "2026-08-04",
+    "A6c das Messdatum wandert NICHT mit — die Karte behauptet nicht, heute gemessen zu haben (" + m1.gemessen + ")");
+  ok(m1.frisch && m1.frisch.leistung === 64 && m1.frisch.gemessen === "2026-08-05",
+    "A6c die echte Messung wird nicht weggeworfen, sondern steht als `frisch` daneben");
+  ok(m1.zurueckgehalten && m1.zurueckgehalten.zahl === 1 && m1.zurueckgehalten.noetig === 3,
+    "A6c und es steht offen da, dass zurueckgehalten wird (1 von 3)");
+
+  // 2. schlechtere Messung: immer noch.
+  const m2 = messungBilden({ vorher: m1, roh: roh(60), heute: "2026-08-06" });
+  ok(m2.leistung === 83 && m2.zurueckgehalten.zahl === 2, "A6c auch beim zweiten Mal bleibt die Karte stehen (2 von 3)");
+
+  // 3. schlechtere Messung: jetzt gilt sie.
+  const m3 = messungBilden({ vorher: m2, roh: roh(58), heute: "2026-08-07" });
+  ok(m3.leistung === 58 && m3.gemessen === "2026-08-07",
+    "A6c beim DRITTEN Mal hintereinander wird der schlechtere Wert uebernommen (" + m3.leistung + ")");
+  ok(!m3.zurueckgehalten && !m3.frisch,
+    "A6c danach steht kein Doppel mehr da — der frische Wert IST der gelistete");
+
+  // Ein besserer Wert gilt sofort, ohne Wartezeit.
+  const b = messungBilden({ vorher: alt, roh: roh(97), heute: "2026-08-06" });
+  ok(b.leistung === 97 && b.gemessen === "2026-08-06" && !b.zurueckgehalten,
+    "A6c ein BESSERER Wert gilt sofort (" + b.leistung + ")");
+
+  // Und ein guter Wert zwischendurch setzt die Zaehlung zurueck: genau der
+  // Jasons-Tresor-Fall (83 / 64 / 97) — die 64 darf sich nicht ansammeln.
+  const z = messungBilden({ vorher: m1, roh: roh(97), heute: "2026-08-06" });
+  ok(z.leistung === 97 && !z.zurueckgehalten,
+    "A6c eine gute Messung setzt die Zaehlung zurueck — schlechte muessen HINTEREINANDER kommen");
+
+  // Die vier Zahlen bleiben ein Satz aus EINER Messung, nie gemischt.
+  const gemischt = messungBilden({
+    vorher: alt,
+    roh: { ok: true, zahlen: { leistung: 50, bedienbarkeit: 100, gute_praxis: 100, auffindbarkeit: 100 }, quelle: "google" },
+    heute: "2026-08-05" });
+  ok(gemischt.bedienbarkeit === 92,
+    "A6c gehalten wird der GANZE Satz — nie die gute Leistung von gestern mit der guten Bedienbarkeit von heute");
+
+  // Erste Messung ueberhaupt: es gibt nichts zu halten.
+  const erste = messungBilden({ vorher: null, roh: roh(12), heute: "2026-08-05" });
+  ok(erste.leistung === 12 && !erste.zurueckgehalten, "A6c die erste Messung wird immer uebernommen");
+}
+
 // A7 — wer kommt dran: ältestes Datum zuerst, nie Gemessene ganz vorn.
 {
   const ziele = [{ id: "b" }, { id: "a" }, { id: "c" }, { id: "d" }];

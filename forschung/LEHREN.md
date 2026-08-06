@@ -187,13 +187,52 @@ die Ausreißer, die schon vorgekommen sind.
 wenn er **bestätigt** ist — durch eine zweite Messung, die ihn hält. Und wo
 eine Schwelle doch nötig ist, gehört sie **je Maß** gesetzt, nicht pauschal.
 
-> **Stand 2026-08-06:** `SCHWELLE = 20` in `tools/forschung.mjs` ist bewusst
-> **noch nicht** geändert. Es gibt mehrere gleich vernünftige Wege, und jeder
-> kostet etwas: eine höhere Zahl verschluckt echte Verbesserungen, ein
-> Bestätigungs-Lauf meldet einen Tag später. Die Wahl liegt bei Klaus —
-> `docs/BRIEF_SCHWELLE_UND_TERMIN.md`. Bis dahin gilt: ein Journal-Eintrag über
-> einen Leistungssprung ist ein **Verdacht**, kein Befund, solange nicht
-> nachgesehen wurde, ob überhaupt etwas gebaut wurde.
+> **Entschieden und gebaut, 2026-08-06 (Klaus).** `SCHWELLE = 20` bleibt, sagt
+> aber nur noch, was groß genug ist, um hinzusehen — sie entscheidet nicht mehr
+> allein. Ein Sprung wird als **Verdacht** gemerkt und erst zum Journal-Eintrag,
+> wenn ihn die **nächste Messung hält**. Gemessen wird gegen den Stand *vor* dem
+> Sprung, die Richtung muss stimmen, und ein verworfener Ausreißer wird nicht
+> zum neuen Maßstab. Gegenprobe: `tests/gegenprobe_forschung_bestaetigung.sh`.
+
+### 6d. Für die Karte gilt die umgekehrte Vorsicht — und das ist kein Widerspruch
+
+**Klaus' Entscheid, 2026-08-06:** *„Keiner soll schlechter abschneiden, als wenn
+er selber nachmisst."* Auf der Marktplatz-Karte gilt deshalb: ein **besserer**
+Wert zählt sofort, ein **schlechterer** erst, wenn er **dreimal hintereinander**
+gemessen wurde.
+
+Das sieht zunächst aus wie das Gegenteil der Regel von eben. Es ist aber
+dieselbe Einsicht für eine **andere Aufgabe**:
+
+| | Journal | Karte |
+|---|---|---|
+| wofür | Forschungs-Protokoll über **Ursachen** | öffentliche Aussage über eine **fremde App** |
+| Haltung | skeptisch in **beide** Richtungen | vorsichtig **nur nach unten** |
+| Fehler, der wehtut | ein Erfolg, den niemand gebaut hat | jemand fällt wegen eines Würfelwurfs aus dem Marktplatz |
+
+Ein einzelner schlechter Wert ist kein wahreres Urteil als ein einzelner guter —
+bei 33 Punkten Streuung ist er schlicht ein anderer Wurf. Die Asymmetrie ist
+also keine Nachsicht, sondern die Antwort auf die Frage, welcher Irrtum hier
+mehr kostet.
+
+**Die Grenze zur Schönfärberei ist scharf, und sie liegt an drei Stellen.**
+Fällt eine davon, ist es keine Entprellung mehr, sondern Rosinenpickerei:
+
+1. Der gezeigte Wert wurde **wirklich so gemessen** — nichts gemittelt, nichts
+   aus Teilen zusammengesetzt. Gehalten wird der **ganze Satz** der vier Zahlen
+   oder keiner, sonst passt die Karte zu keinem Bericht, auf den sie verlinkt.
+2. Das **Messdatum wandert nicht mit**. Die Karte sagt „gemessen am 4.", nicht
+   „gemessen heute".
+3. Der frische Wert wird **nicht verschluckt**: er steht als `frisch` daneben,
+   `zurueckgehalten` nennt Stand und Ziel, und die **Messreihe schreibt ihn
+   ungekürzt fort**. Sonst verlöre die Forschung genau die Ausreißer, wegen
+   derer es die Regel überhaupt gibt.
+
+Jede dieser drei ist einzeln gegengeprobt
+(`tests/gegenprobe_messung_haltefrist.sh`, Proben C–G).
+
+**Regel:** wer eine Zahl entprellt, muss sagen können, welchen Irrtum er damit
+teurer macht — und die drei Ehrlichkeits-Bedingungen einzeln prüfbar halten.
 
 ## 6b. Auch die Mängelliste wackelt — ein neuer Befund ist noch kein neuer Fehler
 

@@ -85,11 +85,16 @@ Annahme ist damit widerlegt. Ohne diesen Nachtrag stünde hier ein Eintrag, der
 wie eine gelungene Verbesserung aussieht und keine ist — genau die Sorte, vor
 der Lehre 6 warnt.
 
-Die Schwelle wurde **nicht** eigenmächtig hochgesetzt: es gibt mehrere gleich
-vernünftige Wege (eigene Schwelle nur für die Leistung · global höher · einen
-Sprung erst melden, wenn er die nächste Messung übersteht), und die Wahl kostet
-in jedem Fall etwas. Sie liegt bei Klaus, siehe `docs/BRIEF_SCHWELLE_UND_TERMIN.md`.
-Festgehalten ist der Befund in `LEHREN.md` Lehre 6.
+**Entschieden noch am selben Tag (Klaus) und gebaut.** Nicht durch eine höhere
+Zahl — eine Schwelle aus dem bisherigen Maximum ist immer zu niedrig —, sondern
+durch **Bestätigung**: ein Sprung wird gemerkt und erst gemeldet, wenn ihn die
+nächste Messung hält. Nach dieser Regel wäre dieser Eintrag hier nie entstanden.
+
+Dazu, auf Klaus' Zuruf, die **umgekehrte** Vorsicht für die Marktplatz-Karte:
+ein besserer Wert gilt sofort, ein schlechterer erst nach drei Messungen
+hintereinander — *„keiner soll schlechter abschneiden, als wenn er selber
+nachmisst."* Beides steht in `LEHREN.md` Lehre 6c und 6d, mit den drei
+Ehrlichkeits-Bedingungen, unter denen das Entprellen keine Schönfärberei ist.
 
 ### 2026-08-05 · family-projekt.de — statische Links, Ausgangsstand vor dem Bau
 

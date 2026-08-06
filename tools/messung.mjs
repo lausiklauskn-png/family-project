@@ -98,6 +98,11 @@ export const KATEGORIEN = [
 
 const SCHLUESSEL = KATEGORIEN.map((k) => k.schluessel);
 
+/* Wie oft ein schlechterer Wert HINTEREINANDER gemessen werden muss, bevor er
+ * die Karte ändert. Klaus 2026-08-06: „nach drei Messungen ist OK." Ein
+ * besserer Wert gilt sofort — begründet bei `messungBilden`. */
+export const SCHLECHTER_NOETIG = 3;
+
 /* ── Empfohlene Nachbesserungen ────────────────────────────────────────────
  * Lighthouse sagt nicht nur, WIE gut eine Seite ist, sondern auch WAS ihr
  * fehlt. Diese Liste ist der eigentliche Nutzen für einen Anbieter: eine Zahl
@@ -375,15 +380,79 @@ export function messungBilden(a) {
   const m = {};
 
   if (roh.ok && roh.zahlen) {
-    m.stand = "gemessen";
-    for (const k of SCHLUESSEL) m[k] = roh.zahlen[k];
-    m.gemessen = heute;
+    const frisch = {};
+    for (const k of SCHLUESSEL) frisch[k] = roh.zahlen[k];
+    frisch.gemessen = heute;
     /* Woher die Zahl stammt, gehört neben die Zahl. Sonst kann niemand
      * einordnen, warum eine eigene Nachmessung abweicht — und genau daran
      * hat sich Klaus am 2026-08-04 gestoßen. */
-    if (roh.quelle) m.quelle = String(roh.quelle).slice(0, 16);
-    if (roh.werkzeug) m.werkzeug = String(roh.werkzeug).slice(0, 40);
-    if (Array.isArray(roh.hinweise) && roh.hinweise.length) m.hinweise = roh.hinweise;
+    if (roh.quelle) frisch.quelle = String(roh.quelle).slice(0, 16);
+    if (roh.werkzeug) frisch.werkzeug = String(roh.werkzeug).slice(0, 40);
+    if (Array.isArray(roh.hinweise) && roh.hinweise.length) frisch.hinweise = roh.hinweise;
+
+    const uebernehmen = () => {
+      Object.assign(m, frisch);
+      m.stand = "gemessen";
+      /* Der frische Wert IST jetzt der gelistete — kein Doppel, keine
+       * Haltenotiz. Sonst stünde beides da und niemand wüsste, was gilt. */
+      return m;
+    };
+
+    if (!hatZahlen(vorher)) return uebernehmen();       // erste Messung: nichts zu halten
+
+    /* ── Haltefrist für schlechtere Werte (Klaus 2026-08-06) ────────────────
+     * „Keiner soll schlechter abschneiden, als wenn er selber nachmisst."
+     *
+     * Der Grund ist gemessen, nicht gefühlt: Jasons-Tresor lieferte an drei
+     * Nächten 83 · 64 · 97, ohne dass seit dem 2026-08-03 jemand eine Zeile
+     * angefasst hatte. Wer an dem einen schlechten Abend auf die Karte sieht,
+     * liest eine 64 — und bei genügend Pech fällt ein Eintrag unter die
+     * Ausschluss-Grenze und verschwindet aus dem Marktplatz, wegen eines
+     * Würfelwurfs. Ein einzelner schlechter Wert ist kein wahreres Urteil als
+     * ein einzelner guter.
+     *
+     * Also: ein BESSERER Wert gilt sofort. Ein SCHLECHTERER muss DREIMAL
+     * hintereinander gemessen werden, bevor er die Karte ändert.
+     *
+     * WO DIE EHRLICHKEIT SITZT — das ist keine Rosinenpickerei, solange drei
+     * Dinge gelten, und alle drei gelten hier:
+     *   1. Der gezeigte Wert wurde WIRKLICH SO GEMESSEN. Es wird nichts
+     *      gemittelt, geschönt oder aus Teilen zusammengesetzt.
+     *   2. Sein MESSDATUM steht dabei und wandert NICHT mit. Die Karte sagt
+     *      „gemessen am 4.", nicht „gemessen heute".
+     *   3. Der frische Wert wird NICHT weggeworfen: er steht als `frisch` im
+     *      selben Bericht, die Messreihe schreibt ihn ungekürzt fort, und
+     *      `zurueckgehalten` sagt offen, dass ein schlechterer vorliegt.
+     * Fiele eines davon weg, wäre es Schönfärberei. Gegenprobe:
+     * tests/gegenprobe_messung_haltefrist.sh
+     *
+     * ENTSCHIEDEN WIRD AN DER LEISTUNG. Sie ist die Zahl, die schwankt (die
+     * anderen drei standen in denselben drei Nächten still: 92 · 100 · 100),
+     * und sie ist die, an der die Ausschluss-Grenze hängt. Bei Gleichstand
+     * wird übernommen — es gäbe nichts zu schützen.
+     *
+     * UND ES BLEIBT EIN SATZ ZAHLEN AUS EINER MESSUNG. Niemals die gute
+     * Leistung von gestern mit der guten Bedienbarkeit von heute mischen:
+     * die vier Zahlen müssen zu dem Bericht passen, auf den die Karte
+     * verlinkt (Klaus 2026-08-04). Gehalten wird der ganze Satz oder keiner. */
+    if (frisch.leistung >= vorher.leistung) return uebernehmen();
+
+    const bisher = (vorher.zurueckgehalten && vorher.zurueckgehalten.zahl) || 0;
+    const zahl = bisher + 1;
+    if (zahl >= SCHLECHTER_NOETIG) return uebernehmen();
+
+    for (const k of SCHLUESSEL) m[k] = vorher[k];
+    m.stand = vorher.stand === "gemessen" ? "gemessen" : "veraltet";
+    if (vorher.gemessen) m.gemessen = vorher.gemessen;   // wandert NICHT mit
+    if (vorher.quelle) m.quelle = vorher.quelle;
+    if (vorher.werkzeug) m.werkzeug = vorher.werkzeug;
+    if (Array.isArray(vorher.hinweise)) m.hinweise = vorher.hinweise;
+    m.frisch = frisch;
+    m.zurueckgehalten = {
+      zahl,
+      noetig: SCHLECHTER_NOETIG,
+      seit: (vorher.zurueckgehalten && vorher.zurueckgehalten.seit) || heute
+    };
     return m;
   }
 
