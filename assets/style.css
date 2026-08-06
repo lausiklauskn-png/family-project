@@ -530,6 +530,11 @@ h2{font-size:1.55rem;margin:0 0 6px}
 :root[data-theme="neon"] .listing .mk-ms-halt{color:#e8c14a}
 .mk-ms-box .mk-ms-halt{border-left:3px solid #b8860b;padding-left:11px;color:var(--text)!important}
 .mk-ms-box .mk-ms-halt small{opacity:.85}
+/* Sichttest-Band (Klaus 2026-08-06): nur sichtbar mit ?sichttest=halt, dann
+   aber unuebersehbar. Erfundene Zahlen duerfen nie wie ein echter Stand
+   aussehen -- auch nicht auf einem Bildschirmfoto. */
+.mk-sichttest{background:#7a2020;color:#fff;border:2px solid #ff6b6b;border-radius:9px;
+  padding:10px 13px;margin:0 0 14px;font-size:.85rem;line-height:1.45;font-weight:600}
 
 /* Der Hinweis auf der Karte, dass die App bewertet ist und nicht das
    Schaufenster davor. Steht nur bei den Einträgen, die beides haben — bei

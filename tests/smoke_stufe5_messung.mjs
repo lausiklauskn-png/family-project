@@ -990,6 +990,43 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     ok(!!o && o.halt === "", "C6c und wo nichts gehalten wird, steht auch nichts");
   }
 
+  /* C7 — der Sichttest-Schalter (?sichttest=halt).
+   * Er zeigt ERFUNDENE Werte, damit die Zurueckhaltungs-Zeile am Tablet
+   * ansehbar ist, bevor der Fall echt eintritt. Genau deshalb wird hier
+   * geprueft, dass er (a) wirkt, (b) sich LAUT als Vorschau ausweist und
+   * (c) OHNE den Parameter nichts anfasst. Ein Vorschau-Zustand, den man
+   * versehentlich anlaesst, waere die Falle, gegen die die Anzeige gebaut ist. */
+  {
+    const p2 = await browser.newPage();
+    await p2.goto(base + "/markt.html?sichttest=halt", { waitUntil: "load" });
+    await p2.waitForSelector(".listing .mk-mess", { timeout: 20000 }).catch(() => {});
+    await p2.waitForSelector("#mkSichttest", { timeout: 20000 }).catch(() => {});
+    const an = await p2.evaluate(() => ({
+      band: (document.getElementById("mkSichttest") || {}).textContent || "",
+      halt: document.querySelectorAll(".listing .mk-ms-halt").length
+    }));
+    ok(an.halt >= 1, "C7 mit ?sichttest=halt erscheint die Zurueckhaltungs-Zeile (" + an.halt + " Karten)");
+    ok(/ERFUNDENEN/.test(an.band),
+      "C7b und ein Band sagt unuebersehbar, dass die Werte erfunden sind");
+    await p2.close();
+
+    const p3 = await browser.newPage();
+    await p3.goto(base + "/markt.html", { waitUntil: "load" });
+    await p3.waitForSelector(".listing .mk-mess", { timeout: 20000 }).catch(() => {});
+    const aus = await p3.evaluate(() => ({
+      band: !!document.getElementById("mkSichttest"),
+      // Nur die Karten OHNE echten zurueckgehalten-Wert im Bericht zaehlen:
+      // markt-rezeptbuch hat einen echten, der muss bleiben.
+      erfunden: Array.from(document.querySelectorAll(".listing")).filter((e) => {
+        const t = (e.querySelector("h3") || {}).textContent || "";
+        return !/Rezeptbuch/i.test(t) && !!e.querySelector(".mk-ms-halt");
+      }).length
+    }));
+    ok(!aus.band, "C7c ohne den Parameter erscheint kein Band");
+    ok(aus.erfunden === 0, "C7d und keine erfundene Zeile — der Schalter klebt nicht (" + aus.erfunden + ")");
+    await p3.close();
+  }
+
   await browser.close();
   s3.close();
 }

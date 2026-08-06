@@ -98,6 +98,24 @@ bricht 'var z = m && m.zurueckgehalten;
 lauf "kein Schutz gegen fehlendes Feld" rot
 heile
 
+echo; echo "I · Der Sichttest-Schalter wirkt AUCH OHNE Parameter"
+echo "     (dann stuenden erfundene Zahlen auf der echten Seite -- der schlimmste Fall)"
+bricht "if (!/[?&]sichttest=halt\\\\b/.test(location.search)) return;|||if (false) return;" "$H"
+lauf "Vorschau ohne Parameter aktiv" rot
+heile
+
+echo; echo "J · Die erfundenen Werte erscheinen OHNE Warnband"
+echo "     (ein Bildschirmfoto daraus waere von einem echten Stand nicht zu unterscheiden)"
+bricht 'if (getroffen) sichttestBand();|||' "$H"
+lauf "Vorschau ohne Warnung" rot
+heile
+
+echo; echo "K · Der Schalter tut gar nichts"
+echo "     (ein Sichttest, den man nicht fahren kann, ist keiner)"
+bricht 'var ids = Object.keys(MESSUNG), getroffen = 0;|||var ids = [], getroffen = 0;' "$H"
+lauf "Schalter wirkungslos" rot
+heile
+
 echo; echo "═══ Endstand ═══"
 lauf "wieder unveraenderter Stand" gruen
 git status --short
