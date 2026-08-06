@@ -262,6 +262,34 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
   ok(journal() === vorher, "und erzeugt keinen Eintrag");
 }
 
+/* ---- 6f · Die Messreihe sieht die ECHTE Messung, nicht den Karten-Wert -----
+ * Seit dem 2026-08-06 haelt die Karte einen schlechteren Wert bis zu dreimal
+ * zurueck (tools/messung.mjs). Der zurueckgehaltene Wert steht dann in
+ * `messung`, der wirklich gemessene daneben in `messung.frisch`. Die Forschung
+ * MUSS den frischen nehmen — sonst verloere sie genau die Ausreisser, wegen
+ * derer die Haltefrist ueberhaupt gebaut wurde. */
+{
+  const vorZahl = punkte().length;
+  fs.writeFileSync(path.join(buehne, "assets", "config", "spore-stand.json"), JSON.stringify({
+    geprueft: "2026-08-17T02:40:00.000Z",
+    eintraege: { "probe-seite": { nodeName: "Probe-Seite", messung: {
+      // Der GELISTETE (zurueckgehaltene) Wert — alt, mit altem Datum:
+      stand: "gemessen", leistung: 100, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100,
+      gemessen: "2026-08-16", quelle: "eigen", werkzeug: "13.4.1", hinweise: [],
+      url: "https://beispiel.invalid/probe/",
+      zurueckgehalten: { zahl: 1, noetig: 3, seit: "2026-08-17" },
+      // Was heute WIRKLICH gemessen wurde:
+      frisch: { leistung: 41, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100,
+                gemessen: "2026-08-17", quelle: "eigen", werkzeug: "13.4.1" }
+    } } }
+  }));
+  lauf("--nachtragen");
+  const letzt = punkte()[punkte().length - 1];
+  ok(punkte().length === vorZahl + 1 && letzt.leistung === 41,
+    "die Messreihe schreibt den WIRKLICH gemessenen Wert fort (" + letzt.leistung + "), nicht den gehaltenen 100");
+  ok(letzt.von === "2026-08-17", "und datiert ihn auf den Tag der echten Messung (" + letzt.von + ")");
+}
+
 /* ---- 7 · Die eigene Zielliste -------------------------------------------- */
 /* `messziele.json` ist von Hand gepflegt. Ein Tippfehler darin fällt sonst erst
  * in der Nacht auf, und dann nur als eine Zeile in einem Aktions-Protokoll,

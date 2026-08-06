@@ -133,8 +133,14 @@ function messungenSammeln(stand) {
       return t && !/^https?:$/.test(t) ? t : "";
     };
     const name = e.nodeName || ausUrl(e.messung && e.messung.url) || id;
-    nimm(e.messung, id, name);
-    nimm(e.messung && e.messung.schaufenster, `${id}--schaufenster`,
+    /* Die Messreihe bekommt IMMER die echte Messung, nie den zurückgehaltenen
+     * Karten-Wert (Haltefrist seit 2026-08-06, siehe tools/messung.mjs). Sonst
+     * verlöre die Station genau die Beweise, mit denen der Ausreißer überhaupt
+     * aufgefallen ist — an Jasons-Tresor 83 · 64 · 97. Die Karte darf einen
+     * schlechten Würfelwurf aussitzen; die Forschung darf ihn nicht vergessen. */
+    const echt = (mess) => (mess && mess.frisch ? { ...mess, ...mess.frisch } : mess);
+    nimm(echt(e.messung), id, name);
+    nimm(echt(e.messung && e.messung.schaufenster), `${id}--schaufenster`,
       `${name} (Schaufenster)`);
   }
   return raus;
