@@ -82,6 +82,36 @@ Wenn du etwas auf einer Bildschirmgröße abschaltest, um dort schneller zu
 werden: **du hast das Problem nicht gelöst, du hast es verschoben.** Miss die
 andere Größe, bevor du „behoben" meldest.
 
+### Der Normalfall — und die zwei Ausreißer
+
+Ganzes Netz, beide Geräte, 2026-08-06 auf derselben Maschine gemessen:
+
+| Seite | Handy | Computer | Ladezeit H → C | Blockierzeit H → C |
+|---|---|---|---|---|
+| Muttis Rezeptbuch | 48 | **90** | 8,7 → 1,5 s | 370 → 0 ms |
+| Sage-Protokol | 69 | **96** | 7,1 → 1,4 s | 150 → 0 ms |
+| SB-KIMTool-Point | 86 | **96** | 3,8 → 0,7 s | 40 → 0 ms |
+| Mein-WorkFloh | 95 | **100** | 2,1 → 0,5 s | 190 → 0 ms |
+| Tomys WorkFloh | 93 | **100** | 2,9 → 0,6 s | 150 → 10 ms |
+| **Tomys Hub (Wurzel)** | 85 | **68** ⚠ | 1,6 → 0,5 s | 580 → **4.430 ms** |
+| **Tomys Schaufenster** | 99 | **69** ⚠ | 2,3 → 0,6 s | 0 → **4.840 ms** |
+
+**So sieht der Normalfall aus:** der Computer ist deutlich besser, genau wie man
+es erwartet — Muttis +42, Sage +27, Point +10.
+
+**Genau zwei Seiten drehen das um.** Beide tragen den WebGL-Hintergrund. Die
+dritte Seite desselben Repos (Tomys WorkFloh) trägt ihn nicht und erreicht am
+Computer **100**. Ein sauberer Beweis innerhalb eines einzigen Repos, mit
+demselben Gerüst und derselben Bau-Maschine.
+
+Bei allen anderen Seiten liegt die Blockierzeit am Computer bei **0 ms** — bei
+den beiden Ausreißern bei über **4.400 ms**.
+
+> **Nebenbefund, nicht übersehen:** bei SB-KIMTool-Point ist der **Layout-Sprung
+> am Computer schlechter** als am Handy (0,103 gegen 0,052) — die
+> `min-height`-Reservierung greift dort, wo die Leiste umbricht, aber nicht am
+> breiten Fenster. Auch das findet man nur, wenn man beide misst.
+
 ---
 
 ## Regel 2 — Drei Runden, im Wechsel
