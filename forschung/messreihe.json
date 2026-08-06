@@ -21,6 +21,22 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 92,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: JavaScript komprimieren"
+     ]
     }
    ]
   },
@@ -105,6 +121,25 @@
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 97,
+     "bedienbarkeit": 92,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: select-Elemente haben keine zugehörigen label-Elemente.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
    ]
   },
@@ -127,6 +162,22 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
     }
    ]
   },
@@ -136,7 +187,7 @@
    "punkte": [
     {
      "von": "2026-08-04",
-     "bis": "2026-08-04",
+     "bis": "2026-08-06",
      "leistung": 100,
      "bedienbarkeit": 100,
      "gute_praxis": 100,
@@ -190,6 +241,24 @@
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 100,
+     "bedienbarkeit": 96,
+     "gute_praxis": 96,
+     "auffindbarkeit": 90,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "auffindbarkeit: Links können nicht gecrawlt werden",
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
    ]
   },
@@ -234,6 +303,25 @@
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 99,
+     "bedienbarkeit": 93,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -272,6 +360,22 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 98,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -297,6 +401,25 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 75,
+     "bedienbarkeit": 91,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Dokument hat keine Hauptmarkierung.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: JavaScript komprimieren"
+     ]
     }
    ]
   },
@@ -315,6 +438,25 @@
      "werkzeug": "13.4.1",
      "mangel": [
       "auffindbarkeit: Dokument enthält keine Meta-Beschreibung",
+      "auffindbarkeit: Links können nicht gecrawlt werden",
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: JavaScript komprimieren",
+      "leistung: Mehrere Weiterleitungen auf die Seite vermeiden",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 79,
+     "bedienbarkeit": 91,
+     "gute_praxis": 96,
+     "auffindbarkeit": 91,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
       "auffindbarkeit: Links können nicht gecrawlt werden",
       "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
       "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
@@ -346,6 +488,23 @@
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 74,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: First Contentful Paint",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -357,6 +516,23 @@
      "von": "2026-08-04",
      "bis": "2026-08-04",
      "leistung": 56,
+     "bedienbarkeit": 94,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Reduziere nicht verwendetes JavaScript",
+      "leistung: Total Blocking Time"
+     ]
+    },
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 58,
      "bedienbarkeit": 94,
      "gute_praxis": 100,
      "auffindbarkeit": 100,
@@ -664,7 +840,124 @@
      ]
     }
    ]
+  },
+  "eigen-kuechenzettel": {
+   "name": "Küchenzettel",
+   "url": "https://lausiklauskn-png.github.io/Kuechenzettel/",
+   "punkte": [
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 100,
+     "bedienbarkeit": 84,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Dokument hat keine Hauptmarkierung.",
+      "bedienbarkeit: Überschriftenelemente sind nicht in einer fortlaufenden absteigenden Reihenfolge angeordnet",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  },
+  "eigen-muttis-rezeptbuch": {
+   "name": "Muttis Rezeptbuch",
+   "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/",
+   "punkte": [
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 56,
+     "bedienbarkeit": 95,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: JavaScript komprimieren",
+      "leistung: Mehrere Weiterleitungen auf die Seite vermeiden",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "eigen-sage": {
+   "name": "Sage-Protokol",
+   "url": "https://lausiklauskn-png.github.io/Sage-Protokol/",
+   "punkte": [
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 65,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: JavaScript komprimieren",
+      "leistung: Largest Contentful Paint",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    }
+   ]
+  },
+  "eigen-sage-pinnwand": {
+   "name": "Sage · Pinnwand",
+   "url": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
+   "punkte": [
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
+  },
+  "eigen-sage-suchtool": {
+   "name": "Sage · Such-Tool",
+   "url": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
+   "punkte": [
+    {
+     "von": "2026-08-06",
+     "bis": "2026-08-06",
+     "leistung": 100,
+     "bedienbarkeit": 93,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    }
+   ]
   }
  },
- "gepflegt": "2026-08-05"
+ "gepflegt": "2026-08-06"
 }

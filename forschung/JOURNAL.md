@@ -21,6 +21,19 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-06 · Jasons-Tresor
+
+<https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 64 → 97** (↑ 33)
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung weg: leistung: Largest Contentful Paint
+- Beanstandung neu: gute_praxis: Es wurden Browserfehler in der Konsole protokolliert
+- Beanstandung neu: leistung: Bildübermittlung verbessern
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-05 · family-projekt.de — statische Links, Ausgangsstand vor dem Bau
 
 <https://family-projekt.de/> · von Hand eingetragen, nicht vom Werkzeug
