@@ -345,7 +345,37 @@ console.log("\n8 — Probelauf ohne --schreiben");
  * niemand sieht, ist so gut wie keiner.
  *
  * Gefahren wird die echte markt.html mit dem echten Studio; nur die Datei
- * spore-stand.json kommt vom Test — sonst hinge er am nächtlichen Lauf. */
+ * spore-stand.json kommt vom Test — sonst hinge er am nächtlichen Lauf.
+ *
+ * WARUM DER WÄHLER AUF DEN SPOREN-BLOCK EINGEGRENZT IST (2026-08-06):
+ * Der Test stand auf „drei Zeilen im Bericht (7)" und zählte vier Zeilen zu
+ * viel. Die Vermutung lag nahe, es seien Einträge mit `sporeUrl` dazugekommen,
+ * und die bequeme Reparatur wäre gewesen, die 3 auf 7 hochzusetzen. Beides
+ * wäre falsch gewesen. Gemessen (nicht geraten, LEHREN.md Lehre 2):
+ *
+ *   Block [data-role=sporen]:  3  — Rezeptbuch · Mixarium · BookLedgerPro
+ *   Block [data-role=messung]: 4  — Rezeptbuch · Mixarium · Kimboard · Tomys Hub
+ *
+ * Der Sporen-Bericht hatte also die ganze Zeit genau die erwarteten drei
+ * Zeilen. Die anderen vier gehören der Messung (Stufe 5, seit 2026-08-01),
+ * die für ihre Zeilen dieselbe CSS-Klasse benutzt — und die zählte der
+ * ungefilterte `document.querySelectorAll(".fpst-sporezeile")` mit. Sie
+ * stammen aus dem ECHTEN `assets/config/messung-hand.json`, denn nur
+ * spore-stand.json kommt vom Test; alles andere liefert das Repo.
+ *
+ * Damit hing eine Zahl über den Bericht an einer Datei, die mit dem Bericht
+ * nichts zu tun hat: jede von Hand nachgetragene Messung hätte den Test
+ * umgeworfen, und 7 wäre morgen 8. Deshalb misst er jetzt den Block, über den
+ * er eine Aussage macht — und nur den. Die erwartete Zahl bleibt 3.
+ *
+ * Die Eingrenzung heilt nebenbei eine zweite, stillere Schwäche: die
+ * XSS-Prüfung weiter unten griff sich das erste `small` IRGENDEINER Zeile.
+ * Wäre eine Messzeile mit `small` (die Ausschluss-Warnung) vorn gelandet,
+ * hätte sie einen harmlosen Text geprüft und wäre grün geblieben, ohne je
+ * den fremden Text anzusehen.
+ *
+ * Gegenprobe in beide Richtungen: tests/gegenprobe_stufe2_sporen.sh */
+const SPZ = "[data-role=sporen] .fpst-sporezeile";
 console.log("\n9 — Sporen-Bericht im Studio (Browser)");
 {
   const http = await import("node:http");
@@ -381,11 +411,11 @@ console.log("\n9 — Sporen-Bericht im Studio (Browser)");
   await page.waitForFunction(() => !!window.FPStudio, null, { timeout: 20000 });
   await page.evaluate(() => window.FPStudio.open());
   // Auf das Ergebnis warten, nicht auf die Uhr: der Bericht wird geholt.
-  await page.waitForSelector(".fpst-sporezeile", { timeout: 20000 }).catch(() => {});
+  await page.waitForSelector(SPZ, { timeout: 20000 }).catch(() => {});
 
-  const z = await page.evaluate(() => Array.from(document.querySelectorAll(".fpst-sporezeile")).map((e) => ({
+  const z = await page.evaluate((sel) => Array.from(document.querySelectorAll(sel)).map((e) => ({
     text: e.textContent, knopf: !!e.querySelector("[data-sptake]"), warn: e.classList.contains("is-warn")
-  })));
+  })), SPZ);
   ok(z.length === 3, "drei Zeilen im Bericht (" + z.length + ")");
   ok(z[0] && z[0].knopf && z[0].warn, "die wartende Zeile steht oben, ist hervorgehoben und hat einen Knopf");
   ok(z.filter((x) => x.knopf).length === 1, "nur die geänderte Zeile hat einen Knopf");
@@ -396,10 +426,10 @@ console.log("\n9 — Sporen-Bericht im Studio (Browser)");
   // würde als textContent und als innerHTML gleich aussehen, und die Prüfung
   // wäre wertlos. Beim Bauen genau so passiert (2026-08-02) — die Gegenprobe
   // blieb grün, bis hier echtes Markup stand.
-  const roh = await page.evaluate(() => {
-    const e = document.querySelector(".fpst-sporezeile small");
+  const roh = await page.evaluate((sel) => {
+    const e = document.querySelector(sel + " small");
     return e ? { txt: e.textContent, kinder: e.children.length } : null;
-  });
+  }, SPZ);
   ok(roh && roh.txt.indexOf("<img") >= 0 && roh.kinder === 0,
      "fremder Text steht als Text da, nicht als HTML (kein Element daraus gebaut)");
 
