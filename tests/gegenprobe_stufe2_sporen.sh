@@ -71,8 +71,11 @@ python3 - <<'EOF'
 import json, collections
 p='assets/config/messung-hand.json'
 d=json.load(open(p), object_pairs_hook=collections.OrderedDict)
-d['markt-kimseek']={"gemessen":"2026-08-06","leistung":88,"barrierefreiheit":95,
-                    "gute_praxis":96,"seo":92,"url":"https://example.invalid/gegenprobe/"}
+# Feldnamen exakt wie in MS_KAT -- mit falschen Namen verwirft msZahlen() den
+# Eintrag lautlos, es entsteht keine Zeile, und die Probe misst nichts (genau
+# das ist am 2026-08-06 beim ersten Lauf passiert).
+d['markt-kimseek']={"leistung":88,"bedienbarkeit":95,"gute_praxis":96,
+                    "auffindbarkeit":92,"gemessen":"2026-08-06"}
 json.dump(d, open(p,'w'), indent=2, ensure_ascii=False)
 EOF
 lauf "ungefiltert + 7, eine Messung mehr" rot
@@ -84,8 +87,11 @@ python3 - <<'EOF'
 import json, collections
 p='assets/config/messung-hand.json'
 d=json.load(open(p), object_pairs_hook=collections.OrderedDict)
-d['markt-kimseek']={"gemessen":"2026-08-06","leistung":88,"barrierefreiheit":95,
-                    "gute_praxis":96,"seo":92,"url":"https://example.invalid/gegenprobe/"}
+# Feldnamen exakt wie in MS_KAT -- mit falschen Namen verwirft msZahlen() den
+# Eintrag lautlos, es entsteht keine Zeile, und die Probe misst nichts (genau
+# das ist am 2026-08-06 beim ersten Lauf passiert).
+d['markt-kimseek']={"leistung":88,"bedienbarkeit":95,"gute_praxis":96,
+                    "auffindbarkeit":92,"gemessen":"2026-08-06"}
 json.dump(d, open(p,'w'), indent=2, ensure_ascii=False)
 EOF
 lauf "Mess-Block waechst, Bericht-Pruefung bleibt ruhig" gruen
