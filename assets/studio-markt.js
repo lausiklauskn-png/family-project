@@ -105,6 +105,7 @@
       ms_regler_wirkung_n: " Einträge fallen damit aus dem Marktplatz.",
       ms_regler_hint: "Wirkt erst nach dem Veröffentlichen. Einträge OHNE Messwert werden nie ausgeblendet — „noch nicht gemessen\" ist kein schlechter Wert. Was der Regler wegnimmt, bleibt hier in der Liste sichtbar, damit niemand still verschwindet.",
       ms_raus: "unter der Schwelle — wird nicht gelistet",
+      ms_halt: "neuere Messung war schlechter — Wert wird noch gehalten:",
       ph_name: "z. B. Mein Tool", ph_desc: "Was macht das Tool? Frei und mit Synonymen — hilft der Suche.",
       ph_url: "https://…", ph_imgurl: "https://…/bild.png", ph_cat: "z. B. Werkzeug, Spiel, Büro",
       ph_tags: "z. B. notizen, offline, pwa", ph_by: "z. B. @extern",
@@ -233,6 +234,7 @@
       ms_regler_wirkung_n: " entries drop out of the marketplace.",
       ms_regler_hint: "Takes effect after publishing. Entries WITHOUT a measurement are never hidden — \"not measured yet\" is not a bad value. Whatever the slider removes stays visible in this list, so nobody disappears silently.",
       ms_raus: "below the threshold — not listed",
+      ms_halt: "a more recent measurement was worse — value still held:",
       ph_name: "e.g. My Tool", ph_desc: "What does the tool do? Free text with synonyms — helps search.",
       ph_url: "https://…", ph_imgurl: "https://…/image.png", ph_cat: "e.g. Tool, Game, Office",
       ph_tags: "e.g. notes, offline, pwa", ph_by: "e.g. @extern",
@@ -1044,6 +1046,22 @@
       if (m.grund) txt += " — " + (m.grund === "noch_nicht_dran" ? T("ms_g_noch_nicht_dran") : m.grund);
       stand.textContent = txt;
       zeile.appendChild(stand);
+
+      /* Zurueckgehaltener Wert (Klaus 2026-08-06): die Karte zeigt noch die
+       * aeltere, bessere Messung, weil die neueren schlechter waren. Das
+       * gehoert auch hierher -- Klaus sieht im Studio nach, warum eine Zahl
+       * steht, und "sie ist gehalten" ist die Antwort. Fail-soft: fehlt das
+       * Feld, entsteht keine Zeile. */
+      var zh = m.zurueckgehalten;
+      if (zh && zh.zahl) {
+        var halt = document.createElement("small");
+        halt.className = "fpst-halt";
+        var frisch = m.frisch && typeof m.frisch.leistung === "number"
+          ? " (" + T("ms_leistung") + " " + m.frisch.leistung + " am " + String(m.frisch.gemessen || "").slice(0, 10) + ")"
+          : "";
+        halt.textContent = "⏳ " + T("ms_halt") + " " + zh.zahl + "/" + (zh.noetig || 3) + frisch;
+        zeile.appendChild(halt);
+      }
 
       if (msRaus(m)) {
         var raus = document.createElement("small");

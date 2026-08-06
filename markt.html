@@ -286,6 +286,12 @@
         mk_ms_von: "gemessen am ",
         mk_ms_von_hand: "abgelesen am ",
         mk_ms_alt: "Diese Zahlen stammen vom letzten geglückten Lauf — die jüngste Messung ist fehlgeschlagen.",
+        // Kurz an der Karte, ausführlich im Fenster — dasselbe Muster wie beim
+        // von Hand eingetragenen Wert. Die Platzhalter {n}/{v} werden mit dem
+        // Stand der Zählung gefüllt.
+        mk_ms_halt: "Neuere Messungen waren schlechter ({n} von {v}) — die Zahl gilt noch.",
+        mk_ms_halt_lang: "Wir haben diese Seite seitdem gemessen und dabei einen schlechteren Wert bekommen ({n} von {v} Mal hintereinander). Angezeigt wird trotzdem noch die ältere, bessere Messung — und zwar aus einem gemessenen Grund: dieselbe unveränderte Seite lieferte an drei Nächten 83, 64 und 97 Punkte, ohne dass jemand eine Zeile geändert hatte. Ein einzelner schlechter Wert ist deshalb kein wahreres Urteil als ein einzelner guter, und niemand soll wegen eines Ausreißers schlechter dastehen. Erst wenn {v} Mal hintereinander schlechter gemessen wird, ändert sich die Zahl; eine bessere Messung dazwischen setzt die Zählung zurück. Was hier steht, wurde wirklich so gemessen, und das Datum daneben ist das seiner Messung — nicht das von heute.",
+        mk_ms_halt_neu: "zuletzt gemessen: ",
         mk_ms_mehr: "📊 Bewertung nachlesen",
         mk_ms_dlg_h: "Technische Bewertung",
         mk_ms_dlg_was: "Diese Seite wird einmal pro Nacht mit Google Lighthouse gemessen — dem Werkzeug, das auch in Chrome eingebaut ist. Gemessen wird von uns, auf einem fremden Rechner, an der öffentlich erreichbaren Seite. Der Anbieter kann seine Werte weder selbst eintragen noch beschönigen; er sieht dieselben Zahlen wie du.",
@@ -404,6 +410,9 @@
         mk_ms_von: "measured on ",
         mk_ms_von_hand: "read off on ",
         mk_ms_alt: "These numbers are from the last successful run — the most recent measurement failed.",
+        mk_ms_halt: "More recent measurements were worse ({n} of {v}) — this number still stands.",
+        mk_ms_halt_lang: "We have measured this page since and got a worse result ({n} of {v} times in a row). What is shown is still the older, better measurement — for a measured reason: the same unchanged page returned 83, 64 and 97 points on three consecutive nights, without anyone changing a line. A single bad value is therefore no truer a verdict than a single good one, and nobody should look worse because of an outlier. Only after {v} worse measurements in a row does the number change; a better measurement in between resets the count. What stands here was really measured that way, and the date beside it is the date of that measurement — not today's.",
+        mk_ms_halt_neu: "last measured: ",
         mk_ms_mehr: "📊 Read the rating",
         mk_ms_dlg_h: "Technical rating",
         mk_ms_dlg_was: "This page is measured once a night with Google Lighthouse — the same tool built into Chrome. We measure it, on someone else's machine, against the publicly reachable page. The provider can neither enter nor polish their own numbers; they see exactly what you see.",
@@ -644,6 +653,25 @@
             '<span aria-hidden="true">' + MS_ICON[k] + '</span> <b>' + esc(String(mm[k])) + '</b></span>';
         }).join("");
       }
+      /* Die Zurueckhaltungs-Zeile (Klaus 2026-08-06).
+       *
+       * Der gelistete Wert bleibt stehen, wenn eine NEUERE Messung schlechter
+       * war -- bis dreimal hintereinander schlechter gemessen wurde. Das ist
+       * gewollt (siehe tools/messung.mjs), aber es darf nicht UNSICHTBAR sein:
+       * sonst steht auf der Karte eine Zahl, zu der es stillschweigend eine
+       * neuere, schlechtere gibt. Genau daran haengt, ob das Entprellen noch
+       * ehrlich ist oder schon Schoenfaerberei.
+       *
+       * Fail-soft: fehlt das Feld (alter Bericht, fremder Knoten, erster Lauf),
+       * entsteht einfach keine Zeile -- nie ein Loch, nie ein Fehler. */
+      function msHalt(m, schluessel) {
+        var z = m && m.zurueckgehalten;
+        if (!z || !z.zahl) return "";
+        return String(FP.t(schluessel))
+          .replace(/\{n\}/g, String(z.zahl))
+          .replace(/\{v\}/g, String(z.noetig || 3));
+      }
+
       function messungBand(x) {
         // ZWEI verschiedene Nichts, und sie sehen unterschiedlich aus (Klaus'
         // Befund 2026-08-01, „ich sehe gar nichts"):
@@ -682,6 +710,9 @@
           // darf nie aussehen wie eine eigene Messung — sonst waere die Zahl
           // genau so viel wert wie die Behauptung dahinter.
           (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t("mk_ms_hand")) + '</p>' : '') +
+          // Es gibt eine neuere, schlechtere Messung — das gehoert an die
+          // Karte, nicht nur in die Datei.
+          (msHalt(m, "mk_ms_halt") ? '<p class="mk-ms-halt">' + esc(msHalt(m, "mk_ms_halt")) + '</p>' : '') +
           // Nur wo es einen Unterschied GIBT, wird er auch benannt. Zwölf von
           // vierzehn Einträgen verlinken die App direkt — dort wäre der Hinweis
           // bloß Lärm. Bei den zwei mit vorgeschalteter Seite steht er, damit
@@ -832,6 +863,15 @@
               (m.quelle ? ' · ' + esc(FP.t(m.quelle === "google" ? "mk_ms_q_google" : "mk_ms_q_eigen")) : '') + '</p>' +
             (m.stand === "veraltet" ? '<p class="mk-ms-alt">' + esc(FP.t("mk_ms_alt")) + '</p>' : '') +
             (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t("mk_ms_hand_lang")) + '</p>' : '') +
+            // Im Fenster steht der ganze Grund — und die neuere Zahl selbst,
+            // damit niemand sie suchen muss.
+            (msHalt(m, "mk_ms_halt_lang")
+              ? '<p class="mk-ms-halt">' + esc(msHalt(m, "mk_ms_halt_lang")) +
+                (m.frisch && msZahlen(m.frisch)
+                  ? '<br><small>' + esc(FP.t("mk_ms_halt_neu")) + esc(msDatum(m.frisch.gemessen)) +
+                    ' · ' + msReihe(m.frisch) + '</small>'
+                  : '') + '</p>'
+              : '') +
             '<p class="mk-ms-dlg-was">' + esc(FP.t("mk_ms_dlg_was")) + '</p>' +
             '<p class="mk-ms-dlg-technisch">' + esc(FP.t("mk_ms_dlg_technisch")) + '</p>' +
             '<p class="mk-ms-dlg-farben">' + esc(FP.t("mk_ms_dlg_farben")) + '</p>' +
