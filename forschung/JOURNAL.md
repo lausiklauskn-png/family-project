@@ -21,6 +21,36 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-06 · family-projekt.de — Zwischenstand, **13 Tage vor dem Termin**
+
+<https://family-projekt.de/> · von Hand eingetragen, nicht vom Werkzeug
+
+**In der Search Console wurde nichts nachgesehen, und das ist der Inhalt dieses
+Eintrags, nicht sein Fehlen.** Der Ausgangs-Eintrag vom 2026-08-05 nennt den
+**2026-08-19** als frühesten Termin. Heute ist der 6. August. Wer jetzt
+nachsähe und nichts fände, hätte nichts widerlegt — er hätte nur zu früh
+geschaut und danach eine Zahl im Kopf, die nichts bedeutet. Die vier Zahlen
+(indexierte Seiten · Klicks im Monat · Adressen in der Sitemap · Verweis von
+family-projekt.de in der Search Console **einzelner Apps**) werden am 19.
+aufgeschrieben, nicht vorher.
+
+Unverändert steht der Ausgangsstand: 4 indexierte Seiten, 8 Klicks im Monat,
+12 Adressen in der Sitemap.
+
+**Nachgezählt im ausgelieferten HTML** (das kostet nichts und hängt an keinem
+Termin): `markt.html` 14 Außen-Links · `werkzeuge.html` 11 · `netzwerk.html` 1
+· `index.html` **0**. Die Null auf der Startseite ist so gewollt — sie listet
+keine Apps, sie führt zu den Unterseiten, und die sind verlinkt.
+
+**Noch nie scharf gewesen, weil es den Fall noch nicht gibt:** 0 von 14
+Marktplatz-Einträgen sind fremd (alle tragen `own`), und alle 13 externen
+Werkzeug-Adressen liegen auf `lausiklauskn-png.github.io`. Die Regeln für
+fremde Einträge (`nofollow ugc`) und fremde Werkzeug-Hosts sind also gebaut
+und gegengeprobt, aber im Echtbetrieb ungetestet.
+
+**Warum:** kein Bau an der Seite, nur Wartung an den Wächtern (siehe
+`docs/BRIEF_SCHWELLE_UND_TERMIN.md`).
+
 ### 2026-08-06 · Jasons-Tresor
 
 <https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
@@ -32,7 +62,34 @@ die nächste Seite von vornherein gebaut wird.
 - Beanstandung neu: leistung: Bildübermittlung verbessern
 - Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
 
-**Warum:** _(noch nicht eingetragen)_
+**Warum:** Gar nicht. Es wurde nichts gebaut — der letzte Commit in
+Jasons-Tresor ist vom **2026-08-03**, also älter als alle drei Messungen. Die
+Reihe zeigt an dieser unveränderten Seite, dreimal von Google, mit derselben
+Werkzeug-Fassung 13.4.1:
+
+| gemessen | Leistung | Bedienbarkeit | gute Praxis | Auffindbarkeit |
+|---|---|---|---|---|
+| 2026-08-04 | 83 | 92 | 100 | 100 |
+| 2026-08-05 | **64** | 92 | 100 | 100 |
+| 2026-08-06 | **97** | 92 | 96 | 100 |
+
+Zwischen dem tiefsten und dem höchsten Wert liegen **33 Punkte**, ohne dass
+jemand eine Zeile angefasst hat. Die anderen drei Zahlen stehen dabei
+praktisch still (92 · 100/96 · 100) — es ist **allein die Leistung**, die so
+weit ausschlägt.
+
+Das ist kein Erfolg, sondern ein Fehlalarm, und zwar einer, der durch unseren
+eigenen Filter gelaufen ist: die Schwelle steht auf 20, weil am 2026-08-05 an
+unveränderten Seiten höchstens 19 Punkte Streuung gemessen worden waren. Diese
+Annahme ist damit widerlegt. Ohne diesen Nachtrag stünde hier ein Eintrag, der
+wie eine gelungene Verbesserung aussieht und keine ist — genau die Sorte, vor
+der Lehre 6 warnt.
+
+Die Schwelle wurde **nicht** eigenmächtig hochgesetzt: es gibt mehrere gleich
+vernünftige Wege (eigene Schwelle nur für die Leistung · global höher · einen
+Sprung erst melden, wenn er die nächste Messung übersteht), und die Wahl kostet
+in jedem Fall etwas. Sie liegt bei Klaus, siehe `docs/BRIEF_SCHWELLE_UND_TERMIN.md`.
+Festgehalten ist der Befund in `LEHREN.md` Lehre 6.
 
 ### 2026-08-05 · family-projekt.de — statische Links, Ausgangsstand vor dem Bau
 
