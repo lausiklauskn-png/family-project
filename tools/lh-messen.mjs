@@ -1,5 +1,5 @@
 /* Lighthouse gegen einen Server, der Klaus' Caddy nachbildet.
- *   node tools/lh-messen.mjs werkzeuge.html [--trace]
+ *   node tools/lh-messen.mjs werkzeuge.html [--trace] [--desktop|--beides]
  *
  * Zwingend (jedes einzelne hat schon Zeit gekostet, siehe Brief § 5):
  *   - gzip AN, sonst misst man den Prüfserver statt der Seite.
@@ -8,6 +8,16 @@
  *     Ein eigener PerformanceObserver-Aufbau misst 0, weil ungedrosselt
  *     alle zwanzig Skripte vor dem ersten Bild fertig sind.
  *   - Welches Element springt, sagt erst der Trace (--trace), nicht der Bericht.
+ *
+ * HANDY UND COMPUTER SIND ZWEI VERSCHIEDENE MESSUNGEN (Klaus 2026-08-06).
+ * PageSpeed zeigt beide, und sie können weit auseinanderliegen — in BEIDE
+ * Richtungen. Wer nur eine misst, übersieht die Hälfte. Voreinstellung bleibt
+ * HANDY (das ist auch Googles Voreinstellung und die strengere Messung);
+ * `--desktop` misst den Computer, `--beides` misst nacheinander beide.
+ * Der Unterschied ist NICHT nur „Computer ist schneller": Lighthouse ändert
+ * mit dem Gerät auch die FENSTERBREITE (412 px gegen 1350 px). Eine Seite kann
+ * am Computer schlechter dastehen, weil dort ein anderes, größeres Element zum
+ * LCP-Element wird oder ein Umbruch anders fällt. Immer beide Werte nennen.
  */
 import http from "node:http";
 import fs from "node:fs";
@@ -27,6 +37,25 @@ const ROOT = process.env.LH_ROOT || path.resolve(path.dirname(fileURLToPath(impo
 const SEITE = process.argv[2] || "werkzeuge.html";
 const MIT_TRACE = process.argv.includes("--trace");
 const LAEUFE = Number((process.argv.find((a) => a.startsWith("--laeufe=")) || "").split("=")[1] || 1);
+
+/* Gerät: handy (Voreinstellung) · desktop · beides.
+ * Die Desktop-Werte sind die von Lighthouse selbst mitgelieferte Desktop-
+ * Voreinstellung (1350x940, kein Mobil-Kennzeichner, deutlich schwächere
+ * Drosselung) — nicht selbst zusammengestellt, damit die Zahlen mit dem
+ * vergleichbar sind, was Klaus in PageSpeed unter „Computer" sieht. */
+const GERAETE = process.argv.includes("--beides")
+  ? ["handy", "desktop"]
+  : [process.argv.includes("--desktop") ? "desktop" : "handy"];
+const DESKTOP_CONFIG = {
+  extends: "lighthouse:default",
+  settings: {
+    formFactor: "desktop",
+    screenEmulation: { mobile: false, width: 1350, height: 940, deviceScaleFactor: 1, disabled: false },
+    throttling: { rttMs: 40, throughputKbps: 10240, cpuSlowdownMultiplier: 1,
+      requestLatencyMs: 0, downloadThroughputKbps: 0, uploadThroughputKbps: 0 },
+    emulatedUserAgentString: false,
+  },
+};
 
 const MIME = { ".html":"text/html",".js":"text/javascript",".mjs":"text/javascript",".css":"text/css",
   ".json":"application/json",".svg":"image/svg+xml",".png":"image/png",".webp":"image/webp",
@@ -60,17 +89,19 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const pw = await import("playwright-core");
 const exe = process.env.PW_CHROMIUM || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 
+for (const GERAET of GERAETE) {
+const LH_CONFIG = GERAET === "desktop" ? DESKTOP_CONFIG : undefined;
 for (let lauf = 1; lauf <= LAEUFE; lauf++) {
   const browser = await pw.chromium.launch({
     executablePath: exe,
     args: ["--no-sandbox", "--use-gl=swiftshader", "--enable-unsafe-swrast", "--remote-debugging-port=9222"],
   });
   const lh = (await import("lighthouse")).default;
-  const res = await lh(`${base}/${SEITE}`, { port: 9222, output: "json", logLevel: "error" });
+  const res = await lh(`${base}/${SEITE}`, { port: 9222, output: "json", logLevel: "error" }, LH_CONFIG);
   const r = res.lhr;
 
   const kat = (k) => (r.categories[k] ? Math.round(r.categories[k].score * 100) : "-");
-  console.log(`\n=== ${SEITE} — Lauf ${lauf}/${LAEUFE} ===`);
+  console.log(`\n=== ${SEITE} — ${GERAET.toUpperCase()} — Lauf ${lauf}/${LAEUFE} ===`);
   console.log(`Leistung ${kat("performance")} · Barrierefreiheit ${kat("accessibility")} · ` +
     `Gute Praxis ${kat("best-practices")} · SEO ${kat("seo")}`);
   console.log(`CLS ${r.audits["cumulative-layout-shift"].displayValue} · ` +
@@ -142,5 +173,6 @@ for (let lauf = 1; lauf <= LAEUFE; lauf++) {
   }
 
   await browser.close();
+}
 }
 server.close();
