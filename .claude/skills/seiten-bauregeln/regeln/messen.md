@@ -251,6 +251,64 @@ Satz, den ein einzelner Lauf nicht trägt.
 Wert der Messreihe danebenlegen. Ein Unterschied, der beim zweiten Mal weg ist,
 war Rauschen, kein Befund.
 
+## Regel 8 — Im selben Bericht gehen zwei Uhren
+
+Der Auslöser (2026-08-07, Sage-Protokol): ein Brief nannte für dieselbe Seite
+eine **Skript-Zeit von 24,5 s** und eine **Blockierzeit von 100 ms** und schloss
+daraus, eine der beiden Zahlen müsse in die Irre führen. Beide stimmten. Sie
+messen nur nicht dasselbe. Drei Fallen stecken darin, alle drei häufig:
+
+**1 · `simulate` gegen `beobachtet`.** Lighthouse misst voreingestellt mit
+`throttlingMethod: "simulate"`: es zeichnet den echten Lauf auf und **rechnet
+daraus hoch**, wie es auf einem langsamen Handy an einer langsamen Leitung wäre
+(4× Prozessor, 150 ms RTT). Im selben Bericht stehen beide Zahlen nebeneinander:
+
+| | simuliert | beobachtet |
+|---|---|---|
+| FCP | 2.687 ms | 303 ms |
+| LCP | 7.563 ms | **847 ms** |
+
+Die **Kennzahlen** oben im Bericht sind simuliert. Einige Einzel-Prüfungen —
+darunter die LCP-Aufschlüsselung — rechnen **beobachtet**. Wer beide
+nebeneinanderlegt, findet einen Widerspruch, der keiner ist. Nachsehen mit:
+
+```bash
+node -e "const j=require('./bericht.json').audits.metrics.details.items[0];
+console.log(j.largestContentfulPaint, 'simuliert |', j.observedLargestContentfulPaint, 'beobachtet')"
+```
+
+**2 · Die Spalte `total` bei „Skript-Ausführungszeit" ist keine Ausführungszeit.**
+Sie ist die Hauptthread-Zeit, die dem **Aufgabenbaum** dieses Skripts zugerechnet
+wird — samt Layout und Malen, das es auslöst. Die Ausführung steht daneben:
+
+| Datei | total | Skript | Parsen |
+|---|---|---|---|
+| `docs/observatorium/vorteilspack.js` | 20.428 ms | **1.052 ms** | 5 ms |
+
+Aus „24,5 s" wurde so ein Skript-Problem gelesen, das keins war. Immer die
+Spalte `scripting` danebenlegen, bevor ein Skript beschuldigt wird.
+
+**3 · TBT deckt nur ein Fenster ab.** Die Blockierzeit zählt nur, was zwischen
+FCP und TTI über 50 ms hinausgeht. Arbeit davor oder danach ist unsichtbar —
+eine kleine Blockierzeit beweist **nicht**, dass der Hauptthread frei ist.
+
+### Und wenn die Kennzahlen nichts sagen: die Gegenprobe an einer Wegwerf-Kopie
+
+An Sage zeigte keine der gemeldeten Prüfungen auf die Ursache. Gefunden wurde
+sie über `non-composited-animations` (8 Elemente) und eine **Gegenprobe**: eine
+Kopie der Seite unter `/tmp`, ein eingeschobenes
+`*{animation:none!important;transition:none!important}`, dann messen. Drei
+Paare im Wechsel:
+
+| | Leistung | LCP | Style & Layout | Rendering | Skript-Auswertung |
+|---|---|---|---|---|---|
+| mit Animationen | 64 · 66 · 71 | 7,2–7,6 s | 7.116 ms | 6.632 ms | 3.241 ms |
+| ohne Animationen | **82 · 80 · 77** | **4,2–5,0 s** | **812 ms** | **1.254 ms** | 3.452 ms |
+
+Die Skript-Auswertung bleibt **gleich** — der Beweis, dass die Skripte nie das
+Problem waren. Das Abschalten ist keine Lösung, sondern das Messinstrument: es
+beziffert, was ein Verdächtiger kostet, **ohne** dass man ihn vorher umbaut.
+
 ## Abhakliste
 
 - [ ] mit **dem einen** Werkzeug gemessen, kein zweites gebaut
@@ -259,6 +317,11 @@ war Rauschen, kein Befund.
 - [ ] Vorher-Wert aus PageSpeed (`forschung/messreihe.json`) danebengelegt — und
       geprüft, dass er **dasselbe Gerät** meint (`geraet`)
 - [ ] keine Seite allein wegen **einer** PageSpeed-Zahl zum Ziel erklärt
+- [ ] bei zwei widersprüchlichen Zahlen geprüft, ob eine **simuliert** und die
+      andere **beobachtet** ist, bevor eine für falsch erklärt wird
+- [ ] kein Skript beschuldigt, ohne die Spalte `scripting` neben `total` gelegt zu haben
+- [ ] wenn keine Prüfung auf die Ursache zeigt: **Gegenprobe an einer Wegwerf-Kopie**
+      (Verdächtigen abschalten, messen) statt im Repo zu raten
 - [ ] mindestens drei Runden **im Wechsel** alt/neu
 - [ ] Einzelwerte genannt, nicht nur einen Mittelwert
 - [ ] die schuldige Kennzahl benannt (LCP · TBT · CLS · FCP)

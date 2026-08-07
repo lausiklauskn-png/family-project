@@ -21,6 +21,63 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-07 (nachts) · Sage-Protokol: der Widerspruch ist aufgeklärt, und es war nie das Skript
+
+Von Hand eingetragen. Der Brief stellte die Frage so: *„die gemeldete
+Skript-Zeit (`docs/observatorium/vorteilspack.js`, 24,5 s) passt nicht zur
+gemeldeten Blockierzeit (100 ms). Eine der beiden Zahlen führt in die Irre."*
+
+**Keine von beiden führt in die Irre. Sie messen Verschiedenes**, und zwischen
+ihnen liegen sogar zwei verschiedene Uhren.
+
+- Die **24,5 s** sind die Spalte `total` der Prüfung „Skript-Ausführungszeit
+  reduzieren". Diese Spalte ist keine Ausführungszeit, sondern die
+  Hauptthread-Zeit, die dem **Aufgabenbaum** des Skripts zugerechnet wird —
+  samt Layout und Malen, das es auslöst. Die Ausführung steht daneben und
+  beträgt **1.052 ms**, das Parsen 5 ms.
+- Die **100 ms** sind TBT, und TBT zählt nur, was zwischen FCP und TTI über
+  50 ms hinausgeht. Eine kleine Blockierzeit heißt nicht, dass der Hauptthread
+  frei ist.
+- Dazu misst Lighthouse voreingestellt mit `throttlingMethod: "simulate"`. Im
+  selben Bericht steht LCP **7.563 ms simuliert** neben **847 ms beobachtet**.
+  Die LCP-Aufschlüsselung rechnet beobachtet, die Kennzahl oben simuliert.
+
+#### Was es wirklich ist
+
+Der LCP ist `p.hero-claim` — **reiner Text**, nichts zu laden, TTFB 22 ms. Die
+gesamte Zeit ist „Verzögerung beim Rendern des Elements". Der Hauptthread ist
+zu beschäftigt, um Text zu zeichnen. Womit, sagt
+`non-composited-animations`: **8 dauernd laufende Animationen**, keine davon
+auf den Compositor auslagerbar — drei Balken über `width`, zwei Ringe über
+`stroke-dasharray`/`-dashoffset`, zwei Lampen über `box-shadow` und
+`background-color`, das Schwarze-Loch-SVG über `filter`. Jedes Bild davon
+erzwingt Layout und Malen auf dem Hauptthread.
+
+**Gegenprobe** an einer Wegwerf-Kopie unter `/tmp` (nur dort ein
+`*{animation:none!important}` eingeschoben, das Repo blieb unangetastet), drei
+Paare im Wechsel:
+
+| | Leistung | LCP | Style & Layout | Rendering | Skript-Auswertung |
+|---|---|---|---|---|---|
+| mit Animationen | 64 · 66 · 71 | 7,2–7,6 s | 7.116 ms | 6.632 ms | 3.241 ms |
+| ohne Animationen | **82 · 80 · 77** | **4,2–5,0 s** | **812 ms** | **1.254 ms** | 3.452 ms |
+
+Die Skript-Auswertung bleibt gleich. Das ist der Beweis, dass die Skripte nie
+das Problem waren.
+
+#### Was daraus folgt — noch nicht gebaut
+
+**Sechs der acht Animationen liegen weit unterhalb des Bildschirms** (ab 9.036
+bis 15.802 px). Sie laufen während des ganzen Ladens, ohne dass jemand sie
+sieht. Sie nur laufen zu lassen, wenn sie im Bild sind, wäre optisch nicht zu
+unterscheiden. Die zwei sichtbaren (Lampe und Siegel-Abzeichen in der Kopfleiste)
+sind Design und gehören Klaus.
+
+**Nicht gebaut, weil der Brief „erst messen, nicht umbauen" sagt** und weil es
+mehrere gleich gute Wege gibt (Beobachter für den Sichtbereich ·
+`content-visibility` · Animationen auf `transform`/`opacity` umstellen). Klaus
+entscheidet. Alle Zahlen oben sind **lokal**; PageSpeed fehlt.
+
 ### 2026-08-07 (abends) · Der doppelte Ladevorgang ist netzweit weg — und einmal kostet er Note
 
 Von Hand eingetragen. Regel 4 (`seiten-bauregeln/regeln/skripte.md`) abgearbeitet:
