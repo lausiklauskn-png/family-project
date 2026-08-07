@@ -35,6 +35,9 @@ fs.mkdirSync(path.join(buehne, "tools"));
 fs.mkdirSync(path.join(buehne, "forschung"));
 fs.mkdirSync(path.join(buehne, "assets", "config"), { recursive: true });
 fs.copyFileSync(path.join(ROOT, "tools", "forschung.mjs"), path.join(buehne, "tools", "forschung.mjs"));
+/* forschung.mjs holt sich das gemessene Gerät aus messung.mjs — eine zweite
+ * Angabe wären zwei Wahrheiten. Also muss die Bühne beide Werkzeuge tragen. */
+fs.copyFileSync(path.join(ROOT, "tools", "messung.mjs"), path.join(buehne, "tools", "messung.mjs"));
 
 const bericht = (werte, tag, hinweise) => {
   fs.writeFileSync(path.join(buehne, "assets", "config", "spore-stand.json"), JSON.stringify({
@@ -288,6 +291,34 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
   ok(punkte().length === vorZahl + 1 && letzt.leistung === 41,
     "die Messreihe schreibt den WIRKLICH gemessenen Wert fort (" + letzt.leistung + "), nicht den gehaltenen 100");
   ok(letzt.von === "2026-08-17", "und datiert ihn auf den Tag der echten Messung (" + letzt.von + ")");
+}
+
+/* ---- 6g · Jeder Punkt sagt, für WELCHES Gerät er gilt ---------------------
+ * Befund 2026-08-07: die Messreihe führte nur eine Zahl je Seite und Tag, ohne
+ * Gerät. Beide Messwege liefern Handy-Werte (PSI `strategy=mobile`, Lighthouse
+ * ohne `formFactor`) — nur stand das nirgends. An denselben Seiten lagen Handy
+ * und Computer am selben Tag 43 Punkte auseinander (Muttis 44 gegen 87). Eine
+ * Zahl ohne Gerät ist darum keine halbe Auskunft, sondern eine irreführende. */
+{
+  const alle = punkte();
+  ok(alle.length > 0 && alle.every((p) => p.geraet === "handy"),
+    `jeder Punkt trägt sein Gerät (${alle.length} Punkte, alle „handy")`);
+
+  /* Nachbeschriftung: ein alter Punkt ohne Gerät bekommt eins — und ein Punkt,
+   * der schon eines trägt, wird NICHT umgestempelt. Das zweite ist das
+   * wichtigere: sonst schriebe ein späterer Wechsel des Messgeräts die ganze
+   * Vergangenheit um. */
+  const reiheDatei = path.join(buehne, "forschung", "messreihe.json");
+  const r = JSON.parse(fs.readFileSync(reiheDatei, "utf8"));
+  const erste = r.reihen["probe-seite"].punkte;
+  delete erste[0].geraet;
+  erste[1].geraet = "desktop";
+  fs.writeFileSync(reiheDatei, JSON.stringify(r, null, 1));
+  bericht({ leistung: 41, bedienbarkeit: 55, gute_praxis: 100, auffindbarkeit: 100 }, "2026-08-18", []);
+  lauf("--nachtragen");
+  const nachher = punkte();
+  ok(nachher[0].geraet === "handy", "ein Punkt ohne Gerät wird als Handy nachbeschriftet");
+  ok(nachher[1].geraet === "desktop", "ein Punkt mit fremdem Gerät bleibt unangetastet");
 }
 
 /* ---- 7 · Die eigene Zielliste -------------------------------------------- */

@@ -227,12 +227,38 @@ v=d['reihen']['markt-workfloh']; print(v['name'], v['url'])
 for p in v['punkte']: print(p['von'], p['leistung'], p.get('mangel'))"
 ```
 
+**Die Messreihe ist eine HANDY-Reihe** (Befund 2026-08-07). Beide Messwege
+lieferten von Anfang an Handy-Werte — PageSpeed über `strategy=mobile`,
+Lighthouse über seine eigene Voreinstellung —, aber bis zum 2026-08-07 stand es
+in keinem Punkt. Seither trägt jeder Punkt ein Feld `geraet`. Wer eine Zahl von
+dort neben eine eigene Computer-Messung legt, vergleicht Ungleiches: an
+Muttis Rezeptbuch lagen Handy und Computer am selben Tag bei **44 gegen 87**,
+an Sage-Protokol bei **71 gegen 97**.
+
+## Regel 7b — Eine einzelne PageSpeed-Zahl trägt keine Rangfolge
+
+Auch PageSpeed streut. Nicht wenig: Jasons-Tresor lieferte an drei Tagen ohne
+einen einzigen Commit **83 · 64 · 97**. Deshalb gilt in der Forschungsstation
+seit dem 2026-08-06, dass ein Sprung erst zählt, wenn ihn die **nächste**
+Messung hält (`tools/forschung.mjs`, Verdachts-Verfahren).
+
+Der belegte Fehlschluss (2026-08-07): family-projekt.de stand um 03:43 Uhr bei
+**80**, am Abend bei **66**, und dazwischen hatte sich an der Seite **kein Byte**
+geändert. Aus der 66 wurde im Brief *„jetzt die schwächste Seite im Netz"* — ein
+Satz, den ein einzelner Lauf nicht trägt.
+
+**Also:** bevor eine Seite zum Ziel erklärt wird, zwei Läufe je Gerät, und den
+Wert der Messreihe danebenlegen. Ein Unterschied, der beim zweiten Mal weg ist,
+war Rauschen, kein Befund.
+
 ## Abhakliste
 
 - [ ] mit **dem einen** Werkzeug gemessen, kein zweites gebaut
 - [ ] **beide** Geräte (`--beides`)
 - [ ] Gewinn **nicht** als Erfolg gemeldet, solange nur die lokale Messung ihn zeigt
-- [ ] Vorher-Wert aus PageSpeed (`forschung/messreihe.json`) danebengelegt
+- [ ] Vorher-Wert aus PageSpeed (`forschung/messreihe.json`) danebengelegt — und
+      geprüft, dass er **dasselbe Gerät** meint (`geraet`)
+- [ ] keine Seite allein wegen **einer** PageSpeed-Zahl zum Ziel erklärt
 - [ ] mindestens drei Runden **im Wechsel** alt/neu
 - [ ] Einzelwerte genannt, nicht nur einen Mittelwert
 - [ ] die schuldige Kennzahl benannt (LCP · TBT · CLS · FCP)

@@ -85,6 +85,19 @@ export const MESSUNG_MAX_PRO_LAUF = 10;     // Deckel, damit die Aktion nicht in
 export const BERICHT_MAX = 40 * 1024 * 1024; // ein Lighthouse-Bericht ist ~1 MB; alles darüber wird nicht gelesen
 export const MESSUNG_SPRACHE = "de";        // Sprache der Prüfungs-Titel (siehe lighthouseBefehl)
 
+/* WELCHES GERÄT gemessen wird — an EINER Stelle, weil beide Messwege es
+ * unabhängig voneinander festlegen und dabei zufällig übereinstimmen:
+ *   Weg B (PageSpeed): `strategy=mobile` in `psiAdresse`.
+ *   Weg A (Lighthouse selbst): `formFactor` wird NIE gesetzt, und Lighthouses
+ *   Voreinstellung ist das Handy.
+ * Beide liefern also Handy-Werte — nur stand das nirgends, und in der Messreihe
+ * war den Zahlen nicht anzusehen, welches Gerät sie meinen (Befund 2026-08-07).
+ * Das ist keine Feinheit: an SB-KIMTool-Point lagen Handy und Computer am
+ * 2026-08-07 bei 81 gegen 97, an Muttis Rezeptbuch lokal bei 44 gegen 87.
+ * Wer eine Handy-Zahl für eine Computer-Zahl hält, sucht den Fehler an der
+ * falschen Seite. */
+export const MESSUNG_GERAET = "handy";
+
 /* Die vier Kategorien an EINER Stelle. Der Schlüssel links ist unser Name im
  * Bericht (deutsch, weil er in der Anzeige auftaucht), rechts steht der Name,
  * unter dem Lighthouse ihn führt. Wer eine fünfte hinzufügen will, ändert nur
@@ -275,7 +288,9 @@ export const PSI_ENDPUNKT = "https://www.googleapis.com/pagespeedonline/v5/runPa
 export function psiAdresse(url, schluessel) {
   const p = new URLSearchParams();
   p.set("url", url);
-  p.set("strategy", "mobile");          // wie im verlinkten Bericht: Handy-Ansicht
+  // Handy-Ansicht wie im verlinkten Bericht. Die Wahl steht bei MESSUNG_GERAET,
+  // damit sie nicht an zwei Stellen unabhängig voneinander getroffen wird.
+  p.set("strategy", MESSUNG_GERAET === "handy" ? "mobile" : "desktop");
   p.set("locale", MESSUNG_SPRACHE);
   for (const k of KATEGORIEN) p.append("category", k.lh);
   if (schluessel) p.set("key", schluessel);
