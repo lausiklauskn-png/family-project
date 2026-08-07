@@ -110,8 +110,54 @@ navigator.serviceWorker.addEventListener('controllerchange', () => {
 Allein das brachte **79 → 85**.
 
 **Wo sonst noch danach suchen:** jede App mit `skipWaiting` **und**
-`clients.claim` **und** einem ungebremsten `controllerchange`-Reload. Bekannt
-betroffen (Stand 2026-08-06): Muttis Rezeptbuch.
+`clients.claim` **und** einem ungebremsten `controllerchange`-Reload.
+
+**Nicht nach dem Fehlen des Reloads suchen, sondern nach dem Fehlen des
+Wächters.** Am 2026-08-07 stand in der Liste nur Muttis Rezeptbuch — Tomys
+WorkFloh war durchgerutscht, obwohl an genau dieser App die 2,3 s **gemessen
+worden waren**. Der Grund: dort war die Doppel-Reload-Sperre (`_swReloaded`)
+schon da und sah beim Überfliegen aus wie ein Wächter. Sie ist keiner. Sie
+verhindert den *zweiten* Reload, nicht den *ersten*.
+
+```bash
+# Alle Fundstellen zeigen, mit vier Zeilen Umfeld — dann selbst hinsehen,
+# ob ein controller-Wächter dabei ist, nicht nur eine Reload-Sperre.
+grep -rn -A4 "controllerchange" --include="*.html" --include="*.js" /home/user | grep -v node_modules
+```
+
+Stand 2026-08-07 alle geprüft und versorgt: Mein-WorkFloh, Tomys WorkFloh,
+Muttis Rezeptbuch, Mein-Rezeptbuch, Mein-Mixarium.
+
+### Der Gewinn ist nicht überall eine bessere Note (2026-08-07)
+
+An einer normal großen Seite gewinnt jede Kennzahl. Tomys WorkFloh, lokal,
+Handy, im Wechsel gemessen:
+
+| | Leistung | LCP | TBT | CLS |
+|---|---|---|---|---|
+| ohne Fix | 87 · 94 | 2,9 s | 320 · 100 ms | 0,041 |
+| mit Fix | **97 · 97** | **2,6 s** | **60 · 30 ms** | **0,021** |
+
+An **Muttis Rezeptbuch** (2 MB `index.html`, davon 1,2 MB eingebettete Bilder)
+sieht dasselbe Muster anders aus, fünf Paare, beide Reihenfolgen:
+
+| | Leistung | LCP | TBT |
+|---|---|---|---|
+| ohne Fix | 55 · 56 · 57 · 56 · 56 | 8,8–9,0 s | 60–140 ms |
+| mit Fix | 54 · 50 · 47 · 52 · 53 | **6,5 s** | 320–570 ms |
+
+**LCP 2,5 s besser, Gesamtnote rund vier Punkte schlechter.** Wahrscheinlichste
+Lesart: Lighthouse misst am alten Stand die **zweite** Navigation, und die ist
+vorgewärmt — Vorrat des Service-Workers, warmer Code-Cache für das riesige
+Inline-Skript. Der schöne TBT war erkauft mit einem zweiten kompletten
+Download und 2,5 s längerer Wartezeit.
+
+**Die Lehre daraus ist nicht „dann lass den Fehler drin".** Sie ist: eine
+Kennzahl kann sich verbessern, weil eine Verschwendung wegfällt, *und* die Note
+kann trotzdem sinken, weil dieselbe Verschwendung eine zweite Kennzahl
+geschönt hat. Wer nur auf die Note sieht, hält die Reparatur für einen
+Rückschritt. Bei so einem Ergebnis: beide Kennzahlen nennen, die Deutung als
+Deutung kennzeichnen, und die Entscheidung Klaus vorlegen.
 
 ## Regel 5 — Cache-Version hochzählen, wenn sich die Schale ändert
 
