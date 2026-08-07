@@ -31,6 +31,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { MESSUNG_GERAET } from "./messung.mjs";
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REIHE = path.join(WURZEL, "forschung", "messreihe.json");
@@ -148,6 +149,30 @@ function messungenSammeln(stand) {
 
 /* ---- Einsortieren --------------------------------------------------------- */
 
+/* Punkte aus der Zeit vor dem 2026-08-07 tragen kein `geraet`. Sie sind
+ * trotzdem alle Handy-Werte, und das ist nachprüfbar, nicht geschätzt:
+ *   · Weg B setzte seit dem ersten Tag der Messreihe `strategy=mobile`
+ *     (tools/messung.mjs, Commit e048abd vom 2026-08-04; die Zeile wurde nie
+ *     geändert — `git log -S strategy -- tools/messung.mjs` zeigt genau einen
+ *     Treffer).
+ *   · Weg A hat `formFactor` NIE gesetzt (`git log -S formFactor` ist leer),
+ *     und Lighthouses Voreinstellung ist das Handy.
+ * Darum werden sie einmalig nachbeschriftet statt als „unbekannt" geführt —
+ * ein ehrliches „unbekannt" wäre hier schlechter, weil es eine Ungewissheit
+ * behauptet, die es nicht gibt. Der Lauf ist idempotent: was schon ein `geraet`
+ * hat, wird nicht angefasst, und ein späterer Wechsel des Messgeräts stempelt
+ * deshalb keine fremden Punkte um. */
+function geraetNachtragen(reihe) {
+  let n = 0;
+  for (const r of Object.values(reihe.reihen || {})) {
+    for (const p of r.punkte || []) {
+      if (!p.geraet) { p.geraet = "handy"; n++; }
+    }
+  }
+  if (n) console.log(`  · ${n} Punkt(e) ohne Gerät nachbeschriftet (alle Handy, siehe Kommentar).`);
+  return n;
+}
+
 const gleich = (a, b) =>
   a && b && MASSE.every((k) => a.werte[k] === b.werte[k]) &&
   JSON.stringify(a.mangel) === JSON.stringify(b.mangel);
@@ -165,6 +190,7 @@ function nachtragen() {
 function einsortieren(stand) {
   const reihe = lesen(REIHE, { fassung: 1, reihen: {} });
   reihe.reihen = reihe.reihen || {};
+  geraetNachtragen(reihe);
 
   const neu = messungenSammeln(stand);
   const ereignisse = [];
@@ -178,6 +204,7 @@ function einsortieren(stand) {
     const punkt = {
       von: m.gemessen, bis: m.gemessen,
       ...m.werte,
+      geraet: MESSUNG_GERAET,
       quelle: m.quelle, werkzeug: m.werkzeug,
       mangel: m.mangel
     };
@@ -423,14 +450,15 @@ function zeigen() {
     if (!punkte.length) continue;
     console.log(`\n═══ ${r.name}`);
     console.log(`    ${r.url}`);
-    console.log(`    Zeitraum                Leist  Bedien  Praxis  Auffind  Quelle`);
+    console.log(`    Zeitraum                Leist  Bedien  Praxis  Auffind  Gerät   Quelle`);
     for (const p of punkte) {
       const spanne = p.von === p.bis ? p.von : `${p.von}…${p.bis}`;
       console.log(`    ${spanne.padEnd(23)} ${String(p.leistung).padStart(3)}` +
         `    ${String(p.bedienbarkeit).padStart(3)}` +
         `     ${String(p.gute_praxis).padStart(3)}` +
         `      ${String(p.auffindbarkeit).padStart(3)}` +
-        `   ${p.quelle === "google" ? "Google" : "eigen"}`);
+        `   ${String(p.geraet || "?").padEnd(6)}` +
+        `  ${p.quelle === "google" ? "Google" : "eigen"}`);
     }
     const a = punkte[0], z = punkte[punkte.length - 1];
     if (a !== z) {
@@ -451,7 +479,13 @@ function rangliste() {
     zeilen.push({ id, name: r.name, p, schnitt, bewegung: schnitt - MASSE.reduce((s, k) => s + erst[k], 0) / MASSE.length });
   }
   zeilen.sort((a, b) => b.schnitt - a.schnitt);
-  console.log(`\nStand — Schnitt aus allen vier Maßen, beste zuerst:\n`);
+  /* Das Gerät gehört über die Tabelle, nicht daneben: eine Rangliste, der man
+   * nicht ansieht, für welches Gerät sie gilt, wird als „die" Rangfolge gelesen.
+   * Am 2026-08-07 lagen an denselben Seiten Handy und Computer 43 Punkte
+   * auseinander (Muttis 44 gegen 87). */
+  const geraete = [...new Set(zeilen.map((z) => z.p.geraet || "?"))].sort();
+  console.log(`\nStand — Schnitt aus allen vier Maßen, beste zuerst.`);
+  console.log(`Gemessenes Gerät: ${geraete.join(" + ")}. Ein anderes Gerät ergibt andere Zahlen.\n`);
   console.log(`   Schnitt  Leist Bedien Praxis Auffind  seit Beginn   Seite`);
   for (const z of zeilen) {
     const bew = z.bewegung === 0 ? "  ·  " : `${z.bewegung > 0 ? "+" : ""}${z.bewegung.toFixed(1)}`;
@@ -534,6 +568,17 @@ async function messen() {
 /* ---- Einstieg ------------------------------------------------------------- */
 
 if (hat("messen")) await messen();
+else if (hat("geraet-nachtragen")) {
+  /* Eigener Aufruf, damit die Nachbeschriftung NICHT über `--nachtragen`
+   * laufen muss. Der Weg wäre gefährlich: `--nachtragen` beurteilt offene
+   * Verdachte mit dem Tagesbericht, und liegt der schon in der Reihe, würde er
+   * seinen eigenen Sprung „bestätigen" — am 2026-08-07 wären so drei Einbrüche
+   * an unangetasteten Seiten als echt ins Journal gewandert. */
+  const reihe = lesen(REIHE, { fassung: 1, reihen: {} });
+  const n = geraetNachtragen(reihe);
+  if (n) { fs.writeFileSync(REIHE, JSON.stringify(reihe, null, 1) + "\n"); console.log(`  → geschrieben.`); }
+  else console.log("  · Jeder Punkt trägt schon sein Gerät — nichts zu tun.");
+}
 else if (hat("nachtragen")) nachtragen();
 else if (hat("offen")) offen();
 else if (hat("rangliste")) rangliste();

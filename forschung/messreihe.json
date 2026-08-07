@@ -1,5 +1,5 @@
 {
- "_hinweis": "Messreihe der Forschungsstation. Wird von tools/forschung.mjs fortgeschrieben — NICHT von Hand bearbeiten. Aufbau: je Ziel eine Liste von Punkten; ein Punkt gilt von `von` bis `bis` (beide Tage eingeschlossen). Ändert sich an einem Tag nichts, wächst nur `bis` des letzten Punktes — die Datei bleibt klein, ohne dass ein Tag verloren geht. Wer den Wert an einem beliebigen Tag wissen will, sucht den Punkt, dessen Spanne diesen Tag enthält: node tools/forschung.mjs --zeigen --seit=2026-08-01",
+ "_hinweis": "Messreihe der Forschungsstation. Wird von tools/forschung.mjs fortgeschrieben — NICHT von Hand bearbeiten. Aufbau: je Ziel eine Liste von Punkten; ein Punkt gilt von `von` bis `bis` (beide Tage eingeschlossen). Ändert sich an einem Tag nichts, wächst nur `bis` des letzten Punktes — die Datei bleibt klein, ohne dass ein Tag verloren geht. Wer den Wert an einem beliebigen Tag wissen will, sucht den Punkt, dessen Spanne diesen Tag enthält: node tools/forschung.mjs --zeigen --seit=2026-08-01 Jeder Punkt nennt in `geraet`, fuer WELCHES Geraet er gilt — gemessen wird das Handy (PageSpeed `strategy=mobile` bzw. Lighthouses Voreinstellung, siehe tools/messung.mjs MESSUNG_GERAET). Ein Computer-Wert derselben Seite kann weit davon abweichen und gehoert nicht in dieselbe Spalte.",
  "fassung": 1,
  "reihen": {
   "markt-bookledgerpro": {
@@ -20,7 +20,8 @@
       "leistung: CSS komprimieren",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -36,7 +37,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: JavaScript komprimieren"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -52,7 +54,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: JavaScript komprimieren"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -76,7 +79,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -94,7 +98,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -112,7 +117,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -136,7 +142,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Erzwungener dynamischer Umbruch"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -154,7 +161,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -173,7 +181,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -191,7 +200,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
-     ]
+     ],
+     "geraet": "handy"
     }
    ],
    "verdacht": {
@@ -235,7 +245,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -251,7 +262,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -272,7 +284,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -296,7 +309,8 @@
       "leistung: Anfragen zum Blockieren des Renderings",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -314,7 +328,8 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -332,7 +347,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -350,7 +366,8 @@
       "leistung: Anfragen zum Blockieren des Renderings",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -375,7 +392,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -394,7 +412,8 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -413,7 +432,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -432,7 +452,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ],
    "verdacht": {
@@ -473,7 +494,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: JavaScript komprimieren"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -489,7 +511,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -505,7 +528,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -521,7 +545,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -546,7 +571,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -565,7 +591,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: JavaScript komprimieren"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -591,7 +618,8 @@
       "leistung: JavaScript komprimieren",
       "leistung: Mehrere Weiterleitungen auf die Seite vermeiden",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -610,7 +638,8 @@
       "leistung: JavaScript komprimieren",
       "leistung: Mehrere Weiterleitungen auf die Seite vermeiden",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -633,7 +662,8 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -650,7 +680,8 @@
       "leistung: First Contentful Paint",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -673,7 +704,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Reduziere nicht verwendetes JavaScript",
       "leistung: Total Blocking Time"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-06",
@@ -690,7 +722,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Reduziere nicht verwendetes JavaScript",
       "leistung: Total Blocking Time"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -712,7 +745,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -729,7 +763,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -746,7 +781,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -770,7 +806,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Total Blocking Time"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -793,7 +830,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Latenz der Dokumentanfrage",
       "leistung: Mehrere Weiterleitungen auf die Seite vermeiden"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -818,7 +856,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -841,7 +880,8 @@
       "leistung: Aufwand für Hauptthread minimieren",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-05",
@@ -858,7 +898,8 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -875,7 +916,8 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -899,7 +941,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: LCP-Anfrageerkennung"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -917,7 +960,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Verursacher von Layout Shifts"
-     ]
+     ],
+     "geraet": "handy"
     }
    ],
    "verdacht": {
@@ -962,7 +1006,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -980,7 +1025,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1003,7 +1049,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendete CSS"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -1019,7 +1066,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: LCP-Anfrageerkennung"
-     ]
+     ],
+     "geraet": "handy"
     }
    ],
    "verdacht": {
@@ -1064,7 +1112,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren"
-     ]
+     ],
+     "geraet": "handy"
     },
     {
      "von": "2026-08-07",
@@ -1081,7 +1130,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendete CSS"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1104,7 +1154,8 @@
       "leistung: CSS komprimieren",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendete CSS"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1129,7 +1180,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Verursacher von Layout Shifts"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1153,7 +1205,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1177,7 +1230,8 @@
       "leistung: JavaScript komprimieren",
       "leistung: Mehrere Weiterleitungen auf die Seite vermeiden",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1200,7 +1254,8 @@
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1222,7 +1277,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1246,7 +1302,8 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1269,7 +1326,8 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
-     ]
+     ],
+     "geraet": "handy"
     }
    ]
   }
