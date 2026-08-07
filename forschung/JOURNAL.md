@@ -21,6 +21,172 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-07 · Mein-WorkFloh **79 → 98** und SB-KIMTool-Point **60 → 81** (Handy)
+
+Von Hand eingetragen, nicht vom Werkzeug. Auslöser war Klaus' Frage: *„Tomys
+WorkFloh ist fast baugleich und hat viel bessere Werte — bei Tomys ist sogar
+noch mehr drin, was theoretisch verlangsamen müsste. Warum?"*
+
+**Alle Zahlen unten sind PageSpeed** (Klaus' eigene Läufe an der live
+ausgelieferten Seite), nicht die lokale Messung. Warum diese Unterscheidung an
+diesem Tag so wichtig wurde, steht in der Randnotiz am Ende.
+
+| Seite | Handy vorher | Handy nachher | Computer vorher | Computer nachher |
+|---|---|---|---|---|
+| **Mein-WorkFloh** | 79 | **98** | 99 | **100** |
+| **SB-KIMTool-Point** | 60 | **81** | 79 | **97** |
+
+---
+
+#### Die Ausgangsfrage war falsch gestellt — und das war der erste Fund
+
+Tomys WorkFloh hat **nicht** mehr drin. Es trägt **kein einziges SBKIM-Modul**,
+ist also gar kein Netz-Knoten: kein Siegel, keine Lampen-Leiste, keine
+Anmeldung im Raum. Mehr *App* hat es, das stimmt. Mein-WorkFloh ist ein
+vollwertiger Knoten und lud dafür 19 zusätzliche Dateien.
+
+Die beiden Apps waren nie gleich ausgestattet. Der Vergleich, der die Frage
+ausgelöst hat, verglich Ungleiches.
+
+#### Mein-WorkFloh — drei Ursachen, nacheinander gefunden
+
+**1 · Die Seite lud sich beim ersten Besuch zweimal.** Der frisch installierte
+Service-Worker übernahm (`skipWaiting` + `clients.claim`), `controllerchange`
+feuerte, und die Seite lud komplett neu — obwohl es beim allerersten Besuch
+keinen alten Code zu ersetzen gab. Lighthouse meldete das als „Mehrere
+Weiterleitungen", 1,6 s. Behoben mit einem Wächter (`hatteController`).
+
+**2 · Der SBKIM-Stapel stand parser-blockierend in der Seite.** 19 Dateien,
+keine davon nötig, um den Auftragszettel anzuzeigen. Werden jetzt **nach** dem
+Laden geholt, in exakt der Reihenfolge des Kanons, jede wartet auf die vorige,
+dazwischen eine Leerlauf-Pause.
+
+**3 · Die PDF-Bibliothek hing im Start-Vorrat des Service-Workers.** Das war
+der eigentliche Bremsklotz, und er war der am besten versteckte:
+
+| Datei | roh | übertragen (gzip) |
+|---|---|---|
+| `pdf.worker.min.js` | 1107 KiB | 296 KiB |
+| `pdf.min.js` | 368 KiB | 104 KiB |
+| **zusammen** | **1475 KiB** | **400 KiB = 46 %** aller 855 KiB beim Laden |
+
+Das Bittere daran: **die App macht es längst richtig** — sie holt `pdf.js` erst
+beim ersten PDF (`ladePdfJs`). Der Service-Worker machte das zunichte und zog
+beide Dateien beim Seitenstart in den Vorrat. Sichtbar wird das **nur
+server-seitig**: Service-Worker-Anfragen tauchen im Netzwerk-Protokoll des
+Browsers nicht auf.
+
+| | wann die PDF-Bibliothek geholt wird |
+|---|---|
+| vorher | **716 ms** — 51 ms nachdem die Seite fertig war, mitten im Messfenster |
+| nachher | **6666 ms** — lange danach |
+
+Anfragen während des Ladens: **53 → 42**. Gelöst über eine zweite Vorrats-Liste
+(`ASSETS_SPAETER`), die die Seite per `postMessage` erst anfordert, wenn sie
+fertig geladen und der Hauptthread ruhig ist. **Offline bleibt erhalten.**
+
+**Punkt 1 und 2 allein bewegten den Live-Wert nicht** (79 vorher, 79 nachher).
+Sie waren trotzdem nicht umsonst — sie blieben nur wirkungslos, solange die
+PDF-Bibliothek die Leitung belegte. **Erst alle drei zusammen ergeben die 98.**
+
+#### SB-KIMTool-Point — Bilder, und zwar drastisch
+
+Drei Banner lagen als PNG im Repo:
+
+| | vorher | nachher |
+|---|---|---|
+| `banner-werkzeuge` | 1194 KiB PNG | 76 KiB WebP |
+| `banner-markt` | 991 KiB PNG | 65 KiB WebP |
+| `banner-modell` | 866 KiB PNG | 51 KiB WebP |
+| **zusammen** | **3051 KiB** | **192 KiB** |
+
+**Das waren 90 % der gesamten Seitenlast** — für Bilder, die `alt=""` und
+`aria-hidden="true"` tragen (reine Dekoration) und per `object-fit: contain` nie
+größer als rund 335 px dargestellt werden. Sie standen zudem auf
+`loading="eager"`, obwohl sie unterhalb des ersten Abschnitts liegen.
+
+Dazu drei kleinere Funde:
+
+- **Layout-Sprung:** Modul 16 hängt das Siegel-Abzeichen (34 × 34) erst nach dem
+  Laden in `.lamps`; die Leiste wuchs von 9 px auf 34 px und schob die Seite.
+  `min-height: 34px` im **app-eigenen** CSS reserviert den Platz vorher. CLS
+  **0,103 → 0,052**. Das Modul selbst blieb unangetastet.
+- **Die Kopf-Bilder der drei Unterseiten waren seit dem ersten Tag unsichtbar.**
+  Eine relative `url()` in einer CSS-Variablen wird gegen das **Stylesheet**
+  aufgelöst, nicht gegen das Dokument; aus `assets/img/x` wurde
+  `assets/assets/img/x` → 404. Gegenprobe am Stand *vor* allen Änderungen: der
+  Fehler war schon dort. Gemerkt hat es niemand, weil ein Gradient-Fallback
+  dahinterlag — **ein leerer Farbverlauf sieht nicht kaputt aus**.
+- **Der „Nebel" auf den Kopf-Streifen** war ein dunkler Verlauf über die volle
+  Breite (0,92 → 0,20). Er sitzt jetzt nur noch unter dem Text und ist ab 78 %
+  der Breite ganz weg; die Lesbarkeit sichert stattdessen ein Textschatten.
+  Für den 1042 px breiten Streifen gibt es eigene `-gross`-Fassungen in voller
+  Originalauflösung — die Start-Karten behalten die kleinen.
+
+#### Tomys Hub — Befund ohne Eingriff
+
+Beim Messen fiel auf, dass zwei Tomys-Seiten das übliche Verhältnis **umkehren**:
+
+| Seite | Handy | Computer | Blockierzeit H → C |
+|---|---|---|---|
+| Tomys Hub (Wurzel) | 85 | **68** | 580 ms → **4.430 ms** |
+| Tomys Schaufenster | 99 | **69** | 0 ms → **4.840 ms** |
+| Tomys WorkFloh | 93 | **100** | 150 ms → 10 ms |
+
+Ursache: `tomy-ui/mycel-bg.js` schaltet den three.js-Hintergrund unter 700 px
+**ganz ab**. Das Handy misst eine Seite **ohne** WebGL, der Computer eine
+**mit** — auf 3,7-facher Fläche. Gegenprobe mit abgeschaltetem Hintergrund:
+**69 → 100**. Die dritte Zeile ist der Kronzeuge: dieselbe Werkstatt, dasselbe
+Gerüst, kein Hintergrund, 100.
+
+**Nicht geändert** — der Hintergrund ist eine Design-Entscheidung von Klaus.
+
+#### Werkzeug und Regeln
+
+- **`tools/lh-messen.mjs` misst jetzt beide Geräte** (`--desktop`, `--beides`).
+  Bis dahin maß es nur das Handy und übersah damit die Hälfte. Klaus:
+  *„Es gibt zwei gemessene Werte."*
+- **Neuer Skill `seiten-bauregeln`** (`.claude/skills/`): Bauregeln nach Gewerk
+  getrennt — Bilder · Skripte · Text/Auffindbarkeit · Layout/Bedienbarkeit ·
+  Messen. Jede Regel mit Datum, Zahl und Fundstelle aus diesen Repos. Die
+  Misserfolge stehen mit drin (`defer` machte es 98 → 90 schlechter; ein
+  einzelnes Skript zu verschieben brachte 79 → 78).
+
+#### Was offen bleibt
+
+- **family-projekt.de: 66 / 70** — jetzt die schwächste Seite im Netz, und die,
+  auf der Fremde zuerst landen.
+- **Muttis Rezeptbuch: 48** — Ursache steht fest (2 MB `index.html` mit 1,2 MB
+  eingebetteten Bildern), der Eingriff berührt aber `build.py` und den
+  Ein-Datei-Grundsatz. Klaus' Entscheidung.
+- **Sage-Protokol: 69** — noch nicht verstanden; die gemeldete Skript-Zeit passt
+  nicht zur Blockierzeit. Erst messen, dann bauen.
+- Point: Auffindbarkeit 80, CLS 0,052 (Handy) / 0,103 (Computer), `ambient.png`
+  fehlt. WorkFloh: Barrierefreiheit 91, Auffindbarkeit 91.
+
+---
+
+> #### Randnotiz zum Vorgehen
+>
+> Zwei Untersuchungen desselben Problems an einem Tag: die erste ging daneben,
+> die zweite traf. **Die Werkzeuge waren beide Male dieselben.** Verschieden war
+> nur, wann aufgehört wurde zu prüfen.
+>
+> Am Vormittag wurde „77 → 95" als Erfolg gemeldet — eine **lokale** Messung.
+> PageSpeed sagte danach 79, unverändert. Am Abend hieß es „lokal 97, der Beweis
+> ist dein Lauf" — und der ergab 98.
+>
+> Gelöst hat den Fall nicht die Punktzahl, sondern eine Frage, deren Antwort
+> nicht von der Erwartung abhängen kann: **wann wird diese Datei geholt?**
+> 716 ms gegen 6666 ms.
+>
+> Klaus' Bitte (2026-08-07), das festzuhalten, ist der Grund für
+> `.claude/skills/seiten-bauregeln/regeln/vorgehen.md`. Dort steht, **wie**
+> analysiert wurde und woran das Denken vorher scheiterte — nicht, was gebaut
+> wurde. Das steht hier.
+
+---
+
 ### 2026-08-06 · family-projekt.de — Zwischenstand, **13 Tage vor dem Termin**
 
 <https://family-projekt.de/> · von Hand eingetragen, nicht vom Werkzeug
