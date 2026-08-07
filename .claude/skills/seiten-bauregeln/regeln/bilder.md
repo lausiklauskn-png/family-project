@@ -95,7 +95,47 @@ Erlaubt bleibt es für: Favicon-SVG, winzige Symbole (< 2 KiB), und dort, wo ein
 **einzige** Datei ausdrücklich Bedingung ist (verteilbare Ein-Datei-Werkzeuge).
 Dann gilt die Größe erst recht: klein rechnen, WebP, nicht mehrere Hundert KiB.
 
-### 7 · WebGL-/Canvas-Hintergründe sind Bilder mit laufenden Kosten
+### 7 · Relative Bildpfade in CSS-Variablen — die stille Falle
+
+**Eine relative `url()` in einer CSS-Variablen wird gegen das STYLESHEET
+aufgelöst, in dem sie verbraucht wird — nicht gegen das HTML-Dokument.**
+
+Belegt an SB-KIMTool-Point (2026-08-07). In der Seite stand:
+
+```html
+<!-- FALSCH: assets/ wird doppelt -->
+<div class="page-banner" style="--art:url('assets/img/banner-markt.webp')">
+```
+
+`style.css` liegt selbst in `assets/`, also machte der Browser daraus
+`assets/assets/img/banner-markt.webp` → **404**. Die Kopf-Streifen von drei
+Unterseiten waren dadurch **seit dem ersten Tag unsichtbar**, und niemand hat es
+gemerkt — weil ein Gradient-Fallback dahinterlag und ein leerer Farbverlauf
+**nicht kaputt aussieht**.
+
+```css
+/* RICHTIG: Zuweisung ins Stylesheet, dort ist img/ der richtige Pfad */
+.page-banner.pb-markt { --art: url('img/banner-markt.webp'); }
+```
+```html
+<div class="page-banner pb-markt">
+```
+
+**Zwei Lehren daraus, die über Bilder hinausgehen:**
+
+- **Ein Fallback verdeckt einen Fehler.** Wo etwas „progressive enhancement" ist,
+  merkt niemand, wenn es gar nicht ankommt. Solche Stellen **aktiv prüfen** —
+  einmal die Seite laden und auf **404 im Netzwerk-Protokoll** sehen, nicht nur
+  hinschauen, ob es „irgendwie okay" aussieht.
+- **Wenn ein Bild fehlt, zuerst die aufgelöste Adresse ansehen**, nicht den
+  geschriebenen Pfad:
+
+  ```js
+  const e = document.querySelector('.page-banner');
+  console.log(getComputedStyle(e).backgroundImage);   // zeigt die ECHTE URL
+  ```
+
+### 8 · WebGL-/Canvas-Hintergründe sind Bilder mit laufenden Kosten
 
 Ein three.js-Hintergrund kostet nicht einmalig, sondern **in jedem Bild pro
 Sekunde** — und die Kosten wachsen mit der Fensterfläche.
@@ -148,6 +188,8 @@ Hinweis, dass eine Bild-KI meist PNG liefert und man einmal umrechnen muss.
 - [ ] `width`/`height` mit den **echten** Maßen
 - [ ] Dekoration: `alt=""` + `aria-hidden="true"`
 - [ ] kein base64 in der HTML (außer Winzlinge)
+- [ ] relative Pfade: bei CSS-Variablen die **aufgelöste** Adresse geprüft
+- [ ] Seite geladen und auf **404 im Netzwerk-Protokoll** gesehen
 - [ ] alt und neu nebeneinander **angesehen**
 - [ ] alte Dateien entfernt, Ablage-Anleitung nachgezogen
 - [ ] vorher/nachher gemessen, **beide Geräte**
