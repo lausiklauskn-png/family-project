@@ -60,8 +60,12 @@ führte zum Service-Worker-Vorrat, und nach dem Fix bestätigte PageSpeed
 **2 · Handy und Computer sind zwei verschiedene Messungen.**
 Nicht „dieselbe Seite, anderes Tempo". Lighthouse ändert mit dem Gerät auch die
 **Fensterbreite** (412 px gegen 1350 px). Jede Regel, die an der Breite hängt,
-macht daraus **zwei verschiedene Seiten**. Immer beide Werte nennen. Details in
-[`regeln/messen.md`](regeln/messen.md).
+macht daraus **zwei verschiedene Seiten**. Immer beide Werte nennen. Wie weit
+das auseinandergeht, zeigt der 2026-08-07 gemessene Fall: Muttis Rezeptbuch
+**44 (Handy) gegen 87 (Computer)** — auf dem Computer ist dieselbe Seite fast in
+Ordnung. Die nächtliche Messreihe führt **nur Handy-Werte**; seit dem
+2026-08-07 sagt jeder Punkt es auch (`geraet`). Details in
+[`regeln/messen.md`](regeln/messen.md) Regel 1 · 7 · 7b.
 
 **3 · Fremdnutzer-Brille.** Alles, was auf family-projekt.de landet, wird von
 Leuten benutzt, die weder das Repo noch dich kennen. Fehlt etwas (Schlüssel,

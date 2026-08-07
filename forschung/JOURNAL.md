@@ -21,6 +21,79 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-07 (später) · Die Messreihe wusste nicht, welches Gerät sie misst
+
+Von Hand eingetragen. Auslöser war eine Nachprüfung, kein Bau: der Brief vom
+selben Abend nennt **family-projekt.de 66 / 70** und daraus abgeleitet *„jetzt
+die schwächste Seite im Netz"*. Die Messreihe nennt für dieselbe Seite am
+**selben Tag 80**. Beide Zahlen sind Google-Werte. Eine von beiden musste in
+die Irre führen.
+
+#### Der Befund: es fehlte das Gerät
+
+Die Messreihe führte **eine** Zahl je Seite und Tag, ohne Angabe, für welches
+Gerät sie gilt. Nachgesehen, statt vermutet:
+
+- `tools/messung.mjs` setzte `strategy=mobile` — Weg B (PageSpeed), seit dem
+  ersten Tag der Reihe (Commit `e048abd`, 2026-08-04, seither nie geändert).
+- Weg A (Lighthouse selbst) setzte `formFactor` **nie**, und dessen
+  Voreinstellung ist ebenfalls das Handy.
+
+Also sind **alle 58 bisherigen Punkte Handy-Werte** — nur stand es nirgends.
+Das ist keine Kleinigkeit, sondern der Unterschied zwischen zwei Seiten:
+
+| Seite (lokal gemessen, beide Geräte) | Handy | Computer | Spanne |
+|---|---|---|---|
+| Muttis Rezeptbuch | 44 | **87** | **43** |
+| Sage-Protokol | 71 | **97** | **26** |
+| family-projekt.de (Start) | 55 | 69 | 14 |
+| family-projekt.de (Marktplatz) | 60 | 69 | 9 |
+
+Muttis und Sage sind auf dem Computer **nahezu in Ordnung**. Ihr Problem ist
+ausschließlich das Handy. Wer die eine Zahl der Messreihe für „die" Note hält,
+sucht an der falschen Seite.
+
+#### Die 66 gegen die 80: keine der beiden ist falsch, beide sind Rauschen
+
+Die Messreihe schreibt ein nächtlicher Lauf um **03:43 Uhr**. Am
+2026-08-07 hat sich an family-projekt.de **kein einziges Byte Seiten-Code**
+geändert (die Commits des Tages betreffen `docs/`, `regeln/` und die
+Forschungsdaten). Zwischen 80 und 66 lag also **dieselbe Seite**.
+
+Das passt zu dem, was in `tools/forschung.mjs` schon dokumentiert steht:
+Jasons-Tresor lieferte unverändert 83 · 64 · 97. Genau deshalb gilt seit dem
+2026-08-06 die Regel, dass ein Sprung erst zählt, wenn ihn die nächste Messung
+hält. Für die Sätze im Brief war sie nicht angewandt worden — sie stützen sich
+auf **je einen** Lauf.
+
+Nebenbei bestätigt: in der Messreihe stehen gerade **vier offene Verdachte**,
+drei davon Einbrüche an Seiten, die niemand angefasst hat (Jasons-Tresor
+97 → 67, Kimseek 99 → 69, Alis Moderaum 90 → 66).
+
+#### Was gebaut wurde
+
+- `tools/messung.mjs`: das gemessene Gerät steht als `MESSUNG_GERAET` an **einer**
+  Stelle; `psiAdresse` leitet die `strategy` daraus ab, statt sie ein zweites
+  Mal selbst festzulegen.
+- `tools/forschung.mjs`: jeder neue Punkt trägt `geraet`. Punkte ohne Gerät
+  werden **einmalig** als `handy` nachbeschriftet (belegt, siehe oben); ein
+  Punkt, der schon ein Gerät trägt, wird nie umgestempelt. `--zeigen` bekommt
+  eine Gerät-Spalte, `--rangliste` eine Kopfzeile mit dem Gerät.
+- `tests/smoke_forschung.mjs`: drei neue Proben (**51 grün, 0 rot**).
+  Gegenprobe beide Richtungen: ohne den Stempel fällt Probe 1, ohne die
+  Nachbeschriftung Probe 2.
+
+Die Nachbeschriftung der echten `messreihe.json` übernimmt der **nächste
+nächtliche Lauf**. Von Hand geschieht sie nicht: in der Datei stehen vier offene
+Verdachte, und ein Lauf `--nachtragen` von heute würde sie mit **derselben**
+Messung beurteilen, aus der sie stammen — und drei Einbrüche als bestätigt ins
+Journal schreiben, die keiner sind.
+
+#### Was daraus folgt
+
+Die Rangfolge „welche Seite ist die schwächste" steht **noch nicht** fest. Sie
+braucht je Seite zwei Werte (Handy und Computer) und mehr als einen Lauf.
+
 ### 2026-08-07 · Mein-WorkFloh **79 → 98** und SB-KIMTool-Point **60 → 81** (Handy)
 
 Von Hand eingetragen, nicht vom Werkzeug. Auslöser war Klaus' Frage: *„Tomys
