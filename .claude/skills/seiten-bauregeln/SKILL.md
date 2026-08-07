@@ -26,6 +26,12 @@ Datei, die zu deiner Arbeit gehört — nicht alle.
 Wenn dein Bau mehrere Gewerke berührt, liest du mehrere Dateien — aber nur die
 betroffenen.
 
+> **Randnotiz am Rand der Sammlung:** [`regeln/vorgehen.md`](regeln/vorgehen.md)
+> gehört zu keinem Gewerk. Dort steht nicht, *was* an einer Seite richtig ist,
+> sondern **wie man beim Untersuchen denkt** — und woran das Denken bisher
+> gescheitert ist. Kein Pflichtteil vor jedem Bau; lies es, wenn eine
+> Untersuchung nicht vorankommt oder ein Ergebnis zu glatt aussieht.
+
 ## Die fünf Regeln über den Regeln
 
 Diese gelten immer, in jedem Gewerk.
