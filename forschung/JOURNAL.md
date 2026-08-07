@@ -65,18 +65,39 @@ Paare im Wechsel:
 Die Skript-Auswertung bleibt gleich. Das ist der Beweis, dass die Skripte nie
 das Problem waren.
 
-#### Was daraus folgt — noch nicht gebaut
+#### Der naheliegende Schluss war falsch — dritte Messung
 
 **Sechs der acht Animationen liegen weit unterhalb des Bildschirms** (ab 9.036
-bis 15.802 px). Sie laufen während des ganzen Ladens, ohne dass jemand sie
-sieht. Sie nur laufen zu lassen, wenn sie im Bild sind, wäre optisch nicht zu
-unterscheiden. Die zwei sichtbaren (Lampe und Siegel-Abzeichen in der Kopfleiste)
-sind Design und gehören Klaus.
+bis 15.802 px) und laufen trotzdem während des ganzen Ladens. Der Vorschlag
+lag auf der Hand: nur laufen lassen, was im Bild ist — optisch nicht zu
+unterscheiden, kein Design-Eingriff.
+
+**Gemessen bringt das so gut wie nichts.** Dritte Fassung der Wegwerf-Kopie,
+diesmal nur die sechs unsichtbaren abgeschaltet:
+
+| Fassung | Leistung | LCP | Style & Layout | Rendering |
+|---|---|---|---|---|
+| alle Animationen an | 64 · 66 · 71 | 7,2–7,6 s | 7.116 ms | 6.632 ms |
+| **nur die 6 unsichtbaren aus** | **72 · 72** | **7,3–7,5 s** | 6.292 ms | 6.190 ms |
+| alle aus | 82 · 80 · 77 | 4,2–5,0 s | 812 ms | 1.254 ms |
+
+Der LCP bewegt sich **überhaupt nicht**. Die Kosten stecken fast vollständig in
+den **zwei sichtbaren** Animationen der Kopfleiste: `#lamp-traffic`
+(`box-shadow` + `background-color`) und `#sbkim-siegel-badge` (`filter` +
+`box-shadow`). Sie zeichnen bei jedem Bild eine große Fläche neu — und sie
+sitzen **direkt über** dem LCP-Element, dem Hero-Text.
+
+Das ist die unbequeme Fassung: der Hebel liegt nicht bei den sechs, die
+niemand sieht, sondern bei den zweien, die Klaus bewusst in die Navleiste
+gestellt hat (Festlegung 2026-05-25, Sage behält die Navleisten-Lampen).
+
+#### Was daraus folgt — noch nicht gebaut
 
 **Nicht gebaut, weil der Brief „erst messen, nicht umbauen" sagt** und weil es
-mehrere gleich gute Wege gibt (Beobachter für den Sichtbereich ·
-`content-visibility` · Animationen auf `transform`/`opacity` umstellen). Klaus
-entscheidet. Alle Zahlen oben sind **lokal**; PageSpeed fehlt.
+mehrere gleich gute Wege gibt: den Puls über `opacity` auf einem Pseudo-Element
+mit fertigem Schein führen (kompositierbar, Optik gleich) · den Puls erst nach
+dem `load`-Ereignis starten · so lassen. Klaus entscheidet. Alle Zahlen oben
+sind **lokal**; PageSpeed fehlt.
 
 ### 2026-08-07 (abends) · Der doppelte Ladevorgang ist netzweit weg — und einmal kostet er Note
 
