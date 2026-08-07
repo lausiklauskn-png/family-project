@@ -47,7 +47,9 @@ Eine Änderung maß lokal 77 → 95 und wurde als Erfolg gemeldet. PageSpeed sag
 danach **79 — wie vorher** (Mein-WorkFloh, 2026-08-07). Der Prüfserver antwortet
 ohne Verzögerung; was nebenher über die Leitung geht, kostet dort nichts und
 draußen Sekunden. **Nie einen Gewinn als Erfolg melden, den nur die lokale
-Messung zeigt.**
+Messung zeigt.** Die Abweichung war dann aber der entscheidende Hinweis: sie
+führte zum Service-Worker-Vorrat, und nach dem Fix bestätigte PageSpeed
+**79 → 98**. Eine Abweichung ist ein Befund, kein Rauschen.
 
 **2 · Handy und Computer sind zwei verschiedene Messungen.**
 Nicht „dieselbe Seite, anderes Tempo". Lighthouse ändert mit dem Gerät auch die

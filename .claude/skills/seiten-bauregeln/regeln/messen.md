@@ -142,6 +142,14 @@ Sekunden. Genau dort steckte der Fehler (siehe Regel 8).
   irgendetwas kostet draußen, was lokal gratis ist. Such nach Bytes, die
   nebenher fließen.
 
+**Wie der Fall ausging — denn die Regel warnt, sie entmutigt nicht.** Die
+Abweichung war der entscheidende Hinweis. Gesucht wurde nach „Bytes, die
+nebenher fließen", gefunden wurde der Service-Worker-Vorrat (Regel 8 in
+[`skripte.md`](skripte.md)): 400 KiB PDF-Bibliothek, geholt 51 ms nach dem
+Laden. Nach dem Fix bestätigte PageSpeed **79 → 98** am Handy (2026-08-07,
+20:12). Gelöst hat es **nicht** die lokale Punktzahl, sondern eine
+**server-seitige Zeitmessung**: *wann* wird die Datei geholt.
+
 ## Regel 2 — Drei Runden, im Wechsel
 
 Die Zahl schwankt auf der Bau-Maschine um mehrere Punkte. Belegt: derselbe

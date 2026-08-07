@@ -183,6 +183,18 @@ davon aus:
 Die Folge ist ein sehr typisches Muster: **Computer 99, Handy 79.** Auf schneller
 Leitung fällt es nicht auf, über Mobilfunk kostet es den ganzen Gewinn.
 
+**Belegt durch PageSpeed vor und nach dem Fix** (2026-08-07):
+
+| | Handy | Computer |
+|---|---|---|
+| vorher | 79 | 99 |
+| nachher | **98** | **100** |
+
+**+19 Punkte durch eine einzige verschobene Datei.** Der Bau davor (Modul-Stapel
+nachladen, Regel 1) blieb wirkungslos, solange die PDF-Bibliothek die Leitung
+belegte — **erst beides zusammen** ergibt die 98. Wenn eine gute Maßnahme nichts
+bringt, ist sie nicht falsch; dann verdeckt sie etwas Größeres.
+
 **Regeln:**
 
 - Der `install`-Vorrat enthält **nur, was die App zum Starten braucht.** Alles
