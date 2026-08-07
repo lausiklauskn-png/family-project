@@ -21,6 +21,42 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-07 (abends) · Der doppelte Ladevorgang ist netzweit weg — und einmal kostet er Note
+
+Von Hand eingetragen. Regel 4 (`seiten-bauregeln/regeln/skripte.md`) abgearbeitet:
+der ungebremste `controllerchange`-Reload. Zwei Apps trugen ihn noch.
+
+**Tomys WorkFloh** war in der Regel nicht als betroffen gelistet, obwohl der
+Verlust dort mit 2,3 s gemessen worden war. Es rutschte durch, weil die
+Doppel-Reload-Sperre (`_swReloaded`) schon da war und beim Überfliegen wie ein
+Wächter aussieht. Sie verhindert den *zweiten* Reload, nicht den *ersten*.
+Gemergt (`Tomys-Hub#148`), lokal Handy im Wechsel: Leistung 87 · 94 → **97 · 97**,
+LCP 2,9 → **2,6 s**, TBT 320 · 100 → **60 · 30 ms**, CLS 0,041 → **0,021**.
+
+**Muttis Rezeptbuch** ist der interessante Fall. Der Mechanismus ist bewiesen:
+die Kette `index.html → index.html` mit **6.346 ms** verschenkt meldet
+Lighthouse nach dem Fix nicht mehr, fünf Läufe, beide Reihenfolgen. Aber die
+Note sinkt:
+
+| | Leistung | LCP | TBT |
+|---|---|---|---|
+| ohne Fix | 55 · 56 · 57 · 56 · 56 | 8,8–9,0 s | 60–140 ms |
+| mit Fix | 54 · 50 · 47 · 52 · 53 | **6,5 s** | 320–570 ms |
+
+Wahrscheinlichste Lesart (Deutung, nicht Beweis): am alten Stand misst
+Lighthouse die **zweite**, vorgewärmte Navigation. Der schöne TBT war erkauft
+mit einem zweiten kompletten Download und 2,5 s längerer Wartezeit. Der Fix
+macht Muttis nicht langsamer, er hört auf zu verbergen, wie teuer der erste
+Besuch ist — die 2-MB-`index.html` mit 1,2 MB eingebetteten Bildern.
+
+**Klaus' Entscheid:** mergen, dann misst er PageSpeed (`Muttis-Rezeptbuch#178`).
+Bestätigt sich der Rückgang draußen, wird der Fix in einem Folge-Commit
+zurückgenommen. **Alle Zahlen oben sind lokal** — die PageSpeed-Werte vorher/
+nachher fehlen hier noch und gehören nachgetragen, sobald Klaus gemessen hat.
+
+Damit tragen alle fünf betroffenen Apps den Wächter: Mein-WorkFloh, Tomys
+WorkFloh, Muttis Rezeptbuch, Mein-Rezeptbuch, Mein-Mixarium.
+
 ### 2026-08-07 (später) · Die Messreihe wusste nicht, welches Gerät sie misst
 
 Von Hand eingetragen. Auslöser war eine Nachprüfung, kein Bau: der Brief vom
