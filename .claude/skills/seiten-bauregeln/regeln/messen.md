@@ -318,13 +318,34 @@ Fassung der Kopie, in der **nur diese sechs** abgeschaltet waren, sagt:
 |---|---|---|
 | alle an | 64 · 66 · 71 | 7,2–7,6 s |
 | nur die 6 unsichtbaren aus | 72 · 72 | **7,3–7,5 s — unverändert** |
+| nur der Puls der Verkehrs-Lampe aus | 70 · 71 · 70 | **7,3–7,6 s — unverändert** |
+| **nur das Einblenden des Bildschirms aus** | **77 · 79 · 76 · 77** | **4,5–5,0 s** |
 | alle aus | 82 · 80 · 77 | 4,2–5,0 s |
 
-Die Kosten steckten in den **zwei sichtbaren** in der Kopfleiste, direkt über
-dem LCP-Element. Der bequeme Vorschlag hätte nichts gebracht und wie ein Erfolg
-ausgesehen. **Eine Ursache zu kennen heißt nicht, die Abhilfe zu kennen** —
-beide brauchen ihre eigene Messung, und die zweite ist die, die man sich gern
-spart, weil der Vorschlag so plausibel klingt.
+Der bequeme Vorschlag hätte nichts gebracht und wie ein Erfolg ausgesehen.
+**Eine Ursache zu kennen heißt nicht, die Abhilfe zu kennen** — beide brauchen
+ihre eigene Messung, und die zweite ist die, die man sich gern spart, weil der
+Vorschlag so plausibel klingt.
+
+### Der eigentliche Fehler: vom Mechanismus auf die Größenordnung schließen
+
+Nach der ersten Fehlspur stand hier zwei Stunden lang, die Kosten steckten in
+den **zwei sichtbaren** Lampen der Kopfleiste. Die Begründung war mechanisch
+sauber: `box-shadow` und `filter` lassen sich nicht auslagern, der Schein
+wächst auf 14 px, das zwingt zu einer Neuzeichnung je Bild, und die Lampen
+sitzen direkt über dem LCP-Element. Jeder Satz davon stimmt. **Gemessen ändert
+das Abschalten trotzdem null**, weil eine Lampe 9 × 9 Pixel groß ist.
+
+Es war schließlich **eine einzige CSS-Regel**: `.screen.active` blendet über
+`fade-in` ein, das startet bei `opacity: 0`, und das LCP-Element liegt darin.
+Der größte Anstrich wartete auf das Ende der Einblendung — bei unverändertem
+**erstem** Anstrich, was rückblickend die deutlichste Spur war.
+
+**Die Regel daraus:** ein Mechanismus sagt, *wie* etwas wirkt, nie *wie viel*.
+Wer „das ist nicht kompositierbar, also teuer" denkt, hat eine Hypothese, kein
+Ergebnis. Und wenn zwei Kennzahlen sich unterschiedlich verhalten (FCP
+unverändert, LCP schlecht), zeigt genau dieser Unterschied auf die Ursache —
+nicht die Liste der Verdächtigen.
 
 ## Abhakliste
 

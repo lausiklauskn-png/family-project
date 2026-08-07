@@ -81,23 +81,47 @@ diesmal nur die sechs unsichtbaren abgeschaltet:
 | **nur die 6 unsichtbaren aus** | **72 · 72** | **7,3–7,5 s** | 6.292 ms | 6.190 ms |
 | alle aus | 82 · 80 · 77 | 4,2–5,0 s | 812 ms | 1.254 ms |
 
-Der LCP bewegt sich **überhaupt nicht**. Die Kosten stecken fast vollständig in
-den **zwei sichtbaren** Animationen der Kopfleiste: `#lamp-traffic`
-(`box-shadow` + `background-color`) und `#sbkim-siegel-badge` (`filter` +
-`box-shadow`). Sie zeichnen bei jedem Bild eine große Fläche neu — und sie
-sitzen **direkt über** dem LCP-Element, dem Hero-Text.
+Der LCP bewegt sich **überhaupt nicht**.
 
-Das ist die unbequeme Fassung: der Hebel liegt nicht bei den sechs, die
-niemand sieht, sondern bei den zweien, die Klaus bewusst in die Navleiste
-gestellt hat (Festlegung 2026-05-25, Sage behält die Navleisten-Lampen).
+#### Und der zweite Schluss war auch falsch
 
-#### Was daraus folgt — noch nicht gebaut
+Daraufhin stand hier: die Kosten steckten in den **zwei sichtbaren**
+Animationen der Kopfleiste (`#lamp-traffic` über `box-shadow`,
+`#sbkim-siegel-badge` über `filter`), weil sie eine große Fläche neu zeichnen
+und direkt über dem LCP-Element sitzen. Klang schlüssig. **Gemessen ist auch
+das falsch:**
 
-**Nicht gebaut, weil der Brief „erst messen, nicht umbauen" sagt** und weil es
-mehrere gleich gute Wege gibt: den Puls über `opacity` auf einem Pseudo-Element
-mit fertigem Schein führen (kompositierbar, Optik gleich) · den Puls erst nach
-dem `load`-Ereignis starten · so lassen. Klaus entscheidet. Alle Zahlen oben
-sind **lokal**; PageSpeed fehlt.
+| Fassung | Leistung | LCP |
+|---|---|---|
+| alle Animationen an | 64 · 66 · 71 | 7,2–7,6 s |
+| nur der Puls der Verkehrs-Lampe aus | 70 · 71 · 70 | 7,3–7,6 s — **unverändert** |
+
+Eine Lampe ist 9 × 9 Pixel groß. Selbst mit wachsendem Schlagschatten ist das
+zu klein, um zu zählen. **Zweimal hintereinander vom Mechanismus auf die
+Größenordnung geschlossen — beide Male daneben.**
+
+#### Was es wirklich war: eine einzige CSS-Regel
+
+`.screen.active` blendet über `fade-in` ein, und das startet bei `opacity: 0`.
+Der Hero-Text darin **ist** das LCP-Element. Der größte Anstrich wartet also
+auf das Ende der Einblendung. Dabei trägt `<main id="screen-overview">` die
+Klasse `active` fest im HTML, und kein Skript setzt sie je auf einen anderen
+Bildschirm: die Einblendung spielt genau einmal, auf der Seite, die ohnehin
+schon da ist.
+
+| Fassung | Leistung | FCP | LCP |
+|---|---|---|---|
+| unverändert | 69 · 71 | 2,6 · 2,7 s | 7,6 · 7,3 s |
+| **nur das Einblenden aus** | **77 · 77** | 2,7 s | **4,6 · 4,7 s** |
+
+Der **erste** Anstrich bleibt gleich, nur der **größte** rückt vor — genau das
+Bild, das ein Element zeichnet, das auf seine Einblendung wartet.
+
+**Gebaut und gemergt** (`Sage-Protokol#788`): `.screen.active.erstanzeige {
+animation: none }` plus Marker am Start-Bildschirm. Bildschirme, die später
+aktiv werden, blenden unverändert ein. Die Lampen bleiben unangetastet — sie
+kosten messbar nichts. Alle Zahlen sind **lokal**; PageSpeed fehlt, und Klaus'
+Blick auf die nun übergangslos erscheinende Seite steht aus.
 
 ### 2026-08-07 (abends) · Der doppelte Ladevorgang ist netzweit weg — und einmal kostet er Note
 
