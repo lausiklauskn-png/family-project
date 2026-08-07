@@ -84,7 +84,10 @@ andere Größe, bevor du „behoben" meldest.
 
 ### Der Normalfall — und die zwei Ausreißer
 
-Ganzes Netz, beide Geräte, 2026-08-06 auf derselben Maschine gemessen:
+Ganzes Netz, beide Geräte, 2026-08-06 auf derselben Maschine gemessen.
+**Achtung, das sind LOKALE Werte** (siehe Regel 1b) — sie taugen zum Vergleich
+der Seiten untereinander, nicht als Aussage darüber, was Google sieht. Bei
+Mein-WorkFloh lag PageSpeed am selben Tag bei **79 statt 95**:
 
 | Seite | Handy | Computer | Ladezeit H → C | Blockierzeit H → C |
 |---|---|---|---|---|
@@ -113,6 +116,31 @@ den beiden Ausreißern bei über **4.400 ms**.
 > breiten Fenster. Auch das findet man nur, wenn man beide misst.
 
 ---
+
+## Regel 1b — Lokale Messung ist ein Hinweis. PageSpeed ist der Beweis.
+
+**Das hier ist teuer gelernt (2026-08-07).** Eine Änderung an Mein-WorkFloh maß
+lokal **77 → 95**. Gemeldet als Erfolg. Klaus hat danach PageSpeed laufen lassen:
+**79 — genau wie vorher.** Der Gewinn war draußen nicht angekommen.
+
+**Warum die beiden auseinandergehen:** der Prüfserver läuft auf derselben
+Maschine und antwortet ohne jede Verzögerung. Lighthouse drosselt zwar Prozessor
+und Leitung *simuliert*, aber alles, was **nebenher** über die Leitung geht —
+allen voran der **Service-Worker-Vorrat** — kostet lokal fast nichts und draußen
+Sekunden. Genau dort steckte der Fehler (siehe Regel 8).
+
+**Verbindlich daraus:**
+
+- **Nie einen Leistungs-Gewinn als Erfolg melden, den nur die lokale Messung
+  zeigt.** Formuliere ehrlich: „lokal 97 — der Beweis ist der nächste
+  PageSpeed-Lauf."
+- Bei jeder Änderung, die **Ladeverhalten** betrifft, gehört ein **Vorher-Wert
+  aus PageSpeed** dazu — der aus `forschung/messreihe.json` reicht.
+- Lokal misst **Richtung und Ursache** verlässlich (welches Element, welche
+  Datei, welcher Zeitpunkt). Die **Punktzahl** ist es nicht.
+- Weicht Lokal stark von PageSpeed ab, ist das ein **Befund**, kein Rauschen:
+  irgendetwas kostet draußen, was lokal gratis ist. Such nach Bytes, die
+  nebenher fließen.
 
 ## Regel 2 — Drei Runden, im Wechsel
 
@@ -195,6 +223,8 @@ for p in v['punkte']: print(p['von'], p['leistung'], p.get('mangel'))"
 
 - [ ] mit **dem einen** Werkzeug gemessen, kein zweites gebaut
 - [ ] **beide** Geräte (`--beides`)
+- [ ] Gewinn **nicht** als Erfolg gemeldet, solange nur die lokale Messung ihn zeigt
+- [ ] Vorher-Wert aus PageSpeed (`forschung/messreihe.json`) danebengelegt
 - [ ] mindestens drei Runden **im Wechsel** alt/neu
 - [ ] Einzelwerte genannt, nicht nur einen Mittelwert
 - [ ] die schuldige Kennzahl benannt (LCP · TBT · CLS · FCP)

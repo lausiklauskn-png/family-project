@@ -26,7 +26,7 @@ Datei, die zu deiner Arbeit gehört — nicht alle.
 Wenn dein Bau mehrere Gewerke berührt, liest du mehrere Dateien — aber nur die
 betroffenen.
 
-## Die vier Regeln über den Regeln
+## Die fünf Regeln über den Regeln
 
 Diese gelten immer, in jedem Gewerk.
 
@@ -41,6 +41,13 @@ Belegte Beispiele:
   Arbeit wanderte nur eine Datei weiter (Mein-WorkFloh, 2026-08-06).
 - „`defer` macht es schneller" — gemessen: 98 → 90, deutlich **schlechter**
   (Tomys-Hub, 2026-08-03).
+
+**1b · Lokale Messung ist ein Hinweis. PageSpeed ist der Beweis.**
+Eine Änderung maß lokal 77 → 95 und wurde als Erfolg gemeldet. PageSpeed sagte
+danach **79 — wie vorher** (Mein-WorkFloh, 2026-08-07). Der Prüfserver antwortet
+ohne Verzögerung; was nebenher über die Leitung geht, kostet dort nichts und
+draußen Sekunden. **Nie einen Gewinn als Erfolg melden, den nur die lokale
+Messung zeigt.**
 
 **2 · Handy und Computer sind zwei verschiedene Messungen.**
 Nicht „dieselbe Seite, anderes Tempo". Lighthouse ändert mit dem Gerät auch die
