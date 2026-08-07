@@ -309,6 +309,23 @@ Die Skript-Auswertung bleibt **gleich** — der Beweis, dass die Skripte nie das
 Problem waren. Das Abschalten ist keine Lösung, sondern das Messinstrument: es
 beziffert, was ein Verdächtiger kostet, **ohne** dass man ihn vorher umbaut.
 
+**Und dann die Gegenprobe auf den VORSCHLAG, nicht nur auf die Ursache.** Sechs
+der acht Animationen lagen weit unterhalb des Bildschirms. Der naheliegende
+Schluss: die pausieren, optisch nicht zu unterscheiden, fertig. Eine dritte
+Fassung der Kopie, in der **nur diese sechs** abgeschaltet waren, sagt:
+
+| Fassung | Leistung | LCP |
+|---|---|---|
+| alle an | 64 · 66 · 71 | 7,2–7,6 s |
+| nur die 6 unsichtbaren aus | 72 · 72 | **7,3–7,5 s — unverändert** |
+| alle aus | 82 · 80 · 77 | 4,2–5,0 s |
+
+Die Kosten steckten in den **zwei sichtbaren** in der Kopfleiste, direkt über
+dem LCP-Element. Der bequeme Vorschlag hätte nichts gebracht und wie ein Erfolg
+ausgesehen. **Eine Ursache zu kennen heißt nicht, die Abhilfe zu kennen** —
+beide brauchen ihre eigene Messung, und die zweite ist die, die man sich gern
+spart, weil der Vorschlag so plausibel klingt.
+
 ## Abhakliste
 
 - [ ] mit **dem einen** Werkzeug gemessen, kein zweites gebaut
