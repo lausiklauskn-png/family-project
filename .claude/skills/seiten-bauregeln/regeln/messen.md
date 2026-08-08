@@ -241,13 +241,20 @@ z.map(t=>({n:t.name,d:((r[t.id]||{}).punkte||[]).slice(-1)[0]?.bis||'nie'}))
  .sort((a,b)=>a.d<b.d?-1:1).forEach((t,i)=>console.log((i<6?'-> ':'   ')+t.d+'  '+t.n))"
 ```
 
-**Die Messreihe ist eine HANDY-Reihe** (Befund 2026-08-07). Beide Messwege
-lieferten von Anfang an Handy-Werte — PageSpeed über `strategy=mobile`,
-Lighthouse über seine eigene Voreinstellung —, aber bis zum 2026-08-07 stand es
-in keinem Punkt. Seither trägt jeder Punkt ein Feld `geraet`. Wer eine Zahl von
-dort neben eine eigene Computer-Messung legt, vergleicht Ungleiches: an
-Muttis Rezeptbuch lagen Handy und Computer am selben Tag bei **44 gegen 87**,
-an Sage-Protokol bei **71 gegen 97**.
+**Jeder Punkt nennt sein Gerät.** Bis zum 2026-08-07 lieferten beide Messwege
+still nur Handy-Werte (PageSpeed über `strategy=mobile`, Lighthouse über seine
+Voreinstellung), ohne dass es irgendwo stand. Seither trägt jeder Punkt ein
+Feld `geraet` — und seit dem **2026-08-08** misst der nächtliche Lauf **beide
+Geräte**: der Computer bekommt eine eigene Reihe `<id>--computer`.
+
+Warum zwei Reihen und nicht zwei Punkte in einer: die Auswertung dahinter
+(Spanne verlängern, Sprung erkennen, Verdacht bestätigen) vergleicht jeden
+Punkt mit dem **vorherigen derselben Reihe**. Lägen Handy und Computer
+abwechselnd darin, meldete sie bei jedem Lauf einen Sprung, den es nicht gibt.
+
+Klaus' Entscheid kam aus den Zahlen des Tages: Sage-Protokol **83 gegen 99**,
+Muttis Rezeptbuch **61 gegen 95**. Wer nur die Handy-Zahl kennt, hält zwei
+Seiten für Sanierungsfälle, die am Computer längst gut sind.
 
 ## Regel 7b — Eine einzelne PageSpeed-Zahl trägt keine Rangfolge
 

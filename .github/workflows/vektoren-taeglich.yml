@@ -41,9 +41,11 @@ on:
     inputs:
       forschung_max:
         description: >-
-          Wie viele eigene Ziele dieser Lauf misst (nachts immer 6). Hochsetzen,
-          wenn ein bestimmtes Ziel hinten in der Warteschlange steht und die Zahl
-          heute gebraucht wird — die Reihenfolge bleibt „ältester Befund zuerst".
+          Wie viele eigene ZIELE dieser Lauf misst (nachts immer 6). Jedes Ziel
+          kostet seit dem 2026-08-08 zwei Messungen — Handy und Computer.
+          Hochsetzen, wenn ein bestimmtes Ziel hinten in der Warteschlange steht
+          und die Zahl heute gebraucht wird — die Reihenfolge bleibt
+          „ältester Befund zuerst".
         required: false
         default: "6"
 
@@ -60,6 +62,10 @@ jobs:
     # Stufe 5 misst je Eintrag rund eine halbe bis eine Minute; der Deckel in
     # tools/messung.mjs hält das bei höchstens zehn Einträgen je Nacht. Mit dem
     # Modell-Download davor bleibt eine Stunde reichlich Luft.
+    # Nachgemessen am 2026-08-08, bevor die eigenen Ziele auf zwei Geräte
+    # umgestellt wurden: die letzten sechs Läufe brauchten 4,5 · 5,7 · 6,5 ·
+    # 5,5 · 5,8 · 9,0 Minuten. Die Verdopplung dieses einen Schrittes bleibt
+    # damit weit unter der Grenze — geprüft, nicht gehofft.
     timeout-minutes: 60
     steps:
       - name: Repo auschecken

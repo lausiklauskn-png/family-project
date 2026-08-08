@@ -420,6 +420,30 @@ const standVon = (dir) => JSON.parse(fs.readFileSync(path.join(dir, "assets/conf
   ok(!psiAdresse("https://beispiel.de/", "").includes("key="),
     "G1g ohne Schlüssel steht auch kein leeres key= in der Adresse");
 }
+/* ── Beide Geräte (Klaus 2026-08-08) ───────────────────────────────────────
+ * Bis dahin wurde nur das Handy gemessen. Die Zahlen desselben Tages zeigen,
+ * warum das zu wenig war: Sage-Protokol 83 am Handy gegen 99 am Computer.
+ * Geprüft wird, dass das Gerät WIRKLICH bis in den Aufruf durchschlägt — bei
+ * beiden Messwegen, denn sie legen es unabhängig voneinander fest. */
+{
+  ok(psiAdresse("https://beispiel.de/", "K", "computer").includes("strategy=desktop"),
+    "G2 PageSpeed wird für den Computer nach der Computer-Ansicht gefragt");
+  ok(psiAdresse("https://beispiel.de/", "K", "handy").includes("strategy=mobile"),
+    "G2b und fürs Handy nach der Handy-Ansicht");
+  ok(psiAdresse("https://beispiel.de/", "K").includes("strategy=mobile"),
+    "G2c ohne Angabe bleibt es beim Handy — Googles Voreinstellung");
+
+  const bc = lighthouseBefehl("https://x.example/", "/tmp/x.json", { cmd: "lh", geraet: "computer" });
+  ok(bc.args.indexOf("--preset=desktop") >= 0,
+    "G2d der eigene Messweg schaltet für den Computer auf --preset=desktop");
+  const bh = lighthouseBefehl("https://x.example/", "/tmp/x.json", { cmd: "lh", geraet: "handy" });
+  ok(bh.args.indexOf("--preset=desktop") < 0,
+    "G2e und lässt fürs Handy die Voreinstellung stehen");
+  ok(lighthouseBefehl("https://x.example/", "/tmp/x.json", { cmd: "lh" }).args.indexOf("--preset=desktop") < 0,
+    "G2f ohne Angabe ebenso");
+  ok(bc.args[0] === "https://x.example/" && bc.args.indexOf("--output=json") >= 0,
+    "G2g und der übrige Aufruf bleibt unverändert");
+}
 {
   // Ohne Schlüssel wird gar nicht erst gefragt — und der Grund steht dabei.
   const r = await psiMessen("https://beispiel.de/", { psiSchluessel: "" });
