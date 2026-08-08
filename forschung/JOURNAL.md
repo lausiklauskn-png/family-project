@@ -120,8 +120,38 @@ Bild, das ein Element zeichnet, das auf seine Einblendung wartet.
 **Gebaut und gemergt** (`Sage-Protokol#788`): `.screen.active.erstanzeige {
 animation: none }` plus Marker am Start-Bildschirm. Bildschirme, die später
 aktiv werden, blenden unverändert ein. Die Lampen bleiben unangetastet — sie
-kosten messbar nichts. Alle Zahlen sind **lokal**; PageSpeed fehlt, und Klaus'
-Blick auf die nun übergangslos erscheinende Seite steht aus.
+kosten messbar nichts.
+
+#### PageSpeed hat beide Vorhersagen widerlegt (nachgetragen 2026-08-08)
+
+Der nächtliche Lauf vom 2026-08-08 03:11 UTC hat beide Seiten gemessen. Beide
+Änderungen lagen zu dem Zeitpunkt seit Stunden auf `main` (Muttis seit 19:54,
+Sage seit 22:00 UTC).
+
+| Seite | lokal vorhergesagt | PageSpeed (Google, Handy) |
+|---|---|---|
+| Muttis Rezeptbuch | **−4** (56 → ~52) | 56 → **61** |
+| Sage-Protokol | **+8** (69 → 77) | 65 → **64** |
+
+**Zweimal in die falsche Richtung.** Beide Vorhersagen kamen aus sorgfältigen
+lokalen Messungen mit mehreren Paaren im Wechsel — und trafen am echten Server
+nicht zu. Deutlicher lässt sich Regel 1b nicht belegen.
+
+Die Beanstandungsliste sagt dabei mehr als die Note:
+
+- **Muttis:** die Beanstandung *„Mehrere Weiterleitungen auf die Seite
+  vermeiden" ist verschwunden.* Das ist genau der doppelte Ladevorgang. Google
+  bestätigt den Mechanismus am live ausgelieferten Stand. Der Fix bleibt.
+- **Sage:** die Liste ist **unverändert**, inklusive *„Largest Contentful
+  Paint"*. Von den lokal gemessenen 2,7 s ist draußen nichts angekommen.
+
+Offen und ehrlich benannt: es ist **je eine** Messung, und nach Regel 7b trägt
+eine einzelne PageSpeed-Zahl kein Urteil — die nächste Nacht hält sie oder
+nicht. Für Sage ist außerdem nicht **bewiesen**, dass Pages den neuen Stand zur
+Messzeit schon auslieferte (fünf Stunden Abstand sprechen dafür, prüfen kann
+diese Umgebung es nicht: der Ausgangs-Proxy verweigert `github.io`). Klaus
+kann es in einem Blick klären — erscheint die Seite ohne Einblenden, ist der
+Stand live.
 
 ### 2026-08-07 (abends) · Der doppelte Ladevorgang ist netzweit weg — und einmal kostet er Note
 

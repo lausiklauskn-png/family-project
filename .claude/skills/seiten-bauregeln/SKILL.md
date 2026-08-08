@@ -57,6 +57,18 @@ Messung zeigt.** Die Abweichung war dann aber der entscheidende Hinweis: sie
 führte zum Service-Worker-Vorrat, und nach dem Fix bestätigte PageSpeed
 **79 → 98**. Eine Abweichung ist ein Befund, kein Rauschen.
 
+Die Regel gilt in **beide** Richtungen — auch ein lokal gemessener *Verlust*
+ist keiner. Am 2026-08-08 lagen zwei sorgfältige lokale Vorhersagen, jede aus
+mehreren Paaren im Wechsel, bei PageSpeed **beide in der falschen Richtung**:
+
+| Seite | lokal vorhergesagt | PageSpeed |
+|---|---|---|
+| Muttis Rezeptbuch | −4 | 56 → **61** |
+| Sage-Protokol | +8 | 65 → **64** |
+
+Wer daraufhin den Muttis-Fix zurückgenommen hätte, weil die Bau-Maschine ihn
+schlechtreden konnte, hätte eine Verbesserung weggeworfen.
+
 **2 · Handy und Computer sind zwei verschiedene Messungen.**
 Nicht „dieselbe Seite, anderes Tempo". Lighthouse ändert mit dem Gerät auch die
 **Fensterbreite** (412 px gegen 1350 px). Jede Regel, die an der Breite hängt,
