@@ -31,7 +31,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { MESSUNG_GERAET } from "./messung.mjs";
+import { MESSUNG_GERAET, MESSUNG_GERAETE } from "./messung.mjs";
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REIHE = path.join(WURZEL, "forschung", "messreihe.json");
@@ -119,6 +119,9 @@ function messungenSammeln(stand) {
         name,
         url: m.url || "",
         gemessen: m.gemessen || heute(),
+        /* Ohne Angabe Handy: der Marktplatz-Tagesbericht kennt kein Gerät und
+         * wird über PageSpeeds Voreinstellung gemessen. */
+        geraet: m.geraet || MESSUNG_GERAET,
         quelle: m.quelle || "eigen",
         werkzeug: m.werkzeug || "",
         werte: Object.fromEntries(MASSE.map((k) => [k, m[k]])),
@@ -204,7 +207,7 @@ function einsortieren(stand) {
     const punkt = {
       von: m.gemessen, bis: m.gemessen,
       ...m.werte,
-      geraet: MESSUNG_GERAET,
+      geraet: m.geraet,
       quelle: m.quelle, werkzeug: m.werkzeug,
       mangel: m.mangel
     };
@@ -522,6 +525,11 @@ async function messen() {
    * nächtlichen Lauf in seiner Zeitgrenze; wer heute nicht drankommt, kommt
    * beim nächsten Mal zuerst dran (ältester Befund zuerst). Das wird GESAGT,
    * nicht verschwiegen — sonst liest sich ein halber Durchgang wie ein ganzer. */
+  /* Der Deckel zählt ZIELE, nicht Messungen. Seit dem 2026-08-08 kostet jedes
+   * Ziel zwei Messungen (Handy + Computer) — der Lauf dauert also doppelt so
+   * lange wie vorher, bei gleicher Zahl im Deckel. Das steht hier, damit
+   * niemand die Zahl später für „Messungen" hält und den Lauf versehentlich
+   * halbiert. */
   const deckel = Number(process.env.FORSCHUNG_MAX || 6);
   const reihe = lesen(REIHE, { fassung: 1, reihen: {} });
   reihe.reihen = reihe.reihen || {};
@@ -545,17 +553,37 @@ async function messen() {
 
   const tag = heute();
   const frisch = { eintraege: {} };
+  /* JEDES Ziel wird auf BEIDEN Geräten gemessen (Klaus 2026-08-08). Der Grund
+   * steht in den Zahlen desselben Tages: Sage-Protokol 83 am Handy gegen 99 am
+   * Computer, Muttis Rezeptbuch 61 gegen 95. Eine Reihe, die nur das Handy
+   * kennt, lässt zwei Seiten wie Sanierungsfälle aussehen, die auf dem
+   * Computer längst gut sind.
+   *
+   * WARUM ZWEI REIHEN und nicht zwei Punkte in einer: die ganze Auswertung
+   * dahinter — Spanne verlängern, Sprung erkennen, Verdacht bestätigen —
+   * vergleicht einen Punkt mit dem VORHERIGEN derselben Reihe. Lägen Handy und
+   * Computer abwechselnd darin, verglichen diese Regeln zwei verschiedene
+   * Geräte miteinander und meldeten bei jedem Lauf einen Sprung, den es nicht
+   * gibt. Der Computer bekommt darum eine eigene Reihe `<id>--computer`, genau
+   * wie es die Schaufenster-Seiten schon tun. */
   for (const z of dran) {
-    const roh = await seiteMessen(z.url, {});
-    const m = messungBilden({ vorher: undefined, roh, heute: tag });
-    m.url = z.url;
-    if (!hatZahlen(m)) {
-      console.log(`  ! ${z.name}: nicht gemessen (${m.hinweis || roh.hinweis || "kein Grund genannt"})`);
-      continue;
+    for (const geraet of MESSUNG_GERAETE) {
+      const istComputer = geraet === "computer";
+      const zielId = istComputer ? `${z.id}--computer` : z.id;
+      const zielName = istComputer ? `${z.name} (Computer)` : z.name;
+
+      const roh = await seiteMessen(z.url, { geraet });
+      const m = messungBilden({ vorher: undefined, roh, heute: tag });
+      m.url = z.url;
+      m.geraet = geraet;
+      if (!hatZahlen(m)) {
+        console.log(`  ! ${zielName}: nicht gemessen (${m.hinweis || roh.hinweis || "kein Grund genannt"})`);
+        continue;
+      }
+      console.log(`  ✓ ${zielName}: ${m.leistung}/${m.bedienbarkeit}/${m.gute_praxis}/${m.auffindbarkeit}` +
+        ` (${m.quelle === "google" ? "Google" : "eigen"})`);
+      frisch.eintraege[zielId] = { nodeName: zielName, messung: m };
     }
-    console.log(`  ✓ ${z.name}: ${m.leistung}/${m.bedienbarkeit}/${m.gute_praxis}/${m.auffindbarkeit}` +
-      ` (${m.quelle === "google" ? "Google" : "eigen"})`);
-    frisch.eintraege[z.id] = { nodeName: z.name, messung: m };
   }
 
   /* Einsortiert wird über denselben Weg wie die Marktplatz-Zahlen — ein zweiter

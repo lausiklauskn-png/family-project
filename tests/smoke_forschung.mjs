@@ -321,6 +321,32 @@ ok(/2026-08-04/.test(sicht) && !/2026-08-01…2026-08-03/.test(sicht),
   ok(nachher[1].geraet === "desktop", "ein Punkt mit fremdem Gerät bleibt unangetastet");
 }
 
+/* ---- 6h · Das Gerät kommt aus der MESSUNG, nicht aus einer festen Zeile ----
+ * Seit dem 2026-08-08 misst der Lauf beide Geräte und legt den Computer in
+ * eine EIGENE Reihe (`<id>--computer`). Damit das trägt, muss der eingetragene
+ * Punkt das Gerät der Messung übernehmen. Stünde dort weiterhin fest „handy",
+ * wäre die Computer-Reihe als Handy-Reihe beschriftet — und die nächste
+ * Sitzung verglichen zwei Geräte miteinander, ohne es zu merken. */
+{
+  fs.writeFileSync(path.join(buehne, "assets", "config", "spore-stand.json"), JSON.stringify({
+    geprueft: "2026-08-19T02:40:00.000Z",
+    eintraege: { "probe-seite--computer": { nodeName: "Probe-Seite (Computer)", messung: {
+      stand: "gemessen", leistung: 95, bedienbarkeit: 100, gute_praxis: 100, auffindbarkeit: 100,
+      gemessen: "2026-08-19", quelle: "google", werkzeug: "13.4.1", hinweise: [],
+      geraet: "computer", url: "https://beispiel.invalid/probe/"
+    } } }
+  }));
+  lauf("--nachtragen");
+  const reihe = JSON.parse(fs.readFileSync(path.join(buehne, "forschung", "messreihe.json"), "utf8"));
+  const c = reihe.reihen["probe-seite--computer"];
+  ok(!!c, "der Computer bekommt eine eigene Reihe statt eines Punktes in der Handy-Reihe");
+  ok(c && c.punkte[c.punkte.length - 1].geraet === "computer",
+    "und sein Punkt trägt das Gerät der Messung, nicht das voreingestellte");
+  const h = reihe.reihen["probe-seite"];
+  ok(h.punkte.every((p) => p.geraet !== "computer"),
+    "die Handy-Reihe bleibt davon unberührt");
+}
+
 /* ---- 7 · Die eigene Zielliste -------------------------------------------- */
 /* `messziele.json` ist von Hand gepflegt. Ein Tippfehler darin fällt sonst erst
  * in der Nacht auf, und dann nur als eine Zeile in einem Aktions-Protokoll,

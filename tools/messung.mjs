@@ -85,18 +85,27 @@ export const MESSUNG_MAX_PRO_LAUF = 10;     // Deckel, damit die Aktion nicht in
 export const BERICHT_MAX = 40 * 1024 * 1024; // ein Lighthouse-Bericht ist ~1 MB; alles darüber wird nicht gelesen
 export const MESSUNG_SPRACHE = "de";        // Sprache der Prüfungs-Titel (siehe lighthouseBefehl)
 
-/* WELCHES GERÄT gemessen wird — an EINER Stelle, weil beide Messwege es
- * unabhängig voneinander festlegen und dabei zufällig übereinstimmen:
- *   Weg B (PageSpeed): `strategy=mobile` in `psiAdresse`.
- *   Weg A (Lighthouse selbst): `formFactor` wird NIE gesetzt, und Lighthouses
- *   Voreinstellung ist das Handy.
- * Beide liefern also Handy-Werte — nur stand das nirgends, und in der Messreihe
- * war den Zahlen nicht anzusehen, welches Gerät sie meinen (Befund 2026-08-07).
- * Das ist keine Feinheit: an SB-KIMTool-Point lagen Handy und Computer am
- * 2026-08-07 bei 81 gegen 97, an Muttis Rezeptbuch lokal bei 44 gegen 87.
- * Wer eine Handy-Zahl für eine Computer-Zahl hält, sucht den Fehler an der
- * falschen Seite. */
-export const MESSUNG_GERAET = "handy";
+/* WELCHE GERÄTE gemessen werden — an EINER Stelle, weil beide Messwege das
+ * sonst unabhängig voneinander festlegen:
+ *   Weg B (PageSpeed): `strategy` in `psiAdresse`.
+ *   Weg A (Lighthouse selbst): `--preset=desktop` in `lighthouseBefehl`;
+ *   ohne diesen Schalter ist Lighthouses Voreinstellung das Handy.
+ *
+ * Bis zum 2026-08-07 wurde NUR das Handy gemessen, und in der Messreihe war
+ * den Zahlen nicht anzusehen, welches Gerät sie meinen. Am 2026-08-08 hat
+ * Klaus die Umstellung auf beide entschieden — die Zahlen des Tages zeigen,
+ * warum: Sage-Protokol stand am Handy bei 83, am Computer bei **99**; Muttis
+ * Rezeptbuch bei 61 gegen **95**. Wer nur die Handy-Zahl kennt, hält zwei
+ * Seiten für Sanierungsfälle, die am Computer längst gut sind.
+ *
+ * Reihenfolge ist Absicht: das Handy zuerst. Es ist die strengere Messung und
+ * Googles eigene Voreinstellung — wer den Lauf abbricht, hat den wichtigeren
+ * Wert schon. */
+export const MESSUNG_GERAETE = ["handy", "computer"];
+
+/* Der Wert, der gilt, wenn keiner genannt ist: die Marktplatz-Zahlen aus dem
+ * Tagesbericht sind Handy-Werte, und die nachbeschrifteten Altpunkte auch. */
+export const MESSUNG_GERAET = MESSUNG_GERAETE[0];
 
 /* Die vier Kategorien an EINER Stelle. Der Schlüssel links ist unser Name im
  * Bericht (deutsch, weil er in der Anzeige auftaucht), rechts steht der Name,
@@ -221,6 +230,12 @@ export function lighthouseBefehl(url, berichtDatei, opts) {
     // entsteht, den heute niemand hat. Deutsch, weil die Seite deutsch ist.
     "--locale=" + MESSUNG_SPRACHE,
     "--max-wait-for-load=45000",
+    /* Ohne diesen Schalter misst Lighthouse das Handy — das ist seine
+     * Voreinstellung. `--preset=desktop` schaltet Fenster (1350 statt 412 px),
+     * Drosselung und Kennzeichner gemeinsam um; einzeln gesetzte Werte
+     * ergäben eine Mischung, die es bei PageSpeed nicht gibt und mit der die
+     * Zahlen nicht mehr vergleichbar wären. */
+    ...(o.geraet === "computer" ? ["--preset=desktop"] : []),
     "--chrome-flags=--headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage"
   ];
   return eigen
@@ -285,12 +300,14 @@ export function werkzeugDa(opts) {
  * lesen ihn unverändert. */
 export const PSI_ENDPUNKT = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed";
 
-export function psiAdresse(url, schluessel) {
+export function psiAdresse(url, schluessel, geraet) {
   const p = new URLSearchParams();
   p.set("url", url);
-  // Handy-Ansicht wie im verlinkten Bericht. Die Wahl steht bei MESSUNG_GERAET,
-  // damit sie nicht an zwei Stellen unabhängig voneinander getroffen wird.
-  p.set("strategy", MESSUNG_GERAET === "handy" ? "mobile" : "desktop");
+  /* Ohne Angabe bleibt es beim Handy — dieselbe Ansicht wie im verlinkten
+   * Bericht und Googles Voreinstellung. Die erlaubten Namen stehen bei
+   * MESSUNG_GERAETE, damit sie nicht an zwei Stellen unabhängig voneinander
+   * festgelegt werden. */
+  p.set("strategy", geraet === "computer" ? "desktop" : "mobile");
   p.set("locale", MESSUNG_SPRACHE);
   for (const k of KATEGORIEN) p.append("category", k.lh);
   if (schluessel) p.set("key", schluessel);
@@ -310,7 +327,7 @@ export async function psiMessen(url, opts) {
   });
   let antwort;
   try {
-    antwort = await holen(psiAdresse(url, schluessel), o.frist || MESSUNG_FRIST);
+    antwort = await holen(psiAdresse(url, schluessel, o.geraet), o.frist || MESSUNG_FRIST);
   } catch (e) {
     return { ok: false, hinweis: ("PageSpeed nicht erreichbar: " + String((e && e.message) || e)).slice(0, 160) };
   }
