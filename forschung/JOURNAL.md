@@ -73,6 +73,29 @@ verdeckte die Langsamkeit einen Umgebungsmangel, der die ganze Zeit da war.
 Der Filter fasst deshalb bewusst **eng** auf den Proxy-Wortlaut — ein wirklich
 totes Relais soll weiterhin auffallen.
 
+#### Mein-Tresor nachgemessen (Klaus, 08.08.2026, 23:09)
+
+| Seite | Computer | Handy | heute früh | lokal vorhergesagt |
+|---|---|---|---|---|
+| **Mein Tresor (App)** | **99** | 83 | 73 · 80 | 98 · 80 |
+
+Barrierefreiheit **84/87 → 100/100** (der `select-name`-Posten mit Gewicht 10 war der
+letzte; behoben im Kanon Jasons-Tresor und byte-gleich kopiert).
+
+**Lehre 1b diesmal andersherum:** lokal hatte ich **80/98** gemessen, draußen steht
+**83/99**. Die lokale Zahl lag also *zu niedrig*. Das entlastet die Regel nicht — sie sagt
+nur, dass die Bau-Maschine nicht die Welt ist, nicht in welche Richtung sie irrt.
+
+**Was danach noch im Bericht stand** (und in Mein-Tresor am selben Abend behoben wurde):
+326 KiB Bilder, die das Handy in Computer-Größe bekam (jetzt `srcset`), und — deutlich
+schwerer — **zehn Abrufe an `raw.githubusercontent.com` beim bloßen Öffnen der Seite**,
+1,7 bis 4,0 s im kritischen Pfad. Das war der Briefkasten-Blick. Er läuft jetzt erst auf
+Knopfdruck; beim Öffnen spricht die Seite mit niemandem mehr. Gegenmessung steht aus.
+
+**Für das ganze Netz:** derselbe Briefkasten-Blick steckt in jedem Knoten mit Postfach.
+Wer dort misst, sucht ihn zuerst — und findet ihn womöglich **doppelt**: in Mein-Tresor
+lösten zwei Stellen denselben stillen Abruf aus, darum zehn statt fünf.
+
 #### Von Google bestätigt (Klaus, 08.08.2026, 20:12–20:16)
 
 | Seite | Computer | Handy | heute früh | lokal vorhergesagt |
