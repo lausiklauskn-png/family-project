@@ -21,6 +21,66 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-08 (nachmittags) · Die beiden Landeseiten — der Fehler war längst repariert, nur woanders
+
+Von Hand eingetragen. Klaus' eigene PageSpeed-Läufe hatten sie als schwächstes
+Paar freigelegt: **Mein-Rezeptbuch-Page 57 / 62** und **Mein-Mixarium-Page
+59 / 67** — eigene Repos, die Landeseiten vor den Apps.
+
+Klaus schickte den vollständigen Mixarium-Bericht. Zwei Stellen darin sagten
+alles:
+
+- **Die zwanzig längsten Hauptthread-Aufgaben waren alle dieselbe Datei** —
+  `assets/mycel-bg.js`, jede **540–640 ms**. Das sind knapp zwei Bilder je
+  Sekunde. Die „Bewegung" war längst keine mehr, sie hat nur noch gerechnet:
+  **39 s** unter `Other`.
+- **Der LCP war reiner Text** (`p.lead`), TTFB **0 ms**, und trotzdem
+  **2.310 ms** „Verzögerung beim Rendering". Nichts zu laden — der Hauptfaden
+  war nur zu beschäftigt, um Text zu zeichnen. Dieselbe Signatur wie an
+  Sage-Protokol am Tag zuvor.
+
+#### Der eigentliche Befund war ein Vergleich, keine Analyse
+
+Dieselbe Datei lag im Netz in **drei** Fassungen:
+
+| | three.js nachgeladen | Selbst-Bremse | Handy |
+|---|---|---|---|
+| family-projekt.de | ✅ | ✅ | 80 |
+| Mein-Rezeptbuch-Page | ✅ | ❌ | 57 |
+| Mein-Mixarium-Page | ❌ | ❌ | 59 |
+
+**Beide Reparaturen waren schon erfunden und von Klaus am 2026-08-02
+freigegeben.** Sie waren nur nie nachgezogen worden. Die Untersuchung hätte
+mit dem Blick auf die Schwester-Seite anfangen können statt mit dem Bericht.
+
+#### Gemessen, vier Runden im Wechsel
+
+| | Blockierzeit | Leistung |
+|---|---|---|
+| Mein-Mixarium-Page | 168.000 → **7.800 ms** | 64 · 63 · 64 · 64 → **70 · 70 · 70 · 70** |
+| Mein-Rezeptbuch-Page | 168.000 → **10.000 ms** | 42 · 43 · 43 · 50 → 54 · 55 · 47 · 48 |
+
+**Ehrlich: bei Rezeptbuch-Page ist die Blockierzeit bewiesen, die Note nicht.**
+Die Zahlen überlappen (50 alt gegen 47 neu). Dort bestimmt der LCP, und der
+hängt an den Bildern — 3,7 bis 4,9 s, schwankend. Das ist der nächste Hebel und
+ein eigener.
+
+#### Zwei Ideen gemessen und verworfen
+
+- **Vorrat des Service-Workers kürzen** — der +19-Punkte-Fund von Mein-WorkFloh.
+  Hier holt der Vorrat 28 Dateien beim ersten Besuch, das sah nach demselben
+  Muster aus. Gegenprobe mit auf drei Dateien gekürztem Vorrat: **48/47 gegen
+  48/48.** Kostet nichts. Nicht gebaut.
+- **Zweite, härtere Not-Schwelle für die Bremse** (ein Bild über 0,4 s bremst
+  sofort, statt fünf abzuwarten — die Bremse braucht sonst 8 Bilder, bei 1,4 s
+  je Bild also 11 s). Gemessen **47 · 54 · 48 gegen 46 · 48 · 47**: im Rauschen.
+  Nicht gebaut.
+
+Zwei plausible Geschichten, zwei Gegenproben, zwei Absagen. Genau dafür ist
+Regel 1 da.
+
+→ Neue Regel 10 in `regeln/skripte.md`.
+
 ### 2026-08-08 · Zwei Hebel an drei Küchen-Apps — von Google bestätigt, nicht nur lokal
 
 Von Hand eingetragen. An **Muttis Rezeptbuch**, **Mein Rezeptbuch** und
