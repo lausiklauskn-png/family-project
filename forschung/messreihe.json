@@ -155,6 +155,22 @@
       "leistung: JavaScript komprimieren",
       "leistung: Largest Contentful Paint"
      ]
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 80,
+     "bedienbarkeit": 95,
+     "gute_praxis": 92,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Auswahlfelder haben keine zugehörige Beschriftung",
+      "gute_praxis: Zeichensatz-Angabe fehlt oder steht zu spät im HTML",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert"
+     ],
+     "geraet": "handy"
     }
    ]
   },
@@ -1583,6 +1599,28 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    }
+   ]
+  },
+  "markt-mein-tresor--computer": {
+   "name": "Mein-Tresor (Computer)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Tresor/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 98,
+     "bedienbarkeit": 95,
+     "gute_praxis": 92,
+     "auffindbarkeit": 100,
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Auswahlfelder haben keine zugehörige Beschriftung",
+      "gute_praxis: Zeichensatz-Angabe fehlt oder steht zu spät im HTML",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert"
+     ],
+     "geraet": "computer"
     }
    ]
   }

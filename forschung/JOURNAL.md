@@ -21,6 +21,62 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-08 (nachts) · Mein-Tresor — 71 → 80 am Handy, 98 am Computer
+
+Von Hand eingetragen, **eigene Messung** (nicht Google — dazu unten).
+
+Mein-Tresor war die langsamste Seite im Netz, die Schwester Jasons-Tresor eine
+der schnellsten, bei gleichem Kern und **gleicher Bildstrecke**. Genau das war
+der Hinweis.
+
+| | Handy vorher | nachher | Computer vorher | nachher |
+|---|---|---|---|---|
+| Leistung | 73 · 73 · 75 · 74 · 74 | **80 · 80 · 80** | 80 · 64 · 80 · 75 · 80 | **98 · 98 · 98** |
+| Ladezeit | 21,8 s (fünfmal gleich) | **5,4 s** | 3,6–9,8 s | **1,0–1,1 s** |
+| Barrierefreiheit | 84 | **95** | 87 | **95** |
+| Übertragen | 15,9 MB · 44 Dateien | **0,75 MB · 23 Dateien** | | |
+
+**Warum.** Zwei Ursachen, und die zweite war die größere:
+
+1. Die vier Safe-Bilder lagen als PNG vor: 8.447 KiB, 70 % der ganzen Seite.
+   Als WebP (Güte 0,90) noch 891 KiB — **89 % weniger**, ohne sichtbaren
+   Unterschied in echter Anzeigegröße. Nur das Drehrad ließ sich zusätzlich
+   verkleinern (1024 → 768 px); die anderen drei lagen schon unter dem
+   Doppelten ihrer Anzeigebreite.
+2. **Danach stand die Ladezeit am Handy immer noch bei 12,6 s.** Das geerbte
+   Tür-Intro und das Regal sind in Mein-Tresor `display:none!important` — an
+   ihrer Stelle steht der Dreh-Safe. Ihre Bilder wurden trotzdem bei **jedem**
+   Aufruf geholt: rund **6 MB, die nie jemand zu sehen bekam**. Behoben mit
+   `loading="lazy"`; ein Bild in einem ausgeblendeten Behälter kommt dem
+   Sichtfeld nie nahe. Dazu das Fach-Fenster (1,38 MiB) — lazy plus stilles
+   Vorwärmen nach dem Laden, damit das Öffnen eines Fachs schnell bleibt.
+
+Das erklärt zugleich die alte Frage, warum dieselbe Bildstrecke bei
+Jasons-Tresor nicht weh tut: **dort wird sie gezeigt.**
+
+Barrierefreiheit 84/87 → 95/95 durch drei Kleinigkeiten: `role="img"` an der
+Wächter-Lampe, Kontrast des Impressum-Verweises (Deckkraft `.5` drückte ihn auf
+3,1:1), und der „Eintreten"-Knopf lag mit seiner Ecke über eben diesem Verweis.
+
+**Drei Dinge, die man dieser Zeile nicht ansieht — ehrlich dazu:**
+
+- **Die Quelle ist `eigen`, nicht Google.** Die Live-Adresse ist aus dem
+  Bau-Container nicht erreichbar und PageSpeed antwortet ohne Schlüssel mit 429.
+  Nach Regel 1b ist das ein **Hinweis, kein Beweis** — die Zahl, die zählt, misst
+  der nächtliche Lauf.
+- **„Gute Praxis 100 → 92" ist kein Rückschritt**, sondern ein Artefakt der
+  Messumgebung: im Container sind die fünf Briefkasten-Abrufe an
+  `raw.githubusercontent.com` gesperrt, das schlägt als „Browserfehler in der
+  Konsole" durch. Live gibt es diese Fehler nicht.
+- **Ein vierter Lauf ergab am Handy 70 statt 80** (Blockierzeit 400 ms statt
+  50–90). Ausreißer der Bau-Maschine, wie am 2026-08-03 schon einmal
+  (94 · 78 · 94). Eingetragen ist die Zahl der drei übereinstimmenden Läufe.
+
+**Was bleibt:** die drei Auswahlfelder ohne Beschriftung (Gewicht 10) stehen im
+**JasonLib-Kern** und gehören damit **beiden** Tresoren. Das ist kein Fall für
+eine App, sondern ein Rollout über den Kanon Jasons-Tresor — sonst entsteht eine
+zweite Kern-Generation.
+
 ### 2026-08-08 (abends) · Der Hintergrund fragt zuerst nach dem Grafikchip — und zwei Korrekturen an mir selbst
 
 Von Hand eingetragen. Die Selbst-Bremse vom Nachmittag war ein Fortschritt und
