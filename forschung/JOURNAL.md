@@ -80,7 +80,7 @@ totes Relais soll weiterhin auffallen.
 | **Mein-Mixarium-Page** | **100** | **100** | 59 | 99 |
 | **Mein-Rezeptbuch-Page** | **99** | **98** | 57 | **75** |
 | Mein Mixarium (App) | **100** | 83 | 39 | 65 |
-| Mein Rezeptbuch (App) | 99 | 83 | 44 | 73 |
+| Mein Rezeptbuch (App) | 99 | **85** | 44 | 73 |
 | Muttis Rezeptbuch | **100** | **94** | 56 | 90 |
 | family-projekt.de | **100** | **90** | 80 | 89 · 94 |
 
