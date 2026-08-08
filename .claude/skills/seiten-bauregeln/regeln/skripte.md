@@ -293,6 +293,82 @@ function netzOeffnen() {
 Das ist zugleich die Voraussetzung dafür, dass Regel 1 (Nachladen) überhaupt
 erlaubt ist.
 
+## Regel 10 — Eine Dauerschleife braucht eine Selbst-Bremse
+
+Ein bewegter Hintergrund (WebGL, Partikel, Shader) kostet auf einem Gerät **mit**
+Grafikbeschleunigung ~2 ms je Bild. **Ohne** — alte Handys, und **jedes**
+Prüfgerät bei PageSpeed — sind es Hunderte. Dann ist die Bewegung keine mehr,
+sie rechnet nur noch und blockiert dabei die Bedienung.
+
+Belegt an Mein-Mixarium-Page (Klaus' Bericht 2026-08-08): **alle zwanzig**
+längsten Hauptthread-Aufgaben waren dieselbe Datei, jede **540–640 ms** — knapp
+zwei Bilder je Sekunde, **39 s** unter `Other`. Der LCP war dabei `p.lead`,
+**reiner Text**, TTFB 0 ms, und trotzdem 2.310 ms „Verzögerung beim Rendering".
+Nichts zu laden — der Hauptfaden war nur zu beschäftigt, um Text zu zeichnen.
+
+Die Abhilfe hält die Schleife nicht an, sie lässt sie **von selbst aufhören**:
+
+```js
+const BREMS_SCHWELLE  = 0.05;  // Sekunden je Bild = 20 Bilder/s
+const BREMS_GEDULD    = 5;     // so viele langsame Bilder HINTEREINANDER
+const AUFWAERM_BILDER = 3;     // die ersten Bilder nicht bewerten
+let langsamInFolge = 0, bilderGezaehlt = 0;
+
+function tick() {
+  const now = performance.now(), dt = (now - last) / 1000; last = now;
+  if (bilderGezaehlt++ >= AUFWAERM_BILDER) {
+    if (dt > BREMS_SCHWELLE) langsamInFolge++; else langsamInFolge = 0;
+    if (langsamInFolge >= BREMS_GEDULD) { renderOnce(); return; }  // Schleife endet
+  }
+  /* … zeichnen … */
+  requestAnimationFrame(tick);
+}
+```
+
+Stehen bleibt **dasselbe** statische Bild, das Geräte mit „Bewegung reduzieren"
+ohnehin bekommen. Der Hintergrund verschwindet nicht, er hört nur auf, sich zu
+drehen — auf einem gesunden Gerät greift die Bremse nie (dort ~16 ms je Bild).
+
+Gemessen (Lighthouse Handy, je vier Runden im Wechsel):
+
+| | Blockierzeit | Leistung |
+|---|---|---|
+| family-projekt.de | 163.000 → **7.480 ms** | 49 → 59 |
+| Mein-Mixarium-Page | 168.000 → **7.800 ms** | 64 → **70** |
+| Mein-Rezeptbuch-Page | 168.000 → **10.000 ms** | 42–50 → 47–55 |
+
+**Zwei Warnungen dazu, beide gemessen:**
+
+- **Die Bremse kostet, bis sie greift.** Sie wartet `AUFWAERM_BILDER +
+  BREMS_GEDULD` = **8 Bilder** ab. Bei 1,4 s je Bild sind das allein 11 s. Eine
+  **zweite, härtere Not-Schwelle** (ein Bild über 0,4 s bremst sofort) lag
+  gemessen **im Rauschen** — 47 · 54 · 48 gegen 46 · 48 · 47 — und wurde
+  deshalb **nicht** gebaut. Wer sie erneut vorschlägt: erst messen.
+- **Die Blockierzeit ist nicht die Note.** An Mein-Rezeptbuch-Page fiel die
+  Blockierzeit um das Siebzehnfache, und die Note bewegte sich kaum: dort
+  bestimmt der LCP, und der hängt an den Bildern. Beide Zahlen nennen.
+
+### Und der eigentliche Fund: dieselbe Datei in drei Generationen
+
+`assets/mycel-bg.js` lag am 2026-08-08 in drei Fassungen im Netz:
+
+| | three.js nachgeladen | Selbst-Bremse | Handy |
+|---|---|---|---|
+| family-projekt.de | ✅ | ✅ | 80 |
+| Mein-Rezeptbuch-Page | ✅ | ❌ | 57 |
+| Mein-Mixarium-Page | ❌ | ❌ | 59 |
+
+Beide Reparaturen waren **schon erfunden und von Klaus freigegeben** — sie waren
+nur nie nachgezogen worden. **Wer eine Seite untersucht, sieht zuerst nach, ob
+die Schwester-Seite dieselbe Datei in einer neueren Fassung trägt.** Das ist
+billiger als jede Analyse.
+
+**Und: kopieren heißt nicht abschreiben.** Der Nachlade-Anstoß der Schwester-Seite
+endet mit `MycelBg.setTheme()`. Dort liest `setTheme()` die Farben aus CSS — an
+Mein-Mixarium-Page erwartet dieselbe Funktion einen Themen-**Namen** und fällt
+ohne Argument auf `Dunkel` zurück. Wortwörtlich übernommen hätte die Zeile Neon
+und Hell stillschweigend überschrieben.
+
 ## Abhakliste
 
 - [ ] Modul-Stapel nach dem Laden, Reihenfolge maschinell gegengeprüft
@@ -304,4 +380,6 @@ erlaubt ist.
 - [ ] Platz für später eingehängte Elemente reserviert
 - [ ] kein byte-1:1-Modul verändert, Drift-Guard grün
 - [ ] alles fail-soft, Öffner fangen „lädt noch" ab
+- [ ] **Dauerschleife hat eine Selbst-Bremse**; und vorher geprüft, ob eine
+      Schwester-Seite dieselbe Datei schon in einer neueren Fassung trägt
 - [ ] `node --check` auf alle geänderten JS-Dateien **und** die Inline-Blöcke
