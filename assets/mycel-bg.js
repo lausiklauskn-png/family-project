@@ -29,6 +29,39 @@
  * Schlägt das Nachladen fehl, bleibt die Seite voll benutzbar — nur ohne
  * bewegten Hintergrund (fail-soft).
  */
+/* Gibt es ueberhaupt einen echten Grafikchip? (Klaus' Entscheid 2026-08-08)
+ *
+ * Die Selbst-Bremse weiter unten misst die BILDRATE — sie merkt also erst,
+ * dass es hoffnungslos ist, nachdem sie acht Bilder gerechnet hat. Auf einem
+ * Geraet ohne Grafikbeschleunigung kostet jedes davon rund 1,4 s. Gemessen an
+ * der Schwester-Seite Mein-Rezeptbuch-Page: Blockierzeit 10,3 s trotz Bremse; ganz ohne Hintergrund 0 ms
+ * bei Leistung 87 statt 48.
+ *
+ * Diese Pruefung stellt die Frage vorher und beantwortet sie in Mikrosekunden:
+ * WebGL sagt selbst, wer zeichnet. Steht dort ein Software-Rasterizer
+ * (SwiftShader, llvmpipe, Mesa offscreen — so laeuft jedes Pruefgeraet bei
+ * PageSpeed und manches alte Handy), dann wird der Hintergrund GAR NICHT
+ * aufgebaut: kein three.js-Aufbau, keine 8000 Punkte, kein Schattierer.
+ * Die Seite zeigt dann ihre eigene Farbe, und alles andere bleibt wie es ist.
+ *
+ * Auf Klaus' Tablet aendert sich nichts — dort steht ein echter Chip drin.
+ *
+ * FAIL-SOFT IN BEIDE RICHTUNGEN: verrat der Browser den Namen nicht (manche
+ * Datenschutz-Einstellungen verbergen ihn), laeuft der Hintergrund normal
+ * weiter — Vorsicht darf keine Bestrafung sein. Gibt es gar kein WebGL,
+ * koennte der Hintergrund ohnehin nicht laufen.                            */
+function keinGrafikchip() {
+  try {
+    var c = document.createElement('canvas');
+    var gl = c.getContext('webgl2') || c.getContext('webgl');
+    if (!gl) return true;                                  // kein WebGL: ginge sowieso nicht
+    var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    var name = dbg ? String(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) || '') : '';
+    // Kein Name preisgegeben -> im Zweifel laufen lassen.
+    return /swiftshader|llvmpipe|software|mesa offscreen|microsoft basic/i.test(name);
+  } catch (_e) { return true; }
+}
+
 function mycelBgStarten(THREE) {
 const canvas = document.getElementById('bg');
 if (canvas) {
@@ -286,9 +319,14 @@ if (canvas) {
 
 /* Der Anstoß: erst nach "load", und dann erst, wenn der Hauptfaden Luft hat. */
 (function () {
-  const los = () => import('three')
-    .then((m) => { mycelBgStarten(m); if (window.MycelBg) { try { window.MycelBg.setTheme(); } catch (_e) {} } })
-    .catch(() => {});
+  /* Ohne Grafikchip wird three.js gar nicht erst geholt — 165 KiB, die auf
+   * so einem Geraet nichts mehr ausrichten koennten. */
+  const los = () => {
+    if (keinGrafikchip()) return;
+    import('three')
+      .then((m) => { mycelBgStarten(m); if (window.MycelBg) { try { window.MycelBg.setTheme(); } catch (_e) {} } })
+      .catch(() => {});
+  };
   const gleich = () => (window.requestIdleCallback
     ? requestIdleCallback(los, { timeout: 2000 })
     : setTimeout(los, 200));
