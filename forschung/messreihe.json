@@ -56,6 +56,23 @@
       "leistung: JavaScript komprimieren"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
    ]
   },
@@ -119,6 +136,25 @@
       "leistung: Largest Contentful Paint"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 71,
+     "bedienbarkeit": 84,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute",
+      "bedienbarkeit: select-Elemente haben keine zugehörigen label-Elemente.",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Largest Contentful Paint"
+     ]
     }
    ]
   },
@@ -202,30 +238,27 @@
       "leistung: Largest Contentful Paint"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 98,
+     "bedienbarkeit": 92,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: select-Elemente haben keine zugehörigen label-Elemente.",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
-   ],
-   "verdacht": {
-    "gesehen": "2026-08-07",
-    "sprung": [
-     {
-      "k": "leistung",
-      "alt": 97,
-      "neu": 67,
-      "d": -30
-     }
-    ],
-    "weg": [
-     "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
-     "leistung: Bildübermittlung verbessern",
-     "leistung: Netzwerkabhängigkeitsbaum"
-    ],
-    "dazu": [
-     "leistung: JavaScript komprimieren",
-     "leistung: Largest Contentful Paint"
-    ],
-    "quelle": "google",
-    "quellwechsel": null
-   }
+   ]
   },
   "markt-tomys-hub": {
    "name": "Tomys Hub",
@@ -368,6 +401,25 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 100,
+     "bedienbarkeit": 96,
+     "gute_praxis": 96,
+     "auffindbarkeit": 90,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "auffindbarkeit: Links können nicht gecrawlt werden",
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
    ]
   },
@@ -454,27 +506,28 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 100,
+     "bedienbarkeit": 93,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
-   ],
-   "verdacht": {
-    "gesehen": "2026-08-07",
-    "sprung": [
-     {
-      "k": "leistung",
-      "alt": 99,
-      "neu": 69,
-      "d": -30
-     }
-    ],
-    "weg": [
-     "leistung: Netzwerkabhängigkeitsbaum"
-    ],
-    "dazu": [
-     "leistung: JavaScript komprimieren"
-    ],
-    "quelle": "google",
-    "quellwechsel": null
-   }
+   ]
   },
   "markt-kimboard": {
    "name": "Kimboard",
@@ -547,8 +600,44 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 72,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: JavaScript komprimieren"
+     ]
     }
-   ]
+   ],
+   "verdacht": {
+    "gesehen": "2026-08-08",
+    "sprung": [
+     {
+      "k": "leistung",
+      "alt": 92,
+      "neu": 72,
+      "d": -20
+     }
+    ],
+    "weg": [
+     "leistung: Reduziere nicht verwendetes JavaScript"
+    ],
+    "dazu": [
+     "leistung: Erzwungener dynamischer Umbruch"
+    ],
+    "quelle": "google",
+    "quellwechsel": null
+   }
   },
   "markt-privat-brain": {
    "name": "Private Brain",
@@ -593,8 +682,47 @@
       "leistung: JavaScript komprimieren"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 96,
+     "bedienbarkeit": 91,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Dokument hat keine Hauptmarkierung.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
-   ]
+   ],
+   "verdacht": {
+    "gesehen": "2026-08-08",
+    "sprung": [
+     {
+      "k": "leistung",
+      "alt": 75,
+      "neu": 96,
+      "d": 21
+     }
+    ],
+    "weg": [
+     "leistung: Erzwungener dynamischer Umbruch"
+    ],
+    "dazu": [
+     "leistung: Reduziere nicht verwendetes JavaScript"
+    ],
+    "quelle": "google",
+    "quellwechsel": null
+   }
   },
   "markt-workfloh": {
    "name": "WorkFloh",
@@ -667,7 +795,7 @@
     },
     {
      "von": "2026-08-06",
-     "bis": "2026-08-06",
+     "bis": "2026-08-08",
      "leistung": 74,
      "bedienbarkeit": 100,
      "gute_praxis": 96,
@@ -783,6 +911,24 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 76,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -808,6 +954,25 @@
       "leistung: Total Blocking Time"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 70,
+     "bedienbarkeit": 87,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Links sind durch Farbe erkennbar.",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
    ]
   },
@@ -1156,6 +1321,24 @@
       "leistung: Reduziere nicht verwendete CSS"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 84,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendete CSS",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -1182,8 +1365,43 @@
       "leistung: Verursacher von Layout Shifts"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 81,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 80,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "auffindbarkeit: Dokument enthält keine Meta-Beschreibung",
+      "auffindbarkeit: Links können nicht gecrawlt werden",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Verursacher von Layout Shifts"
+     ]
     }
-   ]
+   ],
+   "verdacht": {
+    "gesehen": "2026-08-08",
+    "sprung": [
+     {
+      "k": "leistung",
+      "alt": 60,
+      "neu": 81,
+      "d": 21
+     }
+    ],
+    "weg": [],
+    "dazu": [],
+    "quelle": "google",
+    "quellwechsel": null
+   }
   },
   "eigen-kuechenzettel": {
    "name": "Küchenzettel",
@@ -1191,7 +1409,7 @@
    "punkte": [
     {
      "von": "2026-08-06",
-     "bis": "2026-08-06",
+     "bis": "2026-08-08",
      "leistung": 100,
      "bedienbarkeit": 84,
      "gute_praxis": 100,
@@ -1232,6 +1450,25 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 61,
+     "bedienbarkeit": 95,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -1256,6 +1493,24 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 64,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: JavaScript komprimieren",
+      "leistung: Largest Contentful Paint",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -1332,5 +1587,5 @@
    ]
   }
  },
- "gepflegt": "2026-08-07"
+ "gepflegt": "2026-08-08"
 }
