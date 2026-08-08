@@ -73,6 +73,24 @@ verdeckte die Langsamkeit einen Umgebungsmangel, der die ganze Zeit da war.
 Der Filter fasst deshalb bewusst **eng** auf den Proxy-Wortlaut — ein wirklich
 totes Relais soll weiterhin auffallen.
 
+#### Von Google bestätigt (Klaus, 08.08.2026, 20:12–20:16)
+
+| Seite | Computer | Handy | lokal vorhergesagt |
+|---|---|---|---|
+| **Mein-Mixarium-Page** | **100** | **100** | 99 |
+| family-projekt.de | **100** | **90** | 89 · 94 |
+| Muttis Rezeptbuch | **100** | **94** | 90 |
+
+Mein-Mixarium-Page steht auf **100/100** — von 59 heute Mittag. Die lokalen
+Zahlen trafen diesmal in beiden Fällen die Richtung UND ungefähr die Höhe; das
+ist nicht der Normalfall und kein Grund, Lehre 1b zu lockern.
+
+**Was jetzt übrig bleibt, ist nicht mehr die Geschwindigkeit.** Mein-Mixarium-Page
+hat Leistung 100, aber **Barrierefreiheit 87** — Klaus' eigener Bericht nennt die
+Stellen: zu schwacher Kontrast an der ©-Zeile und den Fuß-Verweisen (beide über
+`opacity` abgedunkelt, genau die Falle aus dem 2026-08-04-Eintrag: `opacity`
+schlägt jede Farbwahl darin) und ein `<video>` ohne Untertitel-Spur.
+
 → Regel 10 in `regeln/skripte.md` um den Grafikchip-Teil ergänzt.
 
 ### 2026-08-08 (nachmittags) · Die beiden Landeseiten — der Fehler war längst repariert, nur woanders
