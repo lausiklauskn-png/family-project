@@ -21,6 +21,57 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-08 · Zwei Hebel an drei Küchen-Apps — von Google bestätigt, nicht nur lokal
+
+Von Hand eingetragen. An **Muttis Rezeptbuch**, **Mein Rezeptbuch** und
+**Mein Mixarium** wurden am selben Tag zwei Dinge geändert:
+
+1. **Der SBKIM-Stapel wartet.** 20 `<script src="sbkim/…">` standen im Kopf des
+   Dokuments und mussten geladen und ausgewertet sein, bevor irgendetwas zu
+   sehen war. Sie werden jetzt **nach `load`** über `requestIdleCallback`
+   nachgeladen — in unveränderter Reihenfolge, Module bleiben Module. Muster
+   übernommen von Mein-WorkFloh, wo es seit dem 2026-08-07 läuft.
+2. **Die Symbole verlassen das Dokument.** Alle Tab-, Startbildschirm- und
+   Splash-Bilder lagen als Base64 **im** Dokument und wurden bei jedem Aufruf
+   mitgeladen, obwohl sie während des Ladens niemand sieht. Sie sind jetzt
+   verlinkte Dateien mit **Versionsnummer** (`?v=1`) — dieselbe Cache-Wirkung
+   wie die Einbettung, ohne Bytes im kritischen Pfad.
+
+#### Wie viel es wirklich war (Klaus, Google PageSpeed Insights, 12:56–13:03)
+
+| Seite | Computer | Handy |
+|---|---|---|
+| Muttis Rezeptbuch | **100** | **94** |
+| Mein Rezeptbuch | **99** | **83** |
+| Mein Mixarium | **94** | **85** |
+
+Meine lokalen Läufe hatten Muttis 90/90, Mein Rezeptbuch 73/79 und Mixarium
+65/66 vorhergesagt. **Diesmal stimmte die Richtung** — und draußen fiel das
+Ergebnis sogar besser aus als hier. Das ist die Gegenrichtung zu den beiden
+Fehlvorhersagen vom 2026-08-07 und ändert nichts an Lehre 1b: die lokale Zahl
+sagt, **ob** sich etwas bewegt, nicht **wohin genau**.
+
+#### Was dabei nebenbei sichtbar wurde
+
+Klaus' eigene Messungen zeigen zwei Seiten, die heute **nicht** angefasst
+wurden und jetzt das schwächste Paar sind: **Mein-Rezeptbuch-Page** (57 Handy /
+62 Computer, Barrierefreiheit 94) und **Mein-Mixarium-Page** (67 / 66,
+Barrierefreiheit 87). Das sind eigene Repos — die Landeseiten, nicht die Apps.
+
+#### Regeländerung in drei `CLAUDE.md`
+
+Die bisherige Regel „Icons **immer** als Base64 einbetten" war gegen
+aggressives Favicon-Caching gerichtet. Das Problem war echt, der Preis zu hoch:
+1.119 K (Muttis), 439 K (Mein Rezeptbuch), 439 K (Mixarium) lagen dafür auf dem
+kritischen Pfad. Die Versionsnummer in der Adresse löst dasselbe Problem — eine
+geänderte Adresse ist für den Cache ein anderes Bild. **Ausgenommen bleiben die
+eigenständigen Seiten** (`gift`, `invite`, USP, Impressum): dort ging es nie ums
+Caching, sondern darum, dass eine verschobene Datei das Symbol lautlos bricht.
+
+**Pflicht, die neu dazukam:** jedes verlinkte Symbol muss in den Offline-Vorrat
+des Service Workers, mit **derselben** Adresse samt `?v=`. Sonst holt der Vorrat
+ein anderes Bild als die Seite. Vorräte: 4→25, 5→24, 2→22 Einträge.
+
 ### 2026-08-07 (nachts) · Sage-Protokol: der Widerspruch ist aufgeklärt, und es war nie das Skript
 
 Von Hand eingetragen. Der Brief stellte die Frage so: *„die gemeldete
