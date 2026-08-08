@@ -75,21 +75,32 @@ totes Relais soll weiterhin auffallen.
 
 #### Von Google bestätigt (Klaus, 08.08.2026, 20:12–20:16)
 
-| Seite | Computer | Handy | lokal vorhergesagt |
-|---|---|---|---|
-| **Mein-Mixarium-Page** | **100** | **100** | 99 |
-| family-projekt.de | **100** | **90** | 89 · 94 |
-| Muttis Rezeptbuch | **100** | **94** | 90 |
+| Seite | Computer | Handy | heute früh | lokal vorhergesagt |
+|---|---|---|---|---|
+| **Mein-Mixarium-Page** | **100** | **100** | 59 | 99 |
+| **Mein-Rezeptbuch-Page** | **99** | **98** | 57 | **75** |
+| Mein Mixarium (App) | **100** | 83 | 39 | 65 |
+| Mein Rezeptbuch (App) | 99 | 83 | 44 | 73 |
+| Muttis Rezeptbuch | **100** | **94** | 56 | 90 |
+| family-projekt.de | **100** | **90** | 80 | 89 · 94 |
 
-Mein-Mixarium-Page steht auf **100/100** — von 59 heute Mittag. Die lokalen
-Zahlen trafen diesmal in beiden Fällen die Richtung UND ungefähr die Höhe; das
-ist nicht der Normalfall und kein Grund, Lehre 1b zu lockern.
+**Mein-Mixarium-Page steht auf 100/100** — von 59 heute Mittag.
 
-**Was jetzt übrig bleibt, ist nicht mehr die Geschwindigkeit.** Mein-Mixarium-Page
-hat Leistung 100, aber **Barrierefreiheit 87** — Klaus' eigener Bericht nennt die
-Stellen: zu schwacher Kontrast an der ©-Zeile und den Fuß-Verweisen (beide über
-`opacity` abgedunkelt, genau die Falle aus dem 2026-08-04-Eintrag: `opacity`
-schlägt jede Farbwahl darin) und ein `<video>` ohne Untertitel-Spur.
+**Und Lehre 1b hat sich zum dritten Mal an einem Tag bestätigt, diesmal ins
+Große:** für Mein-Rezeptbuch-Page hatte ich lokal **75** gemessen und die
+verbleibenden 4,5 s LCP als „nächste echte Untersuchung" angekündigt. Draußen
+steht die Seite bei **98**. Die Untersuchung hätte einem Problem gegolten, das
+es nur auf der Bau-Maschine gibt. Die lokale Zahl sagt, **ob** sich etwas
+bewegt — nicht, wo man am Ende landet, und erst recht nicht, was als Nächstes
+zu tun ist.
+
+**Was jetzt übrig bleibt, ist nicht mehr die Geschwindigkeit.** Die schwächste
+Einzelzahl im ganzen Netz ist jetzt **Barrierefreiheit 87** an
+Mein-Mixarium-Page — Klaus' eigener Bericht nennt die Stellen: zu schwacher
+Kontrast an der ©-Zeile und den Fuß-Verweisen (beide über `opacity`
+abgedunkelt, genau die Falle aus dem 2026-08-04-Eintrag: `opacity` schlägt jede
+Farbwahl darin) und ein `<video>` ohne Untertitel-Spur. Zum Vergleich:
+Rezeptbuch-Page 94, Muttis 95, Mixarium-App und family-projekt.de je 100.
 
 → Regel 10 in `regeln/skripte.md` um den Grafikchip-Teil ergänzt.
 
