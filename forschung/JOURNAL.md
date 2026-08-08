@@ -21,6 +21,65 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-08 (nachts) · Sieben Seiten selbst nachgemessen — und warum das Googles Zahlen NICHT bestätigt
+
+Von Hand eingetragen. Klaus' Bitte: „miss einmal selber nach und bestätige, ob
+dieselben Werte herauskommen." **Die Antwort ist nein** — und zwar aus einem
+Grund, der wichtiger ist als jede einzelne Zahl.
+
+Gemessen gegen frische Auszüge von `origin/main` (alle sechs Repos am
+2026-08-08 geholt), drei Runden je Seite und Gerät. Die Live-Adressen sind aus
+dem Bau-Container nicht erreichbar (`000`), PageSpeed antwortet ohne Schlüssel
+mit `429`.
+
+| Seite | Handy (3 Runden) | eingetragen | Computer | Google zuletzt | Abstand |
+|---|---|---|---|---|---|
+| Mein-Rezeptbuch | 73 · 76 · 79 | **76** | **99** | 74 | +2 |
+| Mein-Rezeptbuch (Schaufenster) | 85 · 85 · 85 | **85** | **99** | 58 | **+27** |
+| Mein-Mixarium | 68 · 68 · 69 | **68** | **90** | 76 | **−8** |
+| Mein-Mixarium (Schaufenster) | 100 · 100 · 100 | **100** | **100** | 70 | **+30** |
+| Muttis Rezeptbuch | 91 · 93 · 91 | **91** | **100** | 61 | **+30** |
+| family-projekt.de (Start) | 88 · 85 · 84 | **85** | **99** | 80 | +5 |
+| family-projekt.de (Marktplatz) | 96 · 94 · 88 | **94** | **99** | 81 | **+13** |
+
+**Warum das kein Widerspruch ist, sondern Regel 1b in Reinform.** Eine lokale
+Messung kann eine PageSpeed-Messung grundsätzlich nicht bestätigen. Der
+Prüfserver läuft auf derselben Maschine und antwortet ohne Verzögerung;
+Lighthouse drosselt Prozessor und Leitung nur *simuliert*. Alles, was nebenher
+über die echte Leitung geht, kostet lokal fast nichts und draußen Sekunden.
+Am 2026-08-07 lag Mein-WorkFloh deshalb lokal bei 95 und bei Google bei 79.
+
+**Die Abweichungen gehen in beide Richtungen** — bei Mein-Mixarium bin ich acht
+Punkte *schlechter* als Google. Das spricht gegen ein einfaches „lokal ist immer
+schneller" und für: es sind zwei verschiedene Messungen, nicht zwei Versuche
+derselben.
+
+**Zwei Befunde, die trotzdem tragen:**
+
+- **Muttis Rezeptbuch** — meine 91/93/91 decken sich fast genau mit dem, was die
+  heutige Icon-Umstellung im eigenen Repo dokumentiert (dort lokal 90 · 90 nach
+  dem Umbau). Googles 61 stammt sehr wahrscheinlich von **vor** dem Deploy. Das
+  ist kein Messfehler, sondern ein **Zeitversatz** — der nächtliche Lauf klärt es.
+  Dasselbe gilt vermutlich für die beiden Schaufenster (+27 und +30), die heute
+  ihre Hintergrund-Abschaltung bekommen haben.
+- **Erstmals Computer-Werte für alle sieben.** Alle liegen zwischen 90 und 100
+  und damit deutlich über dem Handy — der Normalfall aus `messen.md`. **Keine
+  dieser Seiten hat das Tomys-Hub-Problem** (Computer schlechter als Handy).
+  Damit ist auch belegt, dass die WebGL-Abschaltung auf schmalen Geräten hier
+  nirgends ein zweites, schlechteres Gesicht erzeugt.
+
+**Was an diesen Zeilen zu beachten ist:** sie tragen alle `quelle: eigen`.
+Wer einen Verlauf liest, darf einen `eigen`-Punkt nicht gegen einen
+`Google`-Punkt rechnen — der Sprung „Muttis +30" in der Zeitraum-Zeile ist
+genau so ein Scheinsprung. Er steht da, weil beide Punkte denselben Tag tragen;
+er misst den Unterschied der **Messwege**, nicht den der Seite.
+
+Die Beanstandungen decken sich dagegen gut mit Googles Listen (nicht
+verwendetes JavaScript, Cache-Verweildauer, fehlende Quellzuordnungen,
+Konsolen-Fehler; bei Muttis zusätzlich der Kontrast). Das ist der belastbare
+Teil einer lokalen Messung: **sie sagt verlässlich, WORAN es liegt — nur nicht,
+wie viele Punkte es kostet.**
+
 ### 2026-08-08 (nachts) · Mein-Tresor — 71 → 80 am Handy, 98 am Computer
 
 Von Hand eingetragen, **eigene Messung** (nicht Google — dazu unten).

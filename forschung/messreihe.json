@@ -826,6 +826,24 @@
       "leistung: Reduziere nicht verwendetes JavaScript"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 76,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
     }
    ]
   },
@@ -868,6 +886,22 @@
       "leistung: Total Blocking Time"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 85,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
     }
    ]
   },
@@ -945,6 +979,24 @@
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 68,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
     }
    ]
   },
@@ -988,6 +1040,22 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Zeichensatz-Angabe fehlt oder steht zu spät im HTML",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
      ]
     }
    ]
@@ -1249,6 +1317,22 @@
       "leistung: LCP-Anfrageerkennung"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 94,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
     }
    ],
    "verdacht": {
@@ -1313,6 +1397,23 @@
       "leistung: Reduziere nicht verwendete CSS"
      ],
      "geraet": "handy"
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 85,
+     "bedienbarkeit": 100,
+     "gute_praxis": 92,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Zeichensatz-Angabe fehlt oder steht zu spät im HTML",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
     }
    ]
   },
@@ -1485,6 +1586,25 @@
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 91,
+     "bedienbarkeit": 95,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
     }
    ]
   },
@@ -1621,6 +1741,168 @@
       "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert"
      ],
      "geraet": "computer"
+    }
+   ]
+  },
+  "markt-rezeptbuch--computer": {
+   "name": "Mein-Rezeptbuch (Computer)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 99,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
+    }
+   ]
+  },
+  "markt-rezeptbuch--schaufenster--computer": {
+   "name": "Mein-Rezeptbuch (Schaufenster) (Computer)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 99,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
+    }
+   ]
+  },
+  "markt-mixarium--computer": {
+   "name": "Mein-Mixarium (Computer)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 90,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
+    }
+   ]
+  },
+  "markt-mixarium--schaufenster--computer": {
+   "name": "Mein-Mixarium (Schaufenster) (Computer)",
+   "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Zeichensatz-Angabe fehlt oder steht zu spät im HTML",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
+    }
+   ]
+  },
+  "eigen-muttis-rezeptbuch--computer": {
+   "name": "Muttis Rezeptbuch (Computer)",
+   "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 100,
+     "bedienbarkeit": 95,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
+    }
+   ]
+  },
+  "eigen-family-projekt--computer": {
+   "name": "family-projekt.de (Start) (Computer)",
+   "url": "https://family-projekt.de/",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 99,
+     "bedienbarkeit": 100,
+     "gute_praxis": 92,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "gute_praxis: Zeichensatz-Angabe fehlt oder steht zu spät im HTML",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
+    }
+   ]
+  },
+  "eigen-family-markt--computer": {
+   "name": "family-projekt.de (Marktplatz) (Computer)",
+   "url": "https://family-projekt.de/markt.html",
+   "punkte": [
+    {
+     "von": "2026-08-08",
+     "bis": "2026-08-08",
+     "leistung": 99,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "eigen",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: CSS komprimieren",
+      "leistung: Effiziente Verweildauer im Cache verwenden"
+     ]
     }
    ]
   }
