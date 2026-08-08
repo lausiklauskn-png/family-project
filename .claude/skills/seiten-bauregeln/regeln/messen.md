@@ -265,6 +265,28 @@ Satz, den ein einzelner Lauf nicht trägt.
 Wert der Messreihe danebenlegen. Ein Unterschied, der beim zweiten Mal weg ist,
 war Rauschen, kein Befund.
 
+### Und: nach einem Deploy misst du womöglich zwei verschiedene Seiten
+
+Der Fall vom 2026-08-08. Zwei Messungen desselben Tages an derselben Seite,
+zwischen denen sich am Repo **nichts** geändert hat:
+
+| Seite | nächtlicher Lauf 03:11 | Handmessung ~10:45 |
+|---|---|---|
+| Muttis Rezeptbuch | 61 | **61** — identisch |
+| Sage-Protokol | 64 | **83** |
+
+Der Schluss kommt aus dem **Vergleich beider Zeilen**, nicht aus einer: wo die
+Seite stabil war, waren sich die Messwege einig. Der Ausreißer steht dort, wo
+kurz vorher ausgeliefert wurde — die 64 traf mit hoher Wahrscheinlichkeit noch
+den alten Stand.
+
+**Praktisch heißt das:** eine Messung, die kurz nach einem Merge fällt, ist
+kein Nachher-Wert, solange nicht feststeht, dass der neue Stand ausgeliefert
+wird. Bei GitHub Pages dauert das meist Minuten, gelegentlich länger. Wer die
+Wirkung einer Änderung belegen will, misst **mit Abstand** — und legt eine
+unveränderte Seite als Kontrolle daneben. Genau die hat hier die Antwort
+gegeben.
+
 ## Regel 8 — Im selben Bericht gehen zwei Uhren
 
 Der Auslöser (2026-08-07, Sage-Protokol): ein Brief nannte für dieselbe Seite
