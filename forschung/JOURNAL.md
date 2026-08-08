@@ -143,15 +143,38 @@ Die Beanstandungsliste sagt dabei mehr als die Note:
   vermeiden" ist verschwunden.* Das ist genau der doppelte Ladevorgang. Google
   bestätigt den Mechanismus am live ausgelieferten Stand. Der Fix bleibt.
 - **Sage:** die Liste ist **unverändert**, inklusive *„Largest Contentful
-  Paint"*. Von den lokal gemessenen 2,7 s ist draußen nichts angekommen.
+  Paint"*.
 
-Offen und ehrlich benannt: es ist **je eine** Messung, und nach Regel 7b trägt
-eine einzelne PageSpeed-Zahl kein Urteil — die nächste Nacht hält sie oder
-nicht. Für Sage ist außerdem nicht **bewiesen**, dass Pages den neuen Stand zur
-Messzeit schon auslieferte (fünf Stunden Abstand sprechen dafür, prüfen kann
-diese Umgebung es nicht: der Ausgangs-Proxy verweigert `github.io`). Klaus
-kann es in einem Blick klären — erscheint die Seite ohne Einblenden, ist der
-Stand live.
+#### Und diese Deutung war wieder zu schnell (Klaus' eigene Messung, 10:45)
+
+Aus der einen 64 stand hier: *„von den lokal gemessenen 2,7 s ist draußen
+nichts angekommen"*. Das war ein Urteil aus **einer** Zahl — keine zwölf
+Stunden, nachdem in `regeln/messen.md` Regel 7b festgehalten worden war, dass
+genau das nicht geht. Klaus hat danach selbst gemessen, beide Geräte:
+
+| Seite | nächtlicher Lauf 03:11 | Klaus ~10:45 | Computer |
+|---|---|---|---|
+| Muttis Rezeptbuch | 61 | **61** — identisch | 95 |
+| Sage-Protokol | 64 | **83** | 99 |
+
+Am Repo hat sich dazwischen **nichts** geändert. Muttis liefert bei beiden
+Läufen exakt dieselbe Zahl — die zwei Messwege sind sich also einig, solange
+die Seite stabil ist. Damit ist der 19-Punkte-Sprung bei Sage sehr
+wahrscheinlich **kein Rauschen, sondern der Auslieferungs-Zeitpunkt**: um
+03:11 lag noch der alte Stand auf Pages, um 10:45 der neue.
+
+**Beweisen lässt es sich von hier aus nicht** (Egress zu `github.io` ist
+geblockt, der Deploy-Zeitpunkt nicht greifbar) — aber die Asymmetrie zwischen
+den beiden Seiten ist das stärkste Argument, das die Daten hergeben.
+
+**Stand danach:** beide Fixes bleiben. Sage 65 → 83 (Handy) und 99 (Computer),
+Muttis 56 → 61 (Handy) und 95 (Computer).
+
+**Die Lehre ist nicht „lokal war doch richtig".** Lokal sagte +8, draußen
+waren es +18 — die Richtung stimmte, die Größe nicht. Die Lehre ist: eine
+frische Zahl kann eine alte Zahl **und** die daraus gezogene Deutung kippen,
+und wer zwischen zwei Messungen etwas ausgeliefert hat, vergleicht womöglich
+zwei verschiedene Seiten.
 
 ### 2026-08-07 (abends) · Der doppelte Ladevorgang ist netzweit weg — und einmal kostet er Note
 
