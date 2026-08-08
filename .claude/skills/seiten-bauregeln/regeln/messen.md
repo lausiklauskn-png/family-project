@@ -227,6 +227,20 @@ v=d['reihen']['markt-workfloh']; print(v['name'], v['url'])
 for p in v['punkte']: print(p['von'], p['leistung'], p.get('mangel'))"
 ```
 
+**Nicht jedes Ziel kommt jede Nacht dran.** Der nächtliche Lauf misst sechs
+(`FORSCHUNG_MAX`), ältester Befund zuerst — bei 19 Zielen also jedes etwa alle
+drei Tage. Wer eine bestimmte Zahl heute braucht, startet den Ablauf
+`vektoren-taeglich` von Hand und setzt `forschung_max` hoch; die Reihenfolge
+bleibt dieselbe. Wer vorher wissen will, wer drankommt:
+
+```bash
+node -e "const fs=require('fs');
+const z=JSON.parse(fs.readFileSync('forschung/messziele.json','utf8')).ziele.filter(z=>z.aktiv!==false);
+const r=JSON.parse(fs.readFileSync('forschung/messreihe.json','utf8')).reihen;
+z.map(t=>({n:t.name,d:((r[t.id]||{}).punkte||[]).slice(-1)[0]?.bis||'nie'}))
+ .sort((a,b)=>a.d<b.d?-1:1).forEach((t,i)=>console.log((i<6?'-> ':'   ')+t.d+'  '+t.n))"
+```
+
 **Die Messreihe ist eine HANDY-Reihe** (Befund 2026-08-07). Beide Messwege
 lieferten von Anfang an Handy-Werte — PageSpeed über `strategy=mobile`,
 Lighthouse über seine eigene Voreinstellung —, aber bis zum 2026-08-07 stand es
