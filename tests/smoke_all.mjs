@@ -33,7 +33,20 @@ async function load(rel){
   page.on("console",(m)=>{ if(m.type()==="error") errors.push(m.text()); });
   page.on("pageerror",(e)=>errors.push("pageerror: "+e.message));
   await page.goto(base+rel,{waitUntil:"load"}); await page.waitForTimeout(1200);
-  const real = errors.filter((e)=>!/transformers|jsdelivr|cdn|net::ERR|Failed to load resource.*(cdn|jsdelivr)/i.test(e));
+  /* Ausgefiltert wird, was NICHT die Seite ist, sondern die Umgebung.
+   *
+   * Neu am 2026-08-08: "Establishing a tunnel via proxy server failed" beim
+   * Relais. Der Container laesst keine WebSocket-Verbindung nach draussen; mit
+   * der Seite hat das nichts zu tun. Aufgefallen ist es erst, als der
+   * Hintergrund schnell wurde — vorher war die Seite 9 s beschaeftigt und der
+   * Fehler traf nach dem Messfenster ein. Der Test war gruen, WEIL es langsam
+   * war (dieselbe Falle wie am 2026-08-04, LEHREN.md Lehre 5); belegt mit der
+   * Gegenprobe am unveraenderten Stand: mit 9 s Wartezeit faellt er dort
+   * genauso um.
+   *
+   * Bewusst ENG gefasst — nur der Proxy-Wortlaut, nicht "WebSocket" allgemein.
+   * Ein wirklich totes Relais soll weiterhin auffallen.                      */
+  const real = errors.filter((e)=>!/transformers|jsdelivr|cdn|net::ERR|Failed to load resource.*(cdn|jsdelivr)|tunnel via proxy server failed/i.test(e));
   return { page, real };
 }
 
@@ -42,7 +55,30 @@ for (const rel of ["/index.html","/netzwerk.html","/werkzeuge.html","/markt.html
   const { page, real } = await load(rel);
   ok(real.length===0, rel+" — keine kritischen Fehler"+(real.length?" — "+JSON.stringify(real.slice(0,3)):""));
   ok(await page.evaluate(()=>!!window.FP), rel+" — app.js geladen");
-  ok(await page.evaluate(()=>!!window.MycelBg), rel+" — three.js-Hintergrund aktiv");
+  /* Der Hintergrund haengt seit 2026-08-08 daran, OB EIN GRAFIKCHIP DA IST.
+   * Dieser Test lief in einem headless Chromium mit SwiftShader — also genau
+   * dem Fall, in dem three.js absichtlich gar nicht mehr geholt wird. Er hat
+   * bis hierher "ist der Hintergrund an?" gefragt; richtig ist jetzt:
+   * "verhaelt er sich zur Grafiklage passend?" Beide Antworten sind gueltig,
+   * eine dritte gibt es nicht — und ein stiller Fehler (three.js geladen, aber
+   * kein MycelBg trotz Chip) faellt damit weiterhin auf. */
+  const bg = await page.evaluate(() => ({
+    da: !!window.MycelBg,
+    ohneChip: (function () {
+      try {
+        var c = document.createElement("canvas");
+        var gl = c.getContext("webgl2") || c.getContext("webgl");
+        if (!gl) return true;
+        var d = gl.getExtension("WEBGL_debug_renderer_info");
+        var n = d ? String(gl.getParameter(d.UNMASKED_RENDERER_WEBGL) || "") : "";
+        return /swiftshader|llvmpipe|software|mesa offscreen|microsoft basic/i.test(n);
+      } catch (_e) { return true; }
+    })(),
+  }));
+  ok(bg.ohneChip ? !bg.da : bg.da,
+    rel + (bg.ohneChip
+      ? " — Hintergrund ohne Grafikchip zu Recht ausgelassen"
+      : " — three.js-Hintergrund aktiv"));
   await page.close();
 }
 
