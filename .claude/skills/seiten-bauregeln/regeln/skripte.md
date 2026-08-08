@@ -337,6 +337,57 @@ Gemessen (Lighthouse Handy, je vier Runden im Wechsel):
 | Mein-Mixarium-Page | 168.000 → **7.800 ms** | 64 → **70** |
 | Mein-Rezeptbuch-Page | 168.000 → **10.000 ms** | 42–50 → 47–55 |
 
+### Die Bremse allein reicht nicht — frag zuerst nach dem Grafikchip
+
+**Nachtrag vom selben Tag, 2026-08-08.** Die Bremse oben war ein Fortschritt und
+trotzdem nur die halbe Antwort. Sie misst die **Bildrate** — sie merkt also erst,
+dass es hoffnungslos ist, **nachdem acht Bilder gerechnet wurden**. Bei 1,4 s je
+Bild sind das allein 11 s. Gegenprobe an Mein-Rezeptbuch-Page: **mit** Bremse
+Leistung 48 bei 10,3 s Blockierzeit, **ganz ohne** Hintergrund 87 bei 0 ms.
+
+Die bessere Frage ist nicht „wie schnell bremse ich", sondern **„gibt es hier
+überhaupt eine Grafikkarte"**. Der Browser sagt es selbst, in Mikrosekunden:
+
+```js
+function keinGrafikchip() {
+  try {
+    var c = document.createElement('canvas');
+    var gl = c.getContext('webgl2') || c.getContext('webgl');
+    if (!gl) return true;                       // kein WebGL: ginge sowieso nicht
+    var d = gl.getExtension('WEBGL_debug_renderer_info');
+    var n = d ? String(gl.getParameter(d.UNMASKED_RENDERER_WEBGL) || '') : '';
+    return /swiftshader|llvmpipe|software|mesa offscreen|microsoft basic/i.test(n);
+  } catch (_e) { return true; }
+}
+```
+
+Die Prüfung gehört **vor den Import**, nicht in den Aufbau — sonst werden die
+165 KiB three.js noch geholt, um dann nichts zu tun.
+
+Gemessen an drei Seiten, je im Wechsel:
+
+| | vorher | nachher | Blockierzeit |
+|---|---|---|---|
+| Mein-Mixarium-Page | 61 · 64 · 62 | **99 · 97 · 99** | 169 s → 0,15 s |
+| Mein-Rezeptbuch-Page | 43 · 47 · 47 | **74 · 75 · 75** | 11 s → 0,32 s |
+| family-projekt.de | 65 · 56 | **89 · 94** | 8,9 s → 0,09 s |
+
+**Klaus' Entscheid, als beide Wege gemessen vorlagen:** auf einem Gerät ohne
+Chip **gar kein** Hintergrund (81 · 80 · 74) statt eines stehenden Bildes
+(52 · 53 · 52, kostet 2 s Blockierzeit). *Wer keine Grafik hat, hat von einem
+stehenden Partikelbild nichts — er hat nur die zwei Sekunden dafür bezahlt.*
+
+**Fail-soft in beide Richtungen:** verrät der Browser den Namen nicht (manche
+Datenschutz-Einstellungen verbergen ihn), läuft der Hintergrund **normal
+weiter**. Vorsicht darf keine Bestrafung sein.
+
+**Und der Teil, den keine Messung hier beweisen kann:** ob der Hintergrund auf
+einem Gerät **mit** Chip noch läuft. Der Container hat selbst keinen — der
+positive Weg lässt sich nur nachstellen (Aufbau intakt, `MycelBg` gesetzt,
+keine Fehler), nicht messen. **Klaus hat es am 2026-08-08 an allen drei Seiten
+im Browser bestätigt:** „Alle drei sind noch da." Ohne diesen Blick wäre die
+Änderung unbelegt geblieben.
+
 **Zwei Warnungen dazu, beide gemessen:**
 
 - **Die Bremse kostet, bis sie greift.** Sie wartet `AUFWAERM_BILDER +
@@ -380,6 +431,7 @@ und Hell stillschweigend überschrieben.
 - [ ] Platz für später eingehängte Elemente reserviert
 - [ ] kein byte-1:1-Modul verändert, Drift-Guard grün
 - [ ] alles fail-soft, Öffner fangen „lädt noch" ab
-- [ ] **Dauerschleife hat eine Selbst-Bremse**; und vorher geprüft, ob eine
-      Schwester-Seite dieselbe Datei schon in einer neueren Fassung trägt
+- [ ] **Vor dem Import gefragt, ob ein Grafikchip da ist**; Dauerschleife hat
+      zusätzlich eine Selbst-Bremse; und vorher geprüft, ob eine Schwester-Seite
+      dieselbe Datei schon in einer neueren Fassung trägt
 - [ ] `node --check` auf alle geänderten JS-Dateien **und** die Inline-Blöcke

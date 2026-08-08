@@ -21,6 +21,60 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-08 (abends) · Der Hintergrund fragt zuerst nach dem Grafikchip — und zwei Korrekturen an mir selbst
+
+Von Hand eingetragen. Die Selbst-Bremse vom Nachmittag war ein Fortschritt und
+trotzdem nur die halbe Antwort: sie misst die **Bildrate** und merkt deshalb
+erst nach **acht Bildern**, dass es hoffnungslos ist. Bei 1,4 s je Bild sind das
+allein 11 s.
+
+Die bessere Frage stellt sich **vorher**: gibt es überhaupt eine Grafikkarte?
+Der Browser sagt es selbst (`WEBGL_debug_renderer_info`). Software-Rasterizer →
+Hintergrund wird gar nicht aufgebaut, three.js gar nicht erst geholt.
+
+| | vorher | nachher | Blockierzeit |
+|---|---|---|---|
+| Mein-Mixarium-Page | 61 · 64 · 62 | **99 · 97 · 99** | 169 s → 0,15 s |
+| Mein-Rezeptbuch-Page | 43 · 47 · 47 | **74 · 75 · 75** | 11 s → 0,32 s |
+| family-projekt.de | 65 · 56 | **89 · 94** | 8,9 s → 0,09 s |
+
+Klaus' Entscheid, als beide Wege gemessen vorlagen: auf einem Gerät ohne Chip
+**gar kein** Hintergrund statt eines stehenden Bildes. **Und er hat den Teil
+bestätigt, den hier keine Messung beweisen kann** — der Container hat selbst
+keinen Grafikchip, der positive Weg ließ sich nur nachstellen. Klaus im
+Browser: *„Alle drei sind noch da."*
+
+#### Erste Korrektur: die Bilder waren es nie
+
+Ich hatte sie als „den verbliebenen Hebel" von Mein-Rezeptbuch-Page benannt.
+Gemessen kommen **alle** Bilder binnen **182 ms** an, 612 KiB zusammen. Der
+Schluss von der Dateigröße auf die Ladezeit war eine Vermutung, keine Messung —
+genau der Fehler, gegen den Regel 1 geschrieben ist. Die Bilder blieben
+unangetastet, und die Gegenprobe mit abgeschaltetem Hintergrund (48 → 87) zeigte
+den wahren Grund.
+
+#### Zweite Korrektur: vier rote Tests, und der erste Verdacht war die eigene Änderung
+
+Nach dem Bau meldeten vier Seiten `Establishing a tunnel via proxy server
+failed` beim Relais. Die Gegenprobe am **unveränderten** Stand, nur mit 9 s
+statt 1,2 s Wartezeit:
+
+```
+  ✗ /index.html · /netzwerk.html · /werkzeuge.html · /markt.html
+  Ergebnis: 106/110 grün, 4 rot
+```
+
+Dieselben vier. Der Container lässt keine WebSocket-Verbindung nach draußen —
+die Tests waren grün, **weil die Seite 9 Sekunden beschäftigt war** und der
+Fehler nach dem Messfenster eintraf. Das ist Lehre 5 vom 2026-08-04, nur
+andersherum: damals fielen Tests um, *weil* die Seite schnell wurde; hier
+verdeckte die Langsamkeit einen Umgebungsmangel, der die ganze Zeit da war.
+
+Der Filter fasst deshalb bewusst **eng** auf den Proxy-Wortlaut — ein wirklich
+totes Relais soll weiterhin auffallen.
+
+→ Regel 10 in `regeln/skripte.md` um den Grafikchip-Teil ergänzt.
+
 ### 2026-08-08 (nachmittags) · Die beiden Landeseiten — der Fehler war längst repariert, nur woanders
 
 Von Hand eingetragen. Klaus' eigene PageSpeed-Läufe hatten sie als schwächstes
