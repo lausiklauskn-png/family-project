@@ -16,6 +16,10 @@
  *   2. Diese Datei per WebFTP in denselben Ordner laden.
  *   3. Im Studio das Studio-Passwort eintragen → „Vom Server holen".
  *
+ * ZWEI MARKTPLÄTZE (2026-08-09): Das Feld `ziel` wählt, in welches Repo
+ * committet wird — `family` oder `toolpoint`, definiert unter `ziele` in
+ * freigabe-config.php. Ohne `ziel` bleibt alles beim Alten.
+ *
  * Sicherheit: JEDE Aktion verlangt das studio_key-Passwort (hash_equals).
  * Der GitHub-Token liegt NUR in freigabe-config.php auf dem Server, NIE im
  * Repo/Browser. Kontakt-Anfragen (zweck:"kontakt") bleiben freigabe.php
@@ -45,6 +49,27 @@ function body_json() { $j = json_decode(file_get_contents('php://input'), true);
 function req($b, $k, $d = '') { if (isset($_REQUEST[$k])) return $_REQUEST[$k]; if (isset($b[$k])) return $b[$k]; return $d; }
 
 $B = body_json();
+
+/* ---- Ziel-Marktplatz wählen (Klaus 2026-08-09) ----------------------------
+ * Diese eine API bedient jetzt ZWEI Marktplätze: family-projekt.de und
+ * pwa-toolpoint.de. Welcher gemeint ist, sagt das Feld `ziel`.
+ *
+ * OHNE `ziel` ändert sich nichts — dann gelten die Werte oben in der Konfig,
+ * genau wie bisher. Ein bestehendes Studio läuft also unverändert weiter, auch
+ * wenn es das Feld gar nicht kennt.
+ *
+ * Ein UNBEKANNTES Ziel wird ABGEWIESEN, statt still auf den Standard zu
+ * fallen. Sonst landete ein Eintrag für den einen Marktplatz im anderen, und
+ * niemand hätte einen Fehler gesehen — die Antwort wäre „ok", der Commit ginge
+ * ins falsche Repo, und auffallen würde es erst, wenn jemand die falsche Liste
+ * liest. Ein lauter Fehler ist hier viel billiger als ein leiser. */
+$ziel = (string) req($B, 'ziel', '');
+if ($ziel !== '') {
+  if (!isset($CFG['ziele'][$ziel]) || !is_array($CFG['ziele'][$ziel])) {
+    out(array('ok' => false, 'error' => 'ziel_unbekannt'), 400);
+  }
+  $CFG = array_merge($CFG, $CFG['ziele'][$ziel]);
+}
 function require_key($STUDIO_KEY, $B) {
   $key = (string) req($B, 'key', '');
   if ($STUDIO_KEY === '' || !hash_equals($STUDIO_KEY, $key)) out(array('ok' => false, 'error' => 'unauthorized'), 401);
@@ -141,7 +166,14 @@ if ($action === 'commit_listings') {
   require_key($STUDIO_KEY, $B);
   $content = (string) req($B, 'content', '');
   // Schutz: nie eine leere/kaputte Datei schreiben.
-  if (strpos($content, 'window.FP_LISTINGS') === false) out(array('ok' => false, 'error' => 'content_invalid'), 422);
+  /* Der erwartete Text hängt am Ziel: Family Projekt heißt FP_LISTINGS, PWA
+     Toolpoint heißt PT_LISTINGS. Ohne diese Unterscheidung schlüge der Schutz
+     beim zweiten Marktplatz IMMER an — und der Fehler sähe aus wie eine
+     kaputte Datei, obwohl nur der Name ein anderer ist. Fehlt die Angabe,
+     gilt weiter Family Projekt. */
+  $marker = isset($CFG['listings_marker']) && $CFG['listings_marker'] !== ''
+    ? (string) $CFG['listings_marker'] : 'window.FP_LISTINGS';
+  if (strpos($content, $marker) === false) out(array('ok' => false, 'error' => 'content_invalid'), 422);
   list($ok, $info) = gh_put_file($CFG, $CFG['listings_path'], base64_encode($content), 'Studio: Marktplatz-Einträge aktualisiert');
   out($ok ? array('ok' => true, 'info' => $info) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);
 }

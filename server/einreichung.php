@@ -24,9 +24,18 @@
 // ===================== CONFIG (bei Bedarf anpassen) =======================
 $CFG = [
   // Von welchen Seiten darf das Formular senden (CORS-Herkunftsprüfung).
+  // Seit 2026-08-09 sendet auch pwa-toolpoint.de an diesen Dienst — ein
+  // Postfach, eine Warteschlange, ein Studio (Klaus' Entscheidung). Fehlt eine
+  // Herkunft hier, weist der BROWSER die Antwort ab; das Formular drueben
+  // faellt dann still auf seinen Kopier-Rueckfall zurueck, und es sieht aus,
+  // als sei nichts passiert.
   'allowed_origins' => [
     'https://family-projekt.de',
     'https://www.family-projekt.de',
+    'https://pwa-toolpoint.de',
+    'https://www.pwa-toolpoint.de',
+    'https://pwa-toolpoint.com',
+    'https://www.pwa-toolpoint.com',
     'https://lausiklauskn-png.github.io', // GitHub-Pages-Vorschau
   ],
   'mail_to'   => 'info@family-projekt.de',
