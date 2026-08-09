@@ -4,6 +4,85 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## 📋 2026-08-09 (abends): Planmodus `semantic-match-demo` — kein Code, ein Plan und ein Befund
+
+Auftrag war Analyse, kein Bau. Das Repo wurde frisch geklont (`031ab12`, ein
+einziger Commit vom 28.07., 17 Dateien) und gelesen. **Im Zielrepo wurde keine
+Datei angelegt und keine geändert.**
+
+### Der Befund, der den Plan trägt — und die Korrektur einer eigenen Vermutung
+
+Erste Annahme war: das bidirektionale Matching aus dem Papier sei nie gebaut
+worden. **Falsch.** In `Sage-Protokol/src/modules/04_match.js` steht
+`matchDimensions` vollständig — beide Lanes (`queryCap × passageNeeds` und
+`queryNeeds × passageCap`), die drei Schichten fachlich/prozess/skalierung, das
+Feld `bruecke`, dazu der LLM-Richter für Stufe B (Bau 04.B, 2026-05-20). Das ist
+genau die Symmetrie-Forderung des Papiers, in Code.
+
+**Die Maschine läuft aber leer.** Suche über alle Module und die ganze
+`INTERFACES.md` nach `capVector` / `needsVector` / `capabilityVector`: **null
+Treffer.** Jede echte Spore trägt genau *einen* `domainVector`. Damit fällt jeder
+Knoten in den Nur-Anbieter-Modus (`availableLanes: 0`, alle Schichten `null`) und
+es bleibt der einfache Cosinus.
+
+> Die 14 Knoten sagen, was sie **sind**. Keiner sagt, was er **braucht**.
+> Das eine Merkmal, mit dem sich SBKIM von gewöhnlicher Vektorsuche
+> unterscheidet, hat im laufenden Netz keinen Treibstoff.
+
+Dass `matchDimensions` nur in Werkzeug-, Test- und Observatoriums-Dateien
+aufgerufen wird und in keinem echten App-Pfad, passt dazu.
+
+### Bestandsaufnahme in einem Satz
+
+Das Papier fragt „könnte man das bauen?" — und die Antwort steht seit Monaten im
+Netz: Layer 1 als family-projekt.de, Layer 2 als Mycel-Karte, das „offene Problem
+6.1" (Entdeckung ohne Sitzungscode) seit dem 11.07. durch Modul 23 gelöst. Was
+fehlt, ist nicht Bau, sondern dass es irgendwo steht. Nie gebaut wurde die
+6-Agenten-Architektur aus `docs/SBKIM_AGENTS.md`; technisch überholt ist die
+Demo (vier fremde Adressen, Modell vom Mai 2025, API-Schlüssel im Klartext in
+`localStorage`). **Ob die Live-Seite noch läuft, war nicht prüfbar** — dieses
+Environment kommt nicht ins offene Netz.
+
+### Klaus' Entscheidungen (AskUserQuestion, alle vier festgehalten)
+
+| Frage | Antwort |
+|---|---|
+| Richtung des gemeinsamen Repos | **Gemeinsamer Bauplatz** — aktiver Werkplatz, an dem beide bauen und lernen |
+| Everlast GmbH (30 Fundstellen in 7 Dateien) | **Erst später entscheiden** — nichts anfassen, nichts darauf aufbauen |
+| Vier „Vertraulich"-PDFs, öffentlich | **Bleiben — war so gewollt.** Punkt ist beendet |
+| Stufe 1 heute bauen? | **Nein — heute nur der Plan** |
+
+Dazu Klaus' Hinweis mitten in der Sitzung: **„repo ist öffentlich"**. Folge für
+den Bauplatz: keine Schlüssel, keine Personendaten, jeder Zwischenstand ist
+Schaufenster.
+
+### Der Plan (drei Stufen, noch nicht begonnen)
+
+Neuer Ordner `bauplatz/` im Repo — fasst **keine** Bestandsdatei an (nicht
+`index.html`, `hub.html`, `sbkim-flow.html`, `sw.js`), damit die offene
+Everlast-Frage unberührt bleibt. Der Service-Worker reicht unbekannte Adressen
+ohnehin ans Netz durch, also ist dort keine Änderung nötig.
+
+1. **Werkbank** — eine Seite, vier Felder, beide Lanes und die drei Schichten
+   sichtbar. Gratis-Cosinus ehrlich als Rangfolge beschriftet, KI-Richter
+   daneben und abschaltbar (BYOK).
+2. **Messung an den echten Knoten** — Klaus schreibt zu jeder App *einen Satz
+   Bedarf* (das kann keine Sitzung raten). Dann einspurig gegen zweispurig über
+   alle 91 Paare, mit Zahl. **Ein „bringt nichts" ist ein gültiges Ergebnis** und
+   beendet den Strang.
+3. **Nur bei nachgewiesenem Vorteil** — additives, freiwilliges Spore-Feld in
+   Sage vorschlagen. Tafel (INTERFACES) zuerst, dann Code; alte Sporen laufen
+   unverändert weiter. Braucht Klaus' ausdrückliches Wort.
+
+### Lehre dieser Sitzung
+
+Die eigene Vermutung („nie gebaut") hielt zwei Greps nicht stand. Der Unterschied
+zwischen *nicht gebaut* und *gebaut, aber ohne Treibstoff* ist der ganze Plan —
+im ersten Fall müsste man eine Match-Maschine bauen, im zweiten nur einen Satz
+pro App schreiben. **Vor der Diagnose greppen, nicht danach.**
+
+---
+
 ## ✅ 2026-08-09: Das Studio konnte nicht mehr veröffentlichen — zwei Fehler, einer davon nicht im Depot
 
 Klaus' Befund war zweigeteilt: der Knopf blieb dauerhaft auf **„Wird
