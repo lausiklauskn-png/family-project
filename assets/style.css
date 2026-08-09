@@ -459,6 +459,12 @@ h2{font-size:1.55rem;margin:0 0 6px}
   border:1px solid currentColor}
 .listing p.mk-wache.is-gelb{color:#b8860b;background:rgba(218,165,32,.10)}
 .listing p.mk-wache.is-rot{color:#c0392b;background:rgba(192,57,43,.10)}
+/* Quittiert: die Bruecke zwischen Klaus' Haken und der naechsten naechtlichen
+   Pruefung. Gruen, weil erledigt — und bewusst kurzlebig: sobald der Lauf
+   bestaetigt hat, faellt die Zeile ersatzlos weg (siehe quittungenAuflegen). */
+.listing p.mk-wache.is-quittiert{color:#2e7d4f;background:rgba(46,125,79,.10)}
+:root[data-theme="dark"] .listing p.mk-wache.is-quittiert,
+:root[data-theme="neon"] .listing p.mk-wache.is-quittiert{color:#6fcf97}
 .listing p.mk-wache small{opacity:.75}
 :root[data-theme="dark"] .listing p.mk-wache.is-gelb,
 :root[data-theme="neon"] .listing p.mk-wache.is-gelb{color:#e8c14a}

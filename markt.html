@@ -260,6 +260,8 @@
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ Zur Seite", search_btn: "Suchen",
         mk_wa_gelb: "Die Zielseite hat sich seit der letzten Prüfung geändert und ist noch nicht durchgesehen.",
+        mk_wa_gruen_hand: "Zielseite persönlich durchgesehen — geändert, aber in Ordnung befunden.",
+        mk_wa_gruen_hand_am: "durchgesehen am ",
         mk_wa_gelb_finger: "Die Zielseite lädt seit der letzten Prüfung von einer neuen fremden Adresse oder enthält verschleierten Code — noch nicht durchgesehen.",
         mk_wa_gelb_tot: "Die Zielseite hat bei der letzten Prüfung nicht geantwortet.",
         mk_wa_gelb_http: "Dieser Eintrag verlinkt ohne verschlüsselte Verbindung (kein https).",
@@ -393,6 +395,8 @@
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ Open site", search_btn: "Search",
         mk_wa_gelb: "The target site has changed since the last check and has not been reviewed yet.",
+        mk_wa_gruen_hand: "Target site reviewed in person — changed, but found to be fine.",
+        mk_wa_gruen_hand_am: "reviewed on ",
         mk_wa_gelb_finger: "Since the last check the target site loads from a new third-party address or contains obfuscated code — not reviewed yet.",
         mk_wa_gelb_tot: "The target site did not answer during the last check.",
         mk_wa_gelb_http: "This entry links without an encrypted connection (no https).",
@@ -537,7 +541,58 @@
         }
         return FP.t("mk_wa_gelb");
       }
+      /* ── Quittungen sofort wirksam machen (Klaus 2026-08-09) ──────────────
+       *
+       * DER BEFUND. Klaus sah die Warnung „Zielseite hat sich geändert" auch
+       * dann noch öffentlich stehen, wenn er längst nachgesehen, im Studio
+       * abgehakt und veröffentlicht hatte. Grund: die Quittung wirkte NUR im
+       * nächtlichen Lauf. Zwischen Klick und 2:40 Uhr stand also eine Warnung
+       * da, die niemand mehr meinte — und eine Warnung, die man nicht
+       * abstellen kann, erzieht dazu, alle Warnungen zu übersehen.
+       *
+       * DIE QUITTUNG IST EINE BRÜCKE, KEIN ETIKETT (Klaus' Klarstellung). Sie
+       * gilt nur, solange der Bericht noch die alte Warnung trägt. Sobald der
+       * nächtliche Lauf bestätigt hat, steht die Ampel ohnehin auf grün — dann
+       * verschwindet die Zeile ersatzlos, und zwar von selbst, weil die
+       * Bedingung unten dann nicht mehr zutrifft. Es gibt also nichts
+       * aufzuräumen und keinen zweiten Zustand zu pflegen. Dass eine Seite
+       * unverändert geblieben ist, gehört nicht auf die Karte.
+       *
+       * DIE GRENZE. Quittiert wird ausschließlich ein Gelb wegen ÄNDERUNG.
+       * „Antwortet nicht", Safe Browsing, von Hand gesperrt, kein https — all
+       * das bleibt unberührt. Eine Quittung ist eine Aussage über einen
+       * Inhalt, den jemand gelesen hat, keine Generalvollmacht. */
+      var QUITTIERBAR = ["geaendert", "fingerabdruck_geaendert"];
+      function quittungenAuflegen(hand) {
+        var n = 0;
+        for (var id in hand) {
+          if (id.charAt(0) === "_") continue;              // _hinweis überspringen
+          var h = hand[id];
+          if (!h || typeof h !== "object" || !h.gesehen) continue;
+          var w = WACHE[id];
+          if (!w || w.ampel !== "gelb" || QUITTIERBAR.indexOf(w.grund) < 0) continue;
+          // Die Quittung gilt für GENAU die Fassung, die sie quittiert hat.
+          // Hat sich die Seite seither erneut geändert, passt die Prüfsumme
+          // nicht mehr und die Warnung bleibt stehen — richtig so.
+          if (h.gesehen !== w.pruefsumme) continue;
+          var neu = {};
+          for (var k in w) neu[k] = w[k];
+          neu.ampel = "quittiert";
+          neu.grund = "hand_durchgesehen";
+          neu.gesehenAm = h.gesehen_am ? String(h.gesehen_am).slice(0, 10) : "";
+          WACHE[id] = neu;
+          n++;
+        }
+        return n;
+      }
+
       function wacheBand(w) {
+        if (w && w.ampel === "quittiert") {
+          return '<p class="mk-wache is-quittiert">' +
+            '<span aria-hidden="true">✓</span> ' + esc(FP.t("mk_wa_gruen_hand")) +
+            (w.gesehenAm ? ' <small>(' + esc(FP.t("mk_wa_gruen_hand_am")) + esc(w.gesehenAm) + ')</small>' : "") +
+            '</p>';
+        }
         if (!w || (w.ampel !== "rot" && w.ampel !== "gelb")) return "";
         return '<p class="mk-wache is-' + esc(w.ampel) + '">' +
           '<span aria-hidden="true">' + (w.ampel === "rot" ? "⛔" : "⚠") + '</span> ' +
@@ -1576,9 +1631,15 @@
         // müsste doch wieder jemand das Werkzeug laufen lassen, und genau das
         // soll der Weg ja ersparen. Fehlt die Datei, passiert nichts.
         fetch("assets/config/messung-hand.json?ts=" + Date.now(), { cache: "no-store" })
+          .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }),
+        // Die Quittungen des Wächters. Sie wirkten bisher NUR im nächtlichen
+        // Lauf — Klaus hakte im Studio ab, veröffentlichte, und die Warnung
+        // stand trotzdem bis 2:40 Uhr weiter öffentlich da. Fehlt die Datei,
+        // passiert nichts (wie überall hier).
+        fetch("assets/config/wache-hand.json?ts=" + Date.now(), { cache: "no-store" })
           .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
       ]).then(function (beides) {
-          var st = beides[0], hand = beides[1];
+          var st = beides[0], hand = beides[1], wacheHand = beides[2];
           var e = (st && st.eintraege) || null;
           var handDa = !!(hand && typeof hand === "object");
           if (!e && !handDa) return;
@@ -1594,6 +1655,7 @@
           // Messung vorliegt. Der nächtliche Lauf gewinnt damit von allein,
           // sobald er einmal gelaufen ist; aufräumen muss niemand.
           if (handDa) n += handAuflegen(hand);
+          if (wacheHand && typeof wacheHand === "object") n += quittungenAuflegen(wacheHand);
           sichttestHalt();
           if (!n && !Object.keys(e || {}).length) return;
           // Die Liste neu aufbauen, weil der Schieberegler erst jetzt greifen

@@ -459,14 +459,27 @@ console.log("\n11 — Anzeige im Marktplatz (Browser)");
     eintraege: {
       "markt-bookledgerpro": { lage: "gleich", wache: { ampel: "rot", grund: "hand_gesperrt",
         handgrund: "Verdacht <b>mit Markup</b> im Grund.", seit: "2026-08-01", safebrowsing: "nicht_geprueft" } },
-      "markt-mein-tresor":   { lage: "gleich", wache: { ampel: "gelb", grund: "geaendert", seit: "2026-08-01" } },
+      "markt-mein-tresor":   { lage: "gleich", wache: { ampel: "gelb", grund: "geaendert", seit: "2026-08-01",
+        pruefsumme: "eeee5555ffff6666" } },
       "markt-jasons-tresor": { lage: "gleich", wache: { ampel: "gruen", grund: "unveraendert", seit: "2026-08-01" } },
-      "markt-tomys-hub":     { lage: "gleich", wache: { ampel: "gelb", grund: "kein_https", seit: "2026-08-01" } }
+      "markt-tomys-hub":     { lage: "gleich", wache: { ampel: "gelb", grund: "kein_https", seit: "2026-08-01",
+        pruefsumme: "cccc3333dddd4444" } },
+      "markt-kimboard":      { lage: "gleich", wache: { ampel: "gelb", grund: "fingerabdruck_geaendert", seit: "2026-08-08",
+        pruefsumme: "aaaa1111bbbb2222", fremde: ["fremd.example"] } }
     }
+  };
+  /* Die Quittungen kommen ebenfalls vom Test — sonst zöge die echte Datei aus
+   * dem Depot mit hinein und das Ergebnis hinge am Tagesstand. */
+  const QUITTUNGEN = {
+    _hinweis: "Testfassung — darf nicht als Eintrag gelesen werden.",
+    "markt-kimboard":    { gesehen: "aaaa1111bbbb2222", gesehen_am: "2026-08-09" },  // passt
+    "markt-mein-tresor": { gesehen: "0000000000000000" },                            // veraltet
+    "markt-tomys-hub":   { gesehen: "cccc3333dddd4444" }                             // passt, anderer Grund
   };
   const s2 = http.createServer((req, res) => {
     const p2 = decodeURIComponent(req.url.split("?")[0]);
     if (p2 === "/assets/config/spore-stand.json") { res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify(BERICHT)); return; }
+    if (p2 === "/assets/config/wache-hand.json") { res.writeHead(200, { "content-type": "application/json" }); res.end(JSON.stringify(QUITTUNGEN)); return; }
     const fp = path.join(ROOT, p2 === "/" ? "/index.html" : p2);
     if (!fp.startsWith(ROOT) || !fs.existsSync(fp) || fs.statSync(fp).isDirectory()) { res.writeHead(404); res.end("404"); return; }
     res.writeHead(200, { "content-type": MIME[path.extname(fp)] || "application/octet-stream" });
@@ -489,6 +502,7 @@ console.log("\n11 — Anzeige im Marktplatz (Browser)");
     band: (e.querySelector(".mk-wache") || {}).textContent || "",
     rot: !!e.querySelector(".mk-wache.is-rot"),
     gelb: !!e.querySelector(".mk-wache.is-gelb"),
+    quittiert: !!e.querySelector(".mk-wache.is-quittiert"),
     link: !!e.querySelector("a.ext"),
     melden: !!e.querySelector(".mk-report")
   })));
@@ -510,6 +524,25 @@ console.log("\n11 — Anzeige im Marktplatz (Browser)");
   const th = k.find((x) => /Tomys/i.test(x.titel));
   ok(th && /https/.test(th.band), "der Grund kein_https nennt genau das (" + (th && th.band.slice(0, 60)) + ")");
   ok(th && !/geändert/.test(th.band), "und behauptet nicht, die Seite habe sich geändert");
+
+  /* Quittungen wirken SOFORT, nicht erst nachts (Klaus 2026-08-09).
+   *
+   * Vorher wirkte der Haken im Studio nur im nächtlichen Lauf: Klaus hakte ab,
+   * veröffentlichte, und die Warnung stand bis 2:40 Uhr weiter öffentlich da.
+   *
+   * Die vier Fälle gehören ZUSAMMEN. 12a/12b zeigen, dass die Quittung greift;
+   * 12c/12d zeigen, dass sie nicht zu viel wegräumt. Ohne die beiden letzten
+   * wäre das hier ein Schalter, der jedes Gelb abstellt, sobald irgendwo eine
+   * Quittung steht. */
+  const kb = k.find((x) => /Kimboard/i.test(x.titel));
+  ok(kb && kb.quittiert && !kb.gelb,
+    "12a quittiert: aus dem gelben Band wird das grüne (" + (kb && kb.band.slice(0, 50)) + ")");
+  ok(kb && /durchgesehen/.test(kb.band) && /2026-08-09/.test(kb.band),
+    "12b und es nennt die persönliche Durchsicht mit Datum");
+  ok(tr && tr.gelb && !tr.quittiert,
+    "12c eine Quittung für eine ÄLTERE Fassung räumt nichts weg");
+  ok(th && th.gelb && !th.quittiert,
+    "12d und ein Gelb aus anderem Grund (kein https) bleibt trotz Quittung stehen");
 
   // Der Hand-Grund ist Klaus' eigener Text — trotzdem nie als HTML.
   // Der Prüftext trägt mit Absicht <b>-Markup: ohne echtes Markup sähen
