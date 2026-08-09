@@ -21,6 +21,21 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-07 · family-projekt.de (Marktplatz)
+
+<https://family-projekt.de/markt.html> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 59 → 81** (↑ 22, am 2026-08-09 noch 80)
+
+> Gesehen am 2026-08-07, **bestätigt durch die Messung vom 2026-08-09**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: gute_praxis: Es wurden Browserfehler in der Konsole protokolliert
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung weg: leistung: Reduziere nicht verwendete CSS
+- Beanstandung neu: leistung: Bildübermittlung verbessern
+- Beanstandung neu: leistung: LCP-Anfrageerkennung
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-08 (abends) · Der Hintergrund fragt zuerst nach dem Grafikchip — und zwei Korrekturen an mir selbst
 
 Von Hand eingetragen. Die Selbst-Bremse vom Nachmittag war ein Fortschritt und
