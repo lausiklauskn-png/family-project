@@ -323,7 +323,17 @@ log("\nWächter — Zielseiten prüfen");
 // der nächste echte Lauf finge stillschweigend wieder bei null an.
 const wache = OHNE_NETZ
   ? vorherigeWachen
-  : await wacheLaufen(liste, { vorher: vorherigeWachen, hand: handLesen(P_HAND), log });
+  : await wacheLaufen(liste, {
+      vorher: vorherigeWachen,
+      hand: handLesen(P_HAND),
+      log,
+      // Spore-Kopplung (Klaus 2026-08-09): der Sporen-Teil oben ist durch und
+      // hat je Eintrag einen `sporeHash` gerechnet. Wo keiner steht, hat der
+      // Eintrag keine Spore — dann trägt allein der Fingerabdruck.
+      sporeHashes: Object.fromEntries(
+        Object.entries(stand.eintraege || {}).map(([k, v]) => [k, (v && v.sporeHash) || null])
+      )
+    });
 for (const x of liste) {
   if (!x || !x.anchorId) continue;
   if (!stand.eintraege[x.anchorId]) stand.eintraege[x.anchorId] = { lage: "ohne_spore" };

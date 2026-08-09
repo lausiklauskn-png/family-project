@@ -218,18 +218,56 @@ console.log("\n2 — zweiter Lauf, nichts geändert");
 }
 
 /* ── Fall 3: Inhalt der Zielseite ändert sich ─────────────────────────────── */
-console.log("\n3 — die Zielseite ändert ihren Inhalt");
+/* ── Fall 3: die zwei Maße (Klaus 2026-08-09) ──────────────────────────────
+ * Bis hierher galt: jedes geänderte Byte -> gelb. Das ist bei 14 eigenen
+ * Einträgen brauchbar und bei tausend fremden die falsche Frage — wer täglich
+ * hundert Meldungen quittieren muss, klickt sie durch, ohne hinzusehen.
+ * Jetzt entscheidet der SICHERHEITS-FINGERABDRUCK: fremde Herkünfte,
+ * Weiterleitungen, verschleierter Code. Der Text darf sich ändern, wie er will.
+ *
+ * Beide Hälften stehen hier zusammen, damit niemand die eine ohne die andere
+ * liest: 3a beweist, dass harmloses NICHT mehr meldet — und 3b, dass
+ * gefährliches sehr wohl. Ohne 3b wäre 3a eine Abschaltung. */
+console.log("\n3a — die Zielseite ändert nur ihren Inhalt: KEINE Meldung");
 {
-  SEITEN = { "/a": "<html>Alles in Ordnung</html>" };
+  SEITEN = { "/a": "<html><body><p>Alles in Ordnung</p></body></html>" };
   const dir = baueRepo([eintrag("markt-a", "/a")]);
   await lauf(dir);
   const vorher = wacheVon(dir, "markt-a");
-  SEITEN["/a"] = "<html>Jetzt steht hier etwas ganz anderes</html>";
+  SEITEN["/a"] = "<html><body><h1>Ganz neuer Text</h1><p>und noch viel mehr davon</p></body></html>";
   await lauf(dir);
   const w = wacheVon(dir, "markt-a");
-  ok(w && w.ampel === "gelb" && w.grund === "geaendert", "wird gelb, Grund geaendert");
-  ok(w && w.pruefsumme !== vorher.pruefsumme, "die neue Prüfsumme steht im Bericht");
+  ok(w && w.ampel === "gruen" && w.grund === "nur_inhalt", "bleibt grün, Grund nur_inhalt (" + w.ampel + "/" + w.grund + ")");
+  ok(w && w.pruefsumme !== vorher.pruefsumme, "die neue Prüfsumme steht trotzdem im Bericht");
+  ok(w && w.grundlage === w.pruefsumme, "die Grundlage wandert mit — sonst bliebe der Eintrag ewig auf geändert");
+  ok(w && w.fingerabdruck === vorher.fingerabdruck, "der Fingerabdruck hat sich NICHT bewegt");
+}
+
+console.log("\n3b — die Zielseite lädt plötzlich von fremd: GELB");
+{
+  SEITEN = { "/a": "<html><body><p>Alles in Ordnung</p></body></html>" };
+  const dir = baueRepo([eintrag("markt-a", "/a")]);
+  await lauf(dir);
+  const vorher = wacheVon(dir, "markt-a");
+  SEITEN["/a"] = '<html><head><script src="https://fremde-quelle.example/x.js"></script></head><body><p>Alles in Ordnung</p></body></html>';
+  await lauf(dir);
+  const w = wacheVon(dir, "markt-a");
+  ok(w && w.ampel === "gelb" && w.grund === "fingerabdruck_geaendert", "wird gelb (" + w.ampel + "/" + w.grund + ")");
+  ok(w && w.fingerabdruck !== vorher.fingerabdruck, "der Fingerabdruck hat sich bewegt");
+  ok(w && Array.isArray(w.fremde) && w.fremde.includes("fremde-quelle.example"), "die neue Herkunft steht als Name im Befund");
   ok(w && w.grundlage === vorher.pruefsumme, "die Grundlage bleibt die alte, geprüfte Fassung");
+}
+
+console.log("\n3c — verschleierter Code meldet ebenfalls");
+{
+  SEITEN = { "/a": "<html><body><p>Sauber</p></body></html>" };
+  const dir = baueRepo([eintrag("markt-a", "/a")]);
+  await lauf(dir);
+  SEITEN["/a"] = '<html><body><p>Sauber</p><script>eval(atob("eA=="))</script></body></html>';
+  await lauf(dir);
+  const w = wacheVon(dir, "markt-a");
+  ok(w && w.ampel === "gelb" && w.grund === "fingerabdruck_geaendert", "wird gelb (" + w.ampel + "/" + w.grund + ")");
+  ok(w && Array.isArray(w.kennzeichen) && w.kennzeichen.includes("eval"), "eval steht als Kennzeichen im Befund");
 }
 
 /* ── Fall 4: gelb bleibt gelb, bis jemand hinsieht ────────────────────────
@@ -241,12 +279,12 @@ console.log("\n4 — gelb bleibt gelb, auch wenn die Seite danach stillsteht");
   SEITEN = { "/a": "<html>Erste Fassung</html>" };
   const dir = baueRepo([eintrag("markt-a", "/a")]);
   await lauf(dir);
-  SEITEN["/a"] = "<html>Zweite Fassung</html>";
+  SEITEN["/a"] = '<html><head><script src="https://fremde-quelle.example/x.js"></script></head><body>Zweite Fassung</body></html>';
   await lauf(dir);
   ok(wacheVon(dir, "markt-a").ampel === "gelb", "nach der Änderung gelb");
   await lauf(dir);                       // dritter Lauf, Seite unverändert
   const w = wacheVon(dir, "markt-a");
-  ok(w.ampel === "gelb" && w.grund === "geaendert", "auch im nächsten Lauf noch gelb (" + w.ampel + "/" + w.grund + ")");
+  ok(w.ampel === "gelb" && w.grund === "fingerabdruck_geaendert", "auch im nächsten Lauf noch gelb (" + w.ampel + "/" + w.grund + ")");
   await lauf(dir);
   ok(wacheVon(dir, "markt-a").ampel === "gelb", "und im übernächsten auch");
 }
@@ -257,7 +295,7 @@ console.log("\n5 — Quittung im Handschalter beendet das Gelb");
   SEITEN = { "/a": "<html>Erste Fassung</html>" };
   const dir = baueRepo([eintrag("markt-a", "/a")]);
   await lauf(dir);
-  SEITEN["/a"] = "<html>Zweite Fassung, von Klaus angesehen</html>";
+  SEITEN["/a"] = '<html><head><script src="https://fremde-quelle.example/x.js"></script></head><body>Zweite Fassung, von Klaus angesehen</body></html>';
   await lauf(dir);
   const gelb = wacheVon(dir, "markt-a");
   ok(gelb.ampel === "gelb", "erst gelb");
@@ -270,7 +308,7 @@ console.log("\n5 — Quittung im Handschalter beendet das Gelb");
 
   // 5b — und wenn sie sich danach ERNEUT ändert, wird sie wieder gelb.
   // Ohne diese Probe wäre eine Quittung ein Freifahrtschein für alle Zukunft.
-  SEITEN["/a"] = "<html>Dritte Fassung, wieder ungefragt</html>";
+  SEITEN["/a"] = '<html><head><script src="https://noch-eine.example/y.js"></script></head><body>Dritte Fassung, wieder ungefragt</body></html>';
   await lauf(dir);
   ok(wacheVon(dir, "markt-a").ampel === "gelb", "eine erneute Änderung wird wieder gelb");
 }

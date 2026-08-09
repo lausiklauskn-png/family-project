@@ -260,6 +260,7 @@
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ Zur Seite", search_btn: "Suchen",
         mk_wa_gelb: "Die Zielseite hat sich seit der letzten Prüfung geändert und ist noch nicht durchgesehen.",
+        mk_wa_gelb_finger: "Die Zielseite lädt seit der letzten Prüfung von einer neuen fremden Adresse oder enthält verschleierten Code — noch nicht durchgesehen.",
         mk_wa_gelb_tot: "Die Zielseite hat bei der letzten Prüfung nicht geantwortet.",
         mk_wa_gelb_http: "Dieser Eintrag verlinkt ohne verschlüsselte Verbindung (kein https).",
         mk_wa_gelb_gross: "Die Zielseite ist zu groß für die tägliche Prüfung und wird nicht überwacht.",
@@ -389,6 +390,7 @@
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ Open site", search_btn: "Search",
         mk_wa_gelb: "The target site has changed since the last check and has not been reviewed yet.",
+        mk_wa_gelb_finger: "Since the last check the target site loads from a new third-party address or contains obfuscated code — not reviewed yet.",
         mk_wa_gelb_tot: "The target site did not answer during the last check.",
         mk_wa_gelb_http: "This entry links without an encrypted connection (no https).",
         mk_wa_gelb_gross: "The target site is too large for the daily check and is not being monitored.",
@@ -519,6 +521,14 @@
         if (w.grund === "kein_https") return FP.t("mk_wa_gelb_http");
         if (w.grund === "nicht_pruefbar") return FP.t("mk_wa_gelb_gross");
         if (w.grund === "hand_verdacht") return FP.t("mk_wa_gelb_hand");
+        // Der schärfere Befund seit 2026-08-09: nicht „irgendetwas hat sich
+        // geändert", sondern „etwas Sicherheitsrelevantes". Die gefundenen
+        // Herkünfte stehen im Bericht und werden hier genannt — sie sind hart
+        // gefiltert (nur [a-z0-9.-]), aber esc() bleibt trotzdem drüber.
+        if (w.grund === "fingerabdruck_geaendert") {
+          var fr = Array.isArray(w.fremde) ? w.fremde.slice(0, 4) : [];
+          return FP.t("mk_wa_gelb_finger") + (fr.length ? " (" + esc(fr.join(", ")) + ")" : "");
+        }
         return FP.t("mk_wa_gelb");
       }
       function wacheBand(w) {

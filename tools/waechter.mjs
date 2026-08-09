@@ -60,6 +60,100 @@ const SB_ENDPUNKT = "https://safebrowsing.googleapis.com/v4/threatMatches:find";
 export const pruefsummeVon = (text) =>
   crypto.createHash("sha256").update(String(text), "utf8").digest("hex").slice(0, 16);
 
+/* ── Sicherheits-Fingerabdruck (Klaus 2026-08-09) ──────────────────────────
+ *
+ * WOZU. Die Prüfsumme oben deckt die ganze Seite ab und beantwortet damit die
+ * Frage „hat sich irgendein Byte geändert?". Bei 14 eigenen Einträgen ist das
+ * brauchbar. Bei tausend fremden ist es die FALSCHE Frage: dort ändert sich
+ * ständig irgendein Byte, und wer jeden Tag hundert Meldungen quittieren muss,
+ * klickt sie irgendwann durch, ohne hinzusehen. Dann steht in der Datei
+ * „geprüft" und geprüft hat niemand — schlechter als kein Wächter, weil ein
+ * ungedecktes Vertrauens-Signal entsteht.
+ *
+ * Klaus' Frage war „was, wenn das Tausende Apps wären?". Die Antwort ist nicht,
+ * seltener zu prüfen, sondern eine bessere Frage zu stellen:
+ *
+ *     nicht  „hat sich etwas geändert?"
+ *     sondern „hat sich etwas geändert, das gefährlich werden kann?"
+ *
+ * Ein umformulierter Absatz, ein neues Foto, eine korrigierte Öffnungszeit sind
+ * gleichgültig. Gefährlich ist eine kurze, benennbare Liste — und genau die
+ * steckt in diesem zweiten Abdruck.
+ *
+ * WAS HINEINGEHT
+ *   · fremde Herkünfte, von denen die Seite etwas LÄDT oder wohin sie SCHICKT:
+ *     script/iframe/object/embed/source/img/link sowie form action
+ *   · Weiterleitungen per <meta http-equiv="refresh"> auf eine andere Herkunft
+ *   · Kennzeichen für verschleierten Code in eingebettetem JS
+ *     (eval, new Function, atob, document.write, javascript:-Adressen)
+ *
+ * WAS BEWUSST DRAUSSEN BLEIBT: alles Eigene. Eine Seite, die nur ihre eigenen
+ * Dateien lädt, hat einen leeren Fremd-Teil — und der ändert sich nicht, wenn
+ * sie umgebaut wird. Genau das ist der Zweck.
+ *
+ * SICHERHEIT. Die Seite bleibt `untrusted external data`: hier wird NUR gelesen
+ * und mit regulären Ausdrücken herausgezogen, nie ausgeführt, nie gerendert,
+ * nie ein HTML-Schnipsel übernommen.
+ *
+ * ⚠ BEWUSSTE ABWEICHUNG von „nichts aus der Seite in den Bericht" (Kopf oben):
+ * die gefundenen Fremd-Herkünfte werden als NAMEN in den Bericht geschrieben.
+ * Ohne sie sagt ein Alarm nur „irgendetwas Sicherheitsrelevantes hat sich
+ * geändert" und der Blick dauert zehn Minuten statt zehn Sekunden. Der Preis
+ * ist abgesichert: es wird ausschließlich ein Hostname übernommen, hart
+ * gefiltert auf `[a-z0-9.-]`, auf 80 Zeichen und 12 Einträge gedeckelt. Damit
+ * kann dort weder Markup noch Skript noch eine Anweisung landen. Die Namen
+ * sind ein BEFUND für einen Menschen — nie eine automatische Entscheidung.
+ */
+const FREMD_ATTRIBUTE = /<(?:script|iframe|object|embed|source|img|link|form|video|audio)\b[^>]*?\b(?:src|href|data|action)\s*=\s*["']?(https?:\/\/[^"'\s>]+)/gi;
+const META_WEITER = /<meta[^>]*http-equiv\s*=\s*["']?refresh["']?[^>]*url\s*=\s*(https?:\/\/[^"'\s>]+)/gi;
+const VERSCHLEIERT = [
+  ["eval", /\beval\s*\(/],
+  ["new-function", /\bnew\s+Function\s*\(/],
+  ["atob", /\batob\s*\(/],
+  ["document-write", /\bdocument\s*\.\s*write\s*\(/],
+  ["javascript-adresse", /(?:href|src)\s*=\s*["']?javascript:/i]
+];
+
+/* Hostname sauber herausziehen — was nicht durch den Filter passt, fällt weg. */
+export function hostVon(url) {
+  let h;
+  try { h = new URL(String(url)).hostname.toLowerCase(); } catch (_e) { return null; }
+  if (!/^[a-z0-9.-]{1,80}$/.test(h)) return null;
+  return h;
+}
+
+/* Die fremden Herkünfte einer Seite, gegen die eigene Adresse gerechnet. */
+export function fremdeHerkuenfte(html, eigeneUrl) {
+  const eigen = hostVon(eigeneUrl);
+  const raus = new Set();
+  const text = String(html || "");
+  for (const re of [FREMD_ATTRIBUTE, META_WEITER]) {
+    re.lastIndex = 0;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const h = hostVon(m[1]);
+      if (h && h !== eigen) raus.add(h);
+      if (raus.size > 400) break;          // Deckel gegen eine absichtlich aufgeblähte Seite
+    }
+  }
+  return [...raus].sort().slice(0, 12);
+}
+
+/* Kennzeichen für verschleierten Code — nur Namen, nie der Fund selbst. */
+export function kennzeichenVon(html) {
+  const text = String(html || "");
+  return VERSCHLEIERT.filter(([, re]) => re.test(text)).map(([name]) => name);
+}
+
+/* Der Abdruck selbst: aus Herkünften + Kennzeichen, sortiert und stabil. */
+export function fingerabdruckVon(html, eigeneUrl) {
+  const teile = [
+    "h:" + fremdeHerkuenfte(html, eigeneUrl).join(","),
+    "k:" + kennzeichenVon(html).join(",")
+  ].join("|");
+  return pruefsummeVon(teile);
+}
+
 /* ── Zielseite holen: nur Status und Prüfsumme, sonst nichts ───────────────── */
 export async function seiteHolen(url, opts) {
   const o = opts || {};
@@ -80,7 +174,14 @@ export async function seiteHolen(url, opts) {
   if (roh.length > SEITE_MAX) {
     return { erreichbar: true, status: r.status, hinweis: "Seite zu groß (" + roh.length + " Bytes), nicht geprüft" };
   }
-  return { erreichbar: true, status: r.status, pruefsumme: pruefsummeVon(roh) };
+  return {
+    erreichbar: true,
+    status: r.status,
+    pruefsumme: pruefsummeVon(roh),
+    fingerabdruck: fingerabdruckVon(roh, url),
+    fremde: fremdeHerkuenfte(roh, url),
+    kennzeichen: kennzeichenVon(roh)
+  };
 }
 
 /* ── Safe Browsing — der Steckplatz ────────────────────────────────────────
@@ -189,16 +290,77 @@ export function ampelBilden(a) {
     // Erreichbar, aber nicht hashbar (zu groß). Kein Urteil möglich.
     w.ampel = "gelb"; w.grund = "nicht_pruefbar";
   } else {
+    /* ── Zwei Maße statt einem (Klaus 2026-08-09) ───────────────────────────
+     * `grundlage`  = Prüfsumme der GANZEN Seite, wie bisher.
+     * `fgrundlage` = Sicherheits-Fingerabdruck, der als in Ordnung gilt.
+     *
+     * Gelb gibt es jetzt, wenn sich der FINGERABDRUCK ändert — also eine neue
+     * fremde Herkunft, eine neue Weiterleitung oder verschleierter Code. Eine
+     * Seite, die nur ihren Text, ihre Bilder oder ihr Aussehen ändert, ist
+     * grün, und zwar ohne Rückfrage.
+     *
+     * DASS DAS EINE LOCKERUNG IST, wird hier ausdrücklich gesagt: vorher hätte
+     * ein reiner Text-Umbau eine Meldung erzeugt, jetzt nicht mehr. Der Tausch
+     * ist bewusst — er kauft dafür ein, dass die verbliebenen Meldungen wieder
+     * gelesen werden statt abgestempelt. Die volle Prüfsumme geht NICHT
+     * verloren, sie steht weiter im Bericht und wandert als Grundlage mit.
+     */
     let grundlage = vorher.grundlage || null;
-    if (hand.gesehen && hand.gesehen === seite.pruefsumme) grundlage = seite.pruefsumme;
-    if (!grundlage) { w.ampel = "gruen"; w.grund = "erste_pruefung"; grundlage = seite.pruefsumme; }
-    else if (grundlage === seite.pruefsumme) { w.ampel = "gruen"; w.grund = "unveraendert"; }
-    else { w.ampel = "gelb"; w.grund = "geaendert"; }
+    let fgrundlage = vorher.fgrundlage || null;
+    const fabdruck = seite.fingerabdruck || null;
+    if (hand.gesehen && hand.gesehen === seite.pruefsumme) { grundlage = seite.pruefsumme; fgrundlage = fabdruck; }
+
+    /* Spore-Kopplung (Klaus 2026-08-09) — NUR wo eine Spore vorhanden ist.
+     * Wer keine will, wird allein am Fingerabdruck gemessen; das ist für ihn
+     * die vollständige Prüfung, nicht die halbe.
+     *
+     * HEUTE NUR EIN VERMERK, KEIN ALARM — und das ist der wichtige Teil:
+     * die Spore beschreibt die Domäne eines Knotens, nicht seine Version. Wer
+     * seine Ladezeit verbessert, hebt sie nicht. Würde „Seite geändert, Spore
+     * unverändert" jetzt gelb auslösen, stünde Klaus' halbes Netz sofort auf
+     * gelb — genau der Fehlalarm, den dieser Umbau abstellen soll. Der Vermerk
+     * wird trotzdem geschrieben, damit die Daten schon da sind, wenn die Spore
+     * später einmal eine Fassung trägt und daraus eine Regel werden kann. */
+    if (!a.sporeHash && !vorher.sporeHash) w.ankuendigung = "ohne_spore";
+    else if (a.sporeHash && vorher.sporeHash && a.sporeHash !== vorher.sporeHash) w.ankuendigung = "spore_mitgehoben";
+    else w.ankuendigung = "spore_unveraendert";
+    if (a.sporeHash) w.sporeHash = String(a.sporeHash).slice(0, 64);
+
+    if (!grundlage) {
+      w.ampel = "gruen"; w.grund = "erste_pruefung";
+      grundlage = seite.pruefsumme; fgrundlage = fabdruck;
+    } else if (!fgrundlage) {
+      /* ÜBERGANG: der Eintrag stammt aus der Zeit vor dem Fingerabdruck. Es
+       * gibt also keinen Vergleichswert von VOR der Änderung — ihn jetzt still
+       * auf grün zu setzen hieße, einen alten offenen Befund ohne jeden Beleg
+       * für erledigt zu erklären. Also: ein bestehendes Gelb bleibt stehen,
+       * bis ein Mensch es quittiert; der Abdruck wird dabei als neue Grundlage
+       * festgehalten. Ab dem nächsten Lauf gilt die neue Regel. */
+      fgrundlage = fabdruck;
+      if (grundlage !== seite.pruefsumme) { w.ampel = "gelb"; w.grund = "geaendert"; }
+      else { w.ampel = "gruen"; w.grund = "unveraendert"; }
+    } else if (fabdruck && fgrundlage !== fabdruck) {
+      w.ampel = "gelb"; w.grund = "fingerabdruck_geaendert";
+    } else if (grundlage === seite.pruefsumme) {
+      w.ampel = "gruen"; w.grund = "unveraendert";
+    } else {
+      /* Die Seite hat sich geändert, aber nichts Sicherheitsrelevantes. Die
+       * Grundlage wandert hier mit — sonst bliebe der Eintrag ewig auf
+       * „geändert" stehen, obwohl er grün ist. */
+      w.ampel = "gruen"; w.grund = "nur_inhalt";
+      grundlage = seite.pruefsumme;
+    }
     w.grundlage = grundlage;
+    if (fgrundlage) w.fgrundlage = fgrundlage;
+    if (fabdruck) w.fingerabdruck = fabdruck;
+    if (seite.fremde && seite.fremde.length) w.fremde = seite.fremde;
+    if (seite.kennzeichen && seite.kennzeichen.length) w.kennzeichen = seite.kennzeichen;
   }
 
   // Die Grundlage nie verlieren, auch wenn heute nichts zu holen war.
   if (!w.grundlage && vorher.grundlage) w.grundlage = vorher.grundlage;
+  if (!w.fgrundlage && vorher.fgrundlage) w.fgrundlage = vorher.fgrundlage;
+  if (!w.sporeHash && vorher.sporeHash) w.sporeHash = vorher.sporeHash;
   if (seite.pruefsumme) w.pruefsumme = seite.pruefsumme;
   if (typeof seite.status === "number") w.status = seite.status;
   if (seite.hinweis) w.hinweis = String(seite.hinweis).slice(0, 160);
@@ -223,7 +385,11 @@ export async function wacheLaufen(liste, opts) {
   const ziele = [];
   for (const x of liste) {
     if (!x || !x.anchorId) continue;
-    ziele.push({ id: x.anchorId, url: String(x.url || "") });
+    // Spore-Kopplung: der Sporen-Teil des Laufs ist zu diesem Zeitpunkt schon
+    // durch und hat je Eintrag einen `sporeHash` gerechnet. Wer keine Spore
+    // hat, kommt hier mit `null` an — das ist kein Mangel, sondern ein
+    // gleichwertiger Fall (siehe ampelBilden).
+    ziele.push({ id: x.anchorId, url: String(x.url || ""), sporeHash: (o.sporeHashes || {})[x.anchorId] || null });
   }
 
   const seiten = new Map();
@@ -244,7 +410,7 @@ export async function wacheLaufen(liste, opts) {
   for (const z of ziele) {
     const seite = seiten.get(z.id);
     const sb = sbMap ? (sbMap.get(z.url) === true) : null;
-    const w = ampelBilden({ vorher: vorher[z.id], seite, hand: hand[z.id], sb, heute });
+    const w = ampelBilden({ vorher: vorher[z.id], seite, hand: hand[z.id], sb, heute, sporeHash: z.sporeHash });
     if (z.url) w.url = z.url;
     raus[z.id] = w;
     log(`  · ${z.id.padEnd(28)} ${w.ampel.padEnd(5)} ${w.grund}${w.hinweis ? " (" + w.hinweis + ")" : ""}`);
