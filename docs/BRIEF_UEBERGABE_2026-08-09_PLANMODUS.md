@@ -6,6 +6,25 @@ Plan — oder die begründete Auskunft, dass es keinen geben sollte.
 
 ---
 
+## 0. Wo wir aufgehört haben — in fünf Zeilen
+
+- **16 PRs gemergt**, alle getestet: family-project #240–#250, Perfect-Skin-Beauty #38–#42.
+- **Zwei echte Fehler gefunden und behoben**, die niemand vermutet hätte: das
+  Studio konnte wegen einer Server-Datei vom 1. August nicht veröffentlichen,
+  und Perfect Skin Beauty war seit dem 5. August **gar nicht messbar**, weil
+  das Hero-Bild auf `z-index: -1` lag (Ergebnis: 98 statt „!").
+- **Der Wächter meldet jetzt Sicherheit statt Bytes** — gelb nur noch bei neuer
+  fremder Herkunft oder auffälligem Muster, nicht mehr bei jedem Textwechsel.
+- **Quittungen wirken sofort**, statt erst um 2:40 Uhr nachts.
+- **Nichts liegt offen.** Beide Depots stehen sauber auf `main`.
+
+**Zwei Dinge warten nur auf Klaus' Blick** (nichts zu tun): bleibt der
+Marktplatz morgen früh grün, obwohl heute an Perfect Skin Beauty dreimal
+geändert wurde? Und sind die grünen „persönlich durchgesehen"-Bänder dann
+verschwunden? Beides ist die erste echte Prüfung von zwei Bauten dieses Tages.
+
+---
+
 ## 1. Pflichtlektüre — in dieser Reihenfolge, vor dem ersten Handgriff
 
 1. `Sage-Protokol/CLAUDE.md` — die Verfassung. Besonders § Sitzungsstart-Pflicht
@@ -319,10 +338,19 @@ eine gültige Antwort und beendet den Punkt.
 
 ### Die Frage, die Klaus stellt
 
-Er nennt es sinngemäß ein **geteiltes Repo für die Zusammenarbeit** zwischen
-ihm und Claude. Was das genau sein soll, ist **noch nicht festgelegt** — und
-das ist die erste Aufgabe der nächsten Sitzung: es mit ihm zusammen scharf
-stellen, bevor irgendetwas geplant wird.
+Seine Antwort am Sitzungsende, wörtlich: **„Ein Repo, wo wir beide gemeinsam
+dran arbeiten und lernen."**
+
+Das ist die Richtung, aber noch kein Auftrag — „arbeiten und lernen" kann ein
+Werkstatt-Buch über die Methode sein, ein Lehrbuch seines eigenen Systems, ein
+gemeinsamer Bauplatz für ein Produkt oder ein öffentliches Schaufenster der
+Zusammenarbeit. Die Wahl entscheidet fast alles Weitere.
+
+**Klaus klärt das ausdrücklich mit DIR direkt** (sein Wort am Sitzungsende).
+Diese Sitzung hat bewusst nicht geraten und nichts vorentschieden.
+
+**Also: frag ihn als Erstes** — mit zwei bis drei konkreten Lesarten zur
+Auswahl, nicht mit einer offenen Frage. Er entscheidet, dann wird geplant.
 
 ### Vorgehen für die nächste Sitzung
 
