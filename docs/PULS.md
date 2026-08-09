@@ -4,6 +4,65 @@ Aktueller Stand, was offen ist, nächste Schritte. Zu Beginn jeder Sitzung lesen
 
 ---
 
+## ✅ 2026-08-09: Das Studio konnte nicht mehr veröffentlichen — zwei Fehler, einer davon nicht im Depot
+
+Klaus' Befund war zweigeteilt: der Knopf blieb dauerhaft auf **„Wird
+veröffentlicht …"** stehen, und nach „Beschreibung übernehmen" ging **gar
+nichts** mehr raus. Es waren tatsächlich drei verschiedene Dinge.
+
+### Die Ursache lag auf dem Server, nicht im Code
+
+`marktplatz-api.php` auf dem Webhosting war **vom 01.08.2026, 10,59 KB** —
+die Fassung im Depot ist 13,48 KB. Zwei Nachträge waren nie hochgeladen
+worden: `sporeUrl` durchreichen (02.08.) und die Aktion **`commit_wache`**
+(03.08.), also genau der „✓ Gesehen"-Knopf. Der Server kannte die Aktion
+nicht, mit der das Studio quittieren wollte.
+
+**Wie das festgestellt wurde, ist der eigentliche Punkt:** aus der Sitzung war
+das nicht prüfbar — das Environment kommt nicht nach außen (CONNECT 403), die
+Apache-Maschine ist von hier unerreichbar. Der Beweis kam aus **Datum und
+Größe in Klaus' WebFTP-Fenster**, nicht aus einem Test. `server/README-marktplatz-api.md`
+hatte den Fall seit dem 03.08. sogar beschrieben — gelesen hatte ihn niemand.
+Nach dem Hochladen: Commit `1863353` „Studio: Wächter-Quittungen aktualisiert",
+12:24 Uhr, zwei neue Quittungen. Erledigt.
+
+### Zwei echte Fehler im Studio-Code (PR #241)
+
+Die wären auch mit richtigem Server geblieben:
+
+1. **`apiPost`/`apiGet` hatten keine Frist.** Ein `fetch` ohne Abbruch wartet
+   unbegrenzt — antwortet der Server nicht, feuert **weder** `.then` noch
+   `.catch`. Deshalb stand der Knopf für immer, ohne dass irgendwo etwas
+   auftauchte. Jetzt 90 s (POST) / 20 s (GET), und ein Abbruch bekommt einen
+   eigenen Satz: „keine Antwort" ist etwas anderes als „kaputt".
+2. **Eine Kette für zwei Dateien.** Bilder + Beschreibungen und die Quittungen
+   der Wache hingen an derselben Promise-Kette. Scheiterte der Quittungs-Teil,
+   riss die Kette, und die unbeteiligten Beschreibungen blieben liegen. Jetzt
+   zwei unabhängige Stränge; was scheitert, wird beim Namen genannt und bleibt
+   offen stehen (`dirty`/`wacheDirty` bleiben gesetzt — nichts geht verloren).
+
+### Offen: ein Prüfer, der zu viel ablehnt
+
+`commit_wache` lehnt in `marktplatz-api.php` **jedes** Feld ab, das nicht
+`gesehen` heißt — auch ein unverändertes. Heute harmlos: in
+`assets/config/wache-hand.json` stehen nur Quittungen. Sobald dort aber von
+Hand eine Sperre steht (`"ampel": "rot"`), schickt das Studio sie unverändert
+mit und **jedes** weitere Quittieren scheitert mit `field_not_allowed` — nicht
+wegen der neuen Quittung, sondern wegen der alten Sperre. Nicht repariert,
+weil es eine Server-Datei betrifft, die nur Klaus hochladen kann; fällig,
+sobald die erste Sperre gesetzt wird.
+
+### Lehre
+
+Wenn eine Web-App scheitert, liegt die Ursache nicht zwangsläufig im Depot.
+Zum Bild gehören **drei** Maschinen (Tablet · Caddy-Cloud-Server · Apache-
+Webhosting), und die Sitzung sieht nur das Depot. Bei einem Fehler an einer
+Server-Aktion gehört **Datum und Größe der Datei auf dem Server** zu den ersten
+Fragen — nicht zu den letzten.
+
+---
+
+
 ## ✅ 2026-08-03, früh: `werkzeuge.html` — der Sprung beim Laden (CLS 0,188 → 0)
 
 Fortsetzung des Marktplatz-Durchgangs von der Nacht. Die Seite stand bei
