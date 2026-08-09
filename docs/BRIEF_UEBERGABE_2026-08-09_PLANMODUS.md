@@ -207,6 +207,30 @@ Das Repo ist im Arbeitsbereich: `/workspace/semantic-match-demo`
 (Stand `031ab12`, 2026-07-28, flacher Klon — für Historie
 `git fetch --unshallow`). Live: `https://lausiklauskn-png.github.io/semantic-match-demo/`
 
+**Was in den Papieren steht** (ausgelesen 2026-08-09, nur Bestandsaufnahme):
+
+- **Konzept PWA-Marktplatz** — „PWA·MARKET": eine Plattform, die Entwickler
+  privater PWAs mit Firmen zusammenbringt, ohne App-Store-Umweg. Kern ist ein
+  KI-Prompt-Matching, dazu gerätegebundene Lizenzen, Treuhand, Partner-Reichweite.
+- **Marktanalyse** (9 S.) — PWA-Markt +30,2 % jährlich auf 34,6 Mrd. $ bis 2035;
+  54.000 aktive PWAs; 70 % bevorzugen PWAs vor nativen Apps. Diagnose: ein
+  **strukturelles Marktversagen** — gute Lösungen von Einzelentwicklern erreichen
+  ihre Zielgruppe nicht, weil bestehende Plattformen algorithmisch und
+  werbegesteuert arbeiten statt bedarfsorientiert.
+- **Kosten-Nutzen** — fünf Phasen, 26–36 Wochen, 65–115 T€, Break-even ab
+  Monat 8 bei 400 Apps, 5–15 % Provision.
+- **Kostenanalyse Everlast Engine** — trennt sauber **Technologie** (Semantic
+  Matching Engine, universell) von **Anwendung** (PWA-Marktplatz).
+- **USP Bidirektionales Matching** — das Prinzip in einem Bild: Entwickler
+  „Wartungsprotokolle mit Offline-Funktion" ⟷ Käufer „digitale Checkliste für
+  Maschinenwartung". Zwei Vektoren, ein Treffer.
+
+**Der bemerkenswerte Teil:** das Konzept beschreibt in weiten Teilen genau das,
+was seither **gebaut wurde**. Der family-projekt.de-Marktplatz IST der
+PWA-Marktplatz aus diesem Papier — ohne Firma dahinter, in Heimarbeit, und mit
+einer Semantik, die tatsächlich läuft. Das gehört in die Bestandsaufnahme:
+gefragt ist nicht „was könnte man bauen", sondern „was ist davon schon da".
+
 ```
 index.html              SBKIM · Semantisches Bidirektionales KI-Matching  (70 KB)
 hub.html                SBKIM · Hub
@@ -262,6 +286,36 @@ auflösen**. Nicht eigenmächtig etwas entfernen (der Pitch kann gewollt
 aufbauen, bevor Klaus gesagt hat, wie es damit weitergeht: *noch aktuell ·
 Historie · soll raus*. Von dieser Antwort hängt ab, ob das Repo überhaupt die
 Grundlage für etwas Gemeinsames sein kann.
+
+### ⚠ ZU KLÄREN: vier Papiere tragen „Vertraulich" und liegen öffentlich
+
+Befund 2026-08-09, Klaus ausdrücklich als **offener Klärungspunkt** notiert —
+nicht entschieden, nichts angefasst:
+
+| Datei | Vermerk im Dokument |
+|---|---|
+| `Konzept_PWA_Marktplatz.pdf` | „Vertrauliches Konzeptpapier · Präsentiert an Everlast.ai" |
+| `Marktanalyse_PWA_Plattform.pdf` | „Vertraulich · Mai 2026 · Präsentiert an Everlast Consulting GmbH" |
+| `Kosten_Nutzen_Analyse_PWA_Plattform.pdf` | „Vertraulich · Präsentiert an Everlast Consulting GmbH" |
+| `Kostenanalyse_Everlast_Engine_PWA.pdf` | „Vertraulich · **ausschließlich für** Everlast Consulting GmbH" |
+
+Das Repo ist öffentlich, `hub.html` verlinkt die Dateien, und `sw.js` legt sie
+in den **Offline-Vorrat**. Lesbar ist damit auch der Kostenrahmen
+(65–115 T€), das Provisionsmodell (5–15 %) und die 3-%-Gebühr im
+Transaktionsfluss.
+
+Das kann **gewollt** sein — ein Pitch will gefunden werden, und der Marktteil
+ist ohnehin öffentliches Wissen. Bei der Kostenanalyse, die „ausschließlich
+für Everlast" im Kopf trägt, ist es weniger offensichtlich.
+
+Das ist ein Fall für die **Auslieferungs-Brille** aus
+`Sage-Protokol/CLAUDE.md`: *„Was liefert der Server WIRKLICH aus?"* Die Antwort
+lautet hier: alles, was im Repo liegt. Die Entscheidung trifft Klaus, nicht
+die Sitzung.
+
+**Für die nächste Sitzung heißt das:** die Frage stellen, die Antwort
+abwarten, **keine Datei entfernen und keine hinzufügen**. Ein „bleibt so" ist
+eine gültige Antwort und beendet den Punkt.
 
 ### Die Frage, die Klaus stellt
 
