@@ -275,6 +275,9 @@
            was ein niedriger Wert für ihn konkret bedeutet. */
         mk_ms_keine: "Noch nicht gemessen.",
         mk_ms_hand: "Vom Anbieter selbst abgelesen — noch nicht von uns gemessen.",
+        mk_ms_hand_wir: "Von uns persönlich geprüft und von Hand eingetragen.",
+        mk_ms_hand_wir_lang: "Diese vier Zahlen haben wir selbst bei Googles PageSpeed Insights abgelesen und von Hand eingetragen — mit demselben Werkzeug, mit dem auch nachts automatisch gemessen wird, nur eben zum Zeitpunkt daneben. Der Grund: eine frisch fertige Seite soll sofort mit einer geprüften Zahl dastehen können, statt bis zur nächsten Nacht ohne. Was hier fehlt, ist allein die Aufschlüsselung: welche Einzelprüfungen durchgefallen sind, liefert erst der automatische Lauf. Der ersetzt diesen Wert dann von selbst, sobald er für dieselbe Adresse ein neueres Datum hat.",
+        mk_ms_von_hand_wir: "von Hand geprüft am ",
         mk_ms_hand_lang: "Diese vier Zahlen hat der Anbieter selbst bei Googles PageSpeed Insights abgelesen und eingetragen, damit die Seite sofort gelistet werden kann. Wir haben sie noch nicht selbst nachgemessen. Beim nächsten nächtlichen Lauf wird der Wert durch unsere eigene Messung ersetzt — dann steht hier auch, welche Einzelprüfungen durchgefallen sind. Bis dahin gilt: nachprüfbar ist die Zahl trotzdem, über den Knopf unten.",
         mk_ms_hand_keine_fix: "Dazu liegen noch keine Einzelprüfungen vor — die kommen mit unserer ersten eigenen Messung.",
         mk_ms_ist_app: "Bewertet ist die App selbst — dem Eintrag ist eine eigene Seite vorgeschaltet.",
@@ -401,6 +404,9 @@
         mk_wa_seit: "since ",
         mk_ms_keine: "Not measured yet.",
         mk_ms_hand: "Read off by the provider — not yet measured by us.",
+        mk_ms_hand_wir: "Checked by us personally and entered by hand.",
+        mk_ms_hand_wir_lang: "We read these four numbers off Google PageSpeed Insights ourselves and entered them by hand — with the same tool the nightly run uses, just at a different moment. The reason: a freshly finished page should be able to show a checked number straight away instead of none until the next night. What is missing here is only the breakdown: which individual audits failed comes with the automatic run. That run then replaces this value on its own, as soon as it has a newer date for the same address.",
+        mk_ms_von_hand_wir: "checked by hand on ",
         mk_ms_hand_lang: "The provider read these four numbers off Google PageSpeed Insights themselves and entered them, so the page could be listed straight away. We have not measured it ourselves yet. The next nightly run replaces the value with our own measurement — and then the individual failed audits appear here too. Until then: the number is still checkable, via the button below.",
         mk_ms_hand_keine_fix: "No individual audits yet — those arrive with our first own measurement.",
         mk_ms_ist_app: "These are the app's own scores — this entry has a separate page in front of it.",
@@ -631,11 +637,24 @@
           if (msZahlen(da)
               && msGleicheAdresse(da.url, ziel)
               && String(da.gemessen || "") >= String(h.gemessen || "")) continue;
-          var m = { stand: "von_hand", gemessen: String(h.gemessen || "") };
+          /* ── Zwei Herkünfte, die nicht dasselbe sind (2026-08-09) ───────
+           * Bis hierher trug JEDER Hand-Wert den Satz „vom Anbieter selbst
+           * abgelesen". Für die Zahlen, die KLAUS selbst bei PageSpeed
+           * abliest, war das schlicht falsch — und zwar zu seinen Ungunsten:
+           * eine selbst geprüfte Zahl las sich wie eine ungeprüfte Behauptung
+           * des Anbieters.
+           *
+           * Darum trägt ein Eintrag jetzt optional `quelle`:
+           *   "betreiber" → wir haben selbst nachgesehen (stärker)
+           *   fehlt/sonst → der Anbieter hat es gemeldet (wie bisher)
+           * Der Standard bleibt die schwächere Lesart. Wer nichts einträgt,
+           * bekommt keine Vertrauens-Aufwertung geschenkt. */
+          var quelle = (h.quelle === "betreiber") ? "betreiber" : "anbieter";
+          var m = { stand: "von_hand", quelle: quelle, gemessen: String(h.gemessen || "") };
           for (var i = 0; i < MS_KAT.length; i++) m[MS_KAT[i]] = h[MS_KAT[i]];
           m.url = ziel || (da && da.url) || "";
           if (h.schaufenster && msZahlen(h.schaufenster)) {
-            var s = { stand: "von_hand", gemessen: String(h.schaufenster.gemessen || h.gemessen || "") };
+            var s = { stand: "von_hand", quelle: (h.schaufenster.quelle === "betreiber" ? "betreiber" : quelle), gemessen: String(h.schaufenster.gemessen || h.gemessen || "") };
             for (var j = 0; j < MS_KAT.length; j++) s[MS_KAT[j]] = h.schaufenster[MS_KAT[j]];
             s.url = h.schaufenster.url || (eintrag && eintrag.url) || "";
             m.schaufenster = s;
@@ -652,7 +671,11 @@
       /* "gemessen am" vs. "abgelesen am" — an EINER Stelle entschieden. Ein
        * von Hand eingetragener Wert wurde nicht gemessen, und das Wort dafuer
        * darf nicht so tun. */
-      function msDatumWort(mm) { return FP.t(mm && mm.stand === "von_hand" ? "mk_ms_von_hand" : "mk_ms_von"); }
+      function msVonUns(mm) { return !!(mm && mm.stand === "von_hand" && mm.quelle === "betreiber"); }
+      function msDatumWort(mm) {
+        if (!mm || mm.stand !== "von_hand") return FP.t("mk_ms_von");
+        return FP.t(msVonUns(mm) ? "mk_ms_von_hand_wir" : "mk_ms_von_hand");
+      }
       /* Angezeigt wird immer NUR der Tag. `gemessen` darf intern eine Uhrzeit
        * tragen ("2026-08-02 15:00"), aber ausschließlich, um zwei Ablesungen
        * DESSELBEN Tages in die richtige Reihenfolge zu bringen. Sie ist keine
@@ -721,7 +744,7 @@
           // Ein von Hand eingetragener Wert wird als solcher ausgewiesen. Er
           // darf nie aussehen wie eine eigene Messung — sonst waere die Zahl
           // genau so viel wert wie die Behauptung dahinter.
-          (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t("mk_ms_hand")) + '</p>' : '') +
+          (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t(msVonUns(m) ? "mk_ms_hand_wir" : "mk_ms_hand")) + '</p>' : '') +
           // Es gibt eine neuere, schlechtere Messung — das gehoert an die
           // Karte, nicht nur in die Datei.
           (msHalt(m, "mk_ms_halt") ? '<p class="mk-ms-halt">' + esc(msHalt(m, "mk_ms_halt")) + '</p>' : '') +
@@ -874,7 +897,7 @@
               (m.werkzeug ? ' · Lighthouse ' + esc(m.werkzeug) : '') +
               (m.quelle ? ' · ' + esc(FP.t(m.quelle === "google" ? "mk_ms_q_google" : "mk_ms_q_eigen")) : '') + '</p>' +
             (m.stand === "veraltet" ? '<p class="mk-ms-alt">' + esc(FP.t("mk_ms_alt")) + '</p>' : '') +
-            (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t("mk_ms_hand_lang")) + '</p>' : '') +
+            (m.stand === "von_hand" ? '<p class="mk-ms-hand">' + esc(FP.t(msVonUns(m) ? "mk_ms_hand_wir_lang" : "mk_ms_hand_lang")) + '</p>' : '') +
             // Im Fenster steht der ganze Grund — und die neuere Zahl selbst,
             // damit niemand sie suchen muss.
             (msHalt(m, "mk_ms_halt_lang")

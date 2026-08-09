@@ -1,10 +1,11 @@
 {
-  "_hinweis": "Von Hand eingetragene Lighthouse-Werte (Stufe 5). Zweck: eine Seite soll SOFORT öffentlich gestellt werden können, ohne einen Tag auf den nächtlichen Lauf zu warten. Klaus misst selbst bei PageSpeed Insights, die Werte kommen hier hinein, und sie sind mit dem Push live — es muss kein Werkzeug laufen. VORRANG (anders als beim Wächter, wo die Hand gewinnt): der Hand-Wert springt nur EIN, bis wirklich gemessen wurde. Sobald der nächtliche Lauf für DIESELBE Adresse ein neueres Messdatum liefert, gewinnt die Messung und der Hand-Wert verschwindet von allein. Er muss also nicht aufgeräumt werden — schadet aber auch nicht, wenn er es wird. ZWEI FEINHEITEN (2026-08-02, aus einem echten Fehlfall an Mein Mixarium gelernt): (1) Eine eigene Messung verdrängt den Hand-Wert nur, wenn sie DIESELBE Adresse gemessen hat. Eine ältere Messung der Landingpage darf keine neuere Ablesung der App blockieren — das sind zwei verschiedene Seiten. (2) 'gemessen' darf eine Uhrzeit tragen ('2026-08-02 15:00'), damit zwei Werte vom SELBEN Tag in die richtige Reihenfolge kommen (morgens gemessen, nachmittags abgelesen). Die Uhrzeit wird NICHT angezeigt — auf der Karte steht nur der Tag. Sie ist reine Reihenfolge, keine Behauptung über die Minute. EHRLICHKEIT: ein Hand-Wert wird auf der Karte und im Fenster als solcher AUSGEWIESEN und sieht nie aus wie eine eigene Messung. Einzelprüfungen ('empfohlene Nachbesserungen') gibt es dazu nicht — die kommen erst mit der ersten eigenen Messung. Schlüssel ist die anchorId aus listings.js. Pflichtfelder je Eintrag: leistung, bedienbarkeit, gute_praxis, auffindbarkeit (0-100) und gemessen (YYYY-MM-DD, optional mit ' HH:MM'). Optional 'schaufenster' mit denselben Feldern, wenn dem Eintrag eine Landingpage vorgeschaltet ist (siehe appUrl in listings.js). Beispiel: \"markt-beispiel\": { \"leistung\": 94, \"bedienbarkeit\": 96, \"gute_praxis\": 100, \"auffindbarkeit\": 100, \"gemessen\": \"2026-08-02\" }",
+  "_hinweis": "Von Hand eingetragene Lighthouse-Werte (Stufe 5). Zweck: eine Seite soll SOFORT öffentlich gestellt werden können, ohne einen Tag auf den nächtlichen Lauf zu warten. Klaus misst selbst bei PageSpeed Insights, die Werte kommen hier hinein, und sie sind mit dem Push live — es muss kein Werkzeug laufen. VORRANG (anders als beim Wächter, wo die Hand gewinnt): der Hand-Wert springt nur EIN, bis wirklich gemessen wurde. Sobald der nächtliche Lauf für DIESELBE Adresse ein neueres Messdatum liefert, gewinnt die Messung und der Hand-Wert verschwindet von allein. Er muss also nicht aufgeräumt werden — schadet aber auch nicht, wenn er es wird. ZWEI FEINHEITEN (2026-08-02, aus einem echten Fehlfall an Mein Mixarium gelernt): (1) Eine eigene Messung verdrängt den Hand-Wert nur, wenn sie DIESELBE Adresse gemessen hat. Eine ältere Messung der Landingpage darf keine neuere Ablesung der App blockieren — das sind zwei verschiedene Seiten. (2) 'gemessen' darf eine Uhrzeit tragen ('2026-08-02 15:00'), damit zwei Werte vom SELBEN Tag in die richtige Reihenfolge kommen (morgens gemessen, nachmittags abgelesen). Die Uhrzeit wird NICHT angezeigt — auf der Karte steht nur der Tag. Sie ist reine Reihenfolge, keine Behauptung über die Minute. EHRLICHKEIT: ein Hand-Wert wird auf der Karte und im Fenster als solcher AUSGEWIESEN und sieht nie aus wie eine eigene Messung. Einzelprüfungen ('empfohlene Nachbesserungen') gibt es dazu nicht — die kommen erst mit der ersten eigenen Messung. Schlüssel ist die anchorId aus listings.js. Pflichtfelder je Eintrag: leistung, bedienbarkeit, gute_praxis, auffindbarkeit (0-100) und gemessen (YYYY-MM-DD, optional mit ' HH:MM'). Optional 'schaufenster' mit denselben Feldern, wenn dem Eintrag eine Landingpage vorgeschaltet ist (siehe appUrl in listings.js). Beispiel: \"markt-beispiel\": { \"leistung\": 94, \"bedienbarkeit\": 96, \"gute_praxis\": 100, \"auffindbarkeit\": 100, \"gemessen\": \"2026-08-02\" } HERKUNFT (2026-08-09): Optionales Feld 'quelle'. \"betreiber\" = wir haben die Zahl selbst bei PageSpeed abgelesen und von Hand eingetragen; die Karte schreibt dann \"von uns persoenlich geprueft\". Fehlt das Feld, gilt die schwaechere Lesart \"vom Anbieter selbst abgelesen\" — wer nichts eintraegt, bekommt keine Vertrauens-Aufwertung geschenkt. Im 'schaufenster'-Block darf 'quelle' eigenstaendig stehen; ohne Angabe erbt es die des Eintrags.",
   "markt-rezeptbuch": {
     "leistung": 73,
     "bedienbarkeit": 96,
     "gute_praxis": 96,
     "auffindbarkeit": 100,
+    "quelle": "betreiber",
     "gemessen": "2026-08-02 15:00",
     "schaufenster": {
       "leistung": 81,
@@ -19,6 +20,7 @@
     "bedienbarkeit": 100,
     "gute_praxis": 96,
     "auffindbarkeit": 100,
+    "quelle": "betreiber",
     "gemessen": "2026-08-02 19:58"
   },
   "markt-mixarium": {
@@ -26,6 +28,7 @@
     "bedienbarkeit": 92,
     "gute_praxis": 96,
     "auffindbarkeit": 100,
+    "quelle": "betreiber",
     "gemessen": "2026-08-02 15:00",
     "schaufenster": {
       "leistung": 94,
@@ -40,6 +43,7 @@
     "bedienbarkeit": 96,
     "gute_praxis": 96,
     "auffindbarkeit": 100,
+    "quelle": "betreiber",
     "gemessen": "2026-08-03 18:36",
     "schaufenster": {
       "leistung": 98,
@@ -54,6 +58,7 @@
     "bedienbarkeit": 100,
     "gute_praxis": 100,
     "auffindbarkeit": 100,
+    "quelle": "betreiber",
     "gemessen": "2026-08-08 23:09"
   }
 }

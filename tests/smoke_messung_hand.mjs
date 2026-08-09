@@ -199,6 +199,44 @@ console.log("Marktplatz — von Hand eingetragene Messwerte");
   await p.close();
 }
 
+// ── 10) Zwei Herkuenfte: selbst geprueft vs. vom Anbieter gemeldet ──────────
+// Bis 2026-08-09 trug JEDER Hand-Wert den Satz "vom Anbieter selbst abgelesen".
+// Fuer die Zahlen, die der Betreiber selbst bei PageSpeed abliest, war das
+// falsch — und zwar zu seinen Ungunsten: eine selbst gepruefte Zahl las sich
+// wie eine ungepruefte Behauptung. Die zwei Faelle stehen bewusst als PAAR:
+// ohne 10c waere 10a/10b eine stille Aufwertung ALLER Hand-Werte.
+{
+  const p = await laden({ eintraege: {} },
+    { "markt-kimboard": Object.assign({ gemessen: "2026-08-09", quelle: "betreiber" }, VIER) });
+  const t = await p.evaluate(() => {
+    const btn = document.querySelector('.mk-report[data-id="markt-kimboard"]');
+    const c = btn && btn.closest(".listing");
+    return {
+      satz: (c && c.querySelector(".mk-ms-hand") || {}).textContent || "",
+      datum: (c && c.querySelector(".mk-mess small") || {}).textContent || ""
+    };
+  });
+  ok(/persönlich geprüft/.test(t.satz),
+    "10a selbst geprueft: die Karte sagt 'von uns persoenlich geprueft' (" + JSON.stringify(t.satz) + ")");
+  ok(/von Hand geprüft am/.test(t.datum) && !/abgelesen am/.test(t.datum),
+    "10b und das Datumswort passt dazu (" + JSON.stringify(t.datum) + ")");
+  await p.close();
+}
+{
+  // Gegenprobe: OHNE `quelle` bleibt die schwaechere Lesart. Wer nichts
+  // eintraegt, bekommt keine Vertrauens-Aufwertung geschenkt.
+  const p = await laden({ eintraege: {} },
+    { "markt-kimboard": Object.assign({ gemessen: "2026-08-09" }, VIER) });
+  const satz = await p.evaluate(() => {
+    const btn = document.querySelector('.mk-report[data-id="markt-kimboard"]');
+    const c = btn && btn.closest(".listing");
+    return (c && c.querySelector(".mk-ms-hand") || {}).textContent || "";
+  });
+  ok(/Anbieter selbst/.test(satz) && !/persönlich/.test(satz),
+    "10c ohne Herkunft bleibt es 'vom Anbieter selbst abgelesen' (" + JSON.stringify(satz) + ")");
+  await p.close();
+}
+
 // ── 9) Die echte Datei im Repo ist gueltiges JSON ───────────────────────────
 {
   let o = null, fehler = "";
