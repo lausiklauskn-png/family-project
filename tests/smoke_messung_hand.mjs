@@ -237,6 +237,36 @@ console.log("Marktplatz — von Hand eingetragene Messwerte");
   await p.close();
 }
 
+// ── 11) Der Hand-Wert der APP nimmt die Schaufenster-Ablesung nicht mit ─────
+// `MESSUNG[id]` wird beim Auflegen ganz ersetzt. Ohne Vorkehrung verschwaende
+// eine vorhandene Messung der Landingpage still, sobald jemand die App von
+// Hand eintraegt — zwei verschiedene Seiten, und die eine abzuloesen heisst
+// nicht, die andere zu widerrufen. (Befund 2026-08-09, Mein Rezeptbuch.)
+{
+  const p = await laden({
+    eintraege: { "markt-rezeptbuch": { messung: { stand: "gemessen", gemessen: "2026-08-08",
+      url: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
+      leistung: 74, bedienbarkeit: 100, gute_praxis: 96, auffindbarkeit: 100,
+      schaufenster: { stand: "gemessen", gemessen: "2026-08-06",
+        url: "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
+        leistung: 58, bedienbarkeit: 94, gute_praxis: 100, auffindbarkeit: 100 } } } }
+  }, { "markt-rezeptbuch": { leistung: 84, bedienbarkeit: 100, gute_praxis: 96,
+      auffindbarkeit: 100, quelle: "betreiber", gemessen: "2026-08-09 12:47" } });
+  const k = await karte(p, "markt-rezeptbuch");
+  ok(k.zahlen && k.zahlen[0] === 84,
+    "11a der Hand-Wert der App gewinnt (" + JSON.stringify(k.zahlen && k.zahlen.slice(0, 4)) + ")");
+  // Das Schaufenster steht im FENSTER, nicht auf der Karte (wie Fall 6).
+  await p.click('[data-msid="markt-rezeptbuch"]');
+  await p.waitForTimeout(600);
+  const sf = await p.evaluate(() => {
+    const b = document.querySelector(".mk-ms-sf");
+    return b ? Array.from(b.querySelectorAll(".mk-ms-w b")).map((e) => Number(e.textContent)) : null;
+  });
+  ok(sf && sf.length === 8 && sf[0] === 84 && sf[4] === 58,
+    "11b und die Schaufenster-Ablesung steht weiterhin da (" + JSON.stringify(sf) + ")");
+  await p.close();
+}
+
 // ── 9) Die echte Datei im Repo ist gueltiges JSON ───────────────────────────
 {
   let o = null, fehler = "";

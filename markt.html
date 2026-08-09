@@ -658,6 +658,15 @@
             for (var j = 0; j < MS_KAT.length; j++) s[MS_KAT[j]] = h.schaufenster[MS_KAT[j]];
             s.url = h.schaufenster.url || (eintrag && eintrag.url) || "";
             m.schaufenster = s;
+          } else if (da && da.schaufenster && msZahlen(da.schaufenster)) {
+            /* Der Hand-Wert spricht über die APP. Trägt er nichts übers
+             * Schaufenster, darf er die vorhandene Ablesung der Landingpage
+             * nicht mit wegnehmen — `MESSUNG[id]` wird hier ganz ersetzt, und
+             * ohne diese Zeile verschwände die zweite Zahl still mit. Das sind
+             * zwei verschiedene Seiten mit eigenem Datum; die eine abzulösen
+             * heißt nicht, die andere zu widerrufen. (Befund 2026-08-09 beim
+             * Eintragen von Mein Rezeptbuch.) */
+            m.schaufenster = da.schaufenster;
           }
           MESSUNG[id] = m;
           n++;
