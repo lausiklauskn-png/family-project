@@ -70,6 +70,7 @@ if ($ziel !== '') {
   }
   $CFG = array_merge($CFG, $CFG['ziele'][$ziel]);
 }
+
 function require_key($STUDIO_KEY, $B) {
   $key = (string) req($B, 'key', '');
   if ($STUDIO_KEY === '' || !hash_equals($STUDIO_KEY, $key)) out(array('ok' => false, 'error' => 'unauthorized'), 401);
@@ -165,8 +166,8 @@ if ($action === 'setstatus') {
 if ($action === 'commit_listings') {
   require_key($STUDIO_KEY, $B);
   $content = (string) req($B, 'content', '');
-  // Schutz: nie eine leere/kaputte Datei schreiben.
-  /* Der erwartete Text hängt am Ziel: Family Projekt heißt FP_LISTINGS, PWA
+  /* Schutz: nie eine leere/kaputte Datei schreiben.
+     Der erwartete Text hängt am Ziel: Family Projekt heißt FP_LISTINGS, PWA
      Toolpoint heißt PT_LISTINGS. Ohne diese Unterscheidung schlüge der Schutz
      beim zweiten Marktplatz IMMER an — und der Fehler sähe aus wie eine
      kaputte Datei, obwohl nur der Name ein anderer ist. Fehlt die Angabe,
