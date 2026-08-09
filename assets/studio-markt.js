@@ -118,6 +118,8 @@
       bad_url: "Link ungültig (muss mit https:// beginnen).",
       publishing: "Wird veröffentlicht …", published: "Veröffentlicht — in ~1 Minute für alle live.",
       pub_err: "Veröffentlichen fehlgeschlagen: ", nothing: "Nichts geändert.",
+      pub_timeout: "Der Server hat nicht geantwortet (Zeitüberschreitung). Es ging nichts verloren — noch einmal versuchen.",
+      pub_teil_e: "Beschreibungen", pub_teil_w: "Quittungen der Wache",
       added: "Hinzugefügt (noch nicht veröffentlicht).", updated: "Geändert (noch nicht veröffentlicht).",
       removed: "Entfernt (noch nicht veröffentlicht).", img_local: "Bild vom Gerät — wird beim Veröffentlichen hochgeladen.",
       dirty_badge: "· ungespeichert", by_default: "@extern",
@@ -247,6 +249,8 @@
       bad_url: "Invalid link (must start with https://).",
       publishing: "Publishing …", published: "Published — live for everyone in ~1 minute.",
       pub_err: "Publishing failed: ", nothing: "Nothing changed.",
+      pub_timeout: "The server did not answer (timeout). Nothing was lost — please try again.",
+      pub_teil_e: "descriptions", pub_teil_w: "watchdog acknowledgements",
       added: "Added (not published yet).", updated: "Changed (not published yet).",
       removed: "Removed (not published yet).", img_local: "Device image — uploaded on publish.",
       dirty_badge: "· unsaved", by_default: "@extern",
@@ -547,7 +551,7 @@
       toast(T("publishing"));
       publishViaServer()
         .then(function () { markDirty(); toast(T("withdrawn")); })
-        .catch(function (err) { markDirty(); toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+        .catch(function (err) { markDirty(); toast(T("pub_err") + fehlerText(err), false); });
     } else {
       markDirty(); toast(T("removed"));
     }
@@ -579,9 +583,26 @@
     if (!key) return Promise.reject(new Error(T("need_srvkey")));
     setSrvKey(key, true);
     var imgPaths = Object.keys(UPLOADS);
-    var chain = Promise.resolve();
+    var fehler = [];
+
+    /* ZWEI STRAENGE, NICHT EINE KETTE (Befund 2026-08-09).
+     *
+     * Bilder und Eintraege gehoeren zusammen: ein Eintrag zeigt auf ein Bild,
+     * das vorher liegen muss. Die Quittungen der Wache haben damit NICHTS zu
+     * tun - sie landen in einer anderen Datei.
+     *
+     * Frueher hing beides an EINER Promise-Kette. Antwortete der Server auf
+     * `commit_wache` nicht wie erwartet (z.B. weil dort noch eine Fassung der
+     * API von vor dem 2026-08-03 liegt, die diese Aktion gar nicht kennt),
+     * riss die Kette - und mit ihr blieben auch die Beschreibungen liegen.
+     * Genau das war Klaus' Befund: "Beschreibung uebernehmen geklickt, aber
+     * ich kann nicht veroeffentlichen." Ein Fehler an einer Stelle darf nicht
+     * das Unbeteiligte mitnehmen. Nacheinander, aber unabhaengig: was geht,
+     * geht raus; was scheitert, wird beim Namen genannt und bleibt offen
+     * (dirty/wacheDirty bleiben dann stehen, nichts geht verloren). */
+    var kette = Promise.resolve();
     imgPaths.forEach(function (p) {
-      chain = chain.then(function () {
+      kette = kette.then(function () {
         return apiPost("commit_image", { path: p, base64: UPLOADS[p] }).then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "Bild"); });
       });
     });
@@ -590,14 +611,23 @@
      * nur bei dirty/Bildern erreichbar war. Mit der Quittung gaebe es sonst
      * einen Eintraege-Commit mit identischem Inhalt. */
     if (dirty || imgPaths.length) {
-      chain = chain.then(function () { return apiPost("commit_listings", { content: serialize() }); })
+      kette = kette.then(function () { return apiPost("commit_listings", { content: serialize() }); })
         .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_listings"); UPLOADS = {}; dirty = false; });
     }
+    kette = kette.catch(function (err) { fehler.push(T("pub_teil_e") + ": " + fehlerText(err)); });
+
     if (wacheDirty) {
-      chain = chain.then(function () { return apiPost("commit_wache", { content: JSON.stringify(WACHEHAND, null, 2) + "\n" }); })
-        .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_wache"); wacheDirty = false; });
+      kette = kette.then(function () {
+        return apiPost("commit_wache", { content: JSON.stringify(WACHEHAND, null, 2) + "\n" })
+          .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_wache"); wacheDirty = false; })
+          .catch(function (err) { fehler.push(T("pub_teil_w") + ": " + fehlerText(err)); });
+      });
     }
-    return chain.then(function () { markDirty(); return true; });
+    return kette.then(function () {
+      markDirty();
+      if (fehler.length) throw new Error(fehler.join(" · "));
+      return true;
+    });
   }
   function publish() {
     if (!API) { toast(T("q_noapi"), false); return; }
@@ -607,7 +637,7 @@
     if (btn) { btn.disabled = true; btn.textContent = T("publishing"); }
     publishViaServer()
       .then(function () { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("published")); })
-      .catch(function (err) { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+      .catch(function (err) { if (btn) { btn.disabled = false; btn.textContent = T("publish"); } toast(T("pub_err") + fehlerText(err), false); });
   }
 
   /* ------------------------------------------- Vektoren bauen (Katalog-Spore Stufe 1)
@@ -1359,7 +1389,7 @@
     toast(T("publishing"));
     publishViaServer()
       .then(function () { renderList(); markDirty(); toast(T("withdrawn")); })
-      .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+      .catch(function (err) { toast(T("pub_err") + fehlerText(err), false); });
   }
 
   /* --------------------------------------------- Warteschlange (Server-API) */
@@ -1367,14 +1397,42 @@
   function srvKeyStored() { try { return localStorage.getItem(LS.srvKey) || ""; } catch (e) { return ""; } }
   function srvKeyVal() { var el = panel && panel.querySelector("[data-f=srvkey]"); if (el && el.value.trim()) return el.value.trim(); return srvKeyStored(); }
   function setSrvKey(v, remember) { try { if (remember && v) localStorage.setItem(LS.srvKey, v); else localStorage.removeItem(LS.srvKey); localStorage.setItem(LS.srvRemember, remember ? "1" : "0"); } catch (e) {} }
+  /* Ein fetch ohne Frist wartet unbegrenzt. Antwortet der Server gar nicht,
+   * blieb der Knopf fuer immer auf "Wird veroeffentlicht ..." stehen - weder
+   * .then noch .catch feuert je. Ein abbrechendes Signal macht daraus einen
+   * ehrlichen Fehler, den man sieht und wiederholen kann. `AbortSignal.timeout`
+   * gibt es nicht ueberall, darum der Handbetrieb als Rueckfall; fehlt beides,
+   * laeuft es wie bisher (fail-soft, kein Absturz). */
+  var FRIST_GET = 20000, FRIST_POST = 90000;
+  function mitFrist(ms) {
+    try {
+      if (typeof AbortSignal !== "undefined" && AbortSignal.timeout) return { signal: AbortSignal.timeout(ms), fertig: function () {} };
+      if (typeof AbortController !== "undefined") {
+        var c = new AbortController();
+        var t = setTimeout(function () { try { c.abort(); } catch (e) {} }, ms);
+        return { signal: c.signal, fertig: function () { clearTimeout(t); } };
+      }
+    } catch (e) {}
+    return { signal: undefined, fertig: function () {} };
+  }
+  // Ein Abbruch heisst "keine Antwort", nicht "kaputt" - das ist ein anderer
+  // Satz fuer Klaus als eine Fehlermeldung vom Server.
+  function fehlerText(err) {
+    if (err && (err.name === "TimeoutError" || err.name === "AbortError")) return T("pub_timeout");
+    return (err && err.message) ? err.message : String(err);
+  }
   function apiGet(action, extra) {
     var q = "?action=" + encodeURIComponent(action) + "&key=" + encodeURIComponent(srvKeyVal());
     if (extra) Object.keys(extra).forEach(function (k) { q += "&" + encodeURIComponent(k) + "=" + encodeURIComponent(extra[k]); });
-    return fetch(API + q, { cache: "no-store" }).then(function (r) { return r.json(); });
+    var f = mitFrist(FRIST_GET);
+    return fetch(API + q, { cache: "no-store", signal: f.signal })
+      .then(function (r) { f.fertig(); return r.json(); }, function (e) { f.fertig(); throw e; });
   }
   function apiPost(action, bodyObj) {
     var body = bodyObj || {}; body.key = srvKeyVal();
-    return fetch(API + "?action=" + encodeURIComponent(action), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+    var f = mitFrist(FRIST_POST);
+    return fetch(API + "?action=" + encodeURIComponent(action), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: f.signal })
+      .then(function (r) { f.fertig(); return r.json(); }, function (e) { f.fertig(); throw e; });
   }
   function statusLabel(st) { return st === "geprueft" ? T("q_status_geprueft") : st === "verdacht" ? T("q_status_verdacht") : T("q_status_neu"); }
   function statusClass(st) { return st === "geprueft" ? "is-geprueft" : st === "verdacht" ? "is-verdacht" : "is-neu"; }
@@ -1458,7 +1516,7 @@
     publishViaServer()
       .then(function () { return apiPost("setstatus", { id: id, status: "freigegeben" }); })
       .then(function () { QUEUE = QUEUE.filter(function (x) { return String(x.id) !== String(id); }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
-      .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+      .catch(function (err) { toast(T("pub_err") + fehlerText(err), false); });
   }
   function rejectMail(it) {
     if (!it.contact) return;
@@ -1486,7 +1544,7 @@
     publishViaServer()
       .then(function () { return Promise.all(good.map(function (id) { return apiPost("setstatus", { id: id, status: "freigegeben" }); })); })
       .then(function () { QUEUE = QUEUE.filter(function (x) { return good.indexOf(x.id) < 0; }); renderQueue(); renderList(); markDirty(); toast(T("q_approved")); })
-      .catch(function (err) { toast(T("pub_err") + (err && err.message ? err.message : err), false); });
+      .catch(function (err) { toast(T("pub_err") + fehlerText(err), false); });
   }
 
   function openPanel() {
