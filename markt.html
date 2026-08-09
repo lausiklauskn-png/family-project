@@ -259,6 +259,10 @@
         mk_verkauf: "Family Projekt ist ein Schaufenster, kein Bezahl-Dienst. Deine App verkaufst du über deinen eigenen Store oder dein eigenes Konto. Wir listen und verlinken nur, ohne Provision, ohne Zahlungsabwicklung.",
         mk_haft: "Hinweis: Einträge werden geprüft und nicht automatisch veröffentlicht. Für fremde Apps gibt es keine Qualitäts- oder Sicherheits-Garantie. Bilder bleiben beim Anbieter; kein fremder Code, keine SVGs.",
         mk_open: "→ Zur Seite", search_btn: "Suchen",
+        /* Bewusst „Nähe" und nicht „Übereinstimmung": der Wert ist ein Cosinus,
+           also eine Rangfolge, kein Urteil. Siehe naeheBand(). */
+        mk_naehe: "Nähe", mk_naehe_t: "Nähe zur Suchfrage (Cosinus über die Bedeutung). Das ist eine Rangfolge, kein Urteil über die Übereinstimmung.",
+        mk_naehe_note: "Nach Bedeutung sortiert — die Zahl an der Karte ist die Nähe zur Frage, eine Rangfolge.",
         mk_wa_gelb: "Die Zielseite hat sich seit der letzten Prüfung geändert und ist noch nicht durchgesehen.",
         mk_wa_gruen_hand: "Zielseite persönlich durchgesehen und als in Ordnung befunden.",
         mk_wa_gruen_hand_am: "durchgesehen am ",
@@ -394,6 +398,8 @@
         mk_verkauf: "Family Projekt is a showcase, not a payment service. You sell your app through your own store or your own account. We only list and link, no commission, no payment handling.",
         mk_haft: "Note: entries are reviewed and not published automatically. There is no quality or security guarantee for foreign apps. Images stay with the provider; no foreign code, no SVGs.",
         mk_open: "→ Open site", search_btn: "Search",
+        mk_naehe: "Closeness", mk_naehe_t: "Closeness to your query (cosine over meaning). This is a ranking, not a verdict on how well it matches.",
+        mk_naehe_note: "Sorted by meaning — the number on each card is closeness to your query, a ranking.",
         mk_wa_gelb: "The target site has changed since the last check and has not been reviewed yet.",
         mk_wa_gruen_hand: "Target site reviewed in person and found to be fine.",
         mk_wa_gruen_hand_am: "reviewed on ",
@@ -1038,6 +1044,26 @@
         return m.leistung >= MIN_LEISTUNG;
       }
 
+      /* Die Nähe zur Suchfrage — nur nach einer Bedeutungs-Suche, sonst gar nicht.
+       *
+       * BEFUND (Klaus 2026-08-09): die Bedeutungs-Suche sortierte nach einem
+       * Wert, den sie sofort wegwarf. Man sah die Reihenfolge, aber nicht, wie
+       * sicher sie ist — und damit auch nicht, ob überhaupt etwas passt.
+       *
+       * EHRLICH BESCHRIFTET: der Wert ist ein Cosinus zwischen Frage und
+       * Eintrag, also eine NÄHE und damit eine Rangfolge. Er ist KEIN Urteil
+       * „passt zu 83 %". Genau diese Klarstellung musste die Pinnwand am
+       * 2026-06-29 nachträglich einziehen, nachdem eine blanke Zahl dort für
+       * ein Urteil gehalten wurde. Deshalb: „Nähe", zwei Nachkommastellen,
+       * kein Prozentzeichen, und der volle Satz im `title`. */
+      function naeheBand(x) {
+        var n = x && x._naehe;
+        if (typeof n !== "number" || !isFinite(n)) return "";
+        return '<p class="mk-naehe"><span class="mk-naehe-wert" title="' +
+          esc(FP.t("mk_naehe_t")) + '">' + esc(FP.t("mk_naehe")) + ' <b>' +
+          esc(n.toFixed(2)) + '</b></span></p>';
+      }
+
       function card(x) {
         var img = safeImg(x.img), url = safeUrl(x.url);
         var w = wacheVon(x);
@@ -1054,6 +1080,7 @@
           '<div class="body"><h3>' + esc(x.label) + '</h3>' +
           (x.by ? '<p class="by">' + esc(x.by) + '</p>' : '') +
           '<p>' + esc((x.text || "").slice(0, 160)) + '</p>' +
+          naeheBand(x) +
           wacheBand(w) +
           messungBand(x) +
           '<div class="listing-actions">' +
@@ -1087,6 +1114,10 @@
       function wordSearch(q) {
         q = (q || "").trim().toLowerCase();
         if (!q) { view = ALL.slice(); render(); return; }
+        /* Alte Nähe-Zahlen abräumen: sie gehören zu einer anderen Frage. Eine
+           stehengebliebene Zahl wäre schlimmer als gar keine — sie sähe aus wie
+           eine Aussage über DIESE Suche. */
+        ALL.forEach(function (x) { delete x._naehe; });
         var terms = q.split(/\s+/);
         view = ALL.filter(function (x) {
           var hay = (x.label + " " + (x.text || "") + " " + (x.by || "") + " " + (x.category || "")).toLowerCase();
@@ -1211,8 +1242,12 @@
             for (var j = 0; j < qvs.length; j++) { var s = SbkimMatch.match(qvs[j], ALL._vecs[i]); if (s > best) best = s; }
             return { x: x, s: best };
           }).sort(function (a, b) { return b.s - a.s; });
+          /* Die Zahl reist AN der Karte mit, nicht daneben — sonst gehörte sie
+             beim nächsten Zeichnen zu einem anderen Eintrag. Nichts wird
+             gespeichert; jede neue Frage überschreibt sie. */
+          scored.forEach(function (r) { r.x._naehe = r.s; });
           view = scored.map(function (r) { return r.x; });
-          note.textContent = "Nach Bedeutung sortiert.";
+          note.textContent = FP.t("mk_naehe_note");
           render();
         } catch (e) {
           stopProg();
