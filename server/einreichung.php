@@ -38,6 +38,29 @@ $CFG = [
     'https://www.pwa-toolpoint.com',
     'https://lausiklauskn-png.github.io', // GitHub-Pages-Vorschau
   ],
+  // ── Von WELCHEM Marktplatz kam die Einsendung (Klaus 2026-08-09) ────────
+  // Seit zwei Marktplaetze auf denselben Dienst zeigen, stand in JEDER Mail
+  // "ueber family-projekt.de" — auch bei einer Einsendung von Toolpoint. Man
+  // sah der Post nicht mehr an, wo sie herkam.
+  //
+  // Die Herkunft wird NICHT aus dem Formular genommen, sondern aus dem
+  // `Origin`-Kopf. Den setzt der BROWSER, nicht die Seite: eine Seite kann
+  // damit nicht behaupten, eine andere zu sein. Ein selbst mitgeschicktes
+  // Feld waere eine Selbstauskunft und taugte fuer diese Frage nicht.
+  //
+  // `ziel` passt zu den Schluesseln unter `ziele` in freigabe-config.php —
+  // damit weiss das Studio spaeter, in WELCHEN Marktplatz ein freigegebener
+  // Eintrag gehoert. Ohne diese Zeile landete eine Toolpoint-Einsendung bei
+  // Family Projekt, ohne dass jemand einen Fehler saehe.
+  'herkunft' => [
+    'https://family-projekt.de'      => ['name' => 'family-projekt.de', 'ziel' => 'family'],
+    'https://www.family-projekt.de'  => ['name' => 'family-projekt.de', 'ziel' => 'family'],
+    'https://pwa-toolpoint.de'       => ['name' => 'PWA Toolpoint',     'ziel' => 'toolpoint'],
+    'https://www.pwa-toolpoint.de'   => ['name' => 'PWA Toolpoint',     'ziel' => 'toolpoint'],
+    'https://pwa-toolpoint.com'      => ['name' => 'PWA Toolpoint',     'ziel' => 'toolpoint'],
+    'https://www.pwa-toolpoint.com'  => ['name' => 'PWA Toolpoint',     'ziel' => 'toolpoint'],
+    'https://lausiklauskn-png.github.io' => ['name' => 'GitHub-Pages-Vorschau', 'ziel' => ''],
+  ],
   'mail_to'   => 'info@family-projekt.de',
   // Absender MUSS eine Adresse auf DIESER Maschine/Domain sein (SPF/DMARC ok).
   'mail_from' => 'noreply@family-projekt.de',
@@ -68,6 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 header('Content-Type: application/json; charset=utf-8');
 
 function out($code, $arr) { http_response_code($code); echo json_encode($arr); exit; }
+
+/* Herkunft aufloesen. Fehlt der Origin-Kopf (direkter POST ohne Browser),
+   wird das ehrlich als "unbekannt" vermerkt statt geraten — eine falsche
+   Herkunft waere schlimmer als eine fehlende. */
+$HK = isset($CFG['herkunft'][$origin]) ? $CFG['herkunft'][$origin] : null;
+$hkName = $HK ? $HK['name'] : ($origin !== '' ? $origin : 'unbekannte Herkunft');
+$hkZiel = $HK ? $HK['ziel'] : '';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') out(405, ['ok' => false, 'error' => 'method']);
 if ($origin !== '' && !$originOk)          out(403, ['ok' => false, 'error' => 'origin']);
@@ -140,10 +170,10 @@ if ($zweck === 'meldung') {
     'text'       => field($data, 'nachricht', 600),
   ];
   if ($rec['label'] === '' && $rec['entry_id'] === '') out(400, ['ok' => false, 'error' => 'felder']);
-  $subject = 'Marktplatz-MELDUNG: ' . ($rec['label'] !== '' ? $rec['label'] : $rec['entry_id']);
+  $subject = $hkName . ' · MELDUNG: ' . ($rec['label'] !== '' ? $rec['label'] : $rec['entry_id']);
   $replyTo = '';
   $bodyLines = [
-    'Meldung zu einem Marktplatz-Eintrag über family-projekt.de',
+    'Meldung zu einem Marktplatz-Eintrag über ' . $hkName,
     '',
     'Eintrag:  ' . $rec['label'],
     'Kennung:  ' . $rec['entry_id'],
@@ -174,11 +204,12 @@ if ($zweck === 'meldung') {
   if (!is_https($rec['url']))   out(400, ['ok' => false, 'error' => 'url']);
   if (!is_img($rec['img']))     out(400, ['ok' => false, 'error' => 'bild']);
   if (!is_email($rec['contact'])) out(400, ['ok' => false, 'error' => 'kontakt']);
-  $subject = 'Marktplatz-Einreichung: ' . ($rec['label'] !== '' ? $rec['label'] : 'ohne Titel');
+  $subject = $hkName . ' · Einreichung: ' . ($rec['label'] !== '' ? $rec['label'] : 'ohne Titel');
   $replyTo = $rec['contact'];
   $bodyLines = [
-    'Neue Marktplatz-Einreichung über family-projekt.de',
+    'Neue Marktplatz-Einreichung über ' . $hkName,
     '',
+    'Herkunft:     ' . $hkName . ($hkZiel !== '' ? ' (Ziel: ' . $hkZiel . ')' : ''),
     'App:          ' . $rec['label'],
     'Kürzel:       ' . $rec['by'],
     'Adresse:      ' . $rec['url'],
@@ -199,12 +230,13 @@ if ($zweck === 'meldung') {
   ];
   if ($rec['text'] === '')        out(400, ['ok' => false, 'error' => 'felder']);
   if (!is_email($rec['contact'])) out(400, ['ok' => false, 'error' => 'email']);
-  $subject = 'Kontakt-Anfrage über family-projekt.de'
+  $subject = $hkName . ' · Kontakt-Anfrage'
            . ($rec['name'] !== '' ? ' — ' . $rec['name'] : '');
   $replyTo = $rec['contact'];
   $bodyLines = [
-    'Neue Kontakt-Anfrage über family-projekt.de',
+    'Neue Kontakt-Anfrage über ' . $hkName,
     '',
+    'Herkunft: ' . $hkName,
     'Name:    ' . $rec['name'],
     'E-Mail:  ' . $rec['contact'],
     '',
@@ -214,6 +246,11 @@ if ($zweck === 'meldung') {
 }
 
 // ── In die Warteschlange schreiben (eine JSON-Zeile) ─────────────────────
+/* Herkunft mit in die Warteschlange — das Studio braucht sie, um einen
+   freigegebenen Eintrag in den RICHTIGEN Marktplatz zu committen. */
+$rec['herkunft'] = $hkName;
+$rec['ziel'] = $hkZiel;
+$rec['origin'] = $origin;
 $rec['ts'] = gmdate('c');
 $rec['ip_hash'] = substr($key, 0, 12); // KEINE Klar-IP: nur ein Kürzel gegen Missbrauch
 $rec['id'] = $rec['ts'] . '-' . substr(hash('sha256', $raw . $now . mt_rand()), 0, 8);
@@ -221,7 +258,7 @@ $rec['status'] = 'neu';
 @file_put_contents($CFG['queue_file'], json_encode($rec, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n", FILE_APPEND | LOCK_EX);
 
 // ── Lokal an info@ mailen (gleiche Maschine → kein Reputations-Problem) ──
-$body = implode("\n", $bodyLines) . "\n\n— family-projekt.de (Zeitpunkt " . $rec['ts'] . " UTC)\n";
+$body = implode("\n", $bodyLines) . "\n\n— gesendet über " . $hkName . " (Zeitpunkt " . $rec['ts'] . " UTC)\n";
 $headers = 'From: Family Projekt <' . $CFG['mail_from'] . ">\r\n"
          // Meldungen kommen ohne Absender-Adresse: dann keinen leeren Reply-To setzen.
          . ($replyTo !== '' ? 'Reply-To: ' . $replyTo . "\r\n" : '')

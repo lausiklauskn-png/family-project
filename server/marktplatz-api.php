@@ -146,6 +146,14 @@ if ($action === 'list') {
       // Stufe 2 (2026-08-02): der freiwillige Spore-Link des Anbieters. Ohne
       // diese Zeile kaeme er nie im Studio an, obwohl er eingereicht wurde.
       'sporeUrl' => isset($r['sporeUrl']) ? $r['sporeUrl'] : '',
+      /* Von WELCHEM Marktplatz die Einsendung kam (2026-08-09). Das Studio
+         braucht es, um den freigegebenen Eintrag in das RICHTIGE Repo zu
+         committen — ohne diese zwei Zeilen kaeme es hier nie an, obwohl
+         einreichung.php es laengst mitschreibt.
+         Aeltere Eintraege aus der Zeit vor dieser Aenderung haben es nicht;
+         sie bleiben leer und gelten damit als Family Projekt (der Standard). */
+      'herkunft' => isset($r['herkunft']) ? $r['herkunft'] : '',
+      'ziel' => isset($r['ziel']) ? $r['ziel'] : '',
     );
   }
   out(array('ok' => true, 'items' => $items));
