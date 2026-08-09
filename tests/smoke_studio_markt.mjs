@@ -118,6 +118,25 @@ if (api) {
   catch (e) { if (String(e.message || "").includes("ENOENT")) { ok(true, "php CLI nicht vorhanden — Syntaxprüfung übersprungen"); } else { ok(false, "PHP-Syntaxfehler: " + e.message); } }
 }
 
+/* 8b) Quittung mit Datum (2026-08-09) — und der Rückfall ohne
+ *
+ * Die drei Stücke gehören zusammen: das Studio schreibt `gesehen_am`, der
+ * Prüfer auf dem Server lässt es zu, und wenn dort noch eine ältere Fassung
+ * liegt, wird OHNE Datum veröffentlicht statt gar nicht. Fehlt das dritte
+ * Stück, bricht das Quittieren bei jedem, der die PHP nicht nachgeladen hat —
+ * genau der Fall, der am 2026-08-09 einen halben Tag gekostet hat. */
+{
+  const api = readFileSync(join(ROOT, "server/marktplatz-api.php"), "utf8");
+  ok(/neu\.gesehen_am = heuteOrt\(\)/.test(studio), "Studio: Quittung trägt das Datum der Durchsicht");
+  ok(/getFullYear\(\)/.test(studio) && !/gesehen_am = new Date\(\)\.toISOString/.test(studio),
+    "Studio: das Datum kommt aus der Ortszeit, nicht aus UTC");
+  ok(/field_not_allowed/.test(studio) && /wa_ohne_datum/.test(studio),
+    "Studio: älterer Server → Quittung geht ohne Datum raus, statt zu scheitern");
+  ok(/'gesehen_am'/.test(api) && /bad_date/.test(api), "API: gesehen_am erlaubt, aber streng als Datum geprüft");
+  ok(/\$vorhanden/.test(api) && /array_key_exists\(\$feld, \$alt\)/.test(api),
+    "API: fremde Felder nur BYTEGLEICH durchreichbar — Sperre bleibt Handarbeit");
+}
+
 /* 9) freigabe-config.example.php: studio_key ergänzt */
 let cfg = "";
 try { cfg = readFileSync(join(ROOT, "server/freigabe-config.example.php"), "utf8"); } catch (e) {}

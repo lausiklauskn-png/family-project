@@ -93,6 +93,7 @@
       wa_gesehen: "✓ Gesehen — Seite ist in Ordnung",
       wa_gesehen_ok: "✓ quittiert — noch veröffentlichen",
       wa_gesehen_datei: "✓ quittiert — die Warnung ist von der Karte weg",
+      wa_ohne_datum: "Quittung veröffentlicht, aber ohne Datum — dafür muss marktplatz-api.php auf dem Server neu hochgeladen werden.",
       wa_quittiert: "✓ Quittiert — jetzt noch auf Veröffentlichen drücken.",
       wa_keine_summe: "Für diesen Eintrag liegt keine Prüfsumme vor — nichts zu quittieren.",
       ms_am: "am ",
@@ -224,6 +225,7 @@
       wa_gesehen: "✓ Reviewed — site is fine",
       wa_gesehen_ok: "✓ acknowledged — still needs publishing",
       wa_gesehen_datei: "✓ acknowledged — the warning is off the card",
+      wa_ohne_datum: "Acknowledgement published, but without a date — marktplatz-api.php needs re-uploading to the server for that.",
       wa_quittiert: "✓ Acknowledged — now press Publish.",
       wa_keine_summe: "No checksum for this entry — nothing to acknowledge.",
       ms_am: "on ",
@@ -618,9 +620,35 @@
 
     if (wacheDirty) {
       kette = kette.then(function () {
-        return apiPost("commit_wache", { content: JSON.stringify(WACHEHAND, null, 2) + "\n" })
+        var voll = JSON.stringify(WACHEHAND, null, 2) + "\n";
+        return apiPost("commit_wache", { content: voll })
           .then(function (j) { if (!j || !j.ok) throw new Error((j && j.error) || "commit_wache"); wacheDirty = false; })
-          .catch(function (err) { fehler.push(T("pub_teil_w") + ": " + fehlerText(err)); });
+          .catch(function (err) {
+            /* RÜCKFALL OHNE DATUM. `gesehen_am` kam am 2026-08-09 dazu; eine
+             * ältere marktplatz-api.php auf dem Webhosting kennt das Feld nicht
+             * und lehnt den ganzen Commit mit `field_not_allowed` ab. Dann
+             * lieber die Quittung OHNE Datum veröffentlichen als gar nicht —
+             * das Datum ist Beschriftung, die Quittung ist der Zweck. Klaus
+             * erfährt, warum es fehlt, statt es zu suchen. */
+            if (!/field_not_allowed/.test(String(err && err.message))) {
+              fehler.push(T("pub_teil_w") + ": " + fehlerText(err)); return;
+            }
+            var ohne = {};
+            for (var id in WACHEHAND) {
+              var e2 = WACHEHAND[id];
+              if (!e2 || typeof e2 !== "object") { ohne[id] = e2; continue; }
+              var kopie = {};
+              for (var f in e2) if (f !== "gesehen_am") kopie[f] = e2[f];
+              ohne[id] = kopie;
+            }
+            return apiPost("commit_wache", { content: JSON.stringify(ohne, null, 2) + "\n" })
+              .then(function (j2) {
+                if (!j2 || !j2.ok) throw new Error((j2 && j2.error) || "commit_wache");
+                WACHEHAND = ohne; wacheDirty = false;
+                toast(T("wa_ohne_datum"), false);
+              })
+              .catch(function (e3) { fehler.push(T("pub_teil_w") + ": " + fehlerText(e3)); });
+          });
       });
     }
     return kette.then(function () {
@@ -1149,6 +1177,10 @@
     var neu = {};
     for (var k in vorher) neu[k] = vorher[k];   // Sperre/Grund NICHT anfassen
     neu.gesehen = String(w.pruefsumme);
+    // Das Datum der Durchsicht — reine Beschriftung auf der Karte, entscheidet
+    // nichts. Ortszeit, nicht UTC: es soll der Tag sein, an dem Klaus
+    // hingesehen hat, nicht der in Greenwich.
+    neu.gesehen_am = heuteOrt();
     WACHEHAND[anchorId] = neu;
     wacheDirty = true; markDirty();
     renderSporen(SPORENSTAND);
@@ -1433,6 +1465,14 @@
     var f = mitFrist(FRIST_POST);
     return fetch(API + "?action=" + encodeURIComponent(action), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: f.signal })
       .then(function (r) { f.fertig(); return r.json(); }, function (e) { f.fertig(); throw e; });
+  }
+  /* Der heutige Tag in ORTSZEIT. `toISOString()` waere UTC und haette abends
+   * nach 22 Uhr (Sommerzeit) schon den naechsten Tag gemeldet - ein Datum, das
+   * neben Klaus' Uhr falsch aussieht. */
+  function heuteOrt() {
+    var d = new Date();
+    var p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + "-" + p2(d.getMonth() + 1) + "-" + p2(d.getDate());
   }
   function statusLabel(st) { return st === "geprueft" ? T("q_status_geprueft") : st === "verdacht" ? T("q_status_verdacht") : T("q_status_neu"); }
   function statusClass(st) { return st === "geprueft" ? "is-geprueft" : st === "verdacht" ? "is-verdacht" : "is-neu"; }

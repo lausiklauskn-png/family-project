@@ -189,15 +189,23 @@ if ($action === 'commit_vectors') {
  * Warnungen zu übersehen.
  *
  * Die Grenze bleibt aber hart: über diesen Weg darf NUR quittiert werden.
- *   - erlaubt je Eintrag ausschliesslich "gesehen" (eine Hex-Prüfsumme),
- *   - "ampel", "grund" und alles andere werden ABGELEHNT, nicht etwa still
- *     entfernt: eine Sperre soll niemand aus dem Browser setzen oder lösen.
- *     Wer rot/grün schalten will, bearbeitet die Datei weiterhin von Hand.
+ *   - GESETZT werden dürfen je Eintrag ausschliesslich "gesehen" (eine
+ *     Hex-Prüfsumme) und "gesehen_am" (das Datum der Durchsicht, reine
+ *     Beschriftung),
+ *   - "ampel", "grund" und alles andere dürfen nur BYTEGLEICH durchgereicht
+ *     werden, so wie sie schon in der Datei stehen. Eine Sperre soll niemand
+ *     aus dem Browser setzen oder lösen; wer rot/grün schalten will,
+ *     bearbeitet die Datei weiterhin von Hand.
  *   - Schlüssel müssen wie eine anchorId aussehen; "_hinweis" bleibt erlaubt,
  *     damit die Erklärung in der Datei nicht verloren geht.
- * Ein bestehender Eintrag mit "ampel" kann also nicht per Browser verändert
- * werden — das Studio schickt ihn unverändert mit, und genau das lehnt der
- * Prüfer ab, wenn jemand daran gedreht hat.
+ *
+ * NACHTRAG 2026-08-09 — hier stand vorher etwas Falsches. Der Satz lautete:
+ * „das Studio schickt einen bestehenden Eintrag unverändert mit, und genau das
+ * lehnt der Prüfer ab, wenn jemand daran gedreht hat." Der Prüfer lehnte in
+ * Wahrheit JEDES fremde Feld ab, auch ein unverändertes — sobald also eine
+ * einzige Sperre von Hand in der Datei stand, wäre jedes weitere Quittieren
+ * aus dem Studio gescheitert. Nicht wegen der neuen Quittung, sondern wegen
+ * der alten Sperre. Jetzt wird wirklich verglichen (siehe $vorhanden unten).
  */
 if ($action === 'commit_wache') {
   require_key($STUDIO_KEY, $B);
@@ -205,19 +213,54 @@ if ($action === 'commit_wache') {
   if (strlen($content) > 64000) out(array('ok' => false, 'error' => 'too_large'), 422);
   $data = json_decode($content, true);
   if (!is_array($data)) out(array('ok' => false, 'error' => 'content_not_json'), 422);
+  $wachePath = isset($CFG['wache_path']) && $CFG['wache_path'] !== ''
+    ? (string) $CFG['wache_path'] : 'assets/config/wache-hand.json';
+
+  /* Die VORHANDENE Fassung holen (Nachtrag 2026-08-09).
+   *
+   * Der Kommentar oben behauptete: „das Studio schickt einen bestehenden
+   * Eintrag mit ampel unveraendert mit, und genau das lehnt der Pruefer ab,
+   * wenn jemand daran gedreht hat." Der zweite Halbsatz stimmte nicht — die
+   * Schleife lehnte JEDES fremde Feld ab, auch ein unveraendertes. Folge:
+   * sobald in der Datei eine einzige Sperre von Hand steht, scheitert JEDES
+   * weitere Quittieren aus dem Studio mit field_not_allowed. Nicht wegen der
+   * neuen Quittung, sondern wegen der alten Sperre.
+   *
+   * Jetzt wird verglichen. Der Browser kann damit weiterhin NICHTS setzen und
+   * nichts loesen — nur unveraendert durchreichen. Faellt der Abruf aus,
+   * bleibt $vorhanden leer und es gilt wieder die alte, strenge Regel:
+   * fail-closed, nie fail-open. */
+  $vorhanden = array();
+  $api_w = '/repos/' . $CFG['github_owner'] . '/' . $CFG['github_repo'] . '/contents/' . $wachePath;
+  list($vc, $vd) = gh_request($CFG, 'GET', $api_w . '?ref=' . rawurlencode($CFG['github_branch']));
+  if ($vc === 200 && isset($vd['content'])) {
+    $roh = base64_decode(str_replace(array("\n", "\r"), '', (string) $vd['content']));
+    $tmp = json_decode($roh, true);
+    if (is_array($tmp)) $vorhanden = $tmp;
+  }
+
   $n = 0;
   foreach ($data as $id => $eintrag) {
     if ($id === '_hinweis') { if (!is_string($eintrag)) out(array('ok' => false, 'error' => 'hinweis_invalid'), 422); continue; }
     if (!preg_match('~^[a-z0-9-]{3,64}$~', (string) $id)) out(array('ok' => false, 'error' => 'bad_key'), 422);
     if (!is_array($eintrag)) out(array('ok' => false, 'error' => 'entry_invalid'), 422);
+    $alt = (isset($vorhanden[$id]) && is_array($vorhanden[$id])) ? $vorhanden[$id] : array();
     foreach ($eintrag as $feld => $wert) {
-      if ($feld !== 'gesehen') out(array('ok' => false, 'error' => 'field_not_allowed'), 422);
-      if (!is_string($wert) || !preg_match('~^[0-9a-f]{8,64}$~', $wert)) out(array('ok' => false, 'error' => 'bad_checksum'), 422);
+      if ($feld === 'gesehen') {
+        if (!is_string($wert) || !preg_match('~^[0-9a-f]{8,64}$~', $wert)) out(array('ok' => false, 'error' => 'bad_checksum'), 422);
+        continue;
+      }
+      /* Das Datum der Durchsicht. Reine Beschriftung — es entscheidet nichts,
+       * darum genuegt die strenge Form. */
+      if ($feld === 'gesehen_am') {
+        if (!is_string($wert) || !preg_match('~^\d{4}-\d{2}-\d{2}$~', $wert)) out(array('ok' => false, 'error' => 'bad_date'), 422);
+        continue;
+      }
+      // Alles Uebrige nur, wenn es BYTEGLEICH schon dort steht.
+      if (!array_key_exists($feld, $alt) || $alt[$feld] !== $wert) out(array('ok' => false, 'error' => 'field_not_allowed'), 422);
     }
     $n++;
   }
-  $wachePath = isset($CFG['wache_path']) && $CFG['wache_path'] !== ''
-    ? (string) $CFG['wache_path'] : 'assets/config/wache-hand.json';
   list($ok, $info) = gh_put_file($CFG, $wachePath, base64_encode($content), 'Studio: Wächter-Quittungen aktualisiert');
   out($ok ? array('ok' => true, 'info' => $info, 'count' => $n) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);
 }
