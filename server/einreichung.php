@@ -70,8 +70,41 @@ $CFG = [
   'rate_window' => 3600,   // … pro IP je Stunde (Sekunden)
   'honeypot'    => 'fp_hp_url',   // muss LEER bleiben (Bot-Falle)
   'min_fill_ms' => 1500,   // schneller als das = Bot
-  'ip_salt'     => 'CHANGE-ME-family-projekt-2026', // für den IP-Hash in der Queue
+  /* Salz für den IP-Kürzel in der Warteschlange.
+   *
+   * Es steht ABSICHTLICH nicht mehr hier: diese Datei liegt im Repo, und ein
+   * echtes Salz in einem öffentlichen Repo ist keins. Bis 2026-08-10 stand hier
+   * `CHANGE-ME-family-projekt-2026` — und weil das niemand geändert hat, war
+   * der Kürzel für jeden nachrechenbar, der die Warteschlange in die Hände
+   * bekommt: IP raten, hashen, vergleichen. Das ist bei IPv4 in Minuten getan.
+   *
+   * Jetzt erzeugt sich das Salz beim ERSTEN Lauf selbst und liegt in einer
+   * eigenen Datei daneben (Punkt am Anfang → dieselbe .htaccess-Sperre wie die
+   * Rate-Datei). Klaus muss nichts eintragen und nichts merken.
+   *
+   * Fail-soft: lässt sich die Datei nicht schreiben, gilt der alte Wert
+   * weiter — lieber ein schwaches Salz als ein Formular, das nicht mehr
+   * annimmt. */
+  'salt_file'   => __DIR__ . '/.ip_salt.php',
+  'ip_salt'     => 'CHANGE-ME-family-projekt-2026',
 ];
+
+/* Salz holen oder anlegen. `random_bytes` ist seit PHP 7 überall da; sollte es
+   doch fehlen, bleibt es beim Wert oben statt mit einem Fehler abzubrechen. */
+if (is_file($CFG['salt_file'])) {
+  $s = @include $CFG['salt_file'];
+  if (is_string($s) && $s !== '') $CFG['ip_salt'] = $s;
+} elseif (function_exists('random_bytes')) {
+  try {
+    $neu = bin2hex(random_bytes(24));
+    if (@file_put_contents($CFG['salt_file'],
+          "<?php\n// Automatisch erzeugt. NICHT ins Repo, NICHT teilen.\nreturn '" . $neu . "';\n",
+          LOCK_EX) !== false) {
+      @chmod($CFG['salt_file'], 0600);
+      $CFG['ip_salt'] = $neu;
+    }
+  } catch (Exception $e) { /* beim alten Wert bleiben */ }
+}
 // =========================================================================
 
 // ── CORS / Herkunft ──────────────────────────────────────────────────────
@@ -103,7 +136,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') out(405, ['ok' => false, 'error' => '
 if ($origin !== '' && !$originOk)          out(403, ['ok' => false, 'error' => 'origin']);
 
 // ── Eingabe lesen (JSON-Body bevorzugt, Formular als Fallback) ───────────
+/* Deckel VOR dem Lesen: die längste erlaubte Nutzlast ist die Kontakt-Nachricht
+   mit 2000 Zeichen; 100 KB sind dafür grosszügig. Ohne diesen Riegel liest der
+   Server jede Menge, die jemand schickt, in den Arbeitsspeicher — ein einzelner
+   Absender könnte den Dienst damit lahmlegen, ganz ohne Spam-Absicht. */
+$laenge = isset($_SERVER['CONTENT_LENGTH']) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+if ($laenge > 100000) out(413, ['ok' => false, 'error' => 'zu_gross']);
+
 $raw = file_get_contents('php://input');
+if (strlen($raw) > 100000) out(413, ['ok' => false, 'error' => 'zu_gross']);
 $data = json_decode($raw, true);
 if (!is_array($data)) $data = $_POST;
 if (!is_array($data)) out(400, ['ok' => false, 'error' => 'body']);
@@ -255,7 +296,11 @@ $rec['ts'] = gmdate('c');
 $rec['ip_hash'] = substr($key, 0, 12); // KEINE Klar-IP: nur ein Kürzel gegen Missbrauch
 $rec['id'] = $rec['ts'] . '-' . substr(hash('sha256', $raw . $now . mt_rand()), 0, 8);
 $rec['status'] = 'neu';
-@file_put_contents($CFG['queue_file'], json_encode($rec, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n", FILE_APPEND | LOCK_EX);
+$inWarteschlange = @file_put_contents(
+  $CFG['queue_file'],
+  json_encode($rec, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n",
+  FILE_APPEND | LOCK_EX
+) !== false;
 
 // ── Lokal an info@ mailen (gleiche Maschine → kein Reputations-Problem) ──
 $body = implode("\n", $bodyLines) . "\n\n— gesendet über " . $hkName . " (Zeitpunkt " . $rec['ts'] . " UTC)\n";
@@ -265,8 +310,20 @@ $headers = 'From: Family Projekt <' . $CFG['mail_from'] . ">\r\n"
          . "Content-Type: text/plain; charset=UTF-8\r\n"
          . "MIME-Version: 1.0\r\n";
 $encSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-@mail($CFG['mail_to'], $encSubject, $body, $headers);
-// Mail-Fehlschlag ist kein harter Fehler: der Eintrag liegt sicher in der
-// Warteschlange (freigabe.php liest sie), nichts geht verloren.
+$gemailt = @mail($CFG['mail_to'], $encSubject, $body, $headers);
+
+/* EIN Fehlschlag ist verkraftbar, ZWEI sind einer zu viel.
+ *
+ * Bisher stand hier bedingungslos `ok`. Solange die Warteschlange schrieb, war
+ * das richtig — die Mail ist nur die Benachrichtigung, der Eintrag liegt in der
+ * Datei. Aber wenn BEIDES scheitert (Platte voll, Rechte weg, kein Mailer), ist
+ * die Einsendung ersatzlos verloren, und der Absender liest trotzdem „ist
+ * angekommen". Das ist die schlimmste Sorte Fehler: einer, den niemand bemerkt.
+ *
+ * Bei 500 greift auf der Seite der Kopier-Rückfall — der Absender bekommt seinen
+ * Text zum Aufheben, statt ihn wegzuwerfen. */
+if (!$inWarteschlange && !$gemailt) {
+  out(500, ['ok' => false, 'error' => 'nicht_gespeichert']);
+}
 
 out(200, ['ok' => true]);
