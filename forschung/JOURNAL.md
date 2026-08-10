@@ -21,6 +21,28 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-08 · SB-KIMTool-Point
+
+<https://lausiklauskn-png.github.io/SB-KIMTool-Point/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 60 → 81** (↑ 21, am 2026-08-10 noch 81)
+
+> Gesehen am 2026-08-08, **bestätigt durch die Messung vom 2026-08-10**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-08 · Private Brain
+
+<https://lausiklauskn-png.github.io/Privat-Brain/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 75 → 96** (↑ 21, am 2026-08-10 noch 98)
+
+> Gesehen am 2026-08-08, **bestätigt durch die Messung vom 2026-08-10**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: Reduziere nicht verwendetes JavaScript
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-07 · family-projekt.de (Marktplatz)
 
 <https://family-projekt.de/markt.html> · Quelle der Zahlen: Google PageSpeed Insights
