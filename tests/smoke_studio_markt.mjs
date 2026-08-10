@@ -114,6 +114,13 @@ if (api) {
   ok(/warteschlange|queue_file/.test(api), "API liest dieselbe Warteschlange (queue_file)");
   ok(/window\.FP_LISTINGS/.test(api) && /content_invalid/.test(api), "API: commit_listings schützt gegen leere/kaputte Datei");
   ok(/assets\/apps\//.test(api), "API: commit_image nur ins Depot assets/apps/");
+  /* Ohne diese vier Felder kann ein Studio eine MELDUNG nicht von einer
+     EINREICHUNG unterscheiden — beide haben nur `label` und `text` gemeinsam.
+     Bis 2026-08-10 fehlten sie, und jede Meldung landete im Pruef-Stapel mit
+     den Warnungen „kein brauchbares Bild" und „Adresse ist kein https". */
+  ["zweck", "entry_id", "grund", "grund_text"].forEach((f) =>
+    ok(new RegExp("'" + f + "' => isset\\(\\$r\\['" + f + "'\\]\\)").test(api),
+       "API: list reicht `" + f + "` durch (Meldung von Einreichung unterscheidbar)"));
   try { execFileSync("php", ["-l", join(ROOT, "server/marktplatz-api.php")], { stdio: "ignore" }); ok(true, "marktplatz-api.php PHP-Syntax (php -l)"); }
   catch (e) { if (String(e.message || "").includes("ENOENT")) { ok(true, "php CLI nicht vorhanden — Syntaxprüfung übersprungen"); } else { ok(false, "PHP-Syntaxfehler: " + e.message); } }
 }
