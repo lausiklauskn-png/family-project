@@ -154,6 +154,24 @@ if ($action === 'list') {
          sie bleiben leer und gelten damit als Family Projekt (der Standard). */
       'herkunft' => isset($r['herkunft']) ? $r['herkunft'] : '',
       'ziel' => isset($r['ziel']) ? $r['ziel'] : '',
+      /* WAS ES IST (2026-08-10). Bis hierher stand in der Antwort kein einziges
+         Merkmal, an dem sich eine MELDUNG von einer EINREICHUNG unterscheiden
+         liesse — beide haben `label` und `text`, sonst nichts Gemeinsames.
+         Folge: das Studio zeigte jede Meldung als Einreichung an, samt der
+         Warnungen „kein brauchbares Bild" und „Adresse ist kein https". Eine
+         Meldung hat beides naturgemaess nicht; sie sah aus wie ein kaputter
+         Eintrag und verstopfte den Pruef-Stapel.
+         Raten waere hier falsch gewesen — eine Einsendung ohne Bild ist auch
+         nur eine Einsendung ohne Bild. Also sagt der Server jetzt, was es ist.
+         Aeltere Zeilen aus der Zeit vor `zweck` bleiben leer und gelten damit
+         wie bisher als Einreichung (der Standard in einreichung.php). */
+      'zweck' => isset($r['zweck']) ? $r['zweck'] : '',
+      /* Die drei Felder, die NUR eine Meldung hat. Ohne sie waere der eigene
+         Platz im Studio eine leere Huelle: man saehe, DASS gemeldet wurde,
+         aber nicht, was woran nicht stimmt. */
+      'entry_id' => isset($r['entry_id']) ? $r['entry_id'] : '',
+      'grund' => isset($r['grund']) ? $r['grund'] : '',
+      'grund_text' => isset($r['grund_text']) ? $r['grund_text'] : '',
     );
   }
   out(array('ok' => true, 'items' => $items));
