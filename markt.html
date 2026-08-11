@@ -36,7 +36,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=100" />
+  <link rel="stylesheet" href="assets/style.css?v=101" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -188,7 +188,7 @@
     <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
   </footer>
 
-  <script type="module" src="assets/mycel-bg.js?v=100"></script>
+  <script type="module" src="assets/mycel-bg.js?v=101"></script>
   <script>window.SBKIM_DB_SUFFIX="familyprojekt";</script>
   <script src="sbkim/01_storage.js"></script>
   <script src="sbkim/02_spore.js"></script>
@@ -483,15 +483,36 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/app.js?v=100"></script>
-  <script src="assets/vec-codec.js?v=100"></script>
-  <script src="assets/status-widget.js?v=100"></script>
+  <script src="assets/app.js?v=101"></script>
+  <script src="assets/vec-codec.js?v=101"></script>
+  <script src="assets/status-widget.js?v=101"></script>
   <script>
     (function () {
       function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
       function safeImg(u){ u=String(u||""); return /^https?:\/\//i.test(u) && !/\.svg(\?|$)/i.test(u) ? u : ""; }
       function safeUrl(u){ u=String(u||""); return /^https?:\/\//i.test(u) ? u : ""; }
       var FP_T0 = Date.now(); // Ladezeitpunkt — für die Mindest-Ausfüllzeit (Bot-Schutz)
+
+      /* Der stille Verlust — und warum hier gewartet wird (Klaus 2026-08-11).
+       *
+       * `einreichung.php` wirft alles unter 1500 ms als Bot weg UND antwortet
+       * dabei mit **200 OK**. Für die Seite sieht das aus wie Erfolg: sie zeigt
+       * „✓ Danke!", der Absender geht zufrieden weg, angekommen ist nichts.
+       * Das ist die schlimmste Sorte Fehler — einer, den niemand bemerkt.
+       *
+       * Wie eng ist das Fenster wirklich? Bei der MELDUNG ist der Freitext
+       * freiwillig: aufklappen, Grund antippen, senden. Am Schwester-Marktplatz
+       * (PWA Toolpoint) wurde dieser Weg mit **596 ms** gemessen — deutlich
+       * unter dem Riegel. Die Einreichung braucht länger, aber die Regel gilt
+       * für alle drei Wege, also gilt der Schutz auch für alle drei.
+       *
+       * 1600 statt 1500: ein bisschen Luft für Uhren, die nicht perfekt
+       * gleichgehen. Wer ohnehin länger gebraucht hat, wartet keine Millisekunde
+       * extra — `offen` ist dann negativ und die Schleife greift gar nicht. */
+      async function warteMindestzeit() {
+        var offen = 1600 - (Date.now() - FP_T0);
+        if (offen > 0) await new Promise(function (f) { setTimeout(f, offen); });
+      }
 
       // Bild-Pflicht, und ab Stufe 5 zusätzlich der Schieberegler (gelistet()).
       // Beim ersten Aufbau greift er noch nicht — die Messwerte kommen erst mit
@@ -1311,6 +1332,7 @@
         if (btn) btn.disabled = true;
         out.textContent = T("mk_sub_sending");
         try {
+          await warteMindestzeit();
           var res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -1367,6 +1389,7 @@
         if (btn) btn.disabled = true;
         out.textContent = T("ct_sending");
         try {
+          await warteMindestzeit();
           var res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -1481,6 +1504,7 @@
         if (btn) btn.disabled = true;
         out.textContent = T("mk_rep_sending");
         try {
+          await warteMindestzeit();
           var res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
@@ -1718,6 +1742,6 @@
   <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
        App-spezifischer Speicher-Präfix; Token nur im Browser. -->
   <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
-  <script src="assets/studio-markt.js?v=100" defer></script>
+  <script src="assets/studio-markt.js?v=101" defer></script>
 </body>
 </html>
