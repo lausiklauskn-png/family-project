@@ -24,9 +24,13 @@ relay.family-projekt.de {
 }
 
 # ── Zweiter Name auf DASSELBE Relais (PWA Toolpoint) ─────────────────────────
-# ⚠ STAND: im Repo eingetragen 2026-08-11, am Server NOCH NICHT eingespielt.
-# Eine Vorlage im Repo ist kein Beweis für den Server (siehe Kopf dieser Datei).
-# Belegt ist es erst, wenn `wss://relay.pwa-toolpoint.de` antwortet.
+# ✅ STAND: am Server eingespielt und BELEGT (2026-08-11, Klaus' Server-Konsole).
+# Nicht behauptet, sondern gemessen — `curl` gegen den neuen Namen ergab:
+#   subject: CN=relay.pwa-toolpoint.de · issuer: Let's Encrypt
+#   SSL certificate verified · HTTP 200 · NIP-11 "name": "Toolpoint-Relay"
+# Eingespielt per `caddy reload` (nicht restart): Caddy prueft die neue Fassung
+# und uebernimmt sie nur fehlerfrei — family-projekt.de kann dabei nicht
+# offline gehen. Sicherung liegt als /opt/relay/Caddyfile.bak.<datum>.
 #
 # Bewusst KEIN zweiter Container und KEINE zweite Datenbank: Toolpoint bekommt
 # eine eigene Adresse, damit es nicht unter dem Namen "family" auftritt — aber
