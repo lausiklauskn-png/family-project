@@ -247,16 +247,47 @@ if ($action === 'commit_vectors') {
  * über die eigene Seite nicht abstellen — und gewöhnt sich dann an, alle
  * Warnungen zu übersehen.
  *
- * Die Grenze bleibt aber hart: über diesen Weg darf NUR quittiert werden.
- *   - GESETZT werden dürfen je Eintrag ausschliesslich "gesehen" (eine
- *     Hex-Prüfsumme) und "gesehen_am" (das Datum der Durchsicht, reine
- *     Beschriftung),
- *   - "ampel", "grund" und alles andere dürfen nur BYTEGLEICH durchgereicht
- *     werden, so wie sie schon in der Datei stehen. Eine Sperre soll niemand
- *     aus dem Browser setzen oder lösen; wer rot/grün schalten will,
- *     bearbeitet die Datei weiterhin von Hand.
+ * Die Grenze bleibt hart, aber sie ist seit dem 2026-08-11 EINSEITIG:
+ *   - GESETZT werden dürfen je Eintrag "gesehen" (eine Hex-Prüfsumme),
+ *     "gesehen_am" (das Datum der Durchsicht, reine Beschriftung) und —
+ *     das ist neu — "ampel"/"grund"/"seit", ABER NUR IN RICHTUNG STRENGER.
+ *   - Alles andere darf weiterhin nur BYTEGLEICH durchgereicht werden, so wie
+ *     es schon in der Datei steht.
  *   - Schlüssel müssen wie eine anchorId aussehen; "_hinweis" bleibt erlaubt,
  *     damit die Erklärung in der Datei nicht verloren geht.
+ *
+ * ── SPERREN JA, LÖSEN NEIN (Klaus 2026-08-11) ─────────────────────────────
+ * HIER STAND VORHER: „Eine Sperre soll niemand aus dem Browser setzen oder
+ * lösen; wer rot/grün schalten will, bearbeitet die Datei weiterhin von Hand."
+ *
+ * Das war für beide Richtungen gedacht und für eine davon zu streng. Wer eine
+ * gefährliche App vor sich hat, muss sie sperren können, wo er sie sieht — im
+ * Studio, auf dem Tablet, sofort. Ein Weg, den man nur über einen Datei-Editor
+ * geht, wird im Ernstfall nicht gegangen.
+ *
+ * Umgekehrt bleibt es beim Alten, und zwar aus einem einzigen Grund: ein
+ * Fehlgriff beim SETZEN sperrt höchstens zu viel, und das fällt sofort auf —
+ * dem Anbieter, dem Besucher, dem Betreiber. Ein Fehlgriff beim LÖSEN ist
+ * still. Niemand sieht eine Sperre, die nicht mehr da ist.
+ *
+ * Die Rangfolge, an der alles hängt (`wache_rang` unten):
+ *
+ *      0  gruen      Hand-Freigabe: gilt sogar über einen Befund hinweg
+ *      1  (nichts)   kein Eintrag — es gilt, was ohnehin gilt
+ *      2  gelb       sichtbarer Vorbehalt, keine Sperre
+ *      3  rot        gesperrt
+ *
+ * Aus dem Browser geht es nur NACH OBEN. Deshalb ist auch „gruen setzen"
+ * verboten: grün steht UNTER „kein Eintrag", weil es die Automatik überstimmt
+ * — es wäre ein Entsperren durch die Hintertür.
+ *
+ * Und weil ohne Grund niemand später erklären kann, warum jemand gesperrt
+ * wurde: eine neue Sperre OHNE lesbaren Grund wird abgewiesen. Das ist die
+ * vierte Regel der Rauswurf-Regel — „nie still handeln" — als Code.
+ *
+ * FAIL-CLOSED BLEIBT FAIL-CLOSED. Lässt sich die vorhandene Fassung nicht
+ * lesen, ist unbekannt, ob eine Schaltung strenger oder milder wäre. Dann wird
+ * gar nichts geschaltet (`vorlage_nicht_lesbar`). Quittieren geht weiter.
  *
  * NACHTRAG 2026-08-09 — hier stand vorher etwas Falsches. Der Satz lautete:
  * „das Studio schickt einen bestehenden Eintrag unverändert mit, und genau das
@@ -266,6 +297,23 @@ if ($action === 'commit_vectors') {
  * aus dem Studio gescheitert. Nicht wegen der neuen Quittung, sondern wegen
  * der alten Sperre. Jetzt wird wirklich verglichen (siehe $vorhanden unten).
  */
+/* Die Rangfolge als eigene, reine Funktion — damit sie prüfbar ist, ohne den
+ * ganzen Dienst zu starten (tests/smoke_studio_markt.mjs rechnet sie wirklich
+ * nach, statt den Wortlaut dieser Datei zu lesen).
+ * -1 heisst: ein Wort, das hier niemand kennt. Das wird abgewiesen, nie geraten. */
+function wache_rang($a) {
+  if ($a === null || $a === '') return 1;
+  if ($a === 'gruen') return 0;
+  if ($a === 'gelb')  return 2;
+  if ($a === 'rot')   return 3;
+  return -1;
+}
+
+function wache_ampel_von($eintrag) {
+  return (is_array($eintrag) && isset($eintrag['ampel']) && is_string($eintrag['ampel']))
+    ? $eintrag['ampel'] : null;
+}
+
 if ($action === 'commit_wache') {
   require_key($STUDIO_KEY, $B);
   $content = (string) req($B, 'content', '');
@@ -290,12 +338,13 @@ if ($action === 'commit_wache') {
    * bleibt $vorhanden leer und es gilt wieder die alte, strenge Regel:
    * fail-closed, nie fail-open. */
   $vorhanden = array();
+  $vorhandenGeholt = false;
   $api_w = '/repos/' . $CFG['github_owner'] . '/' . $CFG['github_repo'] . '/contents/' . $wachePath;
   list($vc, $vd) = gh_request($CFG, 'GET', $api_w . '?ref=' . rawurlencode($CFG['github_branch']));
   if ($vc === 200 && isset($vd['content'])) {
     $roh = base64_decode(str_replace(array("\n", "\r"), '', (string) $vd['content']));
     $tmp = json_decode($roh, true);
-    if (is_array($tmp)) $vorhanden = $tmp;
+    if (is_array($tmp)) { $vorhanden = $tmp; $vorhandenGeholt = true; }
   }
 
   $n = 0;
@@ -304,6 +353,8 @@ if ($action === 'commit_wache') {
     if (!preg_match('~^[a-z0-9-]{3,64}$~', (string) $id)) out(array('ok' => false, 'error' => 'bad_key'), 422);
     if (!is_array($eintrag)) out(array('ok' => false, 'error' => 'entry_invalid'), 422);
     $alt = (isset($vorhanden[$id]) && is_array($vorhanden[$id])) ? $vorhanden[$id] : array();
+    $rangAlt = wache_rang(wache_ampel_von($alt));
+    $rangNeu = wache_rang(wache_ampel_von($eintrag));
     foreach ($eintrag as $feld => $wert) {
       if ($feld === 'gesehen') {
         if (!is_string($wert) || !preg_match('~^[0-9a-f]{8,64}$~', $wert)) out(array('ok' => false, 'error' => 'bad_checksum'), 422);
@@ -315,10 +366,50 @@ if ($action === 'commit_wache') {
         if (!is_string($wert) || !preg_match('~^\d{4}-\d{2}-\d{2}$~', $wert)) out(array('ok' => false, 'error' => 'bad_date'), 422);
         continue;
       }
+      /* Die Ampel und was zu ihr gehoert. Unveraendert durchgereicht ist immer
+       * in Ordnung; GEAENDERT nur, wenn der Eintrag dabei strenger wird. */
+      if ($feld === 'ampel' || $feld === 'grund' || $feld === 'seit') {
+        if (array_key_exists($feld, $alt) && $alt[$feld] === $wert) continue;
+        // Ohne die vorhandene Fassung ist unbekannt, ob das strenger oder
+        // milder waere. Dann gar nichts — nie fail-open.
+        if (!$vorhandenGeholt) out(array('ok' => false, 'error' => 'vorlage_nicht_lesbar'), 409);
+        if ($rangNeu < 0) out(array('ok' => false, 'error' => 'bad_ampel'), 422);
+        if ($rangNeu < $rangAlt) out(array('ok' => false, 'error' => 'entsperren_nur_in_datei'), 422);
+        if ($feld === 'ampel') continue;   // Wert schon ueber den Rang geprueft
+        if (!is_string($wert)) out(array('ok' => false, 'error' => 'bad_grund'), 422);
+        if ($feld === 'seit' && !preg_match('~^\d{4}-\d{2}-\d{2}$~', $wert)) out(array('ok' => false, 'error' => 'bad_seit'), 422);
+        if ($feld === 'grund') {
+          // Der Text steht oeffentlich an der Karte: begrenzt und ohne
+          // Steuerzeichen, sonst ist er kein Satz mehr.
+          if (strlen($wert) > 300 || preg_match('~[\x00-\x08\x0b\x0c\x0e-\x1f]~', $wert)) out(array('ok' => false, 'error' => 'bad_grund'), 422);
+        }
+        continue;
+      }
       // Alles Uebrige nur, wenn es BYTEGLEICH schon dort steht.
       if (!array_key_exists($feld, $alt) || $alt[$feld] !== $wert) out(array('ok' => false, 'error' => 'field_not_allowed'), 422);
     }
+    /* Sperren ohne Begruendung gibt es nicht (Rauswurf-Regel: „nie still
+     * handeln"). Geprueft wird nur, was NEU ist — eine alte Sperre, die schon
+     * ohne Grund in der Datei steht, soll das Quittieren nicht blockieren. */
+    if ($rangNeu >= 2 && $rangNeu > $rangAlt) {
+      $g = isset($eintrag['grund']) && is_string($eintrag['grund']) ? trim($eintrag['grund']) : '';
+      if ($g === '') out(array('ok' => false, 'error' => 'grund_fehlt'), 422);
+    }
     $n++;
+  }
+
+  /* Und der stillste Weg von allen: den Eintrag einfach WEGLASSEN. Ohne diese
+   * Runde waere „entsperren" nur eine Zeile loeschen — die Schleife oben sieht
+   * nie, was gar nicht mitgeschickt wurde. */
+  if ($vorhandenGeholt) {
+    foreach ($vorhanden as $vid => $valt) {
+      if ($vid === '_hinweis' || !is_array($valt)) continue;
+      $rAlt = wache_rang(wache_ampel_von($valt));
+      if ($rAlt < 2) continue;                       // war nichts Sperrendes
+      $vneu = (isset($data[$vid]) && is_array($data[$vid])) ? $data[$vid] : null;
+      $rNeu = ($vneu === null) ? 1 : wache_rang(wache_ampel_von($vneu));
+      if ($rNeu < $rAlt) out(array('ok' => false, 'error' => 'entsperren_nur_in_datei'), 422);
+    }
   }
   list($ok, $info) = gh_put_file($CFG, $wachePath, base64_encode($content), 'Studio: Wächter-Quittungen aktualisiert');
   out($ok ? array('ok' => true, 'info' => $info, 'count' => $n) : array('ok' => false, 'error' => $info), $ok ? 200 : 502);

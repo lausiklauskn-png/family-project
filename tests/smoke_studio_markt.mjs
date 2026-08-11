@@ -6,7 +6,8 @@
  * Ersetzt NICHT den Browser-/Server-Sichttest (Langdruck, echtes Freigeben mit Passwort)
  * — der wartet auf Klaus. Lauf:  node tests/smoke_studio_markt.mjs
  */
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, unlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -148,6 +149,130 @@ if (api) {
 let cfg = "";
 try { cfg = readFileSync(join(ROOT, "server/freigabe-config.example.php"), "utf8"); } catch (e) {}
 ok(/studio_key/.test(cfg), "freigabe-config.example.php: studio_key vorhanden");
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * 10) DER RIEGEL DER AMPEL — sperren ja, lösen nein (Klaus 2026-08-11)
+ *
+ * Diese Prüfung liest NICHT den Wortlaut der PHP-Datei, sie LÄSST SIE LAUFEN.
+ * Der `commit_wache`-Block wird aus der echten Datei geschnitten, mit Attrappen
+ * für Netz und Ausgabe umgeben und mit echten Nutzlasten gefüttert. Was hier
+ * grün ist, ist an der Rechnung grün — nicht an einem Suchbegriff.
+ *
+ * Der Grund für die Umständlichkeit: die Datei ist ein Dienst. Sie einzubinden
+ * hiesse, sie auszuführen, samt Konfiguration und `exit`. Ein zweiter Ort für
+ * dieselbe Regel wäre die Alternative gewesen — und der wäre auseinandergelaufen.
+ * ══════════════════════════════════════════════════════════════════════════ */
+{
+  const quelle = readFileSync(join(ROOT, "server/marktplatz-api.php"), "utf8");
+
+  /* Vom ersten Zeichen der Rangfolge bis zur schliessenden Klammer des
+     commit_wache-Blocks — mit Klammer-Zählung, nicht mit einer Faustregel. */
+  function ausschneiden() {
+    const a = quelle.indexOf("function wache_rang(");
+    const b = quelle.indexOf("if ($action === 'commit_wache') {", a);
+    if (a < 0 || b < 0) return null;
+    let i = quelle.indexOf("{", b), tiefe = 0;
+    for (; i < quelle.length; i++) {
+      if (quelle[i] === "{") tiefe++;
+      else if (quelle[i] === "}") { tiefe--; if (!tiefe) return quelle.slice(a, i + 1); }
+    }
+    return null;
+  }
+  const block = ausschneiden();
+  ok(!!block, "commit_wache-Block liess sich aus der echten Datei schneiden");
+
+  function lauf(vorhanden, neu) {
+    const harness =
+      "<?php\n" +
+      "function out($arr, $code = 200) { throw new RuntimeException(json_encode(array('code'=>$code,'body'=>$arr))); }\n" +
+      "function req($b, $k, $d = '') { return isset($b[$k]) ? $b[$k] : $d; }\n" +
+      "function require_key($a, $b) {}\n" +
+      "function gh_request($CFG, $m, $p, $pl = null) {\n" +
+      "  $v = getenv('VORH');\n" +
+      "  if ($v === 'FEHLER') return array(500, null);\n" +
+      "  return array(200, array('content' => base64_encode($v)));\n" +
+      "}\n" +
+      "function gh_put_file($CFG, $p, $b64, $msg) { return array(true, 'geschrieben'); }\n" +
+      "$CFG = array('github_owner'=>'o','github_repo'=>'r','github_branch'=>'main');\n" +
+      "$STUDIO_KEY = 'x'; $action = 'commit_wache'; $B = array('content' => getenv('NEU'));\n" +
+      "try {\n" + block + "\n} catch (RuntimeException $e) { echo $e->getMessage(); }\n";
+    const datei = join(tmpdir(), "wache-riegel-" + process.pid + ".php");
+    writeFileSync(datei, harness);
+    let roh = "";
+    try {
+      roh = execFileSync("php", [datei], {
+        encoding: "utf8",
+        env: Object.assign({}, process.env, {
+          VORH: typeof vorhanden === "string" ? vorhanden : JSON.stringify(vorhanden),
+          NEU: JSON.stringify(neu, null, 2) + "\n"
+        })
+      });
+    } catch (e) { return { fehler: "php-lauf: " + String(e.message).slice(0, 200) }; }
+    finally { try { unlinkSync(datei); } catch (e) {} }
+    try { const j = JSON.parse(roh.trim()); return { code: j.code, error: j.body && j.body.error, ok: !!(j.body && j.body.ok) }; }
+    catch (e) { return { fehler: "unlesbare Antwort: " + roh.slice(0, 200) }; }
+  }
+
+  function erwarte(was, vorhanden, neu, fehlerErwartet) {
+    const r = lauf(vorhanden, neu);
+    if (r.fehler) { ok(false, was + " → " + r.fehler); return; }
+    if (fehlerErwartet === null) ok(r.ok === true, was + (r.ok ? "" : " → abgewiesen mit " + r.error));
+    else ok(r.error === fehlerErwartet, was + " → erwartet " + fehlerErwartet + ", bekam " + (r.error || "ok"));
+  }
+
+  if (block) {
+    const leer = { _hinweis: "x" };
+    const gesperrt = { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "Verlangt eine Anmeldung.", seit: "2026-08-11" } };
+    const vorbehalt = { _hinweis: "x", "markt-probe": { ampel: "gelb", grund: "Wird geprüft." } };
+
+    /* ── Was gehen MUSS ────────────────────────────────────────────────── */
+    erwarte("Quittieren geht weiter", leer,
+            { _hinweis: "x", "markt-probe": { gesehen: "abcdef0123456789", gesehen_am: "2026-08-11" } }, null);
+    erwarte("SPERREN aus dem Studio ist erlaubt", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "Verlangt eine Anmeldung.", seit: "2026-08-11" } }, null);
+    erwarte("Vorbehalt setzen ist erlaubt", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "gelb", grund: "Wird geprüft.", seit: "2026-08-11" } }, null);
+    erwarte("Verschärfen gelb → rot ist erlaubt", vorbehalt,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "Doch gefährlich.", seit: "2026-08-11" } }, null);
+    erwarte("eine bestehende Sperre unverändert durchreichen", gesperrt,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "Verlangt eine Anmeldung.", seit: "2026-08-11", gesehen: "abcdef0123456789" } }, null);
+
+    /* ── Was NICHT gehen darf — jeder Weg zum stillen Lösen ────────────── */
+    erwarte("rot → gelb (herabstufen)", gesperrt,
+            { _hinweis: "x", "markt-probe": { ampel: "gelb", grund: "halb so wild" } }, "entsperren_nur_in_datei");
+    erwarte("rot → grün (freigeben)", gesperrt,
+            { _hinweis: "x", "markt-probe": { ampel: "gruen", grund: "passt schon" } }, "entsperren_nur_in_datei");
+    erwarte("rot → Ampel weglassen", gesperrt,
+            { _hinweis: "x", "markt-probe": { gesehen: "abcdef0123456789" } }, "entsperren_nur_in_datei");
+    /* Der stillste Weg von allen: den ganzen Eintrag nicht mitschicken. */
+    erwarte("den gesperrten Eintrag ganz weglassen", gesperrt,
+            { _hinweis: "x" }, "entsperren_nur_in_datei");
+    erwarte("grün setzen, wo nichts stand (Automatik überstimmen)", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "gruen", grund: "ich weiß, die zieht um" } }, "entsperren_nur_in_datei");
+
+    /* ── Nie still handeln ─────────────────────────────────────────────── */
+    erwarte("sperren OHNE Grund", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "rot" } }, "grund_fehlt");
+    erwarte("sperren mit leerem Grund", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "   " } }, "grund_fehlt");
+
+    /* ── Form ──────────────────────────────────────────────────────────── */
+    erwarte("erfundenes Ampel-Wort", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "quittiert", grund: "x" } }, "bad_ampel");
+    erwarte("Grund zu lang", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "x".repeat(301) } }, "bad_grund");
+    erwarte("Datum in falscher Form", leer,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "x", seit: "11.08.2026" } }, "bad_seit");
+    erwarte("ein fremdes Feld bleibt gesperrt", leer,
+            { _hinweis: "x", "markt-probe": { handgrund: "geschummelt" } }, "field_not_allowed");
+
+    /* ── FAIL-CLOSED: ohne die vorhandene Fassung wird nichts geschaltet ── */
+    erwarte("Vorlage unlesbar → Sperre wird NICHT gesetzt", "FEHLER",
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "x" } }, "vorlage_nicht_lesbar");
+    erwarte("Vorlage unlesbar → Quittieren geht trotzdem", "FEHLER",
+            { _hinweis: "x", "markt-probe": { gesehen: "abcdef0123456789" } }, null);
+  }
+}
 
 console.log(`\nMarktplatz-Studio-Struktur-Smoke: ${pass} bestanden, ${fail} fehlgeschlagen.`);
 process.exit(fail > 0 ? 1 : 0);
