@@ -21,6 +21,21 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-10 · Mein-Tresor
+
+<https://lausiklauskn-png.github.io/Mein-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 71 → 96** (↑ 25, am 2026-08-11 noch 91)
+
+> Gesehen am 2026-08-10, **bestätigt durch die Messung vom 2026-08-11**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.
+- Beanstandung weg: bedienbarkeit: Elemente verwenden unzulässige ARIA-Attribute
+- Beanstandung weg: bedienbarkeit: select-Elemente haben keine zugehörigen label-Elemente.
+- Beanstandung weg: leistung: Largest Contentful Paint
+- Beanstandung neu: leistung: Bildübermittlung verbessern
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-08 · SB-KIMTool-Point
 
 <https://lausiklauskn-png.github.io/SB-KIMTool-Point/> · Quelle der Zahlen: Google PageSpeed Insights
