@@ -111,6 +111,18 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
 .pill.pill-reload.spinning .rl-ic{animation:rl-spin .8s linear infinite}
 @keyframes rl-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){.pill.pill-reload .rl-ic,.pill.pill-reload.spinning .rl-ic{animation:none;transition:none}}
+/* 🎤-Sprachwahl in der Kopfleiste: EINE Wahl für alle Mikrofone der Seite.
+ * Ein <select> bringt seinen eigenen Rahmen mit — der wird abgenommen, damit
+ * es aussieht wie die Nachbar-Pillen; die Liste selbst muss lesbar bleiben,
+ * darum bekommen die Einträge eine eigene Farbe (sonst hellgrau auf Weiß). */
+.pill.pill-miclang{appearance:none;-webkit-appearance:none;font-family:var(--mono);max-width:12rem;
+  padding-right:22px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 13px) 52%,calc(100% - 9px) 52%;background-size:4px 4px,4px 4px;background-repeat:no-repeat}
+.pill.pill-miclang option{color:#16202c;background:#fff}
+/* Ohne diesen Satz verschwindet jeder Sprach-Fehler lautlos — genau der
+ * Zustand, den Klaus 2026-08-11 gemeldet hat. */
+.mic-hinweis{margin:6px 2px 0;font-size:.82rem;line-height:1.45;color:var(--muted)}
+.mic-hinweis:empty{display:none}
 
 /* Kopf-Status (SBKIM-Lampen + Siegel-Badge) */
 .status{display:inline-flex;align-items:center;gap:9px;margin-left:4px}
