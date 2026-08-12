@@ -51,12 +51,26 @@ Studio-Passwort eintragen (Haken „merken") → **„Vom Server holen"**.
   (`hash_equals`). Kontakt-Anfragen bleiben `freigabe.php` vorbehalten.
 - `commit_listings` schreibt nie eine leere/kaputte Datei (Schutz-Prüfung), `commit_image`
   nur ins Depot `assets/apps/`.
-- `commit_wache` hat den **schärfsten** Prüfer, weil es die Ampel berührt: erlaubt ist je
-  Eintrag **ausschließlich `gesehen`** (eine Hex-Prüfsumme). `ampel`, `grund` und alles
-  andere werden **abgelehnt**, nicht still entfernt. Eine Seite **sperren oder freigeben**
-  kann man über den Browser also **nicht** — das bleibt Handarbeit in
-  `assets/config/wache-hand.json`. Quittiert wird nur „ich habe hingesehen, die Seite ist in
-  Ordnung"; ändert sich die Seite erneut, meldet der Wächter wieder.
+- `commit_wache` hat den **schärfsten** Prüfer, weil es die Ampel berührt.
+
+  > **Hier stand bis zum 2026-08-12 etwas Überholtes.** Der Satz lautete: „erlaubt ist je
+  > Eintrag ausschließlich `gesehen`; `ampel` und `grund` werden abgelehnt". Das galt bis
+  > zum 2026-08-11 und gilt seitdem nur noch für **eine Richtung**.
+
+  Erlaubt sind je Eintrag `gesehen` (Hex-Prüfsumme), `gesehen_am` (Datum) sowie
+  `ampel`/`grund`/`seit` — **aber nur in Richtung strenger**. Der Prüfer rechnet dafür die
+  Rangfolge `gruen 0 < (nichts) 1 < gelb 2 < rot 3` und weist jeden Schritt nach unten mit
+  `entsperren_nur_in_datei` ab. **Sperren geht aus dem Browser, lösen nicht** — gelöst wird
+  in `assets/config/wache-hand.json`. Eine neue Sperre ohne lesbaren Grund wird abgewiesen
+  (`grund_fehlt`); lässt sich die vorhandene Fassung nicht lesen, wird gar nichts geschaltet
+  (`vorlage_nicht_lesbar`, fail-closed). Alle übrigen Felder gehen nur **byte-gleich** durch.
+- Seit dem **2026-08-12** kennt der Prüfer zusätzlich den Schlüssel **`_automatik`** — den
+  Schalter aus Schritt 4 der Rauswurf-Regel (PWA Toolpoint). Er sagt, ob ein ohnehin
+  gerechneter Befund öffentlich gezeigt wird, und trägt deshalb **keine Ampel**:
+  `wache_automatik_pruefen()` lässt genau `an` (Ja/Nein), `naechte` (1–30), `meldungen`
+  (1–100) und `grenze` (1–100) durch, dazu Erklär-Text, und weist alles andere mit
+  `automatik_invalid` ab. Sperren oder lösen kann darüber niemand. Jeder andere Name mit
+  Unterstrich bleibt weiterhin `bad_key`.
 - Eine Warteschlange (`warteschlange.jsonl`) für Formular, `freigabe.php` und Studio —
   keine Dopplung. Der `.htaccess`-Schutz (Warteschlange/Config) gilt wie gehabt.
 
