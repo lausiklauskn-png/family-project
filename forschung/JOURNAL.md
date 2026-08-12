@@ -21,6 +21,37 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-10 · Mein-Rezeptbuch (Schaufenster)
+
+<https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 58 → 98** (↑ 40, am 2026-08-12 noch 98)
+
+> Gesehen am 2026-08-10, **bestätigt durch die Messung vom 2026-08-12**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.
+- Beanstandung weg: gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien
+- Beanstandung weg: leistung: Reduziere nicht verwendetes JavaScript
+- Beanstandung weg: leistung: Total Blocking Time
+- Beanstandung neu: leistung: Bildübermittlung verbessern
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-10 · Mein-Mixarium (Schaufenster)
+
+<https://lausiklauskn-png.github.io/Mein-Mixarium-Page/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 70 → 99** (↑ 29, am 2026-08-12 noch 100)
+
+> Gesehen am 2026-08-10, **bestätigt durch die Messung vom 2026-08-12**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.
+- Beanstandung weg: bedienbarkeit: Links sind durch Farbe erkennbar.
+- Beanstandung weg: gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien
+- Beanstandung weg: leistung: Netzwerkabhängigkeitsbaum
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-10 · Mein-Tresor
 
 <https://lausiklauskn-png.github.io/Mein-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
