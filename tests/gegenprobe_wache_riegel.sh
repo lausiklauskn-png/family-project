@@ -84,6 +84,21 @@ probe "ein unbekanntes Wort gilt als gültig" \
 probe "die Längenprüfung des Grundes fällt weg" \
       "s|strlen(\$wert) > 300|strlen(\$wert) > 300000|"
 
+# 9 · Der Automatik-Schalter (Schritt 4). Sein Prüfer lässt alles durch —
+#     dann könnte im Schalter eine Ampel stehen, an der Rangfolge vorbei.
+probe "der Prüfer des Schalters lässt alles durch" \
+      "s|^  if (!is_array(\$a)) return 'automatik_invalid';|  if (true) return '';\n  if (!is_array(\$a)) return 'automatik_invalid';|"
+
+# 10 · Der Schalter wird zum Generalschlüssel: JEDER Unterstrich-Name kommt
+#      am Schlüssel-Muster vorbei, nicht nur der eine.
+probe "jeder Unterstrich-Schlüssel kommt durch" \
+      "s|if (\$id === '_automatik') {|if (\$id[0] === '_') {|"
+
+# 11 · Der Wertebereich der Nächte fällt weg — dann ließe sich die Automatik
+#      auf 0 stellen und schlüge bei jeder einzelnen schlechten Nacht an.
+probe "der Wertebereich der Nächte fällt weg" \
+      "s|if (!is_int(\$v) \|\| \$v < 1 \|\| \$v > 30)  return 'automatik_invalid';|if (false) return 'automatik_invalid';|"
+
 echo
 echo "$gruen Wächter schlagen an, $blind blind"
 [ "$blind" -eq 0 ] || exit 1

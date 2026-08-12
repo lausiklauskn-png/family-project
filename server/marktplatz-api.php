@@ -314,6 +314,41 @@ function wache_ampel_von($eintrag) {
     ? $eintrag['ampel'] : null;
 }
 
+/* ── Der Automatik-Schalter (Schritt 4 der Rauswurf-Regel, 2026-08-12) ────────
+ *
+ * WARUM DER PRUEFER DAFUER ERWEITERT WURDE — bewusst, nicht nebenbei. Bis
+ * hierher liess er neben "_hinweis" nur Schluessel zu, die wie eine anchorId
+ * aussehen. Der Schalter aus Schritt 4 muss aber committet sein: das
+ * gerechnete gelbe Band steht OEFFENTLICH, also muss der Browser eines fremden
+ * Besuchers wissen, ob die Automatik an ist — und der weiss nichts vom
+ * localStorage des Studios.
+ *
+ * WAS ER KANN UND WAS NICHT. Dieser Block traegt KEINE Ampel und kann deshalb
+ * weder sperren noch loesen. Er sagt nur, OB ein ohnehin gerechneter Befund
+ * oeffentlich gezeigt wird, und ab welcher Zahl. Die Rangfolge oben ist davon
+ * unberuehrt: rot setzt weiterhin nur die Hand, und geloest wird weiterhin nur
+ * in der Datei.
+ *
+ * STRENG GEFORMT. Nur vier Werte, jeder mit Typ und Bereich; alles andere
+ * ausser Erklaer-Text wird abgewiesen. Ein Schalter, der beliebige Felder
+ * durchliesse, waere ein Loch in genau der Datei, die die Sperren traegt.
+ * `grenze` ist reine Beschriftung — gezaehlt wird in tools/messwerte-holen.mjs. */
+function wache_automatik_pruefen($a) {
+  if (!is_array($a)) return 'automatik_invalid';
+  foreach ($a as $f => $v) {
+    if ($f === '_hinweis' || $f === '_grenze_hinweis') {
+      if (!is_string($v) || strlen($v) > 2000) return 'automatik_invalid';
+      continue;
+    }
+    if ($f === 'an') { if (!is_bool($v)) return 'automatik_invalid'; continue; }
+    if ($f === 'naechte')   { if (!is_int($v) || $v < 1 || $v > 30)  return 'automatik_invalid'; continue; }
+    if ($f === 'meldungen') { if (!is_int($v) || $v < 1 || $v > 100) return 'automatik_invalid'; continue; }
+    if ($f === 'grenze')    { if (!is_int($v) || $v < 1 || $v > 100) return 'automatik_invalid'; continue; }
+    return 'automatik_invalid';
+  }
+  return '';
+}
+
 if ($action === 'commit_wache') {
   require_key($STUDIO_KEY, $B);
   $content = (string) req($B, 'content', '');
@@ -350,6 +385,13 @@ if ($action === 'commit_wache') {
   $n = 0;
   foreach ($data as $id => $eintrag) {
     if ($id === '_hinweis') { if (!is_string($eintrag)) out(array('ok' => false, 'error' => 'hinweis_invalid'), 422); continue; }
+    /* Der Schalter aus Schritt 4. Eigener, enger Pruefer (siehe oben) — er
+       traegt keine Ampel und kann darum weder sperren noch loesen. */
+    if ($id === '_automatik') {
+      $fehler = wache_automatik_pruefen($eintrag);
+      if ($fehler !== '') out(array('ok' => false, 'error' => $fehler), 422);
+      continue;
+    }
     if (!preg_match('~^[a-z0-9-]{3,64}$~', (string) $id)) out(array('ok' => false, 'error' => 'bad_key'), 422);
     if (!is_array($eintrag)) out(array('ok' => false, 'error' => 'entry_invalid'), 422);
     $alt = (isset($vorhanden[$id]) && is_array($vorhanden[$id])) ? $vorhanden[$id] : array();

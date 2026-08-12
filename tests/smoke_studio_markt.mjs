@@ -266,6 +266,43 @@ ok(/studio_key/.test(cfg), "freigabe-config.example.php: studio_key vorhanden");
     erwarte("ein fremdes Feld bleibt gesperrt", leer,
             { _hinweis: "x", "markt-probe": { handgrund: "geschummelt" } }, "field_not_allowed");
 
+    /* ── Der Automatik-Schalter (Schritt 4, 2026-08-12) ─────────────────
+     * Er steht als `_automatik` in derselben Datei wie die Ampel, weil das
+     * gerechnete gelbe Band öffentlich ist und der Browser eines Besuchers
+     * wissen muss, ob die Automatik an ist. Der Prüfer ist dafür bewusst
+     * erweitert worden — und diese Proben halten fest, dass die Erweiterung
+     * eng geblieben ist: sie kann nichts sperren und nichts lösen. */
+    erwarte("den Schalter setzen ist erlaubt", leer,
+            { _hinweis: "x", _automatik: { an: true, naechte: 3, meldungen: 4, grenze: 50 } }, null);
+    erwarte("den Schalter wieder ausschalten ist erlaubt", leer,
+            { _hinweis: "x", _automatik: { an: false, naechte: 3, meldungen: 4, grenze: 50 } }, null);
+    erwarte("Erklär-Text im Schalter ist erlaubt", leer,
+            { _hinweis: "x", _automatik: { _hinweis: "so geht das", an: false } }, null);
+    /* Und was er NICHT darf. Vor allem: keine Ampel tragen — sonst wäre der
+       Schalter ein zweiter Weg zur Sperre, an der Rangfolge vorbei. */
+    erwarte("der Schalter trägt keine Ampel", leer,
+            { _hinweis: "x", _automatik: { an: true, ampel: "rot" } }, "automatik_invalid");
+    erwarte("kein fremdes Feld im Schalter", leer,
+            { _hinweis: "x", _automatik: { an: true, egal: 1 } }, "automatik_invalid");
+    erwarte("„an“ muss ein Ja/Nein sein", leer,
+            { _hinweis: "x", _automatik: { an: "ja" } }, "automatik_invalid");
+    erwarte("Nächte außerhalb des Bereichs", leer,
+            { _hinweis: "x", _automatik: { an: true, naechte: 0 } }, "automatik_invalid");
+    erwarte("Nächte als Text", leer,
+            { _hinweis: "x", _automatik: { an: true, naechte: "3" } }, "automatik_invalid");
+    erwarte("Meldungen außerhalb des Bereichs", leer,
+            { _hinweis: "x", _automatik: { an: true, meldungen: 101 } }, "automatik_invalid");
+    erwarte("der Schalter ist kein Ersatz für einen Eintrag", leer,
+            { _hinweis: "x", _automatik: "an" }, "automatik_invalid");
+    /* Der Riegel bleibt vom Schalter unberührt: eine bestehende Sperre lässt
+       sich auch dann nicht lösen, wenn nebenher am Schalter gedreht wird. */
+    erwarte("Schalter drehen löst keine Sperre", gesperrt,
+            { _hinweis: "x", _automatik: { an: true } }, "entsperren_nur_in_datei");
+    /* Und ein Schlüssel mit Unterstrich, den niemand kennt, bleibt draußen —
+       die Erweiterung gilt genau für diesen einen Namen. */
+    erwarte("ein anderer Unterstrich-Schlüssel bleibt gesperrt", leer,
+            { _hinweis: "x", _sonstwas: { an: true } }, "bad_key");
+
     /* ── FAIL-CLOSED: ohne die vorhandene Fassung wird nichts geschaltet ── */
     erwarte("Vorlage unlesbar → Sperre wird NICHT gesetzt", "FEHLER",
             { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "x" } }, "vorlage_nicht_lesbar");
