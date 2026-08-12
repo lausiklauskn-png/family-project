@@ -108,6 +108,156 @@
     }
   }
 
+  /* ---- Mikrofon-Sprache ----------------------------------------------------
+   *
+   * Vorher stand hier `rec.lang = (lang === "en") ? "en-US" : "de-DE"` — die
+   * Oberflächen-Sprache entschied, was das Mikrofon hört. Wer die Seite auf
+   * Deutsch liest, aber Arabisch spricht, bekam Buchstabensalat. Klaus
+   * 2026-08-11: „wenn ich in Arabisch etwas hineinspreche, muss auch Arabisch
+   * als Text herauskommen."
+   *
+   * Die Browser-Spracherkennung hat KEINE Sprach-Erkennung: sie hört genau die
+   * Sprache, die man ihr nennt, und eine abfragbare Liste der gekonnten
+   * Sprachen gibt es nicht. Man kann eine Sprache also nur anbieten — und
+   * sauber sagen, wenn es nicht ging (siehe micFehlerText/schriftPasstNicht).
+   *
+   * EINE Wahl für alle Mikrofone der Seite (Kopfleiste), nicht acht Auswahlen
+   * neben acht Knöpfen: die 🎤 stecken absolut positioniert IN den Feldern,
+   * dort ist kein Platz, und niemand stellt dieselbe Sprache achtmal ein. */
+  var MIC_LANGS = [
+    ["de-DE", "Deutsch"], ["en-US", "English"], ["ru-RU", "Русский (Russisch)"],
+    ["ar-SA", "العربية (Arabisch)"], ["tr-TR", "Türkçe"], ["pl-PL", "Polski"],
+    ["uk-UA", "Українська (Ukrainisch)"], ["fr-FR", "Français"],
+    ["es-ES", "Español"], ["it-IT", "Italiano"],
+    ["ps-AF", "پښتو (Paschtu)"], ["fa-IR", "دری / فارسی (Dari · Persisch)"]
+  ];
+  var LS_MICLANG = "fp_miclang";      // app-eigener Name: geteilter Origin
+
+  /* Ohne Einstellung entscheidet die Geräte-Sprache. Das ist der Fall, der
+   * zählt — wer erst eine Einstellung finden muss, um verstanden zu werden,
+   * benutzt das Mikrofon nicht. Kennt die Liste die Sprache nicht, bleibt es
+   * bei Deutsch: ehrliche Vorgabe statt Raten. */
+  function micLangVorauswahl() {
+    try {
+      var gemerkt = localStorage.getItem(LS_MICLANG);
+      for (var g = 0; g < MIC_LANGS.length; g++) if (MIC_LANGS[g][0] === gemerkt) return gemerkt;
+    } catch (_e) {}
+    var wunsch = [];
+    try {
+      wunsch = (navigator.languages && navigator.languages.length)
+        ? navigator.languages : [navigator.language || ""];
+    } catch (_e2) {}
+    for (var i = 0; i < wunsch.length; i++) {
+      var kurz = String(wunsch[i]).split("-")[0].toLowerCase();
+      for (var j = 0; j < MIC_LANGS.length; j++) {
+        if (MIC_LANGS[j][0].split("-")[0].toLowerCase() === kurz) return MIC_LANGS[j][0];
+      }
+    }
+    return "de-DE";
+  }
+  var micLang = micLangVorauswahl();
+  function micName(code) {
+    for (var i = 0; i < MIC_LANGS.length; i++) if (MIC_LANGS[i][0] === code) return MIC_LANGS[i][1];
+    return code;
+  }
+
+  /* Der STILLE Fehlschlag (Klaus' Sichttest 2026-08-11): Russisch und Arabisch
+   * kamen richtig zurück, Paschtu kam als „Salaam" in LATEINISCHEN Buchstaben —
+   * und OHNE Fehler. Chrome hat stillschweigend etwas anderes gehört. Eine
+   * Fehlermeldung kann da nicht greifen, weil es keinen Fehler gibt; also wird
+   * die Schrift geprüft. */
+  var SCHRIFT_ERWARTET = {
+    ar: [/[؀-ۿ]/, "arabischer"], fa: [/[؀-ۿ]/, "arabischer"],
+    ps: [/[؀-ۿ]/, "arabischer"], ru: [/[Ѐ-ӿ]/, "kyrillischer"],
+    uk: [/[Ѐ-ӿ]/, "kyrillischer"]
+  };
+  function schriftPasstNicht(text, code) {
+    var kurz = String(code || "").split("-")[0].toLowerCase();
+    var e = SCHRIFT_ERWARTET[kurz];
+    if (!e || !text || text.trim().length < 4) return null;
+    if (e[0].test(text)) return null;
+    return "Der Browser hat vermutlich nicht in " + micName(code) +
+      " gehört — der Text steht in lateinischer Schrift, nicht in " + e[1] +
+      ". Du kannst ihn stehen lassen oder tippen.";
+  }
+
+  function micFehlerText(code, sprache) {
+    var name = micName(sprache);
+    if (code === "not-allowed" || code === "service-not-allowed") {
+      return "Das Mikrofon ist nicht freigegeben. Im Browser die Erlaubnis erteilen — oder einfach tippen.";
+    }
+    if (code === "language-not-supported") {
+      return "Dieser Browser kann " + name + " nicht hören. Eine andere Sprache wählen oder tippen.";
+    }
+    if (code === "no-speech") return "Nichts gehört. Noch einmal antippen und sprechen.";
+    if (code === "audio-capture") return "Kein Mikrofon gefunden. Bitte tippen.";
+    if (code === "network") return "Die Spracherkennung braucht Netz und bekam keines. Bitte tippen.";
+    return "Die Spracherkennung in " + name + " hat nicht geklappt. Bitte tippen.";
+  }
+
+  /* Die Meldung braucht einen Platz, an dem man sie SIEHT. Vorher verschwand
+   * jeder Fehler lautlos (`rec.onerror` tat nichts als das Leuchten abzuschalten).
+   * `role="status"` heißt: Vorlese-Programme sagen sie an, ohne den Fokus zu
+   * stehlen. */
+  function micHinweisFeld(field) {
+    var h = field.parentNode ? field.parentNode.querySelector(".mic-hinweis") : null;
+    if (h) return h;
+    h = document.createElement("div");
+    h.className = "mic-hinweis";
+    h.setAttribute("role", "status");
+    if (field.parentNode) field.parentNode.insertBefore(h, field.nextSibling);
+    return h;
+  }
+  function setMicHinweis(field, text) {
+    try {
+      var h = micHinweisFeld(field);
+      h.textContent = text || "";
+      h.style.display = text ? "" : "none";
+    } catch (_e) {}
+  }
+
+  /* Ein Feld, in das arabisch gesprochen wird, muss von rechts lesen. `dir=auto`
+   * lässt den Browser am INHALT entscheiden — richtiger als ein festes `dir`,
+   * das lügt, sobald jemand die Sprache wechselt oder deutsch dazwischentippt. */
+  function feldRichtung(input, code) {
+    try {
+      input.setAttribute("dir", "auto");
+      input.setAttribute("lang", String(code || "").split("-")[0]);
+    } catch (_e) {}
+  }
+
+  function mountMicLangPicker() {
+    var nav = document.querySelector("nav.top");
+    if (!nav) return;
+    if (!document.querySelector(".mic")) return;              // keine Mikrofone → keine Wahl
+    var SR = global.SpeechRecognition || global.webkitSpeechRecognition;
+    if (!SR) return;                                          // fail-soft: kein toter Knopf
+    var sel = document.getElementById("fpMicLang");
+    if (sel) return;                                          // idempotent
+    sel = document.createElement("select");
+    sel.id = "fpMicLang";
+    sel.className = "pill pill-miclang";
+    for (var i = 0; i < MIC_LANGS.length; i++) {
+      var o = document.createElement("option");
+      o.value = MIC_LANGS[i][0]; o.textContent = MIC_LANGS[i][1];
+      sel.appendChild(o);
+    }
+    sel.value = micLang;
+    var setLabel = function () {
+      var de = getLang() === "de";
+      sel.title = de ? "🎤 Sprache, in der du sprichst" : "🎤 language you speak";
+      sel.setAttribute("aria-label", sel.title);
+    };
+    setLabel();
+    global.addEventListener("fp:lang", setLabel);
+    sel.addEventListener("change", function () {
+      micLang = sel.value;
+      try { localStorage.setItem(LS_MICLANG, micLang); } catch (_e) {}
+    });
+    var lb = document.getElementById("langBtn");
+    if (lb && lb.parentNode === nav) nav.insertBefore(sel, lb.nextSibling); else nav.appendChild(sel);
+  }
+
   // ---- Mikrofon: automatisch an jedem .mic-Knopf in einem .field -----------
   function wireMic(btn) {
     var field = btn.closest(".field");
@@ -121,23 +271,36 @@
       return;
     }
     var rec = new SR(); rec.interimResults = true; rec.continuous = false;
-    var on = false;
+    var on = false, gehoert = micLang, letzter = "";
     btn.addEventListener("click", function () {
       if (on) { try { rec.stop(); } catch (_e) {} return; }
-      rec.lang = (lang === "en") ? "en-US" : "de-DE";
+      gehoert = micLang;                       // die Wahl gilt ab dem Antippen
+      rec.lang = gehoert;
+      letzter = "";
+      feldRichtung(input, gehoert);
+      setMicHinweis(field, "");
       try { rec.start(); } catch (_e) {}
     });
     rec.onstart = function () { on = true; btn.classList.add("live"); };
-    rec.onend = function () { on = false; btn.classList.remove("live"); };
-    rec.onerror = function () { on = false; btn.classList.remove("live"); };
+    rec.onend = function () {
+      on = false; btn.classList.remove("live");
+      var warnung = schriftPasstNicht(letzter, gehoert);
+      if (warnung) setMicHinweis(field, warnung);
+    };
+    rec.onerror = function (e) {
+      on = false; btn.classList.remove("live");
+      setMicHinweis(field, micFehlerText(e && e.error, gehoert));
+    };
     rec.onresult = function (e) {
       var txt = "";
       for (var i = 0; i < e.results.length; i++) txt += e.results[i][0].transcript;
+      letzter = txt;
       input.value = txt;
       try { input.dispatchEvent(new Event("input", { bubbles: true })); } catch (_e) {}
     };
   }
   function wireAllMics() {
+    mountMicLangPicker();
     document.querySelectorAll(".mic").forEach(wireMic);
   }
 
@@ -297,6 +460,7 @@
       mic.title = "Sprechen statt tippen"; mic.setAttribute("aria-label", "Spracheingabe");
       mic.textContent = "🎤";
       field.appendChild(mic);
+      mountMicLangPicker();      // erst jetzt gibt es ein Mikrofon zu bedienen
       wireMic(mic);
       addCamButton(field, input);
     });
