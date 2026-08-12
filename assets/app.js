@@ -460,6 +460,7 @@
       mic.title = "Sprechen statt tippen"; mic.setAttribute("aria-label", "Spracheingabe");
       mic.textContent = "🎤";
       field.appendChild(mic);
+      mountMicLangPicker();      // erst jetzt gibt es ein Mikrofon zu bedienen
       wireMic(mic);
       addCamButton(field, input);
     });
