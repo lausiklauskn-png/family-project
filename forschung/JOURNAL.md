@@ -21,6 +21,30 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-10 · WorkFloh (Schaufenster)
+
+<https://lausiklauskn-png.github.io/Mein-Workfloh-Page/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 98 → 63** (↓ 35, am 2026-08-13 noch 65)
+
+> Gesehen am 2026-08-10, **bestätigt durch die Messung vom 2026-08-13**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Netzwerkabhängigkeitsbaum
+- Beanstandung neu: leistung: Total Blocking Time
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-11 · Alis Moderaum
+
+<https://lausiklauskn-png.github.io/Alis-Moderaum/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 72 → 95** (↑ 23, am 2026-08-13 noch 95)
+
+> Gesehen am 2026-08-11, **bestätigt durch die Messung vom 2026-08-13**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Verursacher von Layout Shifts
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-10 · Mein-Rezeptbuch (Schaufenster)
 
 <https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/> · Quelle der Zahlen: Google PageSpeed Insights
