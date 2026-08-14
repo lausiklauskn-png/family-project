@@ -311,5 +311,130 @@ ok(/studio_key/.test(cfg), "freigabe-config.example.php: studio_key vorhanden");
   }
 }
 
+/* ── Der Riegel IM BROWSER — die Tat, nicht der Wortlaut ────────────────────
+ *
+ * Der Block oben prüft den Server. Der Server ist auch die Stelle, die
+ * ENTSCHEIDET — aber er ist nicht die Stelle, an der Klaus den Grund erfährt.
+ * Der Riegel im Studio steht davor, damit eine Ablehnung sofort sichtbar wird
+ * und nicht erst nach einem fehlgeschlagenen Veröffentlichen.
+ *
+ * Geprüft wird er wie der PHP-Block: HERAUSSCHNEIDEN und WIRKLICH LAUFEN
+ * LASSEN, mit Attrappen für alles, was ein Browser mitbringt. Ein `ok(/…/)`
+ * über den Quelltext wäre auch dann grün, wenn die Funktion nie gerufen wird
+ * oder ihr Ergebnis niemanden erreicht. */
+{
+  const a = studio.indexOf("/* WACHE-RIEGEL-START");
+  const b = studio.indexOf("/* WACHE-RIEGEL-ENDE */");
+  ok(a > 0 && b > a, "Riegel-Block liess sich aus der echten Datei schneiden");
+  if (a > 0 && b > a) {
+    const block = studio.slice(a, b);
+
+    /* Die Attrappen sind absichtlich dumm: sie merken sich nur, WAS passiert
+       ist. Damit misst die Probe die Wirkung, nicht die Absicht. */
+    const bau = (vorhanden) => {
+      const zustand = {
+        WACHEHAND: JSON.parse(JSON.stringify(vorhanden || {})),
+        wacheDirty: false, sperrZeile: { id: "x", ampel: "rot" }, gesagt: [], neuGezeichnet: 0,
+      };
+      const fn = new Function("Z", `
+        var WACHEHAND = Z.WACHEHAND, wacheDirty = Z.wacheDirty, sperrZeile = Z.sperrZeile;
+        var SPORENSTAND = null;
+        function toast(t, gut) { Z.gesagt.push(String(t)); }
+        function T(k) { return k; }
+        function markDirty() {}
+        function renderSporen() { Z.neuGezeichnet++; }
+        function heuteOrt() { return "2026-08-14"; }
+        ${block}
+        return { setzen: function (i, a, g) {
+          var r = wacheSetzen(i, a, g);
+          Z.wacheDirty = wacheDirty; Z.sperrZeile = sperrZeile; return r;
+        }, rang: wacheRang, ampel: wacheAmpel };
+      `);
+      return { z: zustand, api: fn(zustand) };
+    };
+
+    /* Die Rangfolge — WIRKLICH gerechnet, nicht aus der Datei gelesen. Sie ist
+       der vierte Ort derselben Regel (Doku · PHP · Toolpoint · hier). */
+    const { api: r } = bau({});
+    ok(r.rang("gruen") === 0, "Rang: gruen ist 0");
+    ok(r.rang(null) === 1, "Rang: kein Eintrag ist 1");
+    ok(r.rang("gelb") === 2, "Rang: gelb ist 2");
+    ok(r.rang("rot") === 3, "Rang: rot ist 3");
+    ok(r.rang("blau") === -1, "Rang: ein unbekanntes Wort wird abgewiesen, nicht geraten");
+    ok(r.rang("gruen") < r.rang(null), "gruen steht UNTER kein-Eintrag (sonst waere es ein Entsperren)");
+
+    /* Was gehen MUSS. */
+    {
+      const { z, api } = bau({});
+      ok(api.setzen("app-x", "rot", "Verlangt eine Anmeldung.") === true, "Sperren mit Grund geht");
+      ok(z.WACHEHAND["app-x"].ampel === "rot", "…und die Ampel steht danach auf rot");
+      ok(z.WACHEHAND["app-x"].grund === "Verlangt eine Anmeldung.", "…mit dem Grund");
+      ok(z.WACHEHAND["app-x"].seit === "2026-08-14", "…und dem Datum in Ortszeit");
+      ok(z.wacheDirty === true, "…und es steht als unveroeffentlicht an");
+      ok(z.sperrZeile === null, "…das Grund-Feld schliesst sich");
+    }
+    {
+      const { z, api } = bau({});
+      ok(api.setzen("app-x", "gelb", "Wird geprueft.") === true, "Vorbehalt mit Grund geht");
+      ok(z.WACHEHAND["app-x"].ampel === "gelb", "…und die Ampel steht auf gelb");
+    }
+    /* Eine Quittung darf beim Sperren NICHT verlorengehen — sonst meldete der
+       Waechter dieselbe Aenderung nach dem Entsperren erneut. */
+    {
+      const { z, api } = bau({ "app-x": { gesehen: "abcdef0123456789", gesehen_am: "2026-08-01" } });
+      api.setzen("app-x", "rot", "Doch gefaehrlich.");
+      ok(z.WACHEHAND["app-x"].gesehen === "abcdef0123456789", "die Quittung bleibt beim Sperren stehen");
+      ok(z.WACHEHAND["app-x"].gesehen_am === "2026-08-01", "…samt ihrem Datum");
+    }
+
+    /* Was NICHT gehen darf. Jede Verweigerung einzeln — und jedes Mal muss die
+       Arbeitskopie UNVERAENDERT bleiben, nicht nur der Rueckgabewert falsch. */
+    const verweigert = (was, vorhanden, id, ampel, grund) => {
+      const { z, api } = bau(vorhanden);
+      const vorher = JSON.stringify(z.WACHEHAND);
+      ok(api.setzen(id, ampel, grund) === false, was + " — wird abgelehnt");
+      ok(JSON.stringify(z.WACHEHAND) === vorher, was + " — und die Arbeitskopie bleibt unberuehrt");
+      ok(z.wacheDirty === false, was + " — und nichts steht als unveroeffentlicht an");
+    };
+    verweigert("gruen setzen (Entsperren durch die Hintertuer)", {}, "app-x", "gruen", "passt schon");
+    verweigert("ohne Grund sperren", {}, "app-x", "rot", "");
+    verweigert("ohne Grund sperren (nur Leerzeichen)", {}, "app-x", "rot", "    ");
+    verweigert("Grund laenger als 300 Zeichen", {}, "app-x", "rot", "x".repeat(301));
+    verweigert("rot auf gelb herunterstufen", { "app-x": { ampel: "rot", grund: "x" } }, "app-x", "gelb", "halb so wild");
+    verweigert("ein unbekanntes Ampel-Wort", {}, "app-x", "blau", "irgendwas");
+    /* Die zwei Faelle, in denen NUR die Untergrenze (`< 2`) haelt — der
+       Richtungs-Vergleich allein laesst sie durch, weil ein unbekanntes Wort
+       den Rang -1 hat und damit UNTER allem steht. Ohne diese zwei Proben
+       liesse sich die Untergrenze spurlos entfernen: die Gegenprobe
+       (tests/gegenprobe_studio_riegel.sh, Probe 4) hat genau das gefunden. */
+    verweigert("gruen setzen, wenn dort Muell steht (0 gilt als 'strenger' als -1)",
+               { "app-x": { ampel: "blau" } }, "app-x", "gruen", "passt schon");
+    verweigert("Muell setzen, wo schon Muell steht (-1 gegen -1)",
+               { "app-x": { ampel: "blau" } }, "app-x", "lila", "irgendwas");
+
+    /* Genau an der Grenze muss es noch gehen — sonst haette die Probe oben nur
+       bewiesen, dass ueberhaupt irgendwo abgelehnt wird. */
+    {
+      const { api } = bau({});
+      ok(api.setzen("app-x", "rot", "x".repeat(300)) === true, "300 Zeichen sind noch erlaubt");
+    }
+    /* Gleich bleiben ist kein Herunterstufen: eine rote Zeile mit neuem Grund
+       muss sich weiter schaerfen lassen. */
+    {
+      const { z, api } = bau({ "app-x": { ampel: "rot", grund: "alt" } });
+      ok(api.setzen("app-x", "rot", "neuer Grund") === true, "rot bleibt rot mit neuem Grund");
+      ok(z.WACHEHAND["app-x"].grund === "neuer Grund", "…und der Grund wird nachgezogen");
+    }
+  }
+}
+
+/* Und die Knoepfe muessen auch verdrahtet sein — eine Funktion, die niemand
+   ruft, ist kein Schutz und keine Bedienung. */
+ok(/data-sperren/.test(studio) && /data-vorbehalt/.test(studio), "Sperr-Knoepfe im Studio vorhanden");
+ok(/closest\("\[data-sperrok\]"\)/.test(studio), "der Setz-Knopf ist verdrahtet");
+ok(/wacheSetzen\(sid,/.test(studio), "…und ruft wirklich wacheSetzen");
+ok(/\(sperrZeile && sperrZeile\.ampel\)/.test(studio),
+   "die Ampel kommt aus dem Zustand, nicht aus dem Markup");
+
 console.log(`\nMarktplatz-Studio-Struktur-Smoke: ${pass} bestanden, ${fail} fehlgeschlagen.`);
 process.exit(fail > 0 ? 1 : 0);

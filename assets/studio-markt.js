@@ -96,6 +96,23 @@
       wa_ohne_datum: "Quittung veröffentlicht, aber ohne Datum — dafür muss marktplatz-api.php auf dem Server neu hochgeladen werden.",
       wa_quittiert: "✓ Quittiert — jetzt noch auf Veröffentlichen drücken.",
       wa_keine_summe: "Für diesen Eintrag liegt keine Prüfsumme vor — nichts zu quittieren.",
+      wa_sperren: "⛔ Sperren",
+      wa_vorbehalt: "⚠ Vorbehalt",
+      wa_grund_rot: "Grund der Sperre (steht öffentlich an der Karte)",
+      wa_grund_gelb: "Grund des Vorbehalts (steht öffentlich an der Karte)",
+      wa_grund_bsp_rot: "z. B. Zielseite verlangt plötzlich eine Anmeldung.",
+      wa_grund_bsp_gelb: "z. B. Wird gerade geprüft.",
+      wa_sperre_setzen: "Sperre setzen",
+      wa_vorbehalt_setzen: "Vorbehalt setzen",
+      wa_abbrechen: "Abbrechen",
+      wa_nicht_ruecknehmbar: "Aus dem Studio lässt sich das nicht wieder lösen. Gelöst wird in assets/config/wache-hand.json — siehe docs/RAUSWURF-REGEL.md.",
+      wa_loesen_hinweis: "Lösen geht nur in assets/config/wache-hand.json — das ist Absicht: ein Fehlgriff sperrt dann höchstens zu viel, und das fällt auf.",
+      wa_gesperrt: "Gesperrt — sichtbar wird es erst mit „Veröffentlichen“.",
+      wa_vorbehalt_gesetzt: "Vorbehalt gesetzt — sichtbar wird er erst mit „Veröffentlichen“.",
+      wa_nur_strenger: "Aus dem Studio wird nur gesperrt, nicht gelöst.",
+      wa_grund_fehlt: "Ohne Grund wird nicht gesperrt — er steht öffentlich an der Karte.",
+      wa_grund_lang: "Der Grund ist zu lang (höchstens 300 Zeichen).",
+      wa_kein_loesen: "Das wäre ein Lösen. Entsperrt wird nur in assets/config/wache-hand.json.",
       ms_am: "am ",
       ms_g_noch_nicht_dran: "war noch nicht an der Reihe (Deckel je Lauf)",
       ms_regler_h: "Ab welchem Leistungswert wird gelistet?",
@@ -228,6 +245,23 @@
       wa_ohne_datum: "Acknowledgement published, but without a date — marktplatz-api.php needs re-uploading to the server for that.",
       wa_quittiert: "✓ Acknowledged — now press Publish.",
       wa_keine_summe: "No checksum for this entry — nothing to acknowledge.",
+      wa_sperren: "⛔ Block",
+      wa_vorbehalt: "⚠ Flag",
+      wa_grund_rot: "Reason for blocking (shown publicly on the card)",
+      wa_grund_gelb: "Reason for the flag (shown publicly on the card)",
+      wa_grund_bsp_rot: "e.g. Target site suddenly demands a login.",
+      wa_grund_bsp_gelb: "e.g. Currently under review.",
+      wa_sperre_setzen: "Block it",
+      wa_vorbehalt_setzen: "Flag it",
+      wa_abbrechen: "Cancel",
+      wa_nicht_ruecknehmbar: "This cannot be undone from the studio. Unblocking happens in assets/config/wache-hand.json — see docs/RAUSWURF-REGEL.md.",
+      wa_loesen_hinweis: "Unblocking only happens in assets/config/wache-hand.json — deliberately: a slip then blocks too much at worst, and that gets noticed.",
+      wa_gesperrt: "Blocked — it becomes visible only once you press Publish.",
+      wa_vorbehalt_gesetzt: "Flag set — it becomes visible only once you press Publish.",
+      wa_nur_strenger: "The studio only blocks, it never unblocks.",
+      wa_grund_fehlt: "No blocking without a reason — it is shown publicly on the card.",
+      wa_grund_lang: "The reason is too long (300 characters at most).",
+      wa_kein_loesen: "That would be an unblock. Unblocking only happens in assets/config/wache-hand.json.",
       ms_am: "on ",
       ms_g_noch_nicht_dran: "not its turn yet (per-run cap)",
       ms_regler_h: "From which performance value on is an entry listed?",
@@ -853,6 +887,9 @@
    * einem laengst gespeicherten Haken weiter "noch veroeffentlichen". */
   var WACHEHAND_DATEI = {};
   var wacheDirty = false;
+  /* Welche Zeile gerade nach einem Grund fragt: {id, ampel} oder null. Eine
+   * Sperre ist nie ein einzelner Klick — erst der Grund, dann die Schaltung. */
+  var sperrZeile = null;
   var LAGE_TEXT = { geaendert: "sp_lage_geaendert", uebernommen: "sp_lage_uebernommen",
                     gleich: "sp_lage_gleich", unerreichbar: "sp_lage_unerreichbar",
                     unbrauchbar: "sp_lage_unbrauchbar", uebersprungen: "sp_lage_gleich",
@@ -1020,6 +1057,67 @@
         gb.setAttribute("data-wagesehen", id);
         zeile.appendChild(gb);
       }
+
+      /* ── Sperren und Vorbehalt ──────────────────────────────────────────────
+       * Angeboten wird nur, was STRENGER ist als der jetzige Stand: an einer
+       * schon roten Zeile steht kein Knopf mehr, an einer gelben nur noch
+       * „Sperren". Ein Knopf, der beim Drücken abgelehnt würde, gehört nicht
+       * hin — sonst lernt man, dass Knöpfe hier manchmal nichts tun.
+       * Gefragt wird die Arbeitskopie (wacheAmpel), nicht der nächtliche
+       * Bericht: der Server vergleicht ebenfalls gegen die Datei. */
+      var jetzt = wacheAmpel(id);
+      if (wacheRang(jetzt) < 3) {
+        var spb = document.createElement("button");
+        spb.type = "button"; spb.className = "fpst-btn";
+        spb.textContent = T("wa_sperren");
+        spb.setAttribute("data-sperren", id);
+        zeile.appendChild(spb);
+      }
+      if (wacheRang(jetzt) < 2) {
+        var vbb = document.createElement("button");
+        vbb.type = "button"; vbb.className = "fpst-btn";
+        vbb.textContent = T("wa_vorbehalt");
+        vbb.setAttribute("data-vorbehalt", id);
+        zeile.appendChild(vbb);
+      }
+      /* Der eine Weg zurück wird GENANNT, nicht versteckt. Ein fehlender Knopf,
+       * den niemand erklärt, sieht aus wie ein Fehler. */
+      if (wacheRang(jetzt) >= 2) {
+        var hin = document.createElement("small");
+        hin.className = "fpst-hinweis";
+        hin.textContent = T("wa_loesen_hinweis");
+        zeile.appendChild(hin);
+      }
+      /* Das Grund-Formular erscheint nur an der Zeile, die gefragt hat. */
+      if (sperrZeile && sperrZeile.id === id) {
+        var rot = sperrZeile.ampel === "rot";
+        var form = document.createElement("div");
+        form.className = "fpst-sperrform";
+        var lab = document.createElement("label");
+        lab.textContent = rot ? T("wa_grund_rot") : T("wa_grund_gelb");
+        form.appendChild(lab);
+        var inp = document.createElement("input");
+        inp.type = "text"; inp.maxLength = 300;
+        inp.setAttribute("data-sperrgrund", id);
+        inp.placeholder = rot ? T("wa_grund_bsp_rot") : T("wa_grund_bsp_gelb");
+        form.appendChild(inp);
+        var okb = document.createElement("button");
+        okb.type = "button"; okb.className = "fpst-btn";
+        okb.textContent = rot ? T("wa_sperre_setzen") : T("wa_vorbehalt_setzen");
+        okb.setAttribute("data-sperrok", id);
+        form.appendChild(okb);
+        var abb = document.createElement("button");
+        abb.type = "button"; abb.className = "fpst-btn";
+        abb.textContent = T("wa_abbrechen");
+        abb.setAttribute("data-sperrab", "1");
+        form.appendChild(abb);
+        var warn = document.createElement("small");
+        warn.className = "fpst-hinweis";
+        warn.textContent = T("wa_nicht_ruecknehmbar");
+        form.appendChild(warn);
+        zeile.appendChild(form);
+      }
+
       var lage = document.createElement("span");
       lage.textContent = T(LAGE_TEXT[e.lage] || "sp_lage_unbrauchbar") + (e.hinweis ? " (" + e.hinweis + ")" : "");
       zeile.appendChild(lage);
@@ -1160,6 +1258,91 @@
     for (var i = 0; i < WORK.length; i++) if (WORK[i] && WORK[i].anchorId === anchorId) return WORK[i];
     return null;
   }
+
+  /* ── SPERREN JA, LÖSEN NEIN — der Riegel der Ampel ─────────────────────────
+   *
+   * Bis hierher konnte dieses Studio die Ampel nur ANSEHEN und quittieren.
+   * Sperren ging allein durch Bearbeiten von assets/config/wache-hand.json —
+   * und ein Weg, den man nur über einen Datei-Editor geht, wird im Ernstfall
+   * nicht gegangen. Wer eine gefährliche App vor sich hat, muss sie dort
+   * sperren können, wo er sie sieht.
+   *
+   * Der Riegel bleibt trotzdem hart, aber EINSEITIG (Klaus 2026-08-11): ein
+   * Fehlgriff beim SETZEN sperrt höchstens zu viel, und das fällt sofort auf —
+   * dem Anbieter, dem Besucher, dir. Ein Fehlgriff beim LÖSEN ist still.
+   * Niemand sieht eine Sperre, die nicht mehr da ist.
+   *
+   * Die Rangfolge, an der alles hängt:
+   *
+   *      0  gruen      Hand-Freigabe: gilt sogar über einen Befund hinweg
+   *      1  (nichts)   kein Eintrag — es gilt, was ohnehin gilt
+   *      2  gelb       sichtbarer Vorbehalt, keine Sperre
+   *      3  rot        gesperrt
+   *
+   * Aus dem Browser geht es nur NACH OBEN. Deshalb ist auch „grün setzen"
+   * verboten: grün steht UNTER „kein Eintrag", weil es die Automatik
+   * überstimmt — es wäre ein Entsperren durch die Hintertür.
+   *
+   * ACHTUNG, VIERTER ORT: dieselbe Rangfolge steht in docs/RAUSWURF-REGEL.md,
+   * in `wache_rang()` in server/marktplatz-api.php (dort wird ENTSCHIEDEN) und
+   * in `WACHE_RANG` in PWA-Toolpoint/assets/studio.js. Wer eine dreht, dreht
+   * alle vier. Der Server prüft ohnehin noch einmal — diese Fassung hier steht
+   * nur, damit du den Grund SOFORT erfährst und nicht erst nach einem
+   * fehlgeschlagenen Veröffentlichen.
+   *
+   * Nicht zu verwechseln mit `rang(e)` weiter oben: das ist die Sortierung der
+   * Liste, nicht die Ampel. */
+  /* WACHE-RIEGEL-START — tests/smoke_studio_markt.mjs schneidet von hier bis
+     WACHE-RIEGEL-ENDE heraus und lässt den Block WIRKLICH laufen. Wer die
+     beiden Marken verschiebt oder entfernt, nimmt der Probe ihren Gegenstand;
+     sie meldet das dann als Fehler und nicht als Erfolg. */
+  var WACHE_RANG = { gruen: 0, gelb: 2, rot: 3 };
+  /* -1 heißt: ein Wort, das hier niemand kennt. Das wird abgewiesen, nie geraten. */
+  function wacheRang(a) {
+    if (a === null || a === undefined || a === "") return 1;
+    return Object.prototype.hasOwnProperty.call(WACHE_RANG, a) ? WACHE_RANG[a] : -1;
+  }
+  /* Gefragt wird die ARBEITSKOPIE, nicht der nächtliche Bericht: der Server
+   * vergleicht die eingereichte Datei mit der Datei, und nur wer dieselbe
+   * Quelle liest, rechnet dasselbe aus. */
+  function wacheVon(id) {
+    return (WACHEHAND[id] && typeof WACHEHAND[id] === "object") ? WACHEHAND[id] : null;
+  }
+  function wacheAmpel(id) {
+    var w = wacheVon(id);
+    return (w && typeof w.ampel === "string") ? w.ampel : null;
+  }
+
+  /* Gibt true zurück, wenn wirklich geschaltet wurde. Der Rückgabewert ist
+   * Absicht: so kann die Probe die TAT messen statt den Wortlaut dieser Datei. */
+  function wacheSetzen(id, ampel, grund) {
+    grund = String(grund === null || grund === undefined ? "" : grund).trim();
+    if (!id) return false;
+    if (wacheRang(ampel) < 2) { toast(T("wa_nur_strenger"), false); return false; }
+    // Ohne Grund keine Sperre — er steht öffentlich an der Karte, und wer später
+    // fragt „warum ist das gesperrt?", soll es dort lesen können.
+    if (!grund) { toast(T("wa_grund_fehlt"), false); return false; }
+    if (grund.length > 300) { toast(T("wa_grund_lang"), false); return false; }
+    if (wacheRang(ampel) < wacheRang(wacheAmpel(id))) { toast(T("wa_kein_loesen"), false); return false; }
+    var vorher = wacheVon(id) || {};
+    var neu = {};
+    // Quittung und alles andere bleibt stehen — geschaltet wird nur die Ampel.
+    for (var f in vorher) if (Object.prototype.hasOwnProperty.call(vorher, f)) neu[f] = vorher[f];
+    neu.ampel = ampel;
+    neu.grund = grund;
+    neu.seit = heuteOrt();
+    WACHEHAND[id] = neu;
+    /* NICHT `dirty` setzen: eine Ampel-Schaltung ändert die Einträge nicht.
+     * Sonst ginge bei jedem Sperren zusätzlich eine unveränderte listings.js
+     * raus, und die Historie wäre voll von Commits, die nichts sagen.
+     * `markDirty()` ist nur das Abzeichen und rechnet `wacheDirty` mit. */
+    wacheDirty = true; markDirty();
+    sperrZeile = null;
+    renderSporen(SPORENSTAND);
+    toast(ampel === "rot" ? T("wa_gesperrt") : T("wa_vorbehalt_gesetzt"));
+    return true;
+  }
+  /* WACHE-RIEGEL-ENDE */
 
   /* Übernehmen ist bewusst NUR ein Vorschlag in die Arbeitsliste: veröffentlicht
    * wird erst mit dem vorhandenen Knopf. So sieht Klaus die Änderung vorher in
@@ -1677,6 +1860,22 @@
     if (sb) sb.addEventListener("click", function (e) {
       var b = e.target.closest("[data-sptake]"); if (b) sporeUebernehmen(b.getAttribute("data-sptake"));
       var g = e.target.closest("[data-wagesehen]"); if (g) wacheGesehen(g.getAttribute("data-wagesehen"));
+      /* Erst fragen, dann schalten. Die beiden oberen Knöpfe öffnen nur das
+       * Grund-Feld; geschaltet wird unten mit `data-sperrok`. */
+      var sp = e.target.closest("[data-sperren]");
+      if (sp) { sperrZeile = { id: sp.getAttribute("data-sperren"), ampel: "rot" }; renderSporen(SPORENSTAND); }
+      var vo = e.target.closest("[data-vorbehalt]");
+      if (vo) { sperrZeile = { id: vo.getAttribute("data-vorbehalt"), ampel: "gelb" }; renderSporen(SPORENSTAND); }
+      var ab = e.target.closest("[data-sperrab]");
+      if (ab) { sperrZeile = null; renderSporen(SPORENSTAND); }
+      var okk = e.target.closest("[data-sperrok]");
+      if (okk) {
+        var sid = okk.getAttribute("data-sperrok");
+        var feld = sb.querySelector('[data-sperrgrund="' + (window.CSS && CSS.escape ? CSS.escape(sid) : sid) + '"]');
+        /* Die Ampel kommt aus dem Zustand, NICHT aus dem Markup: ein Angreifer,
+         * der ein data-Attribut umschreibt, soll damit keine Sperrstufe wählen. */
+        wacheSetzen(sid, (sperrZeile && sperrZeile.ampel) || "rot", feld ? feld.value : "");
+      }
     });
     var vp = panel.querySelector("[data-role=vecreport]"); if (vp) vp.addEventListener("click", vecBericht);
     var mr = panel.querySelector("[data-role=msregler]");
