@@ -431,12 +431,27 @@ function standardLauf(cmd, args, opts) {
  * bekommt. */
 export const GRENZE_LEISTUNG = 50;
 
-export function unterGrenzeFortschreiben(m, vorher) {
+export function unterGrenzeFortschreiben(m, vorher, frischGemessen) {
   const bisher = Number(vorher && vorher.unterGrenze);
   const alt = Number.isFinite(bisher) && bisher > 0 ? Math.floor(bisher) : 0;
+  /* NUR EINE FRISCHE MESSUNG URTEILT — und das ist keine Feinheit, sondern der
+   * Kern. Schlägt eine Messung fehl oder war heute ein anderer Eintrag dran,
+   * trägt der Bericht die ALTEN Zahlen weiter (`veraltet`, `noch_nicht_dran`).
+   * Wer nur schaut „steht da eine Zahl unter 50?", zählt dieselbe alte Zahl
+   * jede Nacht erneut — und nach drei Ausfällen der Leitung hinge ein gelbes
+   * Band an einer Seite, die seit Tagen niemand gemessen hat. Gemeldet würde
+   * dann die kaputte Leitung als langsame Seite.
+   *
+   * Gefragt wird deshalb der Lauf, nicht der Bericht: `roh.ok && roh.zahlen`.
+   * Ohne Angabe gilt „frisch" — dann heißt ein direkter Aufruf genau das, was
+   * er zu heißen scheint. */
+  if (frischGemessen === false) {
+    if (alt > 0) m.unterGrenze = alt;           // der Stand bleibt, wie er war
+    return m;
+  }
   const wert = Number(m && m.leistung);
   if (!Number.isFinite(wert)) {                 // keine Zahl → nichts zu urteilen
-    if (alt > 0) m.unterGrenze = alt;           // der Stand bleibt, wie er war
+    if (alt > 0) m.unterGrenze = alt;
     return m;
   }
   if (wert < GRENZE_LEISTUNG) { m.unterGrenze = alt + 1; return m; }
@@ -451,7 +466,9 @@ export function messungBilden(a) {
   /* Mantel um die eigentliche Bildung: der Zähler gilt für ALLE sieben
      Ausgänge unten gleich. Ihn in jeden einzeln zu schreiben wäre die Sorte
      Wiederholung, bei der beim nächsten Umbau einer vergessen wird. */
-  return unterGrenzeFortschreiben(messungBildenRoh(a), a.vorher || {});
+  const roh = a.roh || {};
+  const frisch = !!(roh.ok && roh.zahlen);   // dieselbe Bedingung wie unten
+  return unterGrenzeFortschreiben(messungBildenRoh(a), a.vorher || {}, frisch);
 }
 
 function messungBildenRoh(a) {

@@ -507,6 +507,54 @@ ok(/studio_key/.test(cfg), "freigabe-config.example.php: studio_key vorhanden");
      "Studio und naechtlicher Lauf meinen dieselbe Grenze");
 }
 
+/* ── Der Zaehler, wirklich gerechnet ────────────────────────────────────────
+ * Diese Proben laufen gegen die ECHTE messungBilden — dieselbe Funktion, die
+ * `vektoren-taeglich.yml` nachts um 02:40 UTC aufruft. Sie stehen hier und
+ * nicht in smoke_stufe5_messung.mjs, weil jene Datei `playwright-core`
+ * importiert und in dieser Umgebung gar nicht erst startet; ein Waechter, der
+ * nie laeuft, bewacht nichts.
+ *
+ * DIE WICHTIGSTE DAVON ist „Messung fehlgeschlagen". Beim Bau war sie ROT:
+ * der Bericht traegt bei einem Fehlschlag die ALTEN Zahlen weiter, und wer
+ * nur schaut „steht da eine Zahl unter 50?", zaehlt dieselbe alte Zahl jede
+ * Nacht erneut. Nach drei Ausfaellen der Leitung haette ein gelbes Band an
+ * einer Seite gehangen, die seit Tagen niemand gemessen hat. */
+{
+  const M = await import(new URL("../tools/messung.mjs", import.meta.url));
+  const z = { leistung: 84, bedienbarkeit: 100, gute_praxis: 96, auffindbarkeit: 100 };
+  const B = M.messungBilden;
+  const heute = "2026-08-14";
+  const langsam = { ...z, leistung: 40 };
+
+  ok(B({ vorher: null, roh: { ok: true, zahlen: z }, heute }).unterGrenze === undefined,
+     "Zaehler: gut gemessen → kein Feld");
+  ok(B({ vorher: null, roh: { ok: true, zahlen: langsam }, heute }).unterGrenze === 1,
+     "Zaehler: erste langsame Messung → 1");
+  ok(B({ vorher: { ...langsam, stand: "gemessen", unterGrenze: 1 },
+         roh: { ok: true, zahlen: langsam }, heute }).unterGrenze === 2,
+     "Zaehler: zweite langsame Messung → 2");
+  ok(B({ vorher: { ...langsam, stand: "gemessen", unterGrenze: 2 },
+         roh: { ok: false, hinweis: "Leitung weg" }, heute }).unterGrenze === 2,
+     "Zaehler: FEHLGESCHLAGENE Messung zaehlt NICHT hoch");
+  ok(B({ vorher: { ...langsam, stand: "gemessen", unterGrenze: 3 },
+         roh: { uebersprungen: true }, heute }).unterGrenze === 3,
+     "Zaehler: UEBERSPRUNGEN zaehlt NICHT hoch");
+  ok(B({ vorher: { ...langsam, stand: "gemessen", unterGrenze: 5 },
+         roh: { ok: true, zahlen: z }, heute }).unterGrenze === undefined,
+     "Zaehler: wieder gut gemessen → Feld verschwindet ganz");
+  /* Die Haltefrist und der Zaehler muessen dasselbe meinen: solange die Karte
+     die alte gute Zahl zeigt, darf kein Band widersprechen. */
+  const gehalten = B({ vorher: { ...z, stand: "gemessen" },
+                       roh: { ok: true, zahlen: langsam }, heute });
+  ok(gehalten.leistung === 84 && gehalten.unterGrenze === undefined,
+     "Zaehler: zurueckgehaltener Wert → gezaehlt wird der ANGEZEIGTE (84), kein Band");
+  ok(B({ vorher: null, roh: { ok: false, hinweis: "nix" }, heute }).unterGrenze === undefined,
+     "Zaehler: nie gemessen → kein Feld");
+  ok(B({ vorher: { ...langsam, stand: "gemessen", unterGrenze: -7 },
+         roh: { ok: true, zahlen: langsam }, heute }).unterGrenze === 1,
+     "Zaehler: kaputter Vorwert wird nicht geglaubt");
+}
+
 /* Und die Knoepfe muessen auch verdrahtet sein — eine Funktion, die niemand
    ruft, ist kein Schutz und keine Bedienung. */
 ok(/data-role=autoan/.test(studio) && /data-role=autonaechte/.test(studio),

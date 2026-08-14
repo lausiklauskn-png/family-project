@@ -54,6 +54,30 @@ probe() {                       # probe <Beschreibung> <sed-Ausdruck>
   cp "$SICHERUNG" "$DATEI"
 }
 
+# Für Lücken in einer ANDEREN Datei als dem Studio (der Zähler wohnt in
+# tools/messung.mjs). Eigene Sicherung je Aufruf, damit sich die beiden
+# Aufräum-Wege nicht in die Quere kommen.
+probe_datei() {                 # probe_datei <Beschreibung> <Datei> <sed-Ausdruck>
+  local was="$1" datei="$2" ausdruck="$3"
+  local sich="/tmp/gp_$(echo "$datei" | tr '/.' '__').bak"
+  cp "$datei" "$sich"
+  sed -i "$ausdruck" "$datei"
+  if ! cmp -s "$sich" "$datei"; then
+    if node tests/smoke_studio_markt.mjs >/dev/null 2>&1; then
+      echo "  ✗ BLIND: $was — der Smoke blieb grün, obwohl die Lücke drin war"
+      blind=$((blind + 1))
+    else
+      echo "  ✓ schlägt an: $was"
+      gruen=$((gruen + 1))
+    fi
+  else
+    echo "  ✗ WIRKUNGSLOS: $was — der sed-Ausdruck hat nichts geändert"
+    blind=$((blind + 1))
+  fi
+  cp "$sich" "$datei"
+  rm -f "$sich"
+}
+
 echo "Gegenprobe: der Riegel im Studio (sperren ja, lösen nein)"
 
 # 1 · Der Kern: die Richtungs-Prüfung fällt weg. Danach lässt sich eine rote
@@ -134,6 +158,24 @@ probe "der Schalter entsteht ohne die Regel-Werte" \
 #      Gegenstand und MUSS das als Fehler melden.
 probe "die Schnittmarke des Schalters verschwindet" \
       "s|/\* AUTO-SCHALTER-ENDE \*/||"
+
+# ── Der Zähler (tools/messung.mjs) ───────────────────────────────────────────
+# Diese drei bewachen den Fehler, der beim Bau WIRKLICH drin war.
+
+# 17 · Die Frisch-Prüfung fällt weg. Dann zählt eine fehlgeschlagene oder
+#      übersprungene Nacht die ALTE Zahl erneut — und nach drei Ausfällen der
+#      Leitung hängt ein gelbes Band an einer ungemessenen Seite.
+probe_datei "eine fehlgeschlagene Nacht zaehlt wieder mit" \
+      tools/messung.mjs "s|  if (frischGemessen === false) {|  if (false) {|"
+
+# 18 · Der Mantel reicht die Frisch-Angabe nicht mehr durch — dieselbe Lücke,
+#      nur eine Ebene höher.
+probe_datei "der Mantel reicht die Frisch-Angabe nicht durch" \
+      tools/messung.mjs "s|unterGrenzeFortschreiben(messungBildenRoh(a), a.vorher \|\| {}, frisch)|unterGrenzeFortschreiben(messungBildenRoh(a), a.vorher \|\| {})|"
+
+# 19 · Die Grenze wandert, ohne dass das Studio es erfährt.
+probe_datei "die Grenze im Lauf laeuft dem Studio davon" \
+      tools/messung.mjs "s|export const GRENZE_LEISTUNG = 50;|export const GRENZE_LEISTUNG = 60;|"
 
 echo
 if [ "$blind" -gt 0 ]; then
