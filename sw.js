@@ -15,7 +15,7 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v101";
+var CACHE_VERSION = "family-projekt-v102";
 // Versions-Anhang der Asset-Adressen (?v=NN) — MUSS zur Zahl in CACHE_VERSION
 // passen und in ALLEN HTML-Seiten identisch stehen.
 //
@@ -31,7 +31,7 @@ var CACHE_VERSION = "family-projekt-v101";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "101";
+var ASSET_V = "102";
 // Absichtlich NICHT mehr im Vorrat (Messung 2026-08-02):
 //
 // 1. "og-image.png" (386 KiB). Das ist das Vorschaubild für geteilte Links.
