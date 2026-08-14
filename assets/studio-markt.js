@@ -113,6 +113,13 @@
       wa_grund_fehlt: "Ohne Grund wird nicht gesperrt — er steht öffentlich an der Karte.",
       wa_grund_lang: "Der Grund ist zu lang (höchstens 300 Zeichen).",
       wa_kein_loesen: "Das wäre ein Lösen. Entsperrt wird nur in assets/config/wache-hand.json.",
+      au_h: "🔦 Wächter — Automatik",
+      au_intro: "Der Befund ist in beiden Stellungen derselbe. Es geht nur darum, WER ihn zu sehen bekommt: unter „Von Hand“ nur du hier, unter „Automatik“ auch die Besucher. Gesperrt (rot) wird immer von Hand — daran ändert der Schalter nichts, und die Automatik löst auch nie etwas.",
+      au_an: "Automatik: das gerechnete Gelb öffentlich an der Karte zeigen",
+      au_naechte: "Messungen in Folge bis Gelb",
+      au_meldungen: "Meldungen bis Prüfstapel",
+      au_stand_an: "Automatik — ein Eintrag mit {n} Messungen in Folge unter {g} trägt öffentlich ein gelbes Band. Es verschwindet von allein, sobald wieder gut gemessen wird. Die Grenze {g} ist hier absichtlich kein Regler: gezählt wird in tools/messung.mjs.",
+      au_stand_aus: "Von Hand — der Befund steht nur hier. Öffentlich sieht man nur, was du selbst geschaltet hast. Die Grenze {g} ist hier absichtlich kein Regler: gezählt wird in tools/messung.mjs.",
       ms_am: "am ",
       ms_g_noch_nicht_dran: "war noch nicht an der Reihe (Deckel je Lauf)",
       ms_regler_h: "Ab welchem Leistungswert wird gelistet?",
@@ -262,6 +269,13 @@
       wa_grund_fehlt: "No blocking without a reason — it is shown publicly on the card.",
       wa_grund_lang: "The reason is too long (300 characters at most).",
       wa_kein_loesen: "That would be an unblock. Unblocking only happens in assets/config/wache-hand.json.",
+      au_h: "🔦 Watchman — automatic",
+      au_intro: "The finding is the same in both settings. It only decides WHO gets to see it: under \"by hand\" only you, under \"automatic\" visitors too. Blocking (red) always stays manual — the switch does not change that, and the automatic never unblocks anything.",
+      au_an: "Automatic: show the computed amber publicly on the card",
+      au_naechte: "Measurements in a row before amber",
+      au_meldungen: "Reports before the review pile",
+      au_stand_an: "Automatic — an entry with {n} measurements in a row below {g} carries a public amber band. It disappears on its own once it measures well again. The threshold {g} is deliberately not a slider here: counting happens in tools/messung.mjs.",
+      au_stand_aus: "By hand — the finding stays here only. Publicly, visitors see only what you switched yourself. The threshold {g} is deliberately not a slider here: counting happens in tools/messung.mjs.",
       ms_am: "on ",
       ms_g_noch_nicht_dran: "not its turn yet (per-run cap)",
       ms_regler_h: "From which performance value on is an entry listed?",
@@ -1002,6 +1016,9 @@
           WACHEHAND_DATEI = JSON.parse(JSON.stringify(WACHEHAND));
         }
         renderSporen(st); renderMessung(MESSSTAND); reglerAnzeigen();
+        // Sonst stuende der Schalter beim Oeffnen leer da, obwohl in der Datei
+        // laengst etwas steht.
+        autoAnzeigen();
       });
   }
 
@@ -1292,6 +1309,73 @@
    *
    * Nicht zu verwechseln mit `rang(e)` weiter oben: das ist die Sortierung der
    * Liste, nicht die Ampel. */
+  /* ── Der Automatik-Schalter (Schritt 4, übernommen 2026-08-14) ─────────────
+   *
+   * Er sagt, WER den Befund zu sehen bekommt: unter „Von Hand" nur du hier im
+   * Studio, unter „Automatik" auch die Besucher auf der Karte. Der Befund
+   * selbst ist in beiden Stellungen derselbe — der Schalter rechnet nichts aus
+   * und schaltet keine Ampel.
+   *
+   * ER KANN NICHT SPERREN UND NICHT LÖSEN. Rot bleibt Handarbeit; die
+   * Automatik zeigt höchstens ein gelbes Band und nimmt nie eines weg. Deshalb
+   * darf er auch neben dem Riegel stehen, ohne ihn zu berühren.
+   *
+   * Die Grenze (50) ist hier bewusst KEIN Regler: gezählt wird in
+   * tools/messung.mjs (`GRENZE_LEISTUNG`). Ein Knopf, der sie dreht, während
+   * der nächtliche Lauf weiter gegen die alte zählt, wäre ein Knopf, der lügt.
+   *
+   * Fail-soft wie überall: fehlt der Block oder steht Unsinn darin, gilt AUS
+   * und die Regel — nie „irgendwas". */
+  /* AUTO-SCHALTER-START — tests/smoke_studio_markt.mjs schneidet von hier bis
+     AUTO-SCHALTER-ENDE heraus und lässt den Block WIRKLICH laufen. Wer die
+     Marken verschiebt, nimmt der Probe ihren Gegenstand; sie meldet das dann
+     als Fehler, nicht als Erfolg. */
+  var AUTO_NAECHTE = 3, AUTO_MELDUNGEN = 4, AUTO_GRENZE = 50;
+  function autoBlock() {
+    var a = WACHEHAND && WACHEHAND._automatik;
+    return (a && typeof a === "object") ? a : null;
+  }
+  function autoZahl(feld, standard, min, max) {
+    var a = autoBlock();
+    var n = a ? Number(a[feld]) : NaN;
+    return (isFinite(n) && n >= min && n <= max) ? Math.floor(n) : standard;
+  }
+  function autoAn() { var a = autoBlock(); return !!(a && a.an === true); }
+  function autoNaechte() { return autoZahl("naechte", AUTO_NAECHTE, 1, 30); }
+  function autoMeldungen() { return autoZahl("meldungen", AUTO_MELDUNGEN, 1, 100); }
+  /* Beim ersten Anfassen entsteht der Block mitsamt den Regel-Werten und der
+   * Erklärung — sonst stünde in der Datei ein nackter Schalter ohne Kontext.
+   * `grenze` reist als reine Beschriftung mit, damit man in der Datei sieht,
+   * gegen welche Zahl gezählt wurde. */
+  function autoSetzen(feld, wert) {
+    if (!WACHEHAND || typeof WACHEHAND !== "object") return false;
+    var a = autoBlock();
+    if (!a) {
+      a = { an: false, naechte: AUTO_NAECHTE, meldungen: AUTO_MELDUNGEN, grenze: AUTO_GRENZE };
+      WACHEHAND._automatik = a;
+    }
+    a[feld] = wert;
+    wacheDirty = true; markDirty();
+    autoAnzeigen();
+    return true;
+  }
+  function autoAnzeigen() {
+    if (!panel) return;
+    var an = panel.querySelector("[data-role=autoan]");
+    var n = panel.querySelector("[data-role=autonaechte]");
+    var m = panel.querySelector("[data-role=automeldungen]");
+    if (an) an.checked = autoAn();
+    // Während getippt wird NICHT überschreiben — sonst springt die Zahl unter
+    // dem Finger weg, sobald irgendetwas neu zeichnet.
+    if (n && document.activeElement !== n) n.value = String(autoNaechte());
+    if (m && document.activeElement !== m) m.value = String(autoMeldungen());
+    var s = panel.querySelector("[data-role=autostand]");
+    if (!s) return;
+    s.textContent = (autoAn() ? T("au_stand_an") : T("au_stand_aus"))
+      .replace("{n}", autoNaechte()).replace("{g}", AUTO_GRENZE);
+  }
+  /* AUTO-SCHALTER-ENDE */
+
   /* WACHE-RIEGEL-START — tests/smoke_studio_markt.mjs schneidet von hier bis
      WACHE-RIEGEL-ENDE heraus und lässt den Block WIRKLICH laufen. Wer die
      beiden Marken verschiebt oder entfernt, nimmt der Probe ihren Gegenstand;
@@ -1827,6 +1911,20 @@
           '<p class="fpst-qintro">' + esc(T("sp_intro")) + '</p>' +
           '<div class="fpst-sporen" data-role="sporen"></div>' +
         '</div>' +
+        /* Der Automatik-Schalter (Schritt 4). Er steht bewusst UNTER dem
+         * Wächter-Abschnitt: er entscheidet nichts über die Ampel, sondern
+         * nur, wer den ohnehin gerechneten Befund zu sehen bekommt. */
+        '<div class="fpst-vec">' +
+          '<h4>' + esc(T("au_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("au_intro")) + '</p>' +
+          '<label class="fpst-autoan"><input type="checkbox" data-role="autoan"> ' +
+            esc(T("au_an")) + '</label>' +
+          '<label class="fpst-autozahl">' + esc(T("au_naechte")) +
+            '<input type="number" min="1" max="30" step="1" data-role="autonaechte"></label>' +
+          '<label class="fpst-autozahl">' + esc(T("au_meldungen")) +
+            '<input type="number" min="1" max="100" step="1" data-role="automeldungen"></label>' +
+          '<div class="fpst-autostand" data-role="autostand"></div>' +
+        '</div>' +
         '<div class="fpst-vec">' +
           '<h4>' + esc(T("ms_h")) + '</h4>' +
           '<p class="fpst-qintro">' + esc(T("ms_intro")) + '</p>' +
@@ -1877,6 +1975,22 @@
         wacheSetzen(sid, (sperrZeile && sperrZeile.ampel) || "rot", feld ? feld.value : "");
       }
     });
+    /* Der Automatik-Schalter. Die beiden Zahlen werden GEKLEMMT statt
+       abgewiesen: wer 0 tippt, meint nicht „aus", sondern ist noch beim
+       Tippen. Der Server prüft dieselben Bereiche noch einmal. */
+    var aa = panel.querySelector("[data-role=autoan]");
+    if (aa) aa.addEventListener("change", function () { autoSetzen("an", !!aa.checked); });
+    var klemm = function (el, feld, min, max) {
+      if (!el) return;
+      var nimm = function () {
+        var v = Math.round(Number(el.value));
+        if (!isFinite(v)) return;
+        autoSetzen(feld, Math.min(max, Math.max(min, v)));
+      };
+      el.addEventListener("change", nimm);
+    };
+    klemm(panel.querySelector("[data-role=autonaechte]"), "naechte", 1, 30);
+    klemm(panel.querySelector("[data-role=automeldungen]"), "meldungen", 1, 100);
     var vp = panel.querySelector("[data-role=vecreport]"); if (vp) vp.addEventListener("click", vecBericht);
     var mr = panel.querySelector("[data-role=msregler]");
     if (mr) {

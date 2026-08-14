@@ -405,7 +405,56 @@ function standardLauf(cmd, args, opts) {
  *                   seinem eigenen Datum weiter da
  *   nicht_gemessen  es gibt keine Zahl, und das wird auch so gesagt
  */
+/* ── Die Grenze und der Zähler darunter (Schritt 4, 2026-08-14) ─────────────
+ *
+ * `GRENZE_LEISTUNG` ist die Zahl, unter der eine Seite als langsam gilt.
+ * `unterGrenze` zählt, wie viele Messungen IN FOLGE darunter lagen. Aus
+ * diesen beiden entsteht später das gerechnete gelbe Band — und zwar erst ab
+ * mehreren Nächten, weil ein einzelner schlechter Wert kein Urteil ist
+ * (dieselbe Haltung wie die Haltefrist oben).
+ *
+ * WARUM DER ANGEZEIGTE WERT GEZÄHLT WIRD, NICHT DER FRISCHE. Wegen der
+ * Haltefrist kann die Karte eine 84 zeigen, während frisch eine 40 gemessen
+ * wurde. Zählte man die frische, stünde ein gelbes Band „drei Nächte unter 50"
+ * neben einer gut aussehenden 84 — das Band widerspräche der Zahl, die
+ * daneben steht, und beide wären für sich richtig. Ein Band erklärt, was man
+ * sieht; also zählt, was man sieht. Sobald die Haltefrist greift und die 40
+ * die Karte übernimmt, beginnt der Zähler zu laufen.
+ *
+ * OHNE ZAHL WIRD NICHT GEZÄHLT. Eine fehlgeschlagene Messung ist keine
+ * schlechte Messung (`nicht_gemessen`) — sie lässt den Zähler stehen, statt
+ * ihn hochzuzählen oder zurückzusetzen. Sonst brächte eine kaputte Leitung
+ * ein Band an eine Seite, die niemand gemessen hat.
+ *
+ * DIESE ZAHL SPERRT NICHTS. Sie ist Anzeige. Rot bleibt Handarbeit, und der
+ * Schalter in wache-hand.json entscheidet nur, WER den Befund zu sehen
+ * bekommt. */
+export const GRENZE_LEISTUNG = 50;
+
+export function unterGrenzeFortschreiben(m, vorher) {
+  const bisher = Number(vorher && vorher.unterGrenze);
+  const alt = Number.isFinite(bisher) && bisher > 0 ? Math.floor(bisher) : 0;
+  const wert = Number(m && m.leistung);
+  if (!Number.isFinite(wert)) {                 // keine Zahl → nichts zu urteilen
+    if (alt > 0) m.unterGrenze = alt;           // der Stand bleibt, wie er war
+    return m;
+  }
+  if (wert < GRENZE_LEISTUNG) { m.unterGrenze = alt + 1; return m; }
+  /* Wieder gut gemessen: der Zähler fällt auf null, und weil eine 0 nichts
+     aussagt, verschwindet das Feld ganz. So bleibt der Bericht schlank und
+     „kein Feld" heißt eindeutig „kein Befund". */
+  delete m.unterGrenze;
+  return m;
+}
+
 export function messungBilden(a) {
+  /* Mantel um die eigentliche Bildung: der Zähler gilt für ALLE sieben
+     Ausgänge unten gleich. Ihn in jeden einzeln zu schreiben wäre die Sorte
+     Wiederholung, bei der beim nächsten Umbau einer vergessen wird. */
+  return unterGrenzeFortschreiben(messungBildenRoh(a), a.vorher || {});
+}
+
+function messungBildenRoh(a) {
   const vorher = a.vorher || {};
   const roh = a.roh || {};
   const heute = a.heute;

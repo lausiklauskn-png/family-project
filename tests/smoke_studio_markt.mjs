@@ -428,8 +428,92 @@ ok(/studio_key/.test(cfg), "freigabe-config.example.php: studio_key vorhanden");
   }
 }
 
+/* ── Der Automatik-Schalter — auch hier die Tat ─────────────────────────────
+ * Derselbe Schnitt wie oben. Wichtig ist vor allem, dass er FAIL-SOFT ist:
+ * fehlt der Block oder steht Unsinn darin, muss AUS und die Regel gelten —
+ * eine Automatik, die aus einem kaputten Wert entsteht, wäre schlimmer als
+ * keine. */
+{
+  const a = studio.indexOf("/* AUTO-SCHALTER-START");
+  const b = studio.indexOf("/* AUTO-SCHALTER-ENDE */");
+  ok(a > 0 && b > a, "Schalter-Block liess sich aus der echten Datei schneiden");
+  if (a > 0 && b > a) {
+    const block = studio.slice(a, b);
+    const bau = (hand) => {
+      const Z = { WACHEHAND: JSON.parse(JSON.stringify(hand || {})), wacheDirty: false };
+      const fn = new Function("Z", `
+        var WACHEHAND = Z.WACHEHAND, wacheDirty = Z.wacheDirty, panel = null;
+        function markDirty() {}
+        function T(k) { return k; }
+        ${block}
+        return { an: autoAn, naechte: autoNaechte, meldungen: autoMeldungen,
+                 setzen: function (f, v) { var r = autoSetzen(f, v); Z.wacheDirty = wacheDirty; return r; } };
+      `);
+      return { Z, api: fn(Z) };
+    };
+
+    { const { api } = bau({});
+      ok(api.an() === false, "ohne Block gilt: aus");
+      ok(api.naechte() === 3 && api.meldungen() === 4, "… und es gelten die Regel-Zahlen (3 · 4)"); }
+    { const { api } = bau({ _automatik: { an: true, naechte: 5, meldungen: 7 } });
+      ok(api.an() === true, "an wird gelesen");
+      ok(api.naechte() === 5 && api.meldungen() === 7, "eigene Zahlen gelten"); }
+    /* Unsinn darf NICHT wirken — jeder Wert einzeln. */
+    { const { api } = bau({ _automatik: { an: "ja", naechte: 0, meldungen: -2 } });
+      ok(api.an() === false, "Unsinn bei an wirkt nicht (nur echtes true zaehlt)");
+      ok(api.naechte() === 3 && api.meldungen() === 4, "… und Unsinn bei den Zahlen auch nicht"); }
+    { const { api } = bau({ _automatik: { naechte: 31, meldungen: 101 } });
+      ok(api.naechte() === 3 && api.meldungen() === 4, "Zahlen ausserhalb des Bereichs wirken nicht"); }
+    { const { api } = bau({ _automatik: "an" });
+      ok(api.an() === false, "ein Block, der kein Objekt ist, gilt als aus"); }
+    /* Und er muss beim Schalten ERSETZT werden. Ohne die Objekt-Pruefung
+       schriebe autoSetzen auf einen Text — das verpufft lautlos, waehrend der
+       Schalter „ungespeichert" meldet und beim naechsten Zeichnen wieder aus
+       steht. Die Gegenprobe (Probe 14) hat genau diese Luecke gefunden: das
+       blosse LESEN eines kaputten Blocks faellt nicht auf, erst das Schreiben. */
+    { const { Z, api } = bau({ _automatik: "an" });
+      api.setzen("an", true);
+      ok(Z.WACHEHAND._automatik && typeof Z.WACHEHAND._automatik === "object",
+         "ein kaputter Block wird beim Schalten durch einen echten ersetzt");
+      ok(Z.WACHEHAND._automatik.an === true, "… und die Schaltung kommt wirklich an"); }
+    /* Schalten legt den Block MIT Regel-Werten an — sonst stuende ein nackter
+       Schalter ohne Kontext in der Datei. */
+    { const { Z, api } = bau({});
+      ok(api.setzen("an", true) === true, "Schalten geht");
+      ok(Z.WACHEHAND._automatik.an === true, "… und steht danach im Block");
+      ok(Z.WACHEHAND._automatik.naechte === 3 && Z.WACHEHAND._automatik.grenze === 50,
+         "… samt Regel-Zahlen und Grenze als Beschriftung");
+      ok(Z.wacheDirty === true, "… und es steht als unveroeffentlicht an"); }
+    /* Und das Wichtigste: der Schalter kann KEINE Ampel tragen. */
+    { const { Z, api } = bau({ "app-x": { ampel: "rot", grund: "x" } });
+      api.setzen("an", true);
+      ok(!("ampel" in Z.WACHEHAND._automatik), "der Schalter traegt KEINE Ampel");
+      ok(Z.WACHEHAND["app-x"].ampel === "rot", "… und laesst eine bestehende Sperre unberuehrt"); }
+  }
+}
+
+/* Der Zaehler, gegen den der Schalter rechnet. Ohne ihn waere der Schalter ein
+   Knopf, hinter dem nichts liegt — genau das, was hier nicht gebaut wird. */
+{
+  const mess = readFileSync(join(ROOT, "tools/messung.mjs"), "utf8");
+  ok(/export const GRENZE_LEISTUNG = 50;/.test(mess), "die Grenze steht in tools/messung.mjs");
+  ok(/unterGrenzeFortschreiben\(messungBildenRoh\(a\)/.test(mess),
+     "der Zaehler liegt als Mantel um ALLE Ausgaenge, nicht in einem einzelnen");
+  /* Die Zahl im Studio-Text muss dieselbe meinen wie der Lauf — sonst steht
+     dort eine Grenze, gegen die niemand zaehlt. */
+  const gLauf = /export const GRENZE_LEISTUNG = (\d+);/.exec(mess);
+  const gStudio = /var AUTO_NAECHTE = \d+, AUTO_MELDUNGEN = \d+, AUTO_GRENZE = (\d+);/.exec(studio);
+  ok(!!gLauf && !!gStudio && gLauf[1] === gStudio[1],
+     "Studio und naechtlicher Lauf meinen dieselbe Grenze");
+}
+
 /* Und die Knoepfe muessen auch verdrahtet sein — eine Funktion, die niemand
    ruft, ist kein Schutz und keine Bedienung. */
+ok(/data-role=autoan/.test(studio) && /data-role=autonaechte/.test(studio),
+   "der Schalter ist im Panel angelegt");
+ok(/aa\.addEventListener\("change"/.test(studio), "das Haekchen ist verdrahtet");
+ok(/autoAnzeigen\(\);\s*\n\s*\}\);/.test(studio) || studio.indexOf("autoAnzeigen();") !== studio.lastIndexOf("autoAnzeigen();"),
+   "der Schalter wird auch nach dem Laden gezeichnet, nicht nur beim Schalten");
 ok(/data-sperren/.test(studio) && /data-vorbehalt/.test(studio), "Sperr-Knoepfe im Studio vorhanden");
 ok(/closest\("\[data-sperrok\]"\)/.test(studio), "der Setz-Knopf ist verdrahtet");
 ok(/wacheSetzen\(sid,/.test(studio), "…und ruft wirklich wacheSetzen");
