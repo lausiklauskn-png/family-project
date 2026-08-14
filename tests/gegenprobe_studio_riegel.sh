@@ -108,6 +108,33 @@ probe "die Ampel kommt wieder aus dem Markup statt aus dem Zustand" \
 probe "die Schnittmarke verschwindet (die Probe verliert ihren Gegenstand)" \
       "s|/\* WACHE-RIEGEL-ENDE \*/||"
 
+# ── Der Automatik-Schalter (Schritt 4) ───────────────────────────────────────
+# Er kann nicht sperren und nicht lösen — aber er kann still falsch werden.
+
+# 12 · „an" nimmt jeden Wahrheitswert statt nur echtes true. Dann schaltete ein
+#      versehentliches "nein" (ein nicht-leerer Text!) die Automatik EIN.
+probe "der Schalter glaubt jedem Wert statt nur echtem true" \
+      "s|function autoAn() { var a = autoBlock(); return !!(a \&\& a.an === true); }|function autoAn() { var a = autoBlock(); return !!(a \&\& a.an); }|"
+
+# 13 · Die Bereichsprüfung der Zahlen fällt weg. Dann gälte eine 0 als Schwelle
+#      und jede Messung träfe sofort zu.
+probe "die Bereichspruefung der Zahlen faellt weg" \
+      "s|return (isFinite(n) \&\& n >= min \&\& n <= max) ? Math.floor(n) : standard;|return isFinite(n) ? Math.floor(n) : standard;|"
+
+# 14 · Ein Block, der gar kein Objekt ist, wird trotzdem benutzt.
+probe "ein Block, der kein Objekt ist, wird trotzdem benutzt" \
+      "s|return (a \&\& typeof a === \"object\") ? a : null;|return a \|\| null;|"
+
+# 15 · Der Schalter legt sich ohne die Regel-Werte an — dann stünde ein nackter
+#      Schalter ohne Kontext in der Datei.
+probe "der Schalter entsteht ohne die Regel-Werte" \
+      "s|a = { an: false, naechte: AUTO_NAECHTE, meldungen: AUTO_MELDUNGEN, grenze: AUTO_GRENZE };|a = { an: false };|"
+
+# 16 · Die Marke des Schalter-Blocks verschwindet — die Probe verlöre ihren
+#      Gegenstand und MUSS das als Fehler melden.
+probe "die Schnittmarke des Schalters verschwindet" \
+      "s|/\* AUTO-SCHALTER-ENDE \*/||"
+
 echo
 if [ "$blind" -gt 0 ]; then
   echo "$gruen Wächter schlagen an, $blind BLIND — der Riegel ist nicht vollständig bewacht."
