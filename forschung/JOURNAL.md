@@ -21,6 +21,22 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-13 · family-projekt.de (Marktplatz) (Computer)
+
+<https://family-projekt.de/markt.html> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 100 → 75** (↓ 25, am 2026-08-15 noch 77)
+
+> Gesehen am 2026-08-13, **bestätigt durch die Messung vom 2026-08-15**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung weg: leistung: LCP-Anfrageerkennung
+- Beanstandung weg: leistung: Netzwerkabhängigkeitsbaum
+- Beanstandung neu: leistung: CSS komprimieren
+- Beanstandung neu: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Reduziere nicht verwendete CSS
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-11 · Muttis Rezeptbuch
 
 <https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/> · Quelle der Zahlen: Google PageSpeed Insights
