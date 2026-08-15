@@ -52,6 +52,13 @@
       "aktiv": true
     },
     {
+      "id": "eigen-sbkim-demo",
+      "name": "SBKIM-Demo",
+      "url": "https://lausiklauskn-png.github.io/Sage-Protokol/sbkim-demo/",
+      "repo": "Sage-Protokol",
+      "aktiv": true
+    },
+    {
       "id": "eigen-kimtool-point",
       "name": "SB-KIMTool-Point",
       "url": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",
