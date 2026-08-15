@@ -66,6 +66,13 @@
       "aktiv": true
     },
     {
+      "id": "eigen-alis-warenwirtschaft",
+      "name": "Alis Moderaum · Warenwirtschaft",
+      "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/warehouse.html",
+      "repo": "Alis-Moderaum",
+      "aktiv": true
+    },
+    {
       "id": "eigen-company-brain",
       "name": "Company Brain",
       "url": "https://lausiklauskn-png.github.io/Company-Brain/",
@@ -100,7 +107,6 @@
       "repo": "New-Perfect-Skin-Beauty-",
       "aktiv": true
     },
-
     {
       "id": "eigen-kim-sync",
       "name": "Kim-sync",
