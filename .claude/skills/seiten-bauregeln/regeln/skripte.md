@@ -420,6 +420,49 @@ Mein-Mixarium-Page erwartet dieselbe Funktion einen Themen-**Namen** und fällt
 ohne Argument auf `Dunkel` zurück. Wortwörtlich übernommen hätte die Zeile Neon
 und Hell stillschweigend überschrieben.
 
+### Nachtrag 2026-08-15 — der Rollout war unvollständig, und niemand merkte es
+
+Eine Woche später lag `Mein-Workfloh-Page` bei **Leistung 62**. Die Suche ging
+zuerst in die falsche Richtung (siehe unten), bis Klaus sagte: *„prüf das an den
+anderen Seiten, die sind ähnlich aufgebaut."* Dann war es in fünf Minuten klar:
+
+| | Wächter | Bremse | nachgeladen | Leistung |
+|---|---|---|---|---|
+| Mein-Rezeptbuch-Page · Mein-Mixarium-Page · family-projekt.de | ✅ | ✅ | ✅ | 89 |
+| Tomys-Hub | **–** | ✅ | ✅ | 94 |
+| Mein-Workfloh-Page | **–** | **–** | **–** | **62** |
+
+**Die Reparatur von 2026-08-08 wurde an drei Seiten ausgerollt. Es gab fünf.**
+Das Wissen fehlte nicht, die Regel stand hier bereits vollständig — es fehlte
+die *Liste*. Daraus zwei Dinge:
+
+- **Wer eine Regel dieser Art einführt, sucht im ganzen Netz nach der Datei**,
+  nicht nur in den Repos, an denen er gerade arbeitet. Ein Einzeiler genügt:
+  `find /home/user -name "mycel-bg*.js"` und je Treffer prüfen, welche Stufen
+  drin sind. Ohne das altert eine Reparatur zu einem Sonderfall.
+- **Die Regel „sieh zuerst bei der Schwester nach" stand schon hier — und wurde
+  trotzdem übersprungen.** Sie ist der billigste Schritt der ganzen Untersuchung
+  und gehört an den *Anfang*, nicht ans Ende.
+
+**Der Fehlgriff davor, als Warnung:** aus den PageSpeed-Diagnosen (kritischer
+Pfad, ungenutztes JavaScript, längste Aufgaben) wurde geschlossen, die
+Bibliothek hänge im Ladeweg — also wurde das *Laden* nach hinten verlegt.
+Ergebnis: **LCP 1.940 ms → 0,4 s, FCP 0,3 s, CLS 0,028 — und die Note fiel
+trotzdem.** Die Blockierzeit blieb bei 23.490 ms, und sie trägt die Note.
+
+> **Merksatz:** Eine Dauerschleife wird nicht dadurch billiger, dass sie später
+> anfängt. Wer den Ladeweg richtet, verbessert LCP und FCP; wer die Note bewegen
+> will, muss die **Arbeit** loswerden, nicht ihren Startzeitpunkt. Steht in der
+> Messung LCP grün und Blockierzeit rot, ist der Ladeweg das falsche Ziel.
+
+**Neuer Befund nebenbei — der Hintergrund hungerte das Netz aus.** Nach dem
+Abschalten fiel in Tomys-Hub eine E2E-Probe von 16/16 auf 15/16: eine
+WebSocket-Verbindung zum Relais scheiterte. Nicht die Änderung war schuld —
+dieselbe Probe fällt, wenn man den Hintergrund völlig neutral abschaltet.
+**Ohne den Hintergrund bekam die Verbindung erstmals Leerlaufzeit und versuchte
+es überhaupt.** Vorher kam sie im Testfenster nie dran. Auf einem langsamen
+Gerät heißt das: der Zierhintergrund verzögerte die Netz-Anbindung.
+
 ## Abhakliste
 
 - [ ] Modul-Stapel nach dem Laden, Reihenfolge maschinell gegengeprüft
@@ -432,6 +475,10 @@ und Hell stillschweigend überschrieben.
 - [ ] kein byte-1:1-Modul verändert, Drift-Guard grün
 - [ ] alles fail-soft, Öffner fangen „lädt noch" ab
 - [ ] **Vor dem Import gefragt, ob ein Grafikchip da ist**; Dauerschleife hat
-      zusätzlich eine Selbst-Bremse; und vorher geprüft, ob eine Schwester-Seite
-      dieselbe Datei schon in einer neueren Fassung trägt
+      zusätzlich eine Selbst-Bremse; und **als ERSTES** geprüft, ob eine
+      Schwester-Seite dieselbe Datei schon in einer neueren Fassung trägt
+      (`find /home/user -name "<datei>"`, je Treffer die Stufen zählen) — 2026-08-15
+      hing genau daran eine Seite bei 62, während vier Schwestern längst gerichtet waren
+- [ ] bei roter Blockierzeit **nicht** am Ladeweg gedreht: LCP grün + Blockierzeit
+      rot heißt, die Arbeit muss weg, nicht ihr Startzeitpunkt
 - [ ] `node --check` auf alle geänderten JS-Dateien **und** die Inline-Blöcke
