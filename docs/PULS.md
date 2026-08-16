@@ -48,7 +48,7 @@ Environment kommt nicht ins offene Netz.
 | Frage | Antwort |
 |---|---|
 | Richtung des gemeinsamen Repos | **Gemeinsamer Bauplatz** — aktiver Werkplatz, an dem beide bauen und lernen |
-| Everlast GmbH (30 Fundstellen in 7 Dateien) | **Erst später entscheiden** — nichts anfassen, nichts darauf aufbauen |
+| EVL. (30 Fundstellen in 7 Dateien) | **Erst später entscheiden** — nichts anfassen, nichts darauf aufbauen |
 | Vier „Vertraulich"-PDFs, öffentlich | **Bleiben — war so gewollt.** Punkt ist beendet |
 | Stufe 1 heute bauen? | **Nein — heute nur der Plan** |
 
@@ -60,7 +60,7 @@ Schaufenster.
 
 Neuer Ordner `bauplatz/` im Repo — fasst **keine** Bestandsdatei an (nicht
 `index.html`, `hub.html`, `sbkim-flow.html`, `sw.js`), damit die offene
-Everlast-Frage unberührt bleibt. Der Service-Worker reicht unbekannte Adressen
+EVL.-Frage unberührt bleibt. Der Service-Worker reicht unbekannte Adressen
 ohnehin ans Netz durch, also ist dort keine Änderung nötig.
 
 1. **Werkbank** — eine Seite, vier Felder, beide Lanes und die drei Schichten
