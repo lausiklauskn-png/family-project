@@ -59,3 +59,11 @@ hält die Modell-Bibliothek diese HTML-Seite für die Modell-Datei und wirft
 Lauf lädt die Dateien auf GitHubs Servern und committet sie nach
 `models/…`. Danach `git pull` + auf der Seite einmal **Strg+Shift+R**. Details:
 `models/Xenova/multilingual-e5-small/PLATZHALTER.md`.
+
+---
+
+## Rechte
+
+Rechteinhaber ist Klaus Nitzsche. Welche Lizenz gilt und welche Rolle die
+KI-Werkzeuge hatten, steht in [`RECHTE.md`](RECHTE.md); der Lizenztext in
+[`LICENSE`](LICENSE).
