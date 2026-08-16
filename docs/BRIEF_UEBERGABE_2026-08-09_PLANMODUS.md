@@ -238,7 +238,7 @@ Das Repo ist im Arbeitsbereich: `/workspace/semantic-match-demo`
   werbegesteuert arbeiten statt bedarfsorientiert.
 - **Kosten-Nutzen** — fünf Phasen, 26–36 Wochen, 65–115 T€, Break-even ab
   Monat 8 bei 400 Apps, 5–15 % Provision.
-- **Kostenanalyse Everlast Engine** — trennt sauber **Technologie** (Semantic
+- **Kostenanalyse EVL.-Engine** — trennt sauber **Technologie** (Semantic
   Matching Engine, universell) von **Anwendung** (PWA-Marktplatz).
 - **USP Bidirektionales Matching** — das Prinzip in einem Bild: Entwickler
   „Wartungsprotokolle mit Offline-Funktion" ⟷ Käufer „digitale Checkliste für
@@ -260,7 +260,7 @@ protocol/sbkim-register.html  · Registrieren
 docs/SBKIM_AGENTS.md
 SBKIM_Paper.html · SBKIM_Paper_DE.html · das große Paper als PDF
 USP_SBKIM.html · USP_Bidirektionales_Matching.pdf
-Everlast_Pitch.html
+EVL._Pitch.html
 Konzept_PWA_Marktplatz.pdf · Marktanalyse · zwei Kostenanalysen
 CLAUDE.md (15 KB)
 ```
@@ -270,27 +270,27 @@ und Kostenanalysen, eine Demo, ein Hub, eine Netzwerk-Schicht und zwei
 Protokoll-Seiten. Also Konzept und Prototyp an einem Ort — während das Mycel
 inzwischen 14 laufende Knoten und einen Marktplatz hat.
 
-### ⚠ Everlast GmbH — vor allem anderen zu klären
+### ⚠ EVL. — vor allem anderen zu klären
 
 Das Repo ist **nicht neutral**. Es ist über weite Strecken ein **Angebot an
 eine namentlich genannte Firma**, und es ist **öffentlich**:
 
 ```
-Everlast_Pitch.html                    Partnerschafts-Angebot („Was ich einbringe /
-                                       Was Everlast einbringt / Was nicht funktioniert")
-Kostenanalyse_Everlast_Engine_PWA.pdf  eigene Kostenrechnung
-hub.html            Karte „Für Everlast" verlinkt den Pitch
-sbkim-flow.html     Transaktionsfluss mit „Everlast-Gebühr (3 %)"
-index.html          „③ Zertifizierter Entwickler – Everlast-Review ✓"
-sbkim-network.html  Knoten „Everlast CRM"
-protocol/…register  Platzhalter „z. B. Klaus, Everlast GmbH, SportShop24…"
-sw.js               beide Everlast-Dateien im Offline-Vorrat
+EVL._Pitch.html                    Partnerschafts-Angebot („Was ich einbringe /
+                                       Was EVL. einbringt / Was nicht funktioniert")
+Kostenanalyse_EVL._Engine_PWA.pdf  eigene Kostenrechnung
+hub.html            Karte „Für EVL." verlinkt den Pitch
+sbkim-flow.html     Transaktionsfluss mit „EVL.-Gebühr (3 %)"
+index.html          „③ Zertifizierter Entwickler – EVL.-Review ✓"
+sbkim-network.html  Knoten „EVL.-CRM"
+protocol/…register  Platzhalter „z. B. Klaus, EVL., SportShop24…"
+sw.js               beide EVL.-Dateien im Offline-Vorrat
 ```
 
 **Dem steht eine stehende Anweisung von Klaus gegenüber.** In
 `Sage-Protokol/docs/PULS.md` steht als *heilige Tafel*:
 
-> **Privatheits-Klausel: Die Sonnen-Galaxie erwähnt Everlast GmbH NICHT.**
+> **Privatheits-Klausel: Die Sonnen-Galaxie erwähnt EVL. NICHT.**
 > Klaus' Wunsch ausdrücklich. Stationen, die im realen Werdegang einen
 > kommerziellen Kontext hatten, werden ausschließlich in ihrer
 > technisch-konzeptionellen Form erzählt.
@@ -313,10 +313,10 @@ nicht entschieden, nichts angefasst:
 
 | Datei | Vermerk im Dokument |
 |---|---|
-| `Konzept_PWA_Marktplatz.pdf` | „Vertrauliches Konzeptpapier · Präsentiert an Everlast.ai" |
-| `Marktanalyse_PWA_Plattform.pdf` | „Vertraulich · Mai 2026 · Präsentiert an Everlast Consulting GmbH" |
-| `Kosten_Nutzen_Analyse_PWA_Plattform.pdf` | „Vertraulich · Präsentiert an Everlast Consulting GmbH" |
-| `Kostenanalyse_Everlast_Engine_PWA.pdf` | „Vertraulich · **ausschließlich für** Everlast Consulting GmbH" |
+| `Konzept_PWA_Marktplatz.pdf` | „Vertrauliches Konzeptpapier · Präsentiert an EVL." |
+| `Marktanalyse_PWA_Plattform.pdf` | „Vertraulich · Mai 2026 · Präsentiert an EVL." |
+| `Kosten_Nutzen_Analyse_PWA_Plattform.pdf` | „Vertraulich · Präsentiert an EVL." |
+| `Kostenanalyse_EVL._Engine_PWA.pdf` | „Vertraulich · **ausschließlich für** EVL." |
 
 Das Repo ist öffentlich, `hub.html` verlinkt die Dateien, und `sw.js` legt sie
 in den **Offline-Vorrat**. Lesbar ist damit auch der Kostenrahmen
@@ -325,7 +325,7 @@ Transaktionsfluss.
 
 Das kann **gewollt** sein — ein Pitch will gefunden werden, und der Marktteil
 ist ohnehin öffentliches Wissen. Bei der Kostenanalyse, die „ausschließlich
-für Everlast" im Kopf trägt, ist es weniger offensichtlich.
+für EVL." im Kopf trägt, ist es weniger offensichtlich.
 
 Das ist ein Fall für die **Auslieferungs-Brille** aus
 `Sage-Protokol/CLAUDE.md`: *„Was liefert der Server WIRKLICH aus?"* Die Antwort

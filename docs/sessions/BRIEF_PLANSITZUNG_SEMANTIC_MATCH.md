@@ -110,12 +110,11 @@ in `docs/BRIEF_UEBERGABE_2026-08-09_PLANMODUS.md` §5 — leg sie ihm zur Auswah
 
 ## Vor allem anderen zu klären (nichts anfassen)
 
-1. **Everlast GmbH.** Das Repo ist öffentlich ein namentliches Angebot (Pitch, Hub-Karte
-   „Für Everlast", „Everlast-Gebühr (3 %)" im Transaktionsfluss, Knoten „Everlast CRM").
+1. **EVL.** Das Repo ist öffentlich ein namentliches Angebot (Pitch, Hub-Karte
+   „Für EVL.", „EVL.-Gebühr (3 %)" im Transaktionsfluss, Knoten „EVL.-CRM").
    Zugleich trägt `Sage-Protokol/docs/PULS.md` eine heilige Tafel: *„Die Sonnen-Galaxie
-   erwähnt Everlast GmbH NICHT. Klaus' Wunsch ausdrücklich."*
-2. **Vier Papiere tragen „Vertraulich"**, eines „ausschließlich für Everlast Consulting
-   GmbH" — und liegen öffentlich, `sw.js` legt sie sogar in den Offline-Vorrat. Lesbar sind
+   erwähnt EVL. NICHT. Klaus' Wunsch ausdrücklich."*
+2. **Vier Papiere tragen „Vertraulich"**, eines „ausschließlich für EVL." — und liegen öffentlich, `sw.js` legt sie sogar in den Offline-Vorrat. Lesbar sind
    damit Kostenrahmen (65–115 T€), Provision (5–15 %) und die 3-%-Gebühr.
 
 **Beides benennen, nicht auflösen.** Klaus entscheidet: *noch aktuell · Historie · soll

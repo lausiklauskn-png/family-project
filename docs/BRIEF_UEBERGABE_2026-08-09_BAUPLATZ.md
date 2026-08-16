@@ -19,7 +19,7 @@ die Werkbank — soll ich?"* Sagt er ja, gilt der Freibrief für den Rest.
   Bedarf getrennt**. Die Maschine läuft leer.
 - **Klaus' Richtung: „Gemeinsamer Bauplatz"** — ein aktiver Werkplatz, an dem
   beide bauen und lernen.
-- **Everlast: erst später entscheiden.** Nichts anfassen, nichts darauf aufbauen.
+- **EVL.: erst später entscheiden.** Nichts anfassen, nichts darauf aufbauen.
 - **Die vier „Vertraulich"-PDFs bleiben.** Das war so gewollt, der Punkt ist
   beendet — nicht erneut aufmachen.
 
@@ -82,7 +82,7 @@ Bedarf pro App schreiben und messen, ob es etwas bringt".
 Alles Neue lebt in einem **neuen Ordner `bauplatz/`** im Repo
 `lausiklauskn-png/semantic-match-demo`. Er fasst **keine** Bestandsdatei an:
 nicht `index.html`, nicht `hub.html`, nicht `sbkim-flow.html`, nicht
-`Everlast_Pitch.html`, **nicht `sw.js`**. Damit bleibt die offene Everlast-Frage
+`EVL._Pitch.html`, **nicht `sw.js`**. Damit bleibt die offene EVL.-Frage
 unberührt. Der Service-Worker braucht keine Änderung — er reicht unbekannte
 Adressen ans Netz durch (`caches.match(...) || fetch(...)`).
 
@@ -141,13 +141,13 @@ Tafel und braucht Klaus' ausdrückliche Zustimmung.
 
 ## 4. Was NICHT getan wird
 
-- **Everlast nicht anfassen** — 30 Fundstellen in 7 Dateien. Klaus entscheidet
+- **EVL. nicht anfassen** — 30 Fundstellen in 7 Dateien. Klaus entscheidet
   später. Nichts entfernen, nichts umbenennen, nichts darauf aufbauen.
 - **Die vier „Vertraulich"-PDFs bleiben.** Entschieden, erledigt. Nicht erneut
   vorlegen.
 - **Die alten Demo-Seiten nicht reparieren** (fremde Adressen, altes Modell,
   Schlüssel im `localStorage`). Sie sind die Wurzel von Mai 2026. Erst wenn
-  Klaus die Everlast-Frage geklärt hat, ist ein Aufräum-Durchgang überhaupt
+  Klaus die EVL.-Frage geklärt hat, ist ein Aufräum-Durchgang überhaupt
   sinnvoll.
 - **Kein neues Repo.** Der Bauplatz gehört dorthin, wo das Papier liegt.
 
