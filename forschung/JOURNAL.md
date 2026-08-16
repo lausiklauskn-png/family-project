@@ -21,6 +21,18 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-14 · family-projekt.de (Start) (Computer)
+
+<https://family-projekt.de/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 99 → 55** (↓ 44, am 2026-08-16 noch 77)
+
+> Gesehen am 2026-08-14, **bestätigt durch die Messung vom 2026-08-16**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Verursacher von Layout Shifts
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-13 · family-projekt.de (Marktplatz) (Computer)
 
 <https://family-projekt.de/markt.html> · Quelle der Zahlen: Google PageSpeed Insights
