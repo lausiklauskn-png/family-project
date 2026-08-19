@@ -78,6 +78,33 @@ const verNum = (/(\d+)\s*$/.exec(verNow || "") || [])[1];
 ok(!!assetV, `ASSET_V lesbar (${assetV})`);
 ok(assetV === verNum, `ASSET_V passt zur CACHE_VERSION (${assetV} = ${verNum})`);
 
+/* ---- Der Versions-Anhang IN der CORE-Liste (Befund 2026-08-19) -------------
+ *
+ * `coreListOf()` oben streift das `?v=` bewusst ab, bevor es vergleicht — das
+ * war gegen einen anderen Fehler richtig (git meldet Dateinamen ohne Anhang).
+ * Die Nebenwirkung: die Zahl in CORE wurde von NIEMANDEM geprüft. Sie stand
+ * deshalb auf `?v=98`, während jede Seite `?v=103` anforderte.
+ *
+ * Das ist kein Schönheitsfehler. Für den Cache sind `style.css?v=98` und
+ * `style.css?v=103` ZWEI verschiedene Einträge: der Service-Worker lud beim
+ * Installieren drei Dateien in den Vorrat, die keine Seite je anfragt — und
+ * genau die, die sie braucht, lagen nicht darin. Ein Erstbesucher, der sofort
+ * offline geht, bekam eine Seite ohne Gestaltung.
+ *
+ * Wieder derselbe Fehlertyp wie die anderen dieser Woche: ein Wächter, der
+ * grün ist, weil er an der Stelle absichtlich wegsieht, an der es bricht.
+ * Deshalb hier eine eigene Prüfung, die die ROHE Liste ansieht. */
+{
+  const rohCore = (/var\s+CORE\s*=\s*\[([\s\S]*?)\]/.exec(swNow) || [])[1] || "";
+  const falsch = [...rohCore.matchAll(/"([^"]+\?v=(\d+))"/g)]
+    .filter((m) => m[2] !== assetV)
+    .map((m) => m[1]);
+  ok(falsch.length === 0,
+    falsch.length === 0
+      ? `alle ?v= in der CORE-Liste tragen ${assetV}`
+      : `CORE-Liste hängt auf alter Version: ${falsch.join(", ")} (erwartet ?v=${assetV}) — der Vorrat holt dann Adressen, die keine Seite anfragt`);
+}
+
 const htmlFiles = [];
 for (const dir of [repoRoot, resolve(repoRoot, "werkzeuge")]) {
   for (const f of readdirSync(dir)) if (f.endsWith(".html")) htmlFiles.push(resolve(dir, f));
