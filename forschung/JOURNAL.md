@@ -21,6 +21,76 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-16 · family-projekt.de (Start) (Computer)
+
+<https://family-projekt.de/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 55 → 77** (↑ 22, am 2026-08-19 noch 76)
+
+> Gesehen am 2026-08-16, **bestätigt durch die Messung vom 2026-08-19**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: JavaScript komprimieren
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-16 · WorkFloh (Schaufenster)
+
+<https://lausiklauskn-png.github.io/Mein-Workfloh-Page/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 65 → 100** (↑ 35, am 2026-08-19 noch 98)
+
+> Gesehen am 2026-08-16, **bestätigt durch die Messung vom 2026-08-19**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.
+- Beanstandung weg: gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien
+- Beanstandung weg: leistung: Reduziere nicht verwendetes JavaScript
+- Beanstandung weg: leistung: Total Blocking Time
+- Beanstandung neu: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-16 · WorkFloh (Schaufenster) (Computer)
+
+<https://lausiklauskn-png.github.io/Mein-Workfloh-Page/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 61 → 100** (↑ 39, am 2026-08-19 noch 96)
+
+> Gesehen am 2026-08-16, **bestätigt durch die Messung vom 2026-08-19**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.
+- Beanstandung weg: gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien
+- Beanstandung weg: leistung: Reduziere nicht verwendetes JavaScript
+- Beanstandung weg: leistung: Total Blocking Time
+- Beanstandung neu: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-17 · Alis Moderaum
+
+<https://lausiklauskn-png.github.io/Alis-Moderaum/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 96 → 72** (↓ 24, am 2026-08-19 noch 52)
+
+> Gesehen am 2026-08-17, **bestätigt durch die Messung vom 2026-08-19**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Bildübermittlung verbessern
+- Beanstandung neu: leistung: Verursacher von Layout Shifts
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-08-18 · Private Brain
+
+<https://lausiklauskn-png.github.io/Privat-Brain/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 97 → 66** (↓ 31, am 2026-08-19 noch 74)
+
+> Gesehen am 2026-08-18, **bestätigt durch die Messung vom 2026-08-19**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Bildübermittlung verbessern
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Reduziere nicht verwendetes JavaScript
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-17 · Jasons-Tresor
 
 <https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights

@@ -1040,6 +1040,23 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 96,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -1642,29 +1659,28 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 74,
+     "bedienbarkeit": 91,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Dokument hat keine Hauptmarkierung.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
     }
-   ],
-   "verdacht": {
-    "gesehen": "2026-08-18",
-    "sprung": [
-     {
-      "k": "leistung",
-      "alt": 97,
-      "neu": 66,
-      "d": -31
-     }
-    ],
-    "weg": [
-     "leistung: Bildübermittlung verbessern",
-     "leistung: Erzwungener dynamischer Umbruch"
-    ],
-    "dazu": [
-     "leistung: JavaScript komprimieren",
-     "leistung: Reduziere nicht verwendetes JavaScript"
-    ],
-    "quelle": "google",
-    "quellwechsel": null
-   }
+   ]
   },
   "markt-workfloh": {
    "name": "WorkFloh",
@@ -1733,7 +1749,7 @@
     },
     {
      "von": "2026-08-15",
-     "bis": "2026-08-17",
+     "bis": "2026-08-19",
      "leistung": 98,
      "bedienbarkeit": 96,
      "gute_praxis": 96,
@@ -2619,23 +2635,43 @@
       "leistung: JavaScript komprimieren",
       "leistung: Verursacher von Layout Shifts"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 52,
+     "bedienbarkeit": 94,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Überschriftenelemente sind nicht in einer fortlaufenden absteigenden Reihenfolge angeordnet",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Largest Contentful Paint"
+     ]
     }
    ],
    "verdacht": {
-    "gesehen": "2026-08-17",
+    "gesehen": "2026-08-19",
     "sprung": [
      {
       "k": "leistung",
-      "alt": 96,
-      "neu": 72,
-      "d": -24
+      "alt": 72,
+      "neu": 52,
+      "d": -20
      }
     ],
     "weg": [
-     "leistung: Bildübermittlung verbessern"
+     "leistung: Verursacher von Layout Shifts"
     ],
     "dazu": [
-     "leistung: Verursacher von Layout Shifts"
+     "leistung: Largest Contentful Paint"
     ],
     "quelle": "google",
     "quellwechsel": null
@@ -3221,7 +3257,7 @@
    "punkte": [
     {
      "von": "2026-08-06",
-     "bis": "2026-08-16",
+     "bis": "2026-08-19",
      "leistung": 100,
      "bedienbarkeit": 84,
      "gute_praxis": 100,
@@ -3628,31 +3664,26 @@
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 98,
+     "bedienbarkeit": 96,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
-   ],
-   "verdacht": {
-    "gesehen": "2026-08-16",
-    "sprung": [
-     {
-      "k": "leistung",
-      "alt": 65,
-      "neu": 100,
-      "d": 35
-     }
-    ],
-    "weg": [
-     "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
-     "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
-     "leistung: Reduziere nicht verwendetes JavaScript",
-     "leistung: Total Blocking Time"
-    ],
-    "dazu": [
-     "leistung: JavaScript komprimieren",
-     "leistung: Netzwerkabhängigkeitsbaum"
-    ],
-    "quelle": "google",
-    "quellwechsel": null
-   }
+   ]
   },
   "eigen-sage-pinnwand--computer": {
    "name": "Sage · Pinnwand (Computer)",
@@ -3801,7 +3832,7 @@
     },
     {
      "von": "2026-08-15",
-     "bis": "2026-08-17",
+     "bis": "2026-08-19",
      "leistung": 98,
      "bedienbarkeit": 94,
      "gute_praxis": 96,
@@ -4008,27 +4039,25 @@
       "leistung: JavaScript komprimieren",
       "leistung: Verursacher von Layout Shifts"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 76,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Verursacher von Layout Shifts"
+     ]
     }
-   ],
-   "verdacht": {
-    "gesehen": "2026-08-16",
-    "sprung": [
-     {
-      "k": "leistung",
-      "alt": 55,
-      "neu": 77,
-      "d": 22
-     }
-    ],
-    "weg": [
-     "leistung: Erzwungener dynamischer Umbruch"
-    ],
-    "dazu": [
-     "leistung: JavaScript komprimieren"
-    ],
-    "quelle": "google",
-    "quellwechsel": null
-   }
+   ]
   },
   "eigen-workfloh-page--computer": {
    "name": "WorkFloh (Schaufenster) (Computer)",
@@ -4067,31 +4096,25 @@
       "leistung: JavaScript komprimieren",
       "leistung: Netzwerkabhängigkeitsbaum"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 96,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
-   ],
-   "verdacht": {
-    "gesehen": "2026-08-16",
-    "sprung": [
-     {
-      "k": "leistung",
-      "alt": 61,
-      "neu": 100,
-      "d": 39
-     }
-    ],
-    "weg": [
-     "bedienbarkeit: Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend.",
-     "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
-     "leistung: Reduziere nicht verwendetes JavaScript",
-     "leistung: Total Blocking Time"
-    ],
-    "dazu": [
-     "leistung: JavaScript komprimieren",
-     "leistung: Netzwerkabhängigkeitsbaum"
-    ],
-    "quelle": "google",
-    "quellwechsel": null
-   }
+   ]
   },
   "eigen-family-werkzeuge--computer": {
    "name": "family-projekt.de (Werkzeuge) (Computer)",
@@ -4471,6 +4494,23 @@
       "bedienbarkeit: Links sind durch Farbe erkennbar.",
       "leistung: JavaScript komprimieren"
      ]
+    },
+    {
+     "von": "2026-08-19",
+     "bis": "2026-08-19",
+     "leistung": 100,
+     "bedienbarkeit": 94,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.4.1",
+     "mangel": [
+      "bedienbarkeit: Dokument hat keine Hauptmarkierung.",
+      "bedienbarkeit: Links sind durch Farbe erkennbar.",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren"
+     ]
     }
    ]
   },
@@ -4497,5 +4537,5 @@
    ]
   }
  },
- "gepflegt": "2026-08-18"
+ "gepflegt": "2026-08-19"
 }
