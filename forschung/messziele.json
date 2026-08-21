@@ -161,6 +161,13 @@
       "repo": "SP-FP-md-Speicher",
       "aktiv": false,
       "grund": "Ablage für Markdown-Dateien, keine Seite — nichts zu messen."
+    },
+    {
+      "id": "eigen-toolpoint-pruefer",
+      "name": "Auslieferungsprüfer (PWA Toolpoint)",
+      "url": "https://pwa-toolpoint.de/auslieferungspruefer.html",
+      "repo": "PWA-Toolpoint",
+      "aktiv": true
     }
   ]
 }
