@@ -133,6 +133,43 @@ family-projekt.de, www.family-projekt.de {
 	@models path /models/*
 	header @models Access-Control-Allow-Origin "*"
 
+	# ── Von aussen PRÜFBAR machen (2026-08-23) ───────────────────────────
+	# ⚠ STAND: im Repo eingetragen, am Server NOCH NICHT eingespielt.
+	# Wer das liest und es nicht selbst nachgemessen hat: eine Vorlage im
+	# Repo ist kein Beweis für den Server. Nachweis-Befehl steht unten.
+	#
+	# ANLASS: Klaus hat am 2026-08-23 versucht, family-projekt.de mit dem
+	# Auslieferungsprüfer (pwa-toolpoint.de) zu prüfen, und bekam „Der
+	# Browser lässt diese Seite nicht lesen". Sein Befund, wörtlich:
+	# „fP lässt sich nicht hohlen." Sage-Protokol ging, weil GitHub Pages
+	# diesen Kopf von sich aus mitschickt — dieser Server nicht.
+	#
+	# WARUM DAS HIER UNBEDENKLICH IST, und zwar genau hier:
+	#   · Die Seiten sind ÖFFENTLICH. Wer sie lesen will, holt sie ohnehin
+	#     mit einem einzigen `curl`. Dieser Kopf erlaubt nur, dass ein
+	#     BROWSER sie im Auftrag einer anderen Seite liest.
+	#   · Es gibt hier nichts Angemeldetes. Kein Konto, keine Sitzung, kein
+	#     Keks — es gibt also nichts, was jemand „im Namen des Nutzers"
+	#     abholen könnte. Genau davor schützt diese Sperre sonst.
+	#   · `Access-Control-Allow-Credentials` steht bewusst NICHT dabei. Mit
+	#     ihm zusammen wäre der Kopf eine echte Öffnung; allein ist er es
+	#     nicht.
+	#   · `/server/*` liefert weiter 404 (der handle-Block oben). Der Kopf
+	#     kommt dort nie an, und er darf es auch nie: dort lägen die
+	#     PHP-Endpunkte samt Token.
+	#
+	# ⚠ WER DIESE REGEL AUSWEITET, PRÜFT ZUERST /server/. Ein
+	# Access-Control-Kopf auf einer API, die etwas TUT, ist etwas völlig
+	# anderes als einer auf einer Seite, die nur dasteht.
+	#
+	# Nachweis nach dem Einspielen:
+	#     curl -sI https://family-projekt.de/ | grep -i access-control
+	#     -> access-control-allow-origin: *
+	#     curl -sI https://family-projekt.de/server/freigabe.php | head -1
+	#     -> HTTP/2 404      (MUSS 404 bleiben)
+	@lesbar path *.html /
+	header @lesbar Access-Control-Allow-Origin "*"
+
 	header {
 		X-Content-Type-Options "nosniff"
 		Referrer-Policy "no-referrer-when-downgrade"
@@ -143,6 +180,28 @@ family-projekt.de, www.family-projekt.de {
 family-projekt.com, www.family-projekt.com {
 	redir https://family-projekt.de{uri} permanent
 }
+
+# ── ⚠ WAS IN DIESEM SPIEGEL FEHLT (Befund 2026-08-23) ────────────────────────
+#
+# Klaus: „pwa toolpoint ist auch auf meinem server."
+#
+# In dieser Datei steht dazu NUR `relay.pwa-toolpoint.de` (das Relais). Ein
+# Site-Block für `pwa-toolpoint.de` selbst — die Marktplatz-Seite — steht hier
+# nicht. Entweder liegt er am Server und ist hier nie nachgetragen worden, oder
+# die Seite wird anders ausgeliefert.
+#
+# Das ist genau die Falle, vor der der Kopf dieser Datei warnt: **eine Vorlage
+# im Repo ist kein Beweis für die Wirklichkeit.** Hier wird sie nicht geraten,
+# sondern benannt und offen gelassen. Wer sie schließt, holt sich den echten
+# Stand und trägt ihn ein:
+#
+#     ssh <server> 'cat /opt/relay/Caddyfile' > Caddyfile.example
+#
+# WARUM ES FÜR DEN AUSLIEFERUNGSPRÜFER ZÄHLT: liegen beide Seiten auf demselben
+# Caddy, ist es EINE Datei, die Klaus anfasst — der `@lesbar`-Block oben gehört
+# dann in den `family-projekt.de`-Block, damit pwa-toolpoint.de ihn lesen darf.
+# Und wenn pwa-toolpoint.de dort einen eigenen Block hat, braucht er denselben
+# Kopf, sobald jemand IHN von aussen prüfen will.
 
 # ── Bewusst NICHT enthalten ───────────────────────────────────────────────────
 #
