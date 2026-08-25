@@ -1,6 +1,6 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-08-24T03:00:09.932Z",
+  "geprueft": "2026-08-25T02:59:48.979Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
@@ -30,10 +30,15 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-24",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
+          {
+            "k": "leistung",
+            "t": "CSS komprimieren",
+            "ms": 150
+          },
           {
             "k": "leistung",
             "t": "Effiziente Verweildauer im Cache verwenden"
@@ -41,10 +46,6 @@
           {
             "k": "leistung",
             "t": "Netzwerkabhängigkeitsbaum"
-          },
-          {
-            "k": "leistung",
-            "t": "Bildübermittlung verbessern"
           },
           {
             "k": "gute_praxis",
@@ -83,6 +84,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-24",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -101,7 +103,6 @@
             "t": "Erzwungener dynamischer Umbruch"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
       }
     },
@@ -129,70 +130,34 @@
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
       },
       "messung": {
-        "leistung": 98,
+        "leistung": 68,
         "bedienbarkeit": 97,
-        "gute_praxis": 96,
+        "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-08-22",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Netzwerkabhängigkeitsbaum"
+            "t": "JavaScript komprimieren",
+            "ms": 600
           },
           {
             "k": "leistung",
-            "t": "Effiziente Verweildauer im Cache verwenden"
+            "t": "Reduziere nicht verwendetes JavaScript",
+            "ms": 150
           },
           {
             "k": "leistung",
-            "t": "Bildübermittlung verbessern"
+            "t": "Largest Contentful Paint"
           },
           {
             "k": "bedienbarkeit",
             "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
-          },
-          {
-            "k": "gute_praxis",
-            "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "frisch": {
-          "leistung": 64,
-          "bedienbarkeit": 97,
-          "gute_praxis": 100,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-08-24",
-          "quelle": "google",
-          "werkzeug": "13.4.1",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "JavaScript komprimieren",
-              "ms": 600
-            },
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendetes JavaScript",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Largest Contentful Paint"
-            },
-            {
-              "k": "bedienbarkeit",
-              "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 2,
-          "noetig": 3,
-          "seit": "2026-08-23"
-        },
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
       }
     },
@@ -252,14 +217,14 @@
           "bedienbarkeit": 100,
           "gute_praxis": 96,
           "auffindbarkeit": 100,
-          "gemessen": "2026-08-24",
+          "gemessen": "2026-08-25",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
             {
               "k": "leistung",
               "t": "JavaScript komprimieren",
-              "ms": 600
+              "ms": 620
             },
             {
               "k": "leistung",
@@ -277,7 +242,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-08-24"
         },
@@ -287,7 +252,7 @@
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
-          "gemessen": "2026-08-24",
+          "gemessen": "2026-08-25",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
@@ -333,33 +298,32 @@
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
       },
       "messung": {
-        "leistung": 96,
+        "leistung": 100,
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-08-23",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "Reduziere nicht verwendetes JavaScript",
-            "ms": 450
-          },
-          {
-            "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
-          },
-          {
-            "k": "leistung",
             "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
           },
           {
             "k": "gute_praxis",
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
       }
     },
@@ -391,6 +355,7 @@
         "bedienbarkeit": 93,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-24",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -424,7 +389,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kimseek/"
       }
     },
@@ -438,7 +402,7 @@
       "neuerText": "Kimboard — semantische Pinnwand: Fragen und Notizen an ein geborgtes „dummes Brett“ (Nostr) heften, geräteübergreifend und nach Bedeutung sortiert. Merken, Notizen, Frage-Antwort — server-los direkt im Browser, ohne Server und ohne Konto.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -459,7 +423,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "gemessen": "2026-08-24",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -470,11 +434,12 @@
           },
           {
             "k": "leistung",
-            "t": "Effiziente Verweildauer im Cache verwenden"
+            "t": "JavaScript komprimieren",
+            "ms": 150
           },
           {
             "k": "leistung",
-            "t": "Verursacher von Layout Shifts"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "gute_praxis",
@@ -512,27 +477,26 @@
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
       },
       "messung": {
-        "leistung": 99,
+        "leistung": 100,
         "bedienbarkeit": 91,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-08-22",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "JavaScript komprimieren",
+            "t": "Reduziere nicht verwendetes JavaScript",
             "ms": 150
           },
           {
             "k": "leistung",
-            "t": "Effiziente Verweildauer im Cache verwenden"
+            "t": "Netzwerkabhängigkeitsbaum"
           },
           {
             "k": "leistung",
-            "t": "Bildübermittlung verbessern"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "bedienbarkeit",
@@ -551,6 +515,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
       }
     },
@@ -586,8 +551,7 @@
         "bedienbarkeit": 96,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-08-23",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -613,6 +577,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
       }
     },
@@ -637,6 +602,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-24",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -663,13 +629,13 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
         "schaufenster": {
           "leistung": 98,
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
+          "stand": "gemessen",
           "gemessen": "2026-08-24",
           "quelle": "google",
           "werkzeug": "13.4.1",
@@ -687,7 +653,6 @@
               "t": "Netzwerkabhängigkeitsbaum"
             }
           ],
-          "stand": "gemessen",
           "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
         }
       }
@@ -709,12 +674,11 @@
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
       },
       "messung": {
-        "leistung": 89,
+        "leistung": 88,
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-08-21",
+        "gemessen": "2026-08-25",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -740,50 +704,14 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "frisch": {
-          "leistung": 88,
-          "bedienbarkeit": 100,
-          "gute_praxis": 96,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-08-24",
-          "quelle": "google",
-          "werkzeug": "13.4.1",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendetes JavaScript",
-              "ms": 600
-            },
-            {
-              "k": "leistung",
-              "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "leistung",
-              "t": "Bildübermittlung verbessern"
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Es wurden Browserfehler in der Konsole protokolliert"
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 2,
-          "noetig": 3,
-          "seit": "2026-08-23"
-        },
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
         "schaufenster": {
           "leistung": 100,
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
-          "gemessen": "2026-08-24",
+          "gemessen": "2026-08-25",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
@@ -877,6 +805,7 @@
         "bedienbarkeit": 94,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-08-24",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -911,7 +840,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
       }
     },
@@ -936,7 +864,7 @@
         "bedienbarkeit": 87,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-08-23",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -962,6 +890,7 @@
             "t": "Die Formularelemente sind nicht mit Labels verknüpft"
           }
         ],
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
       }
     }
@@ -972,8 +901,8 @@
     "rot": 0
   },
   "messungZaehler": {
-    "gemessen": 12,
-    "veraltet": 2,
+    "gemessen": 11,
+    "veraltet": 3,
     "nicht_gemessen": 0
   }
 }
