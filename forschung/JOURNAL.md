@@ -21,6 +21,20 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-08-27 · Jasons-Tresor
+
+<https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 60 → 98** (↑ 38, am 2026-08-28 noch 96)
+
+> Gesehen am 2026-08-27, **bestätigt durch die Messung vom 2026-08-28**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung weg: leistung: Largest Contentful Paint
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-08-24 · Jasons-Tresor
 
 <https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
