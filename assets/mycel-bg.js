@@ -129,10 +129,12 @@ if (canvas) {
       uColorMid:  { value: new THREE.Color(0xa78bfa) },
       uAlpha:     { value: 0.42 },
       uMouse:     { value: new THREE.Vector2(2, 2) }, // weit weg → kein Boost
+      uSchein:    { value: 0 },                     // 0 = aus, 1 = voll da
       uPxRatio:   { value: renderer.getPixelRatio() }
     },
     vertexShader: /* glsl */`
       uniform float uTime; uniform float uPxRatio; uniform vec2 uMouse;
+      uniform float uSchein;
       attribute float aSeed; attribute float aSize;
       varying float vMix; varying float vAlpha;
       void main() {
@@ -158,7 +160,7 @@ if (canvas) {
            CSS zu holen und Text neu zu zeichnen, waehrend der Finger sich
            bewegt. Schmuck weicht dem Inhalt, nicht umgekehrt. */
         vec2 ndc = gl_Position.xy / gl_Position.w;
-        float nearC = smoothstep(0.22, 0.0, distance(ndc, uMouse));
+        float nearC = smoothstep(0.22, 0.0, distance(ndc, uMouse)) * uSchein;
         gl_PointSize = aSize * breath * (220.0 / -mv.z) * uPxRatio * (1.0 + nearC * 0.45);
         vMix = aSeed;
         float pulse = sin(t * 2.4 + aSeed * 31.4159);
@@ -262,17 +264,102 @@ if (canvas) {
    * eine Beruehrung zieht den Schein danach wieder weg. Die Maus darf ihn
    * behalten, solange sie im Fenster ist: dort ist er gewollt und folgt
    * ohnehin.                                                              */
+  /* ── ER LAEUFT NACH, ER KLEBT NICHT (Klaus 2026-09-02) ─────────────────
+   *
+   * Klaus, nachdem der Schein klein und dunkel genug war: "jetzt lenkt es
+   * sehr ab von der Mausbewegung, weil sich das genauso bewegt wie die Maus.
+   * Man schaut dann mehr auf den Lichteffekt als auf die Maus."
+   *
+   * Ein Licht, das exakt auf dem Zeiger sitzt, ist ein zweiter Zeiger. Es
+   * zieht deshalb hinterher und laeuft aus, statt mitzuspringen.
+   *
+   * ZWEI Zeitkonstanten, weil es zwei Bewegungen sind:
+   *   POSITION — wie weit es hinterherhaengt, waehrend die Maus laeuft.
+   *   AUSLAUF  — wie lange es nachglimmt, wenn der Zeiger weg ist.
+   * Das Wegnehmen ist bewusst traeger als das Folgen: abruptes Ausgehen
+   * faellt genauso auf wie abruptes Mitspringen.
+   *
+   * Gefadet wird die STAERKE, nicht die Position. Den Punkt stattdessen aus
+   * dem Bild zu schieben hiesse, den Schein quer ueber den Schirm zu ziehen
+   * — sichtbarer als das, was er ersetzen soll.
+   *
+   * Zeitkonstanten statt fester Schritte pro Bild: bei 30 und bei 120
+   * Bildern/s dauert es dann gleich lang. Ein Schritt "mal 0,1 je Bild"
+   * waere auf einem langsamen Geraet viermal traeger.                     */
+  const SCHEIN_FOLGT = 0.16;   // Sekunden bis rund zwei Drittel aufgeholt
+  const SCHEIN_AUSLAUF = 0.42; // Sekunden zum Verglimmen
+
+  const zielMaus = new THREE.Vector2(2, 2);
+  let zielSchein = 0;
+
+  /* Ohne laufende Schleife gibt es nichts zu ueberblenden: bei "Bewegung
+     reduzieren", bei gedruecktem Pause-Knopf und nach der Selbst-Bremse
+     wird der Wert sofort gesetzt und einmal gezeichnet. Ein Nachlauf, den
+     niemand rechnet, bliebe sonst auf halbem Weg stehen. */
+  function scheinSofort() {
+    mat.uniforms.uMouse.value.copy(zielMaus);
+    mat.uniforms.uSchein.value = zielSchein;
+    requestAnimationFrame(renderOnce);
+  }
+
+  /* ⚠ WENN DIE SCHLEIFE ENDET, GEHT DAS LICHT AUS — und zwar in derselben
+   * Zeile, in der sie endet.
+   *
+   * Gemessen am 2026-09-02: haelt die Selbst-Bremse an, waehrend der Schein
+   * gerade nachzieht, bleibt er stehen, wo er ist. Voll aufgedreht, mitten
+   * im Bild, und nichts holt ihn je wieder ab — genau der geparkte Fleck aus
+   * Klaus' Bildschirmfoto, nur mit einer anderen Ursache davor.
+   *
+   * Es geht AUS statt einzufrieren, weil auf so einem Geraet jedes einzelne
+   * Bild 180 bis 255 ms kostet. Den Schein weiter mitzuziehen hiesse, bei
+   * jeder Mausbewegung genau die Arbeit zu machen, wegen der die Bremse
+   * gerade angehalten hat.                                                */
+  function scheinAus() {
+    zielSchein = 0;
+    mat.uniforms.uSchein.value = 0;
+  }
+
+  /* DREI Wege halten die Schleife an: der Pause-Knopf, die Selbst-Bremse und
+   * der Pausen-Zweig in der Schleife selbst. Alle drei gehen durch hier
+   * hindurch, damit ein vierter das Licht nicht vergessen kann — beim ersten
+   * Anlauf hatte genau einer es vergessen, und der Knopf liess einen hellen
+   * Fleck stehen. Bewacht wird die Zusicherung, nicht die Zeile.          */
+  function schleifeAnhalten() {
+    laeuft = false;
+    scheinAus();
+    renderOnce();              // ein letztes, stehendes Bild
+  }
+
+  /* Wieviel des Rueckstands in `dt` Sekunden aufgeholt wird. Eine eigene
+   * Funktion, damit die Probe GENAU DIESE Rechnung pruefen kann statt eine
+   * abgeschriebene zweite Fassung davon. */
+  function scheinFaktor(dt, tau) { return Math.min(1 - Math.exp(-dt / tau), 1); }
+
+  function scheinNachfuehren(dt) {
+    const u = mat.uniforms;
+    u.uMouse.value.lerp(zielMaus, scheinFaktor(dt, SCHEIN_FOLGT));
+    const staerker = zielSchein > u.uSchein.value;
+    u.uSchein.value += (zielSchein - u.uSchein.value)
+      * scheinFaktor(dt, staerker ? SCHEIN_FOLGT : SCHEIN_AUSLAUF);
+  }
+
   const scheinWeg = () => {
-    mat.uniforms.uMouse.value.set(2, 2);   // weit weg → kein Boost
-    if (reduce) requestAnimationFrame(renderOnce);
+    zielSchein = 0;                        // verglimmt, statt wegzuspringen
+    /* Ohne Schleife gibt es nichts zu ueberblenden. Gezeichnet wird dann nur
+       bei "Bewegung reduzieren" — dort ist ein Bild je Zeigerbewegung
+       gewollt. Steht der Hintergrund wegen der Pause oder der Bremse, bleibt
+       das Bild, wie es ist: dort waere jedes Bild genau die Last, die man
+       gerade eingespart hat. */
+    if (!laeuft && reduce) scheinSofort();
   };
 
   window.addEventListener('pointermove', (e) => {
-    mat.uniforms.uMouse.value.set(
+    zielMaus.set(
       (e.clientX / window.innerWidth) * 2 - 1,
       -((e.clientY / window.innerHeight) * 2 - 1)
     );
-    if (reduce) requestAnimationFrame(renderOnce);
+    zielSchein = 1;
+    if (!laeuft && reduce) scheinSofort();
   }, { passive: true });
 
   window.addEventListener('pointerleave', scheinWeg, { passive: true });
@@ -345,7 +432,7 @@ if (canvas) {
     /* Der Schalter greift HIER, nicht erst beim naechsten Bild: sonst liefe
        die Schleife nach dem Druck noch weiter, und der Knopf saehe aus, als
        haette er nichts getan. */
-    if (typeof pausiert !== 'undefined' && pausiert) { laeuft = false; renderOnce(); return; }
+    if (typeof pausiert !== 'undefined' && pausiert) { schleifeAnhalten(); return; }
 
     const now = performance.now();
     const dt = (now - last) / 1000; last = now;
@@ -353,12 +440,12 @@ if (canvas) {
     if (bilderGezaehlt++ >= AUFWAERM_BILDER) {
       if (dt > BREMS_SCHWELLE) langsamInFolge++; else langsamInFolge = 0;
       if (langsamInFolge >= BREMS_GEDULD) {
-        laeuft = false;
-        renderOnce();            // ein letztes, stehendes Bild
+        schleifeAnhalten();
         return;                  // Schleife endet — kein Dauerlauf mehr
       }
     }
 
+    scheinNachfuehren(dt);
     mat.uniforms.uTime.value = now / 1000;
     mycelGroup.rotation.y += dt * 0.02;
     applyScroll();
@@ -401,12 +488,28 @@ if (canvas) {
     umschalten: function () {
       pausiert = !pausiert;
       try { localStorage.setItem(PAUSE_SCHLUESSEL, pausiert ? 'ja' : 'nein'); } catch (_e) {}
-      if (pausiert) { laeuft = false; renderOnce(); }
+      if (pausiert) schleifeAnhalten();
       else schleifeStarten();
       return pausiert;
     },
     /** Nur fuer die Probe: laeuft die Schleife wirklich? */
     laeuft: function () { return laeuft; },
+  };
+
+  /* Nur zum NACHSEHEN, nie zum Auslösen: die Probe misst damit, ob der
+   * Schein wirklich hinterherhängt, statt es aus dem Quelltext zu schließen.
+   * Ein Haken, der etwas ANSTOESST, würde einen Weg messen, den kein Nutzer
+   * geht — dieser liest nur, was ohnehin dasteht.                         */
+  window.MycelBg.scheinFaktor = scheinFaktor;
+  window.MycelBg.scheinZeiten = function () {
+    return { folgt: SCHEIN_FOLGT, auslauf: SCHEIN_AUSLAUF };
+  };
+  window.MycelBg.schein = function () {
+    return {
+      x: mat.uniforms.uMouse.value.x, y: mat.uniforms.uMouse.value.y,
+      staerke: mat.uniforms.uSchein.value,
+      zielX: zielMaus.x, zielY: zielMaus.y, zielStaerke: zielSchein,
+    };
   };
 
   /* Der Knopf in der Kopfleiste wird vor uns gebaut. Er soll nicht raten,

@@ -68,9 +68,10 @@ probe "ein Startfehler wird stumm verschluckt" assets/mycel-bg.js \
   "s/\.catch((e) => { try { console.warn('\[mycel-bg\] nicht gestartet:', e); } catch (_e) {} });/.catch(() => {});/"
 
 # 3 · Die Pause versteckt nur, statt die Schleife anzuhalten.
+#     Alle Halte-Wege gehen durch schleifeAnhalten() — ein Eingriff dort
+#     trifft die Zusicherung selbst, statt einen von drei Wegen.
 probe "die Pause hält die Schleife NICHT mehr an" assets/mycel-bg.js \
-  "s/if (pausiert) { laeuft = false; renderOnce(); }/if (pausiert) { renderOnce(); }/" \
-  "s/^    if (typeof pausiert !== 'undefined' \&\& pausiert) { laeuft = false; renderOnce(); return; }//"
+  "s/^    laeuft = false;$//"
 
 # 4 · Die Wahl wird nicht mehr gespeichert.
 probe "die Wahl überlebt das Neuladen nicht" assets/mycel-bg.js \
@@ -100,6 +101,24 @@ probe "der Lichtschein ist wieder so grell wie vorher" assets/mycel-bg.js \
 probe "der Schein bleibt nach dem Loslassen wieder stehen" assets/mycel-bg.js \
   "s/window.addEventListener('pointerup', (e) => {/window.addEventListener('pointerupNIE', (e) => {/" \
   "s/window.addEventListener('pointercancel', scheinWeg, { passive: true });//"
+
+# 10 · Der Schein klebt wieder an der Maus, statt nachzulaufen.
+probe "der Schein klebt wieder am Zeiger" assets/mycel-bg.js \
+  "s/u.uMouse.value.lerp(zielMaus, scheinFaktor(dt, SCHEIN_FOLGT));/u.uMouse.value.copy(zielMaus);/"
+
+# 11 · Er springt aus, statt zu verglimmen.
+probe "er springt aus, statt zu verglimmen" assets/mycel-bg.js \
+  "s/^  const SCHEIN_AUSLAUF = 0.42;.*$/  const SCHEIN_AUSLAUF = 0.02;/"
+
+# 12 · Die Traegheit haengt wieder an der Bildrate statt an der Zeit.
+probe "die Traegheit haengt wieder an der Bildrate" assets/mycel-bg.js \
+  "s|return Math.min(1 - Math.exp(-dt / tau), 1);|return 0.12;|"
+
+# 13 · Jeder Ausstieg aus der Schleife laesst den Schein stehen.
+#      Alle drei Wege gehen durch schleifeAnhalten() — also EIN Eingriff,
+#      der die Zusicherung trifft, statt drei, die einander decken.
+probe "jeder Halt der Schleife laesst einen hellen Fleck stehen" assets/mycel-bg.js \
+  "s/^    scheinAus();$//"
 
 echo
 echo "$gruen gefangen, $blind durchgerutscht"
