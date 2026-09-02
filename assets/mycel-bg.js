@@ -144,13 +144,25 @@ if (canvas) {
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         float breath = 0.85 + 0.25 * sin(t * 1.4);
         gl_Position = projectionMatrix * mv;
-        // Sterne nahe der Maus werden heller + etwas größer (Klaus 2026-06-27)
+        /* Sterne nahe dem Zeiger werden heller und etwas groesser
+           (Klaus 2026-06-27), seit dem 2026-09-02 deutlich zurueckgenommen.
+           
+           ⚠ DER RADIUS WAR DER EIGENTLICHE FEHLER. Gemessen wird hier in
+           Bildschirm-Koordinaten von -1 bis 1. Ein Radius von 0.5 ist also
+           ein VIERTEL der Bildbreite in jede Richtung, und der Schein deckte
+           damit die halbe Seite. Klaus am 2026-09-02: "man kann die Schrift
+           dahinter kaum lesen."
+           
+           Gegen eine Flaeche dieser Groesse gewinnt keine Schriftfarbe. Die
+           Schrift dunkler zu machen hiesse ausserdem, die Zeigerposition ins
+           CSS zu holen und Text neu zu zeichnen, waehrend der Finger sich
+           bewegt. Schmuck weicht dem Inhalt, nicht umgekehrt. */
         vec2 ndc = gl_Position.xy / gl_Position.w;
-        float nearC = smoothstep(0.5, 0.0, distance(ndc, uMouse));
-        gl_PointSize = aSize * breath * (220.0 / -mv.z) * uPxRatio * (1.0 + nearC * 0.9);
+        float nearC = smoothstep(0.22, 0.0, distance(ndc, uMouse));
+        gl_PointSize = aSize * breath * (220.0 / -mv.z) * uPxRatio * (1.0 + nearC * 0.45);
         vMix = aSeed;
         float pulse = sin(t * 2.4 + aSeed * 31.4159);
-        vAlpha = 0.10 + 0.55 * pow(max(pulse, 0.0), 4.0) + nearC * 0.75;
+        vAlpha = 0.10 + 0.55 * pow(max(pulse, 0.0), 4.0) + nearC * 0.30;
       }
     `,
     fragmentShader: /* glsl */`
@@ -238,7 +250,23 @@ if (canvas) {
     if (reduce) requestAnimationFrame(renderOnce);
   }, { passive: true });
 
-  // Maus-Position (NDC) an den Shader → Sterne unter der Maus leuchten heller.
+  /* ── DER ZEIGER-SCHEIN, UND WARUM ER AUF DEM TABLET GEPARKT HAT ─────────
+   *
+   * Bis zum 2026-09-02 stand hier nur `pointerleave` am Fenster. Das feuert
+   * auf einem Tablet beim Fingerheben NICHT. Der Schein blieb also genau
+   * dort stehen, wo zuletzt getippt wurde, und lag als heller Fleck ueber
+   * dem Text. Klaus hat es an genau der Stelle beschrieben: "sehr hell an
+   * den Stellen, wo er stoppt."
+   *
+   * Deshalb wird jetzt auch auf `pointerup` und `pointercancel` gehoert, und
+   * eine Beruehrung zieht den Schein danach wieder weg. Die Maus darf ihn
+   * behalten, solange sie im Fenster ist: dort ist er gewollt und folgt
+   * ohnehin.                                                              */
+  const scheinWeg = () => {
+    mat.uniforms.uMouse.value.set(2, 2);   // weit weg → kein Boost
+    if (reduce) requestAnimationFrame(renderOnce);
+  };
+
   window.addEventListener('pointermove', (e) => {
     mat.uniforms.uMouse.value.set(
       (e.clientX / window.innerWidth) * 2 - 1,
@@ -246,10 +274,14 @@ if (canvas) {
     );
     if (reduce) requestAnimationFrame(renderOnce);
   }, { passive: true });
-  window.addEventListener('pointerleave', () => {
-    mat.uniforms.uMouse.value.set(2, 2);
-    if (reduce) requestAnimationFrame(renderOnce);
+
+  window.addEventListener('pointerleave', scheinWeg, { passive: true });
+  /* Ein gehobener Finger ist ein verlassener Zeiger. Fuer die Maus aendert
+     das nichts: sie bewegt sich weiter und setzt den Wert sofort neu. */
+  window.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse') scheinWeg();
   }, { passive: true });
+  window.addEventListener('pointercancel', scheinWeg, { passive: true });
 
   let curScale = 1;
   function applyScroll() {
@@ -258,7 +290,26 @@ if (canvas) {
     mycelGroup.scale.setScalar(curScale);
   }
 
+  /* ⚠ ERST ZEICHNEN, WENN ALLES STEHT (Befund 2026-09-02).
+   *
+   * `setTheme` malt bei "Bewegung reduzieren" sofort ein Bild — und wird
+   * beim Aufbau gerufen, waehrend die Werte darunter noch gar nicht
+   * angelegt sind. `applyScroll` griff dann auf `scrollY` zu, danach auf
+   * `curScale`: `Cannot access ... before initialization`. Der Fang beim
+   * Import verschluckte den Fehler, also fehlte der Hintergrund bei
+   * "Bewegung reduzieren" KOMMENTARLOS — samt Pause-Schalter.
+   *
+   * Einzelne Namen hochzuziehen kuriert je einen Fall. Dieser Riegel deckt
+   * alle: vor dem Ende des Aufbaus wird nicht gezeichnet, und das Bild
+   * kommt danach ohnehin.
+   *
+   * `var` ist hier Absicht, nicht Nachlaessigkeit: es wird nach oben
+   * gezogen und ist von Anfang an lesbar. Ein `let` faellt in genau die
+   * Falle, die es zuhalten soll — beim ersten Versuch ist es passiert. */
+  var bereit = false;
+
   function renderOnce() {
+    if (!bereit) return;
     applyScroll();
     renderer.render(scene, camera);
   }
@@ -291,12 +342,18 @@ if (canvas) {
   let langsamInFolge = 0, bilderGezaehlt = 0;
 
   function tick() {
+    /* Der Schalter greift HIER, nicht erst beim naechsten Bild: sonst liefe
+       die Schleife nach dem Druck noch weiter, und der Knopf saehe aus, als
+       haette er nichts getan. */
+    if (typeof pausiert !== 'undefined' && pausiert) { laeuft = false; renderOnce(); return; }
+
     const now = performance.now();
     const dt = (now - last) / 1000; last = now;
 
     if (bilderGezaehlt++ >= AUFWAERM_BILDER) {
       if (dt > BREMS_SCHWELLE) langsamInFolge++; else langsamInFolge = 0;
       if (langsamInFolge >= BREMS_GEDULD) {
+        laeuft = false;
         renderOnce();            // ein letztes, stehendes Bild
         return;                  // Schleife endet — kein Dauerlauf mehr
       }
@@ -309,10 +366,59 @@ if (canvas) {
     requestAnimationFrame(tick);
   }
 
-  if (reduce) {
+  /* ── PAUSE-SCHALTER (Klaus 2026-09-02) ──────────────────────────────────
+   *
+   * Regel 3.5 der Bauregeln: Bewegung ist abschaltbar, und der Schalter
+   * merkt sich die Wahl. `prefers-reduced-motion` war bisher der einzige
+   * Weg dorthin, und den stellt niemand fuer eine einzelne Seite um.
+   *
+   * ⚠ ER HAELT DIE SCHLEIFE WIRKLICH AN, statt den Hintergrund nur zu
+   * verstecken. Ein verstecktes Bild rechnet weiter: auf einem Geraet ohne
+   * Grafikbeschleunigung kostet jedes davon 180 bis 255 ms (gemessen, siehe
+   * die Selbst-Bremse darueber). Ein Schalter, der die Last nicht senkt,
+   * waere ein Knopf, der aussieht wie Hilfe.
+   *
+   * Ein STEHENDES Bild bleibt trotzdem: der Hintergrund verschwindet nicht,
+   * er hoert nur auf, sich zu bewegen. Dasselbe, was Geraete mit
+   * "Bewegung reduzieren" von jeher bekommen.                             */
+  const PAUSE_SCHLUESSEL = 'fp_bg_pause';   // App-Suffix: geteilte Adresse
+  let pausiert = false;
+  try { pausiert = localStorage.getItem(PAUSE_SCHLUESSEL) === 'ja'; } catch (_e) {}
+
+  let laeuft = false;
+  function schleifeStarten() {
+    if (laeuft || pausiert || reduce) return;
+    laeuft = true;
+    last = performance.now();
+    langsamInFolge = 0; bilderGezaehlt = 0;   // Bremse neu bewerten
+    requestAnimationFrame(tick);
+  }
+
+  window.MycelBgPause = {
+    /** Wahr, wenn der Hintergrund gerade steht. */
+    steht: function () { return pausiert || reduce; },
+    /** Umschalten. Gibt den neuen Zustand zurueck. */
+    umschalten: function () {
+      pausiert = !pausiert;
+      try { localStorage.setItem(PAUSE_SCHLUESSEL, pausiert ? 'ja' : 'nein'); } catch (_e) {}
+      if (pausiert) { laeuft = false; renderOnce(); }
+      else schleifeStarten();
+      return pausiert;
+    },
+    /** Nur fuer die Probe: laeuft die Schleife wirklich? */
+    laeuft: function () { return laeuft; },
+  };
+
+  /* Der Knopf in der Kopfleiste wird vor uns gebaut. Er soll nicht raten,
+   * wann wir da sind, und er soll auch nicht auf die Uhr sehen. */
+  try { window.dispatchEvent(new Event('fp:bg-bereit')); } catch (_e) {}
+
+  bereit = true;
+
+  if (reduce || pausiert) {
     renderOnce();            // ein statisches Bild
   } else {
-    requestAnimationFrame(tick);
+    schleifeStarten();
   }
 }
 }
@@ -325,7 +431,11 @@ if (canvas) {
     if (keinGrafikchip()) return;
     import('three')
       .then((m) => { mycelBgStarten(m); if (window.MycelBg) { try { window.MycelBg.setTheme(); } catch (_e) {} } })
-      .catch(() => {});
+      /* Der Hintergrund ist Zierde: faellt er aus, laeuft die Seite weiter.
+       * Aber er faellt nicht STUMM aus — ein verschluckter Startfehler war
+       * am 2026-09-02 der Grund, warum der Pause-Schalter bei "Bewegung
+       * reduzieren" fehlte und keine Probe es sah. */
+      .catch((e) => { try { console.warn('[mycel-bg] nicht gestartet:', e); } catch (_e) {} });
   };
   const gleich = () => (window.requestIdleCallback
     ? requestIdleCallback(los, { timeout: 2000 })

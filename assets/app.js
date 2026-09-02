@@ -737,6 +737,75 @@
       if (tb) tb.setAttribute("aria-label",
         nameMitSichtbarem(tb, getLang() === "de" ? "Farbthema wechseln" : "switch colour theme"));
     };
+    /* ── PAUSE-SCHALTER FUER DEN HINTERGRUND (Klaus 2026-09-02) ───────────
+     *
+     * Der Knopf steht fest im HTML, nicht nachtraeglich eingehaengt. Die
+     * Kopfleiste hat `flex-wrap`, und ein spaeter dazukommendes Element
+     * schiebt sie auf eine neue Zeile: 50 px auf einen Schlag, alles
+     * darunter rutscht nach (Bauregeln Layout 1.2).
+     *
+     * ⚠ ER SCHALTET AUCH, WENN DER HINTERGRUND GAR NICHT LAEUFT. Auf einem
+     * Geraet ohne Grafikchip wird three.js nie geholt, und `MycelBgPause`
+     * gibt es dann nicht. Der Knopf sagt das dann und tut nichts, statt
+     * stumm zu bleiben: ein toter Knopf mit Beschriftung ist die schlimmste
+     * Sorte, er sieht aus wie Hilfe. */
+    var pb = document.getElementById("bgPauseBtn");
+    if (pb) {
+      var pauseNachziehen = function () {
+        /* Der Hintergrund ist die Auskunft, sobald es ihn gibt. Vorher steht
+           die Wahrheit im Speicher — und die ist sofort lesbar, auch wenn
+           three.js noch gar nicht geholt wurde. Der Schluessel steht auch in
+           assets/mycel-bg.js; `smoke_hintergrund.mjs` haelt beide gleich. */
+        var steht;
+        if (window.MycelBgPause) {
+          steht = window.MycelBgPause.steht();
+        } else {
+          try { steht = localStorage.getItem("fp_bg_pause") === "ja"; }
+          catch (_e) { steht = false; }
+        }
+        var z = document.getElementById("bgPauseZeichen");
+        var n = document.getElementById("bgPauseName");
+        var de = getLang() === "de";
+        /* Nur das Zeichen ist sichtbar; das Wort steht fuer Vorleseprogramme
+           daneben und im `title`. Sonst waere der Knopf fuer Blinde stumm. */
+        var wort = de
+          ? (steht ? "Hintergrund-Bewegung fortsetzen" : "Hintergrund-Bewegung anhalten")
+          : (steht ? "resume background motion" : "pause background motion");
+        if (z) z.textContent = steht ? "\u25B6" : "\u23F8";
+        if (n) n.textContent = wort;
+        pb.setAttribute("title", wort);
+        pb.setAttribute("aria-pressed", steht ? "true" : "false");
+        pb.setAttribute("aria-label", wort);
+      };
+      alsKnopf(pb, function () {
+        if (!window.MycelBgPause) {
+          /* Kein bewegter Hintergrund auf diesem Geraet. Der Knopf sagt es
+             an sich selbst, statt stumm zu bleiben oder eine Meldung zu
+             rufen, die es nicht gibt. */
+          var wort0 = getLang() === "de"
+            ? "Der Hintergrund steht auf diesem Geraet ohnehin still."
+            : "The background is already still on this device.";
+          var n0 = document.getElementById("bgPauseName");
+          if (n0) n0.textContent = wort0;
+          pb.setAttribute("title", wort0);
+          return;
+        }
+        window.MycelBgPause.umschalten();
+        pauseNachziehen();
+      }, function () {
+        return nameMitSichtbarem(pb, getLang() === "de"
+          ? "Hintergrund-Bewegung anhalten oder fortsetzen"
+          : "pause or resume background motion");
+      });
+      /* Der Hintergrund wird erst nach `load` und im Leerlauf geholt. Beim
+         ersten Nachziehen gibt es ihn also meistens noch nicht — deshalb
+         meldet er sich, wenn er da ist. Eine feste Wartezeit waere ein
+         Rennen: kommt er spaeter, stuende der Knopf dauerhaft falsch. */
+      pauseNachziehen();
+      global.addEventListener("fp:bg-bereit", pauseNachziehen);
+      global.addEventListener("fp:lang", pauseNachziehen);
+    }
+
     applyTheme(ti);
     applyLang(lang);
     wireAllMics();

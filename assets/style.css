@@ -99,6 +99,19 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
 .pill>*{position:relative}
 .pill:hover{color:var(--text);border-color:var(--accent);box-shadow:inset 0 1.5px 1px rgba(255,255,255,.4),inset 0 -2px 4px rgba(0,0,0,.45),var(--glow)}
 .pill:hover::before{opacity:.9}
+/* Pause-Knopf fuer den bewegten Hintergrund (Klaus 2026-09-02).
+ *
+ * Nur das Zeichen, kein Wort: die Kopfleiste bricht um, und ein 94 px breiter
+ * Knopf schob sie bei eingeschaltetem JavaScript in eine weitere Reihe — der
+ * 39-px-Sprung, den `tests/smoke_kein_sprung.mjs` zu Recht gemeldet hat.
+ *
+ * Das Wort ist deshalb nicht weg, sondern nur unsichtbar: Vorleseprogramme
+ * lesen es weiter, und `title` zeigt es der Maus. Ein Knopf ohne jede
+ * Beschriftung waere fuer Blinde ein toter Knopf.                          */
+.pill.pill-eng{padding:6px 9px}
+.nur-vorlesen{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+
 /* „Aktualisieren"-Knopf — deutlicher sichtbar, zum Thema passend (Akzent + Glühen). */
 .pill.pill-reload{color:var(--accent);font-weight:700;border-color:color-mix(in srgb,var(--accent) 42%,var(--line));
   background:linear-gradient(180deg,rgba(110,231,211,.16),rgba(18,23,33,.22));box-shadow:var(--glow)}
