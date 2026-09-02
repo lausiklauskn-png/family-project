@@ -125,6 +125,12 @@ for (const [einst, wort] of [["no-preference", "normal"], ["reduce", "„Bewegun
 {
   const { ctx, p } = await seite("no-preference");
   const vorher = await p.evaluate(() => window.MycelBgPause.laeuft());
+  /* Erst den Schein anzuenden, sonst prueft der Wächter darunter nichts:
+     ein Fleck, den es gar nicht gibt, bleibt auch nicht stehen. */
+  await p.mouse.move(640, 400);
+  await p.waitForFunction(() => window.MycelBg.schein().staerke > 0.5, null, { timeout: 8000 }).catch(() => {});
+  const anGewesen = await p.evaluate(() => window.MycelBg.schein().staerke);
+  ok(anGewesen > 0.5, `der Schein brennt, bevor die Pause kommt (Staerke ${anGewesen.toFixed(2)})`);
   await p.click("#bgPauseBtn");
   await p.waitForTimeout(300);
   const nach = await p.evaluate(() => ({
@@ -136,6 +142,9 @@ for (const [einst, wort] of [["no-preference", "normal"], ["reduce", "„Bewegun
      "die Renderschleife läuft davor und steht danach wirklich still (ein Schalter, der nur versteckt, senkt die Last nicht)");
   ok(nach.gedrueckt === "true", "der Knopf sagt es auch Vorleseprogrammen (aria-pressed)");
   ok(nach.gemerkt === "ja", "und die Wahl ist gespeichert");
+  const beiPause = await p.evaluate(() => window.MycelBg.schein().staerke);
+  ok(beiPause < 0.02,
+     `und der Schein bleibt nicht als heller Fleck stehen (Staerke ${beiPause.toFixed(4)}) — ohne Schleife holt ihn niemand mehr ab`);
 
   /* Neu laden: die Wahl gilt weiter, UND der Knopf zeigt sie sofort. Vor der
    * Reparatur wartete er 2500 ms auf den Hintergrund und stand solange auf
@@ -206,15 +215,120 @@ for (const [einst, wort] of [["no-preference", "normal"], ["reduce", "„Bewegun
   ok(schein.hell < 60000, `und deckt höchstens ein Viertel der Fläche (gemessen ${schein.anteil} %, Grenze 25 %)`);
   ok(schein.spitze < 95, `und ist nicht mehr grell (Spitze +${schein.spitze}/255, Grenze +95)`);
 
-  /* ── 7 · Er parkt nicht ──────────────────────────────────────────────
+  /* ── 8 · Er parkt nicht ──────────────────────────────────────────────
    * Auf dem Tablet gibt es kein „pointerleave": der Finger geht hoch, und
    * der Schein blieb stehen, wo er zuletzt war. Genau das zeigte Klaus'
    * Bildschirmfoto. */
   await p.evaluate(() => window.dispatchEvent(new PointerEvent("pointerup", { pointerType: "touch", bubbles: true })));
-  await p.waitForTimeout(500);
+  /* Auf die BEDINGUNG warten, nicht auf die Uhr: seit er verglimmt statt zu
+     springen, braucht er dafuer Zeit — und wie lange, haengt am Geraet. */
+  await p.waitForFunction(() => window.MycelBg.schein().staerke < 0.02, null, { timeout: 8000 }).catch(() => {});
   const danach = await vergleich(ruhig, await bild());
   ok(danach.hell < schein.hell / 4,
      `nach dem Loslassen geht er weg statt stehen zu bleiben (${schein.hell} → ${danach.hell} aufgehellte Punkte)`);
+  await ctx.close();
+}
+
+/* ── Er laeuft nach, er klebt nicht ─────────────────────────────────────
+ * Eigener Abschnitt mit LAUFENDER Schleife. Im ersten Anlauf stand das hier
+ * im Reduzieren-Modus — und dort gibt es per Bauart keine Schleife und damit
+ * keinen Nachlauf. Der Wächter haette gemessen, dass etwas fehlt, das dort
+ * gar nicht sein soll. */
+{
+  const { ctx, p } = await seite("no-preference");
+  /*
+   * Klaus, nachdem Groesse und Helligkeit stimmten: "jetzt lenkt es sehr ab
+   * von der Mausbewegung, weil sich das genauso bewegt wie die Maus."
+   *
+   * Die Rechnung wird an GENAU DER Funktion geprueft, die der Hintergrund
+   * benutzt — eine abgeschriebene zweite Fassung liefe irgendwann anders und
+   * die Probe bliebe trotzdem gruen. */
+  const zeiten = await p.evaluate(() => window.MycelBg.scheinZeiten());
+  ok(zeiten.folgt > 0.05 && zeiten.folgt < 0.5,
+     `er haengt spuerbar hinterher, ohne traege zu wirken (${zeiten.folgt} s)`);
+  ok(zeiten.auslauf > zeiten.folgt,
+     `und laeuft langsamer aus, als er folgt (${zeiten.auslauf} s gegen ${zeiten.folgt} s) — abruptes Ausgehen faellt so auf wie abruptes Mitspringen`);
+
+  /* Und die Rechnung allein genuegt nicht: sie sagt nichts darueber, ob der
+     Hintergrund sie auch BENUTZT. Wird die Position wieder direkt gesetzt,
+     bleibt jede Prueferei an `scheinFaktor` gruen. Also einmal wirklich
+     springen lassen und sofort nachsehen. */
+  /* ZWEI Proben kurz hintereinander statt Warten aufs Ankommen. Auf dieser
+     Bau-Maschine haelt die Selbst-Bremse die Schleife nach gut einer Sekunde
+     an (kein Grafikchip) — ein Wächter, der aufs Ankommen wartet, misst dann
+     nichts mehr. Zwei Proben zeigen dasselbe: er ist zurueck, und er holt
+     auf. */
+  await p.mouse.move(200, 200);
+  await p.waitForTimeout(250);
+  await p.mouse.move(1150, 700);
+  const rest = () => p.evaluate(() => {
+    const s = window.MycelBg.schein();
+    return { d: Math.hypot(s.x - s.zielX, s.y - s.zielY), laeuft: window.MycelBgPause.laeuft() };
+  });
+  const a = await rest();
+  /* Auf die BEDINGUNG warten, nicht auf die Uhr. Erster Anlauf: 160 ms fest
+     — auf dieser Maschine dauert ein Bild rund 200 ms, es lief also gar
+     keins dazwischen, und die Probe war rot, ohne dass etwas fehlte. */
+  const aufgeholt = await p.waitForFunction((start) => {
+    const s = window.MycelBg.schein();
+    return Math.hypot(s.x - s.zielX, s.y - s.zielY) < start * 0.75;
+  }, a.d, { timeout: 6000 }).then(() => true).catch(() => false);
+  const b2 = await rest();
+  ok(a.laeuft, "die Schleife laeuft noch, als der Sprung gemessen wird (sonst misst der Wächter darunter nichts)");
+  /* Die Grenze ist bewusst niedrig und NICHT "ein Viertel des Sprungs": wie
+     weit er beim ersten Blick zurueckliegt, haengt an der Bildzeit dieser
+     Maschine. Hier dauert ein Bild rund 200 ms, also holt er in einem
+     einzigen Schritt schon zwei Drittel auf. Eine feste Zahl maesse die
+     Bildrate, nicht den Nachlauf. Gemessen wird, was den Unterschied
+     ausmacht: bei direkt gesetzter Position waere der Rest exakt null. */
+  ok(a.d > 0.01,
+     `unmittelbar nach dem Sprung haengt er zurueck (${a.d.toFixed(3)} in Bildkoordinaten) — bei direkt gesetzter Position waere hier null`);
+  ok(aufgeholt,
+     `und holt sichtbar auf (${a.d.toFixed(3)} → ${b2.d.toFixed(3)}) — Nachlauf, nicht Liegenbleiben`);
+
+  const rechnung = await p.evaluate(() => {
+    const f = window.MycelBg.scheinFaktor, tau = window.MycelBg.scheinZeiten().folgt;
+    /* Ein Sprung von 1 auf 0: wieviel bleibt nach einer Zeitkonstante? */
+    const nachTau = 1 - f(tau, tau);
+    /* Zwei halbe Schritte muessen so weit kommen wie ein ganzer — sonst
+       haengt die Traegheit an der Bildrate, und auf einem langsamen Geraet
+       waere sie eine andere. */
+    let a = 1; a -= a * f(0.1, tau); a -= a * f(0.1, tau);
+    let b = 1; b -= b * f(0.2, tau);
+    /* Und eine Bildpause, die laenger ist als die Zeitkonstante, darf nicht
+       ueber das Ziel hinausschiessen. */
+    const langeStille = f(5, tau);
+    return { nachTau: +nachTau.toFixed(3), zweiHalbe: +a.toFixed(4), einGanzer: +b.toFixed(4), langeStille };
+  });
+  ok(rechnung.nachTau > 0.30 && rechnung.nachTau < 0.42,
+     `nach einer Zeitkonstante ist er noch ${Math.round(rechnung.nachTau * 100)} % zurueck — er holt auf, statt zu springen`);
+  ok(Math.abs(rechnung.zweiHalbe - rechnung.einGanzer) < 0.0005,
+     `zwei halbe Schritte kommen so weit wie ein ganzer (${rechnung.zweiHalbe} gegen ${rechnung.einGanzer}) — die Traegheit haengt an der Zeit, nicht an der Bildrate`);
+  ok(rechnung.langeStille <= 1,
+     `eine lange Bildpause schiesst nicht ueber das Ziel hinaus (Faktor ${rechnung.langeStille})`);
+
+  await ctx.close();
+}
+
+/* ── 9 · Die Selbst-Bremse friert ihn nicht ein ──────────────────────────
+ * Gemessen am 2026-09-02, und zwar an der eigenen Bau-Maschine: die hat
+ * keinen Grafikchip, also greift die Bremse dort wirklich. Haelt sie an,
+ * waehrend der Schein gerade nachzieht, bliebe er voll aufgedreht mitten im
+ * Bild stehen — derselbe geparkte Fleck wie in Klaus' Bildschirmfoto, nur
+ * mit einer anderen Ursache davor. */
+{
+  const { ctx, p } = await seite("no-preference");
+  await p.mouse.move(300, 300);
+  await p.waitForTimeout(400);
+  await p.mouse.move(1000, 600);
+  await p.evaluate(() => window.dispatchEvent(new PointerEvent("pointerup", { pointerType: "touch", bubbles: true })));
+  const ruht = await p.waitForFunction(
+    () => window.MycelBgPause.laeuft() === false || window.MycelBg.schein().staerke < 0.02,
+    null, { timeout: 15000 }).then(() => true).catch(() => false);
+  const ende = await p.evaluate(() => ({ laeuft: window.MycelBgPause.laeuft(), s: window.MycelBg.schein() }));
+  ok(ruht, "der Hintergrund kommt zur Ruhe (Schleife aus oder Schein verglommen)");
+  ok(ende.s.staerke < 0.02,
+     `und der Schein ist dann wirklich aus (Staerke ${ende.s.staerke.toFixed(4)}${ende.laeuft ? "" : ", Schleife von der Bremse angehalten"})`);
   await ctx.close();
 }
 
