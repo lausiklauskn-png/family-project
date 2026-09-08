@@ -613,13 +613,13 @@
     var tasks = [];
     try {
       if ("serviceWorker" in navigator && navigator.serviceWorker.getRegistrations) {
-        tasks.push(navigator.serviceWorker.getRegistrations()
-          .then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+        tasks.push(navigator.serviceWorker.getRegistration() /* nur der EIGENE Worker — getRegistrations() meldete ALLE Apps des Ursprungs ab */
+          .then(function (r) { return r && r.unregister(); })
           .catch(function () {}));
       }
       if (global.caches && caches.keys) {
-        tasks.push(caches.keys()
-          .then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); })
+        tasks.push(caches.keys() /* nur EIGENE Vorraete — caches gehoert dem Ursprung */
+          .then(function (ks) { return Promise.all(ks.filter(function (k) { return k.startsWith('family-projekt-'); }).map(function (k) { return caches.delete(k); })); })
           .catch(function () {}));
       }
     } catch (_e) {}
