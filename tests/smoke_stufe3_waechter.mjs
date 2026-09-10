@@ -445,6 +445,48 @@ console.log("\n10 — auch Einträge ohne Spore-Link werden bewacht");
   ok(b.wacheZaehler && b.wacheZaehler.gruen === 2, "der Bericht zählt die Ampeln (" + JSON.stringify(b.wacheZaehler) + ")");
 }
 
+/* ── Fall 10b: die Quittungen im Depot passen auf den Bericht ─────────────
+ *
+ * ⚠ EINE QUITTUNG MIT DER FALSCHEN PRÜFSUMME RÄUMT NICHTS WEG — sie sieht nur
+ * so aus. `wache-hand.json` und `spore-stand.json` sind zwei Dateien; wer in
+ * die eine schreibt, ohne in die andere zu sehen, hinterlässt eine Quittung,
+ * die nie greift, und die Warnung steht weiter über der Karte.
+ *
+ * Gemessen wird gegen die ECHTEN Dateien des Depots, nicht gegen eine
+ * Vorlage: genau dort ist der Fehler möglich. */
+console.log("\n10b — Quittungen passen auf den Bericht");
+{
+  const hand = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/config/wache-hand.json"), "utf8"));
+  const stand = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/config/spore-stand.json"), "utf8"));
+  /* ⚠ NUR DIE QUITTUNGEN PRÜFEN, DIE GERADE ETWAS BEWIRKEN SOLLEN. Eine
+     veraltete Quittung an einem GRÜNEN Eintrag ist der Normalfall: die Seite
+     hat sich seither geändert, ohne dass etwas Sicherheitsrelevantes dabei
+     war, und der Wächter hat sie von allein grün gelassen. Die erste Fassung
+     dieses Wächters verlangte Gleichheit von allen und meldete prompt sechs
+     harmlose Fälle — eine Warnung, die man nicht loswird, erzieht dazu, alle
+     Warnungen zu übersehen. Gemessen wird deshalb der Fall, in dem es
+     schiefgeht: ein GELB, das eine Quittung wegräumen soll, und die passt
+     nicht. */
+  const QUITTIERBAR = ["geaendert", "fingerabdruck_geaendert"];
+  let schief = [];
+  for (const [id, h] of Object.entries(hand)) {
+    if (id.startsWith("_") || !h || !h.gesehen) continue;
+    const w = (stand.eintraege[id] || {}).wache;
+    if (!w) { schief.push(id + " (kein Bericht)"); continue; }
+    if (w.ampel !== "gelb" || QUITTIERBAR.indexOf(w.grund) < 0) continue;
+    if (w.pruefsumme && h.gesehen !== w.pruefsumme) schief.push(id + " (" + h.gesehen + " ≠ " + w.pruefsumme + ")");
+  }
+  ok(schief.length === 0, "keine Quittung läuft an einem noch gelben Eintrag ins Leere"
+    + (schief.length ? " — schief: " + schief.join(", ") : ""));
+  /* Und die zwei, um die es am 2026-09-10 ging, ausdrücklich: sie standen
+     seit dem 2026-08-24 mit einer Warnung da, für die es keinen Fund gab. */
+  for (const id of ["markt-kim-bell", "markt-kimseek"]) {
+    ok(hand[id] && hand[id].gesehen, id + " ist quittiert");
+    ok(hand[id] && /Eruda|jsdelivr/.test(String(hand[id].grund || "")),
+      id + ": der Grund nennt, was sich geändert hat");
+  }
+}
+
 /* ── Fall 11: die Anzeige im Marktplatz (Browser) ─────────────────────────
  * Der wichtigste Teil für Klaus' Bedingung: ein gesperrter Eintrag darf nie
  * stillschweigend verschwinden. Er bleibt sichtbar, der Grund steht dabei,
@@ -465,7 +507,23 @@ console.log("\n11 — Anzeige im Marktplatz (Browser)");
       "markt-tomys-hub":     { lage: "gleich", wache: { ampel: "gelb", grund: "kein_https", seit: "2026-08-01",
         pruefsumme: "cccc3333dddd4444" } },
       "markt-kimboard":      { lage: "gleich", wache: { ampel: "gelb", grund: "fingerabdruck_geaendert", seit: "2026-08-08",
-        pruefsumme: "aaaa1111bbbb2222", fremde: ["fremd.example"] } }
+        pruefsumme: "aaaa1111bbbb2222", fremde: ["fremd.example"] } },
+      /* Der Fall Kim-Bell/Kimseek (2026-09-10): der Abdruck hat sich geändert,
+         weil eine fremde Adresse WEGGEFALLEN ist. Weder Herkünfte noch
+         Kennzeichen stehen im Bericht. */
+      "markt-kim-bell":      { lage: "gleich", wache: { ampel: "gelb", grund: "fingerabdruck_geaendert", seit: "2026-08-24",
+        pruefsumme: "1111aaaa2222bbbb" } },
+      /* Und der Gegenfall: ein Kennzeichen für verschleierten Code, ohne
+         fremde Herkunft. Ohne ihn wäre nicht gemessen, dass Kennzeichen
+         überhaupt genannt werden. */
+      "markt-kimseek":       { lage: "gleich", wache: { ampel: "gelb", grund: "fingerabdruck_geaendert", seit: "2026-08-24",
+        pruefsumme: "3333cccc4444dddd", kennzeichen: ["eval", "atob"] } },
+      /* Und einer mit fremder Herkunft, der NICHT quittiert ist. Kimboard
+         trägt zwar `fremde`, ist hier aber quittiert — sein Band ist das
+         grüne, und dort steht die Herkunft gar nicht. Ohne diesen Eintrag
+         wäre „die Herkunft wird genannt" nie gemessen. */
+      "markt-mycel-karte":   { lage: "gleich", wache: { ampel: "gelb", grund: "fingerabdruck_geaendert", seit: "2026-08-24",
+        pruefsumme: "5555eeee6666ffff", fremde: ["fremd.example", "noch-fremder.example"] } }
     }
   };
   /* Die Quittungen kommen ebenfalls vom Test — sonst zöge die echte Datei aus
@@ -543,6 +601,35 @@ console.log("\n11 — Anzeige im Marktplatz (Browser)");
     "12c eine Quittung für eine ÄLTERE Fassung räumt nichts weg");
   ok(th && th.gelb && !th.quittiert,
     "12d und ein Gelb aus anderem Grund (kein https) bleibt trotz Quittung stehen");
+
+  /* ── Der Satz zum Fingerabdruck sagt nur, WAS der Wächter weiß ──────────
+   *
+   * ⚠ BIS ZUM 2026-09-10 STAND DORT DAS GEGENTEIL. Der Satz lautete „lädt
+   * seit der letzten Prüfung von einer neuen fremden Adresse oder enthält
+   * verschleierten Code". Bei Kim-Bell und Kimseek war am 2026-08-23 Eruda
+   * ausgebaut worden — cdn.jsdelivr.net ist also WEGGEFALLEN. Zweieinhalb
+   * Wochen stand über beiden Karten eine Anschuldigung, deren Gegenteil
+   * zutraf, und weil `fremde` leer war, stand nicht einmal ein Beispiel
+   * dabei. Der Wächter kennt nur „der Abdruck hat sich geändert"; die
+   * Richtung kennt er nicht, also behauptet der Satz sie nicht mehr. */
+  const kbell = k.find((x) => /Kim-Bell/i.test(x.titel));
+  const kseek = k.find((x) => /Kimseek/i.test(x.titel));
+  ok(kbell && kbell.gelb, "der Abdruck-Fall ohne Fund trägt weiter das gelbe Band");
+  ok(kbell && /Fingerabdruck/.test(kbell.band),
+    "und nennt den Fingerabdruck als das, was sich geändert hat");
+  ok(kbell && !/neuen fremden Adresse/.test(kbell.band),
+    "er behauptet NICHT, die Seite lade von einer neuen fremden Adresse");
+  ok(kbell && /keiner fremden Adresse/.test(kbell.band) && /kein Kennzeichen/.test(kbell.band),
+    "sondern sagt, dass weder Herkunft noch Kennzeichen gefunden wurden");
+  ok(kseek && /eval/.test(kseek.band) && /atob/.test(kseek.band),
+    "gefundene Kennzeichen werden namentlich genannt (" + (kseek && kseek.band.slice(-40)) + ")");
+  ok(kseek && !/keiner fremden Adresse/.test(kseek.band),
+    "und dann steht der Leer-Satz NICHT da");
+  const mkarte = k.find((x) => /Mycel-Karte/i.test(x.titel));
+  ok(mkarte && /fremd\.example/.test(mkarte.band) && /noch-fremder\.example/.test(mkarte.band),
+    "gefundene fremde Herkünfte werden namentlich genannt (" + (mkarte && mkarte.band.slice(-52)) + ")");
+  ok(mkarte && !/keiner fremden Adresse/.test(mkarte.band),
+    "und auch dort steht der Leer-Satz nicht");
 
   // Der Hand-Grund ist Klaus' eigener Text — trotzdem nie als HTML.
   // Der Prüftext trägt mit Absicht <b>-Markup: ohne echtes Markup sähen
