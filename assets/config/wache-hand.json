@@ -26,5 +26,15 @@
   },
   "markt-tomys-hub": {
     "gesehen": "ff997e38883e1298"
+  },
+  "markt-kim-bell": {
+    "gesehen": "9d4d7eb0e32c4e94",
+    "gesehen_am": "2026-09-10",
+    "grund": "Der Abdruck hat sich geaendert, weil am 2026-08-23 Eruda ausgebaut wurde — cdn.jsdelivr.net faellt damit weg. Nachgerechnet mit tools/waechter.mjs gegen origin/main: keine fremde Herkunft, kein Kennzeichen fuer verschleierten Code (Abdruck d03a998f4df78896, quittierte Grundlage war f07ba1be3192dbd5 mit cdn.jsdelivr.net)."
+  },
+  "markt-kimseek": {
+    "gesehen": "80bf75f035683cba",
+    "gesehen_am": "2026-09-10",
+    "grund": "Wie Kim-Bell: Eruda am 2026-08-23 ausgebaut, cdn.jsdelivr.net faellt weg. Nachgerechnet gegen origin/main: keine fremde Herkunft, kein Kennzeichen (Abdruck d03a998f4df78896)."
   }
 }

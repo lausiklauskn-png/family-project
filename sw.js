@@ -15,7 +15,7 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v105";
+var CACHE_VERSION = "family-projekt-v106";
 
 /* ⚠ NUR EIGENE VORRAETE AUFRAEUMEN — `caches` gehoert dem URSPRUNG, nicht dem
  * Pfad. Auf lausiklauskn-png.github.io liegen rund zwanzig Apps; ein Filter,
@@ -40,7 +40,7 @@ var VORRAT_PRAEFIX = "family-projekt-";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "105";
+var ASSET_V = "106";
 // Absichtlich NICHT mehr im Vorrat (Messung 2026-08-02):
 //
 // 1. "og-image.png" (386 KiB). Das ist das Vorschaubild für geteilte Links.
@@ -60,7 +60,7 @@ var ASSET_V = "105";
 var CORE = [
   "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=105", "assets/app.js?v=105", "assets/status-widget.js?v=105",
+  "assets/style.css?v=106", "assets/app.js?v=106", "assets/status-widget.js?v=106",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
   "manifest.json", "icon-192.png", "icon-512.png"
 ];
