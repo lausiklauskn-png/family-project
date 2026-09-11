@@ -226,6 +226,39 @@ window.FP_LISTINGS = [
     "own": true,
     "sporeUrl": "https://lausiklauskn-png.github.io/Mein-WorkFloh/sbkim/spore.json"
   },
+  {
+    "label": "PWA Toolpoint",
+    "anchorId": "markt-pwa-toolpoint",
+    "text": "PWA Toolpoint, der offene Marktplatz für installierbare Web-Apps: Werkzeuge und Apps nach Bedeutung finden, mit gemessenen Ladezeiten und ihrem Messdatum daneben — auch den schlechten. Zweite Instanz neben diesem Marktplatz, offen für alle statt für den engen Kreis. Zugleich eigener SBKIM-Knoten im Mycel, mit Siegel und eigener Identität. App-Verzeichnis, Marktplatz, Apps finden, Werkzeuge, Messwerte, Ladezeit, PWA, Knoten. Läuft offline im Browser.",
+    "by": "@klaus",
+    "url": "https://pwa-toolpoint.de/",
+    "img": "https://pwa-toolpoint.de/assets/icon-512.png",
+    "category": "Werkzeug",
+    "own": true,
+    "sporeUrl": "https://pwa-toolpoint.de/sbkim/spore.json"
+  },
+  {
+    "label": "Auslieferungsprüfer",
+    "anchorId": "markt-auslieferungspruefer",
+    "text": "Auslieferungsprüfer: sieh nach, was eine fertige Seite oder Datei wirklich nach außen gibt, bevor sie online geht. Findet Zeilen, die etwas von einem fremden Rechner holen, vergessene Platzhalter aus der Bauzeit, Bilder ohne Beschreibung, Links, die nirgendwohin führen, und fehlende Sprachangaben — dazu Personenbezug und offen mitgelieferte Geheimnisse. Fünf Eingänge: Datei, Text, Adresse, Ordner und E-Mail. Zugleich eigener SBKIM-Knoten mit eigenem Siegel. Prüfen, Datenschutz, Sicherheit, Befund, Auslieferung, Webseite prüfen, Datenleck. Läuft im Browser, nichts wird hochgeladen.",
+    "by": "@klaus",
+    "url": "https://pwa-toolpoint.de/auslieferungspruefer.html",
+    "img": "https://pwa-toolpoint.de/assets/pruefer-karte.png",
+    "category": "Sicherheit",
+    "own": true,
+    "sporeUrl": "https://pwa-toolpoint.de/sbkim/pruefer-spore.json"
+  },
+  {
+    "label": "Kim Hub Company",
+    "anchorId": "markt-kim-hub-company",
+    "text": "Kim Hub Company, die Werkstatt im Browser: acht Rollen mit Namen arbeiten nacheinander an einem Auftrag — vorschlagen, bauen, prüfen, Fehler suchen, aufschreiben. Heraus kommt ein Übergabe-Blatt, das man an ein großes Modell weitergeben kann. Läuft auf dem eigenen KI-Zugang (BYOK), mit einem Deckel je Schicht und einem Fahrtenbuch, das jede Fahrt mit ihren Kosten festhält, auch die abgebrochene. Zugleich eigener SBKIM-Knoten. Werkstatt, Agenten, Auftrag, Werkzeug bauen, Konferenz, Protokoll, KI. Der Schlüssel bleibt im Browser.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/kim-hub-company/",
+    "img": "https://lausiklauskn-png.github.io/kim-hub-company/icons/kimhub-512.png",
+    "category": "Werkzeug",
+    "own": true,
+    "sporeUrl": "https://lausiklauskn-png.github.io/kim-hub-company/sbkim/spore.json"
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
