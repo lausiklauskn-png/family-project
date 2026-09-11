@@ -21,6 +21,50 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-09-08 · Muttis Rezeptbuch
+
+<https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 95 → 72** (↓ 23, am 2026-09-11 noch 74)
+
+> Gesehen am 2026-09-08, **bestätigt durch die Messung vom 2026-09-11**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung weg: leistung: Netzwerkabhängigkeitsbaum
+- Beanstandung neu: leistung: Effiziente Verweildauer im Cache verwenden
+- Beanstandung neu: leistung: JavaScript komprimieren
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-09-09 · Jasons-Tresor
+
+<https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 63 → 96** (↑ 33, am 2026-09-11 noch 97)
+
+> Gesehen am 2026-09-09, **bestätigt durch die Messung vom 2026-09-11**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung weg: leistung: Largest Contentful Paint
+- Beanstandung weg: leistung: Reduziere nicht verwendetes JavaScript
+- Beanstandung neu: leistung: Bildübermittlung verbessern
+- Beanstandung neu: leistung: Effiziente Verweildauer im Cache verwenden
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
+### 2026-09-09 · Private Brain
+
+<https://lausiklauskn-png.github.io/Privat-Brain/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 74 → 98** (↑ 24, am 2026-09-11 noch 97)
+
+> Gesehen am 2026-09-09, **bestätigt durch die Messung vom 2026-09-11**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Effiziente Verweildauer im Cache verwenden
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-09-06 · Jasons-Tresor
 
 <https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
