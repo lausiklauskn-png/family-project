@@ -323,11 +323,12 @@
 
     var feld = ersterMic.closest(".field");
     if (feld) micLangZuFeld(feld);
-    // Der Riegel gegen den Auto-Uebersetzer greift auch hier: Sprachnamen sind
-    // Eigennamen. Er laeuft als Beobachter (assets/notranslate.js) und erwischt
-    // diese Reihe von selbst — der Aufruf hier ist die Rueckfalllinie, falls
-    // die Datei einmal fehlt.
-    try { if (global.FPNoTranslate) global.FPNoTranslate.riegeln(document); } catch (_e) {}
+    // Geriegelt wird NICHT hier. Der Riegel gegen den Auto-Uebersetzer steht an
+    // EINER Stelle (assets/notranslate.js) und laeuft als Beobachter; er
+    // erwischt diese Reihe von selbst. Ein zweiter Aufruf hier hat beim ersten
+    // Gegenprobe-Lauf genau das angerichtet, wovor die Verfassung warnt: er
+    // DECKTE den Beobachter. Schaltete man den ab, blieb alles geriegelt, und
+    // der Fall meldete „nicht gefangen", obwohl der Waechter tot war.
   }
 
   /* Beschriftung UND Options-Namen folgen der Oberflaechen-Sprache. Vorher

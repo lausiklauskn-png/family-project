@@ -57,8 +57,26 @@ fall "Markenname faellt aus dem Riegel" assets/notranslate.js \
   '".brand",' '"KEIN-TREFFER-brand",'
 fall "Themen-Knopf faellt aus dem Riegel (das war „Hoelle“)" assets/notranslate.js \
   '"#themeBtn",' '"#KEIN-TREFFER-themeBtn",'
-fall "App-Namen fallen aus dem Riegel" assets/notranslate.js \
-  '".listing h3",' '".listing KEIN-TREFFER-h3",'
+# ⚠ ZWEI RIEGEL DECKEN EINANDER, und beide sind berechtigt: die Liste in
+# notranslate.js UND das translate="no", das card() direkt ins Karten-Markup
+# schreibt. Der erste Lauf baute nur einen aus und meldete „nicht gefangen",
+# obwohl beide Waechter tadellos waren. Sabotiert wird die ZUSICHERUNG, nicht
+# die Zeile — also beide zugleich.
+fall_zwei() {  # fall_zwei "<name>" <d1> <a1> <n1> <d2> <a2> <n2>
+  local name="$1"; shift
+  if ! ersetze "$1" "$2" "$3" > /dev/null 2>&1 || ! ersetze "$4" "$5" "$6" > /dev/null 2>&1; then
+    echo "  ✗ $name → ANKER NICHT GEFUNDEN (misst nichts)"; tot=$((tot+1)); heile; return
+  fi
+  if node tests/smoke_uebersetzung.mjs > /tmp/gpu.txt 2>&1; then
+    echo "  ✗ $name → gruen geblieben, NICHT GEFANGEN"; durch=$((durch+1))
+  else
+    echo "  ✓ $name → rot: $(grep -m1 '✗' /tmp/gpu.txt | sed 's/^ *//' | cut -c1-92)"; gefangen=$((gefangen+1))
+  fi
+  heile
+}
+fall_zwei "App-Namen fallen aus BEIDEN Riegeln" \
+  assets/notranslate.js '".listing h3",' '".listing KEIN-TREFFER-h3",' \
+  markt.html "'<div class=\"body\"><h3 translate=\"no\">'" "'<div class=\"body\"><h3>'"
 # Der Beobachter ist der Teil, der die NACHGELADENEN Elemente erwischt. Ohne
 # ihn bleibt die Pille „🌐 Mycel“ ungeriegelt, obwohl sie in der Liste steht —
 # ein einmaliger Durchgang beim Start laeuft vor ihr.
