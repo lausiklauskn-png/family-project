@@ -171,8 +171,12 @@ export function marktHtml(eintraege) {
         `<img src="${esc(e.img)}" alt="${esc(e.label)}" loading="lazy" referrerpolicy="no-referrer">` +
       "</div>" +
       '<div class="body">' +
-        `<h3>${esc(e.label)}</h3>` +
-        (e.by ? `<p class="by">${esc(e.by)}</p>` : "") +
+        // translate="no": App-Namen und Anbieter-Kuerzel sind EIGENNAMEN.
+        // Googles Uebersetzer machte aus „Family Projekt" ein
+        // „Familienprojekt" (Klaus' Bildschirmfoto 2026-09-14) — dasselbe
+        // waere hier mit jedem App-Namen passiert.
+        `<h3 translate="no">${esc(e.label)}</h3>` +
+        (e.by ? `<p class="by" translate="no">${esc(e.by)}</p>` : "") +
         `<p>${esc(e.text)}</p>` +
         '<div class="listing-actions"><div class="listing-foot">' + link + "</div></div>" +
       "</div>" +

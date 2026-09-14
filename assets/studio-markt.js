@@ -444,6 +444,12 @@
     o.label = String(e.label || "").trim();
     o.anchorId = e.anchorId || ("markt-" + slugify(o.label));
     o.text = String(e.text || "").trim();
+    /* Die englische Fassung des Beschreibungstextes. Sie MUSS hier stehen:
+     * normEntry ist eine Positivliste, und was nicht drinsteht, wirft das
+     * Studio beim naechsten Veroeffentlichen STILL weg. Der Eintrag saehe
+     * danach unveraendert aus und waere im Englisch-Modus wieder deutsch —
+     * ein Verlust, den niemand bemerkt haette. */
+    if (e.text_en) o.text_en = String(e.text_en).trim();
     if (e.by) o.by = String(e.by).trim();
     o.url = String(e.url || "").trim();
     o.img = String(e.img || "").trim();
