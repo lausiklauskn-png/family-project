@@ -124,6 +124,24 @@ fall "der Suchen-Knopf rutscht in die dritte Zeile" assets/style.css \
   '.searchrow > .mic-sprache{order:2;margin:2px 2px 0}' \
   '.searchrow > .mic-sprache{margin:2px 2px 0}'
 
+echo; echo "═══ D · sicherheit.html traegt ihre Uebersetzung selbst ═══"
+# Die Seite laedt kein app.js. Faellt ihr eigenes Woerterbuch oder der Anwender
+# aus, steht sie im Englisch-Modus wieder vollstaendig auf Deutsch — genau der
+# Zustand vor dem 2026-09-14.
+fall "die Ueberschrift verliert ihre englische Fassung" sicherheit.html \
+  'sh_h1: "How the mycelium works, and how you are protected.",' \
+  'sh_h1_AUS: "How the mycelium works, and how you are protected.",'
+fall "der Anwender schreibt nichts mehr" sicherheit.html \
+  '      if (w[k] != null) el.textContent = w[k];' \
+  '      /* abgeschaltet */'
+fall "die Seite folgt fp_lang nicht mehr" sicherheit.html \
+  '  var lang = gewaehlt();' \
+  '  var lang = "de";'
+# Die Gegenrichtung: ein Waechter, der Eigennamen mitzaehlt, verlangte ihre
+# Uebersetzung — „Hyphe" soll „Hyphe" bleiben.
+fall "ein Eigenname verliert seinen Riegel (Waechter darf NICHT meckern)" sicherheit.html \
+  '<dt translate="no">Hyphe</dt>' '<dt>Hyphe</dt>'
+
 echo
 echo "$gefangen gefangen · $durch durchgerutscht · $tot tote Anker"
 [ "$durch" -eq 0 ] && [ "$tot" -eq 0 ] || exit 1

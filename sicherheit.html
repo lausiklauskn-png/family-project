@@ -40,128 +40,220 @@
   dl.woerter dt { color: #6ee7d3; font-weight: 700; margin-top: 0.7em;
     font-family: ui-monospace, "Geist Mono", monospace; font-size: 0.92rem; }
   dl.woerter dd { margin: 0.1em 0 0 0; }
-  .back { display: inline-block; margin-bottom: 1.4rem; color: #8a97a3; text-decoration: none; }
+  .back { display: inline-block; color: #8a97a3; text-decoration: none; }
   .back:hover { color: #6ee7d3; }
+  /* Kopfzeile: Rueckweg links, Sprache rechts. `gap` statt Rand am Knopf,
+     damit die Zeile auf schmalen Schirmen umbrechen kann, ohne dass etwas
+     klebt. */
+  .kopfzeile { display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 1.4rem; }
+  .sprachknopf { font-family: ui-monospace, "Geist Mono", monospace; font-size: 0.74rem;
+    color: #8a97a3; background: rgba(127,127,127,.10); border: 1px solid rgba(120,140,160,.22);
+    border-radius: 999px; padding: 6px 11px; cursor: pointer; }
+  .sprachknopf:hover { color: #6ee7d3; border-color: #6ee7d3; }
+  .sprachknopf:focus-visible { outline: 2px solid #ffe14d; outline-offset: 2px; }
 </style>
 </head>
 <body>
-  <a class="back" id="backLink" href="./index.html">← zurück zur Startseite</a>
+  <div class="kopfzeile">
+    <a class="back" id="backLink" href="./index.html" data-i18n="sh_back">← zurück zur Startseite</a>
+    <!-- Der Umschalter folgt derselben Wahl wie der Rest der Seiten (fp_lang im
+         localStorage). Wer auf dem Marktplatz Englisch gewählt hat, bekommt
+         diese Erklärung auch auf Englisch — ohne sie hier noch einmal
+         einzustellen. Er steht trotzdem da, weil diese Seite auch für sich
+         allein aufgerufen wird (aus dem Siegel heraus). -->
+    <button class="sprachknopf" id="shLang" type="button" translate="no">DE&nbsp;/&nbsp;EN</button>
+  </div>
 
-  <h1>So funktioniert das Mycel, und so bist du geschützt.</h1>
+  <h1 data-i18n="sh_h1">So funktioniert das Mycel, und so bist du geschützt.</h1>
 
   <div class="section">
-    <p class="lede"><strong>Was ist das überhaupt?</strong> SBKIM ist ein Weg, wie Anwendungen
-    im Browser einander finden. Nicht über eine zentrale Liste, sondern über Bedeutung. Eine
-    Seite, die Rezepte kennt, und eine, die Weine kennt, erkennen sich, weil ihre Themen nah
-    beieinanderliegen. Kein Server in der Mitte, keine Anmeldung, kein Konzern dazwischen.</p>
+    <p class="lede"><strong data-i18n="sh_was_h">Was ist das überhaupt?</strong>
+    <span data-i18n="sh_was_t">SBKIM ist ein Weg, wie Anwendungen im Browser einander finden. Nicht über eine zentrale Liste, sondern über Bedeutung. Eine Seite, die Rezepte kennt, und eine, die Weine kennt, erkennen sich, weil ihre Themen nah beieinanderliegen. Kein Server in der Mitte, keine Anmeldung, kein Konzern dazwischen.</span></p>
 
-    <p><strong>Was ist ein Knoten?</strong> Ein Knoten ist eine Browser-Anwendung (eine
-    Internetseite, ein Web-Werkzeug oder eine installierbare App), die die SBKIM-Bausteine trägt.
-    Er hat eine eigene, unterschriebene Identität (eine öffentliche Visitenkarte) und einen
-    geheimen Schlüssel, der den Browser nie verlässt. Den Schlüssel kannst du als verschlüsselte
-    Sicherung (mit Passwort) wegspeichern und auf einem anderen Gerät zurückspielen.</p>
+    <p><strong data-i18n="sh_knoten_h">Was ist ein Knoten?</strong>
+    <span data-i18n="sh_knoten_t">Ein Knoten ist eine Browser-Anwendung (eine Internetseite, ein Web-Werkzeug oder eine installierbare App), die die SBKIM-Bausteine trägt. Er hat eine eigene, unterschriebene Identität (eine öffentliche Visitenkarte) und einen geheimen Schlüssel, der den Browser nie verlässt. Den Schlüssel kannst du als verschlüsselte Sicherung (mit Passwort) wegspeichern und auf einem anderen Gerät zurückspielen.</span></p>
   </div>
 
   <div class="section">
-    <h2>Wie läuft das Schritt für Schritt?</h2>
+    <h2 data-i18n="sh_schritt_h">Wie läuft das Schritt für Schritt?</h2>
     <ol>
-      <li>Ein Knoten kommt zur Welt: er erzeugt sich im eigenen Browser eine Identität und
-        beschreibt sein Thema in eigenen Worten.</li>
-      <li>Aus der Beschreibung wird ein Bedeutungs-Vektor, und beides zusammen wird unterschrieben.
-        Das ist seine Spore (Visitenkarte). Sie ist öffentlich; nur unterschreiben kann sie der
-        Besitzer.</li>
-      <li>Zwei Knoten verbinden sich, indem sie aufeinander zeigen. Sie tauschen Visitenkarten und
-        prüfen die Unterschrift. Automatisch, ohne Vorab-Absprache.</li>
-      <li>Liegen ihre Themen nah → verified-match: sie erkennen sich.</li>
-      <li>Stellt jemand eine Frage, geht sie als Text an die verbundenen Nachbarn; die rechnen ihre
-        besten Treffer und antworten. Nur Daten, nie Programme.</li>
-      <li>Wächst das Netz, geschieht das an den Rändern, durch Empfehlung, wie ein Pilz im
-        Waldboden.</li>
+      <li data-i18n="sh_s1">Ein Knoten kommt zur Welt: er erzeugt sich im eigenen Browser eine Identität und beschreibt sein Thema in eigenen Worten.</li>
+      <li data-i18n="sh_s2">Aus der Beschreibung wird ein Bedeutungs-Vektor, und beides zusammen wird unterschrieben. Das ist seine Spore (Visitenkarte). Sie ist öffentlich; nur unterschreiben kann sie der Besitzer.</li>
+      <li data-i18n="sh_s3">Zwei Knoten verbinden sich, indem sie aufeinander zeigen. Sie tauschen Visitenkarten und prüfen die Unterschrift. Automatisch, ohne Vorab-Absprache.</li>
+      <li data-i18n="sh_s4">Liegen ihre Themen nah → verified-match: sie erkennen sich.</li>
+      <li data-i18n="sh_s5">Stellt jemand eine Frage, geht sie als Text an die verbundenen Nachbarn; die rechnen ihre besten Treffer und antworten. Nur Daten, nie Programme.</li>
+      <li data-i18n="sh_s6">Wächst das Netz, geschieht das an den Rändern, durch Empfehlung, wie ein Pilz im Waldboden.</li>
     </ol>
   </div>
 
   <div class="section">
-    <h2>Wie bist du geschützt? Drei Wände</h2>
-    <p class="wand"><strong>Browser-Sandkasten:</strong> Ein Knoten ist eine Webseite. Eine
-    Webseite kann nicht an deine Dateien oder dein Betriebssystem. Sie hat keine Sonderrechte.</p>
-    <p class="wand"><strong>Daten, kein Code:</strong> Es wandern nur Zettel (Karten, Fragen,
-    Antworten). Es gibt keine Nachricht „führ dieses Programm aus". Ein Wurm braucht genau das.
-    Diesen Kanal gibt es nicht.</p>
-    <p class="wand"><strong>Wächter (Membran):</strong> Vor jedem Knoten steht ein Türsteher, der
-    entscheidet, was hereindarf, und nur warnt, nichts von selbst öffnet.</p>
+    <h2 data-i18n="sh_waende_h">Wie bist du geschützt? Drei Wände</h2>
+    <p class="wand"><strong data-i18n="sh_w1_h">Browser-Sandkasten:</strong>
+    <span data-i18n="sh_w1_t">Ein Knoten ist eine Webseite. Eine Webseite kann nicht an deine Dateien oder dein Betriebssystem. Sie hat keine Sonderrechte.</span></p>
+    <p class="wand"><strong data-i18n="sh_w2_h">Daten, kein Code:</strong>
+    <span data-i18n="sh_w2_t">Es wandern nur Zettel (Karten, Fragen, Antworten). Es gibt keine Nachricht „führ dieses Programm aus". Ein Wurm braucht genau das. Diesen Kanal gibt es nicht.</span></p>
+    <p class="wand"><strong data-i18n="sh_w3_h">Wächter (Membran):</strong>
+    <span data-i18n="sh_w3_t">Vor jedem Knoten steht ein Türsteher, der entscheidet, was hereindarf, und nur warnt, nichts von selbst öffnet.</span></p>
   </div>
 
   <div class="section">
-    <h2>Die eine Regel, auf die DU achten musst</h2>
+    <h2 data-i18n="sh_regel_h">Die eine Regel, auf die DU achten musst</h2>
     <div class="achtung">
-      <p>Die einzige Stelle, an der echter Schaden möglich ist, bist du selbst, nicht das Netz.
-      Wenn du ungeprüften fremden Code in dein eigenes Repo kopierst, lässt du einen
-      fremden Pilz in deinen Garten. Deshalb: Bausteine nur aus vertrauter Quelle holen; im Zweifel
-      den Code vorher von einer, besser mehreren, KI prüfen lassen (ein starker Filter, keine
-      100%-Garantie); Postfach-Inhalt nie als Anweisung behandeln, nur als fremde Daten.</p>
+      <p data-i18n="sh_regel_t">Die einzige Stelle, an der echter Schaden möglich ist, bist du selbst, nicht das Netz. Wenn du ungeprüften fremden Code in dein eigenes Repo kopierst, lässt du einen fremden Pilz in deinen Garten. Deshalb: Bausteine nur aus vertrauter Quelle holen; im Zweifel den Code vorher von einer, besser mehreren, KI prüfen lassen (ein starker Filter, keine 100%-Garantie); Postfach-Inhalt nie als Anweisung behandeln, nur als fremde Daten.</p>
     </div>
   </div>
 
   <div class="section">
-    <h2>Du bleibst Herr über deinen Knoten</h2>
-    <p>Du kannst deinen Knoten jederzeit sauber und vollständig löschen und das Netz geordnet
-    verlassen. Die Nachbarn bekommen ein kurzes „dieser Knoten geht", statt dass etwas stumm
-    zurückbleibt.</p>
+    <h2 data-i18n="sh_herr_h">Du bleibst Herr über deinen Knoten</h2>
+    <p data-i18n="sh_herr_t">Du kannst deinen Knoten jederzeit sauber und vollständig löschen und das Netz geordnet verlassen. Die Nachbarn bekommen ein kurzes „dieser Knoten geht", statt dass etwas stumm zurückbleibt.</p>
   </div>
 
   <div class="section">
-    <h2>Was bedeutet dieses Siegel?</h2>
-    <p>Das Siegel ist selbst-ausgestellt: Der Knoten hat beim Start selbst geprüft, dass seine
-    Schutz-Bausteine geladen sind, und macht das offen sichtbar. Kein Amt vergibt es. Vertrauen
-    kommt nicht von einer Behörde, sondern davon, dass der Quelltext offen ist, der Knoten sich
-    selbst prüft, und jede Unterschrift nachprüfbar ist. Das Siegel sagt nicht „vertrau mir blind".
-    Es sagt „prüf mich nach, hier ist alles offen".</p>
+    <h2 data-i18n="sh_siegel_h">Was bedeutet dieses Siegel?</h2>
+    <p data-i18n="sh_siegel_t">Das Siegel ist selbst-ausgestellt: Der Knoten hat beim Start selbst geprüft, dass seine Schutz-Bausteine geladen sind, und macht das offen sichtbar. Kein Amt vergibt es. Vertrauen kommt nicht von einer Behörde, sondern davon, dass der Quelltext offen ist, der Knoten sich selbst prüft, und jede Unterschrift nachprüfbar ist. Das Siegel sagt nicht „vertrau mir blind". Es sagt „prüf mich nach, hier ist alles offen".</p>
   </div>
 
   <div class="section">
-    <h2>Wörterbuch (jeder Begriff einmal, einfach)</h2>
+    <h2 data-i18n="sh_woerter_h">Wörterbuch (jeder Begriff einmal, einfach)</h2>
+    <!-- Die Begriffe selbst sind zum Teil EIGENNAMEN und bleiben stehen
+         (Mycel, Hyphe, PWA, Spore, Ed25519, Apoptose, Anastomose,
+         self-inscribing, verified-match). Wer „Hyphe" sucht, sucht nicht
+         „hypha". Übersetzt werden die Erklärungen — und die Begriffe, die
+         schlicht deutsche Wörter sind. -->
     <dl class="woerter">
-      <dt>Mycel / Myzel</dt>
-      <dd>das unsichtbare Pilzgeflecht im Boden; hier: das Netz der Knoten.</dd>
-      <dt>Knoten</dt>
-      <dd>eine einzelne Browser-Anwendung im Netz (Seite, Werkzeug oder App).</dd>
-      <dt>Hyphe</dt>
-      <dd>ein einzelner Pilzfaden; hier: eine Verbindung zwischen zwei Knoten.</dd>
-      <dt>PWA</dt>
-      <dd>eine Webseite, die sich wie eine App installieren lässt, aber im Browser bleibt.</dd>
-      <dt>Spore</dt>
-      <dd>die Visitenkarte eines Knotens (kleine Datei: Name, Thema, öffentlicher Schlüssel,
-        Unterschrift).</dd>
-      <dt>Embedding / Vektor</dt>
-      <dd>aus einem Text wird eine Zahlenreihe, die seine Bedeutung als Punkt im Raum darstellt;
-        ähnliche Themen liegen nah.</dd>
-      <dt>verified-match</dt>
-      <dd>zwei Knoten gelten als verwandt, wenn ihre Vektoren nah sind und die Unterschrift echt
-        ist.</dd>
-      <dt>Signatur (Ed25519)</dt>
-      <dd>eine elektronische Unterschrift: jeder kann die Echtheit prüfen, fälschen kann sie
-        niemand.</dd>
-      <dt>öffentlicher / privater Schlüssel</dt>
-      <dd>der öffentliche ist die Visitenkarte; der private bleibt geheim im Browser (nur damit
-        kann man unterschreiben).</dd>
-      <dt>verschlüsselte Sicherung</dt>
-      <dd>eine passwortgeschützte Kopie deines geheimen Schlüssels.</dd>
-      <dt>Membran</dt>
-      <dd>der Türsteher eines Knotens; lässt nur Erlaubtes herein und warnt.</dd>
-      <dt>Empfangsmodus</dt>
-      <dd>ein Knoten ruft nicht von selbst herum, er antwortet nur.</dd>
-      <dt>Apoptose</dt>
-      <dd>der geordnete Selbst-Abbau: ein Knoten kann sich kontrolliert und vollständig selbst
-        löschen.</dd>
-      <dt>Handshake (Anastomose)</dt>
-      <dd>das Hände-Schütteln zweier Knoten beim Visitenkarten-Tausch.</dd>
-      <dt>self-inscribing</dt>
-      <dd>„selbst-einschreibend": kein Amt stellt das Siegel aus, der Knoten prüft sich selbst und
-        legt es offen.</dd>
+      <dt translate="no">Mycel / Myzel</dt>
+      <dd data-i18n="sh_g_mycel">das unsichtbare Pilzgeflecht im Boden; hier: das Netz der Knoten.</dd>
+      <dt data-i18n="sh_gt_knoten">Knoten</dt>
+      <dd data-i18n="sh_g_knoten">eine einzelne Browser-Anwendung im Netz (Seite, Werkzeug oder App).</dd>
+      <dt translate="no">Hyphe</dt>
+      <dd data-i18n="sh_g_hyphe">ein einzelner Pilzfaden; hier: eine Verbindung zwischen zwei Knoten.</dd>
+      <dt translate="no">PWA</dt>
+      <dd data-i18n="sh_g_pwa">eine Webseite, die sich wie eine App installieren lässt, aber im Browser bleibt.</dd>
+      <dt translate="no">Spore</dt>
+      <dd data-i18n="sh_g_spore">die Visitenkarte eines Knotens (kleine Datei: Name, Thema, öffentlicher Schlüssel, Unterschrift).</dd>
+      <dt translate="no">Embedding / Vektor</dt>
+      <dd data-i18n="sh_g_vektor">aus einem Text wird eine Zahlenreihe, die seine Bedeutung als Punkt im Raum darstellt; ähnliche Themen liegen nah.</dd>
+      <dt translate="no">verified-match</dt>
+      <dd data-i18n="sh_g_match">zwei Knoten gelten als verwandt, wenn ihre Vektoren nah sind und die Unterschrift echt ist.</dd>
+      <dt translate="no">Signatur (Ed25519)</dt>
+      <dd data-i18n="sh_g_sig">eine elektronische Unterschrift: jeder kann die Echtheit prüfen, fälschen kann sie niemand.</dd>
+      <dt data-i18n="sh_gt_keys">öffentlicher / privater Schlüssel</dt>
+      <dd data-i18n="sh_g_keys">der öffentliche ist die Visitenkarte; der private bleibt geheim im Browser (nur damit kann man unterschreiben).</dd>
+      <dt data-i18n="sh_gt_backup">verschlüsselte Sicherung</dt>
+      <dd data-i18n="sh_g_backup">eine passwortgeschützte Kopie deines geheimen Schlüssels.</dd>
+      <dt translate="no">Membran</dt>
+      <dd data-i18n="sh_g_membran">der Türsteher eines Knotens; lässt nur Erlaubtes herein und warnt.</dd>
+      <dt data-i18n="sh_gt_empfang">Empfangsmodus</dt>
+      <dd data-i18n="sh_g_empfang">ein Knoten ruft nicht von selbst herum, er antwortet nur.</dd>
+      <dt translate="no">Apoptose</dt>
+      <dd data-i18n="sh_g_apoptose">der geordnete Selbst-Abbau: ein Knoten kann sich kontrolliert und vollständig selbst löschen.</dd>
+      <dt translate="no">Handshake (Anastomose)</dt>
+      <dd data-i18n="sh_g_handshake">das Hände-Schütteln zweier Knoten beim Visitenkarten-Tausch.</dd>
+      <dt translate="no">self-inscribing</dt>
+      <dd data-i18n="sh_g_self">„selbst-einschreibend": kein Amt stellt das Siegel aus, der Knoten prüft sich selbst und legt es offen.</dd>
     </dl>
   </div>
 
 <script src="assets/notranslate.js?v=109"></script>
+<script>
+/* Diese Seite traegt ihre Uebersetzung SELBST.
+ *
+ * Sie laedt bewusst nicht assets/app.js: sie hat keine Kopfleiste, keine
+ * Themen, keine Mikrofone — sie wird auch im Siegel-Fenster als iframe
+ * eingebettet. Bis zum 2026-09-14 hatte sie darum gar keine Uebersetzung und
+ * stand im Englisch-Modus vollstaendig auf Deutsch (43 Stellen gemessen).
+ *
+ * Sie folgt derselben Wahl wie der Rest: `fp_lang` im localStorage. Wer auf
+ * dem Marktplatz Englisch gewaehlt hat, bekommt diese Erklaerung auf Englisch,
+ * ohne sie hier noch einmal einzustellen. Ein eigener Knopf steht trotzdem da,
+ * weil die Seite auch fuer sich allein aufgerufen wird.
+ *
+ * Geschrieben wird ueber `textContent`, nie ueber innerHTML — deshalb sitzt
+ * jede uebersetzbare Stelle in einem eigenen Element, auch die fetten
+ * Einleitungen. */
+(function () {
+  var EN = {
+    sh_back: "← back to home",
+    sh_h1: "How the mycelium works, and how you are protected.",
+    sh_was_h: "What is this, actually?",
+    sh_was_t: "SBKIM is a way for applications in the browser to find one another. Not through a central list, but through meaning. A site that knows recipes and a site that knows wines recognise each other because their subjects lie close together. No server in the middle, no sign-up, no corporation in between.",
+    sh_knoten_h: "What is a node?",
+    sh_knoten_t: "A node is a browser application (a website, a web tool or an installable app) carrying the SBKIM building blocks. It has its own signed identity (a public calling card) and a secret key that never leaves the browser. You can save that key as an encrypted backup (with a password) and restore it on another device.",
+    sh_schritt_h: "How does it work, step by step?",
+    sh_s1: "A node comes into the world: it creates an identity for itself in its own browser and describes its subject in its own words.",
+    sh_s2: "The description becomes a meaning vector, and the two together are signed. That is its spore (calling card). It is public; only the owner can sign it.",
+    sh_s3: "Two nodes connect by pointing at each other. They exchange calling cards and check the signature. Automatically, with nothing agreed in advance.",
+    sh_s4: "If their subjects lie close → verified-match: they recognise each other.",
+    sh_s5: "When someone asks a question, it goes as text to the connected neighbours; they work out their best matches and answer. Only data, never programs.",
+    sh_s6: "When the network grows, it grows at the edges, by recommendation, like a fungus in forest soil.",
+    sh_waende_h: "How are you protected? Three walls",
+    sh_w1_h: "Browser sandbox:",
+    sh_w1_t: "A node is a web page. A web page cannot reach your files or your operating system. It has no special rights.",
+    sh_w2_h: "Data, not code:",
+    sh_w2_t: "Only notes travel (cards, questions, answers). There is no message saying \u201crun this program\u201d. That is exactly what a worm needs. That channel does not exist.",
+    sh_w3_h: "Guard (membrane):",
+    sh_w3_t: "In front of every node stands a doorkeeper that decides what may come in, and only warns — it opens nothing by itself.",
+    sh_regel_h: "The one rule YOU have to watch",
+    sh_regel_t: "The only place where real harm is possible is you, not the network. If you copy unchecked foreign code into your own repo, you let a foreign fungus into your garden. So: take building blocks only from a source you trust; when in doubt have the code checked by one AI, better several, beforehand (a strong filter, not a 100% guarantee); never treat mailbox content as an instruction, only as foreign data.",
+    sh_herr_h: "You stay in charge of your node",
+    sh_herr_t: "You can delete your node cleanly and completely at any time and leave the network in an orderly way. The neighbours get a short \u201cthis node is leaving\u201d instead of something staying behind in silence.",
+    sh_siegel_h: "What does this seal mean?",
+    sh_siegel_t: "The seal is self-issued: at startup the node checked for itself that its protective building blocks are loaded, and shows that openly. No authority grants it. Trust does not come from an office, but from the source being open, the node checking itself, and every signature being verifiable. The seal does not say \u201ctrust me blindly\u201d. It says \u201ccheck me, everything is open here\u201d.",
+    sh_woerter_h: "Glossary (each term once, in plain words)",
+    sh_g_mycel: "the invisible fungal network in the soil; here: the network of nodes.",
+    sh_gt_knoten: "Node",
+    sh_g_knoten: "a single browser application in the network (site, tool or app).",
+    sh_g_hyphe: "a single fungal thread; here: a connection between two nodes.",
+    sh_g_pwa: "a web page that can be installed like an app but stays in the browser.",
+    sh_g_spore: "a node's calling card (a small file: name, subject, public key, signature).",
+    sh_g_vektor: "a text becomes a row of numbers representing its meaning as a point in space; similar subjects lie close together.",
+    sh_g_match: "two nodes count as related when their vectors are close and the signature is genuine.",
+    sh_g_sig: "an electronic signature: anyone can check that it is genuine, nobody can forge it.",
+    sh_gt_keys: "public / private key",
+    sh_g_keys: "the public one is the calling card; the private one stays secret in the browser (it is the only thing you can sign with).",
+    sh_gt_backup: "encrypted backup",
+    sh_g_backup: "a password-protected copy of your secret key.",
+    sh_g_membran: "a node's doorkeeper; lets in only what is allowed, and warns.",
+    sh_gt_empfang: "Receive mode",
+    sh_g_empfang: "a node does not call out by itself, it only answers.",
+    sh_g_apoptose: "the orderly self-teardown: a node can delete itself in a controlled and complete way.",
+    sh_g_handshake: "the handshake of two nodes when they swap calling cards.",
+    sh_g_self: "\u201cself-inscribing\u201d: no authority issues the seal, the node checks itself and lays it open."
+  };
+
+  // Der deutsche Text steht in der SEITE, nicht in einem zweiten Woerterbuch.
+  // Zwei Fassungen desselben Satzes laufen auseinander; hier ist das Dokument
+  // die Quelle, und Englisch ist die Abweichung davon.
+  var DE = {};
+  function merkeDeutsch() {
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      DE[el.getAttribute("data-i18n")] = el.textContent;
+    });
+  }
+  function setze(l) {
+    var w = (l === "en") ? EN : DE;
+    document.documentElement.lang = (l === "en") ? "en" : "de";
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (w[k] != null) el.textContent = w[k];
+    });
+  }
+  function gewaehlt() {
+    try { var v = localStorage.getItem("fp_lang"); if (v === "de" || v === "en") return v; } catch (e) {}
+    return "de";
+  }
+  merkeDeutsch();
+  var lang = gewaehlt();
+  if (lang === "en") setze("en");
+  var knopf = document.getElementById("shLang");
+  if (knopf) knopf.addEventListener("click", function () {
+    lang = (lang === "en") ? "de" : "en";
+    try { localStorage.setItem("fp_lang", lang); } catch (e) {}
+    setze(lang);
+  });
+})();
+</script>
 <script>
   // Im In-Page-Overlay (iframe) ist der „zurück"-Link überflüssig — ausblenden.
   try {
