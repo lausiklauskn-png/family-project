@@ -79,10 +79,33 @@ console.log("\nÜbersetzung — Riegel gegen den Auto-Übersetzer");
   ok(r.namen.alle && r.namen.anzahl > 5, `App-Namen geriegelt (${r.namen.anzahl}×)`, JSON.stringify(r.namen));
   ok(r.kuerzel.alle, "Anbieter-Kürzel geriegelt (@handle)");
   ok(r.sprachen.alle, "Mikrofon-Sprachnamen geriegelt — „Türkçe“ bleibt „Türkçe“");
-  // Das Modul haengt die Pille ERST NACH dem Laden ein. Ein einmaliger
-  // Durchgang beim Start haette sie nie erwischt; deshalb beobachtet der
-  // Riegel. Genau DAS misst diese Zeile.
-  ok(r.pille === true, "die nachgeladene Pille „🌐 Mycel“ ist geriegelt", String(r.pille));
+  ok(r.pille === true, "die Pille „🌐 Mycel“ ist geriegelt", String(r.pille));
+
+  /* ⚠ DER BEOBACHTER BRAUCHT EINE EIGENE MESSUNG, und die Zeile darueber ist
+   * sie NICHT. Gemessen am 2026-09-14: auf dieser Maschine steht die Pille
+   * schon beim ersten Durchgang da — schaltet man den Beobachter ab, bleibt
+   * sie trotzdem geriegelt. Der Waechter war damit von seinem Fehlen nicht zu
+   * unterscheiden, und der Gegenprobe-Fall meldete „nicht gefangen", obwohl
+   * der Beobachter tot war.
+   *
+   * Wofuer er da ist, ist etwas anderes: ein Element, das SPAETER dazukommt.
+   * Auf einem langsamen Geraet kann die Leerlauf-Kette hinter den ersten
+   * Durchgang rutschen — dann ist er der einzige, der greift. Gemessen wird
+   * deshalb genau das: ein Eigenname, der NACH dem Laden entsteht. */
+  const spaet = await page.evaluate(async () => {
+    const el = document.createElement("p");
+    el.setAttribute("data-eigenname", "");
+    el.textContent = "Family Projekt";
+    document.body.appendChild(el);
+    // Auf die BEDINGUNG warten, nicht auf die Uhr: der Beobachter meldet sich,
+    // sobald er darf. Die Frist ist nur die Reissleine.
+    for (let i = 0; i < 60; i++) {
+      if (el.getAttribute("translate") === "no") return true;
+      await new Promise((x) => setTimeout(x, 50));
+    }
+    return false;
+  });
+  ok(spaet === true, "ein Eigenname, der NACH dem Laden dazukommt, wird auch geriegelt (der Beobachter)", String(spaet));
   // Die Gegenrichtung, und sie ist die wichtigere: ein Riegel, der ALLES
   // sperrt, nimmt fremdsprachigen Besuchern den einzigen Weg.
   ok(r.fliesstext === true, "Fließtext bleibt übersetzbar — nicht zu viel geriegelt", String(r.fliesstext));

@@ -74,9 +74,15 @@ fall_zwei() {  # fall_zwei "<name>" <d1> <a1> <n1> <d2> <a2> <n2>
   fi
   heile
 }
+# ⚠ UND DER ANKER MUSS EINDEUTIG SEIN. `<div class="body"><h3 translate="no">`
+# steht 18× in markt.html — 17× in der statischen Liste und einmal in card().
+# Die statische Liste steht WEITER OBEN, also traf die Ersetzung eine Karte
+# statt der Funktion: sabotiert war eine Karte, die das Skript ohnehin
+# ueberschreibt, und der Fall meldete „nicht gefangen". Genommen wird deshalb
+# die JS-Form mit `+ esc(x.label)` — die gibt es genau einmal.
 fall_zwei "App-Namen fallen aus BEIDEN Riegeln" \
   assets/notranslate.js '".listing h3",' '".listing KEIN-TREFFER-h3",' \
-  markt.html "'<div class=\"body\"><h3 translate=\"no\">'" "'<div class=\"body\"><h3>'"
+  markt.html "'<div class=\"body\"><h3 translate=\"no\">' + esc(x.label)" "'<div class=\"body\"><h3>' + esc(x.label)"
 # Der Beobachter ist der Teil, der die NACHGELADENEN Elemente erwischt. Ohne
 # ihn bleibt die Pille „🌐 Mycel“ ungeriegelt, obwohl sie in der Liste steht —
 # ein einmaliger Durchgang beim Start laeuft vor ihr.
