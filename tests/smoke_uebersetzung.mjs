@@ -184,6 +184,130 @@ console.log("\nMikrofon-Sprache wandert zum benutzten Mikrofon");
   await ctx.close();
 }
 
+console.log("\nSprachriegel — die Wahl in der App schlägt den Auto-Übersetzer");
+{
+  /* Klaus am 2026-09-14: „Ich klicke in der App das zwar an, aber Google Chrome
+   * zieht wieder rüber und übernimmt wieder." Sein Chrome hat „Englisch immer
+   * übersetzen" gesetzt; der EN-Knopf setzt lang="en", und genau das löst die
+   * Regel aus. Drei Fälle, und alle drei werden hier gemessen. */
+  const lies = () => ({
+    lang: document.documentElement.lang,
+    translate: document.documentElement.getAttribute("translate"),
+    klasse: /(^|\s)notranslate(\s|$)/.test(document.documentElement.className || ""),
+    meta: !!document.querySelector('meta[name="google"][content="notranslate"]'),
+    hinweis: !!document.getElementById("fpUebersetzerHinweis")
+  });
+
+  // 1 · Wer NICHT gewählt hat, wird nicht gesperrt. Das ist der Fall, der
+  //     zählt: zwölf Mikrofon-Sprachen, darunter Paschtu und Dari — ohne
+  //     Google hätten diese Besucher keinen Weg.
+  {
+    const ctx = await browser.newContext(); const page = await ctx.newPage();
+    await page.goto(`${base}/markt.html`, { waitUntil: "load" });
+    await page.waitForTimeout(1500);
+    const r = await page.evaluate(lies);
+    ok(r.translate !== "no" && !r.klasse && !r.meta,
+       "ohne ausdrückliche Wahl bleibt der Übersetzer erlaubt", JSON.stringify(r));
+    ok(!r.hinweis, "…und es steht kein Hinweis im Weg");
+    await ctx.close();
+  }
+
+  // 2 · Ein Klick auf den Sprachknopf ist eine ausdrückliche Wahl — ab da
+  //     gewinnt die App, auf ALLEN Wegen zugleich (keiner greift überall).
+  {
+    const ctx = await browser.newContext(); const page = await ctx.newPage();
+    await page.goto(`${base}/markt.html`, { waitUntil: "load" });
+    await page.waitForTimeout(1500);
+    await page.click("#langBtn");
+    await page.waitForTimeout(400);
+    const nach = await page.evaluate(lies);
+    ok(nach.translate === "no", "nach dem Klick: translate=no am Dokument", JSON.stringify(nach));
+    ok(nach.klasse, "nach dem Klick: Klasse notranslate");
+    ok(nach.meta, "nach dem Klick: meta google/notranslate");
+
+    /* ⚠ DIE ENTSCHEIDENDE ZEILE. Der Riegel muss VOR dem ersten Anstrich
+     * stehen — danach hat Chrome längst entschieden, und nachträgliches Setzen
+     * kommt zu spät. Gemessen wird beim `commit`, also sobald die Antwort
+     * beginnt, NICHT nach `load`. */
+    await page.goto(`${base}/werkzeuge.html`, { waitUntil: "commit" });
+    const frueh = await page.evaluate(lies).catch(() => null);
+    ok(frueh && frueh.translate === "no" && frueh.meta,
+       "auf der nächsten Seite steht der Riegel schon VOR dem ersten Anstrich",
+       JSON.stringify(frueh));
+    await ctx.close();
+  }
+
+  // 3 · Google war schneller — dann sagt es die Seite, statt den Nutzer raten
+  //     zu lassen. Chromes eigene Leiste ist keine verlässliche Auskunft
+  //     („taucht ab und zu kurz auf … oder manchmal zeigt sie's gar nicht an").
+  {
+    const ctx = await browser.newContext(); const page = await ctx.newPage();
+    await page.goto(`${base}/index.html`, { waitUntil: "load" });
+    await page.evaluate(() => { localStorage.setItem("fp_lang", "en"); localStorage.setItem("fp_lang_wahl", "1"); });
+    await page.reload({ waitUntil: "load" });
+    await page.waitForTimeout(1200);
+    ok(!(await page.evaluate(lies)).hinweis, "solange nichts übersetzt wird, steht kein Hinweis da");
+    // Chromes Übersetzer nachstellen: er hängt `translated-ltr` ans Wurzelelement.
+    await page.evaluate(() => document.documentElement.classList.add("translated-ltr"));
+    await page.waitForFunction(() => !!document.getElementById("fpUebersetzerHinweis"), null, { timeout: 5000 }).catch(() => {});
+    const h = await page.evaluate(() => {
+      const k = document.getElementById("fpUebersetzerHinweis");
+      return k ? { da: true, riegel: k.getAttribute("translate"),
+                   fest: getComputedStyle(k).position === "fixed",
+                   text: k.innerText.replace(/\s+/g, " ") } : { da: false };
+    });
+    ok(h.da, "greift der Übersetzer trotzdem zu, sagt die Seite es");
+    ok(h.riegel === "no", "…und der Hinweis wird nicht selbst übersetzt");
+    ok(h.fest, "…und er verschiebt die Seite nicht (position:fixed)");
+    ok(/Chrome/.test(h.text || ""), "…und er nennt den Weg, es abzustellen", (h.text || "").slice(0, 70));
+    await ctx.close();
+  }
+
+  // 4 · Die Gegenrichtung: wer NICHT gewählt hat, bekommt den Hinweis nicht.
+  //     Sonst wäre er Lärm für genau die Besucher, für die der Übersetzer
+  //     angelassen wurde.
+  {
+    const ctx = await browser.newContext(); const page = await ctx.newPage();
+    await page.goto(`${base}/index.html`, { waitUntil: "load" });
+    await page.waitForTimeout(1200);
+    await page.evaluate(() => document.documentElement.classList.add("translated-ltr"));
+    await page.waitForTimeout(600);
+    ok(!(await page.evaluate(lies)).hinweis,
+       "ohne Wahl kein Hinweis — kein Lärm für die, die Google absichtlich nutzen");
+    await ctx.close();
+  }
+
+  // 5 · Der Weg zurück. Ohne ihn waere ein einziger Klick eine Einbahnstrasse.
+  {
+    const ctx = await browser.newContext(); const page = await ctx.newPage();
+    await page.goto(`${base}/markt.html`, { waitUntil: "load" });
+    /* EINMAL setzen, nicht bei jedem Aufbau: ein addInitScript schriebe zurueck,
+     * was der Rueckweg gerade entfernt hat — der Rueckweg saehe kaputt aus,
+     * obwohl er arbeitet. Genau so ist die erste Fassung dieser Messung
+     * hereingefallen. */
+    await page.evaluate(() => { localStorage.setItem("fp_lang", "en"); localStorage.setItem("fp_lang_wahl", "1"); });
+    await page.reload({ waitUntil: "load" });
+    await page.waitForTimeout(1500);
+    await page.click("#langBtn");
+    await page.waitForTimeout(400);
+    const kurz = await page.evaluate(() => localStorage.getItem("fp_lang_wahl"));
+    ok(kurz === "1", "ein KURZER Druck nimmt die Wahl nicht zurück", String(kurz));
+
+    const kn = await page.$("#langBtn"); const box = await kn.boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.waitForTimeout(1800);
+    await page.mouse.up();
+    await page.waitForFunction(() => { try { return localStorage.getItem("fp_lang_wahl") === null; } catch (_e) { return false; } },
+      null, { timeout: 6000 }).catch(() => {});
+    const r = await page.evaluate(lies);
+    const wahl = await page.evaluate(() => localStorage.getItem("fp_lang_wahl"));
+    ok(wahl === null, "ein LANGER Druck nimmt die Wahl zurück", String(wahl));
+    ok(r.translate !== "no" && !r.meta, "…und der Übersetzer ist danach wieder erlaubt", JSON.stringify(r));
+    await ctx.close();
+  }
+}
+
 console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
 {
   /* Diese Seite lädt kein assets/app.js (keine Kopfleiste, keine Themen, kein
