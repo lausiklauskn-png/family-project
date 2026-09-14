@@ -68,6 +68,150 @@
     try { global.dispatchEvent(new CustomEvent("fp:lang", { detail: { lang: lang } })); } catch (_e) {}
   }
   function getLang() { return lang; }
+
+  /* ---- Sprachriegel: die Wahl IN DER APP schlaegt den Auto-Uebersetzer ----
+   *
+   * Klaus am 2026-09-14, nachdem der Riegel auf Eigennamen schon stand:
+   * „Ich klicke in der App das zwar an, aber Google Chrome zieht wieder rueber
+   * und uebernimmt wieder … somit kann ich oben meinen Englisch-Knopf gar
+   * nicht richtig nutzen."
+   *
+   * Was passiert: sein Chrome hat „Englisch immer uebersetzen" gesetzt. Er
+   * drueckt EN, die Seite wird englisch und setzt `lang="en"` — und genau das
+   * loest die Regel aus. Chrome uebersetzt sofort zurueck nach Deutsch. Kurz
+   * blitzt Englisch auf, dann ist es wieder weg.
+   *
+   * DIE PRIORISIERUNG, die daraus folgt — und sie hat drei Faelle, nicht zwei:
+   *
+   *   niemand hat gewaehlt   → Google darf uebersetzen. Das ist der Fall, der
+   *                            zaehlt: wer weder Deutsch noch Englisch liest,
+   *                            haette sonst keinen Weg. Zwoelf Mikrofon-
+   *                            Sprachen, darunter Paschtu und Dari.
+   *   der Nutzer hat gewaehlt → die APP gewinnt. Die Seite sperrt den
+   *                            Uebersetzer, in BEIDEN Richtungen: wer Deutsch
+   *                            waehlt, will auch kein uebersetztes Deutsch.
+   *   Google war schneller    → gemerkt und benannt (siehe uebersetzerHinweis).
+   *
+   * Gesperrt wird auf drei Wegen zugleich, weil keiner davon allein in jedem
+   * Browser greift: `translate="no"` am Wurzelelement, die Klasse
+   * `notranslate` und `<meta name="google" content="notranslate">`.
+   *
+   * ⚠ DER RIEGEL IM <head> IST DER EIGENTLICHE. Er steht als eine Zeile ganz
+   * oben in jeder Seite und laeuft VOR dem ersten Anstrich — danach hat Chrome
+   * laengst entschieden, und nachtraegliches Setzen kommt zu spaet. Was hier
+   * steht, ist der Teil fuer den Augenblick des Klicks. */
+  var LS_WAHL = "fp_lang_wahl";
+
+  function sperreUebersetzer() {
+    var h = document.documentElement;
+    h.setAttribute("translate", "no");
+    h.classList.add("notranslate");
+    if (!document.querySelector('meta[name="google"][content="notranslate"]')) {
+      var m = document.createElement("meta");
+      m.name = "google"; m.content = "notranslate";
+      (document.head || h).appendChild(m);
+    }
+  }
+
+  /* Chromes Uebersetzer haengt beim Uebersetzen `translated-ltr` bzw.
+   * `translated-rtl` ans Wurzelelement. Daran — und nur daran — laesst sich
+   * von der Seite aus erkennen, dass er zugegriffen hat. */
+  function googleHatUebersetzt() {
+    return /(^|\s)translated-(ltr|rtl)(\s|$)/.test(document.documentElement.className || "");
+  }
+
+  /* DER DRITTE FALL: der Nutzer hat gewaehlt, und Chrome uebersetzt trotzdem.
+   *
+   * Klaus: „Die taucht ab und zu kurz auf, sodass ich das rueckgaengig machen
+   * kann, aber verschwindet auch wieder. Oder manchmal zeigt sie's gar nicht
+   * an." — Chromes eigene Leiste ist also keine verlaessliche Auskunft. Die
+   * Seite sagt es deshalb selbst, und zwar bleibend.
+   *
+   * Er erscheint NUR, wenn beides zutrifft: eine ausdrueckliche Wahl liegt vor
+   * UND der Uebersetzer hat zugegriffen. Wer Google absichtlich benutzt, hat
+   * nie gewaehlt und sieht ihn nie — sonst waere er Laerm fuer genau die
+   * Besucher, fuer die der Uebersetzer angelassen wurde.
+   *
+   * `position:fixed`: er darf die Seite nicht verschieben. Und `translate="no"`
+   * traegt er selbst, sonst uebersetzte Chrome ausgerechnet den Satz, der von
+   * Chromes Uebersetzung handelt. */
+  function uebersetzerHinweis() {
+    if (document.getElementById("fpUebersetzerHinweis")) return;
+    var de = getLang() === "de";
+    var k = document.createElement("div");
+    k.id = "fpUebersetzerHinweis";
+    k.className = "fp-ue-hinweis notranslate";
+    k.setAttribute("translate", "no");
+    k.setAttribute("role", "status");
+
+    var t = document.createElement("span");
+    t.textContent = de
+      ? "Dein Browser übersetzt diese Seite zusätzlich — deshalb springt sie zurück."
+      : "Your browser is translating this page on top — that is why it jumps back.";
+    var weg = document.createElement("span");
+    weg.className = "fp-ue-weg";
+    weg.textContent = de
+      ? "In Chrome: Menü (⋮) → Übersetzen → dort „nie übersetzen“ wählen."
+      : "In Chrome: menu (⋮) → Translate → choose “never translate” there.";
+
+    var zu = document.createElement("button");
+    zu.type = "button";
+    zu.className = "fp-ue-zu";
+    zu.textContent = "✕";
+    zu.setAttribute("aria-label", de ? "Hinweis schließen" : "dismiss notice");
+    zu.addEventListener("click", function () { k.remove(); });
+
+    k.appendChild(t); k.appendChild(weg); k.appendChild(zu);
+    document.body.appendChild(k);
+  }
+
+  /* Chrome uebersetzt NACH dem Laden. Ein einmaliger Blick beim Start saehe
+   * die Klasse nie — gewartet wird deshalb auf die Bedingung, nicht auf die
+   * Uhr. Ein `setTimeout` mit runder Zahl waere ein Rennen, das auf einem
+   * langsamen Geraet still verloren geht. */
+  function beobachteUebersetzer() {
+    var gewaehlt = false;
+    try { gewaehlt = localStorage.getItem(LS_WAHL) === "1"; } catch (_e) {}
+    if (!gewaehlt) return;                       // wer nicht gewaehlt hat, wird nicht belaestigt
+    if (googleHatUebersetzt()) { uebersetzerHinweis(); return; }
+    if (!global.MutationObserver) return;
+    var beo = new global.MutationObserver(function () {
+      if (googleHatUebersetzt()) { uebersetzerHinweis(); beo.disconnect(); }
+    });
+    try { beo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] }); } catch (_e) {}
+  }
+
+  /* DER WEG ZURUECK. Ohne ihn waere ein einziger Klick eine Einbahnstrasse:
+   * wer den Sprachknopf einmal gedrueckt hat, bekaeme den Uebersetzer nie
+   * wieder — und das traefe ausgerechnet die Besucher, fuer die er angelassen
+   * wurde. Ein langer Druck auf den Sprachknopf nimmt die Wahl zurueck,
+   * dasselbe Muster wie das Pflege-Studio am © in der Fusszeile.
+   *
+   * ⚠ BENANNTE GRENZE: ein langer Druck ist versteckt, und wer ihn nicht
+   * kennt, findet ihn nicht. Er steht deshalb im Vorlese-Namen des Knopfes —
+   * das ist keine Loesung fuer alle, aber besser als kein Weg. */
+  function wahlZuruecknehmen() {
+    try { localStorage.removeItem(LS_WAHL); } catch (_e) {}
+    try { location.reload(); } catch (_e) {}
+  }
+  function langerDruckZuruecknehmen(el) {
+    if (!el) return;
+    var uhr = null;
+    var los = function () { uhr = global.setTimeout(wahlZuruecknehmen, 1500); };
+    var stop = function () { if (uhr) { global.clearTimeout(uhr); uhr = null; } };
+    el.addEventListener("pointerdown", los);
+    ["pointerup", "pointerleave", "pointercancel"].forEach(function (e) { el.addEventListener(e, stop); });
+  }
+
+  function waehleSprache(l) {
+    try { localStorage.setItem(LS_WAHL, "1"); } catch (_e) {}
+    applyLang(l);
+    sperreUebersetzer();
+    /* Hat Chrome die Seite schon uebersetzt, nuetzt das Sperren jetzt nichts
+     * mehr — es greift erst beim naechsten Aufbau. Also neu laden. Eine
+     * Schleife kann daraus nicht werden: das hier laeuft nur auf einen Klick. */
+    if (googleHatUebersetzt()) { try { location.reload(); } catch (_e) {} }
+  }
   function t(key) { return (I18N[lang] && I18N[lang][key] != null) ? I18N[lang][key] : key; }
 
   // ---- Themen --------------------------------------------------------------
@@ -816,9 +960,17 @@
   }
 
   function init() {
+    try { beobachteUebersetzer(); } catch (_e) {}
     var lb = document.getElementById("langBtn");
-    alsKnopf(lb, function () { applyLang(lang === "de" ? "en" : "de"); },
-      function () { return nameMitSichtbarem(lb, getLang() === "de" ? "Sprache umschalten, Deutsch oder Englisch" : "switch language, German or English"); });
+    // waehleSprache statt applyLang: ein KLICK ist eine ausdrueckliche Wahl,
+    // und die schlaegt den Auto-Uebersetzer. Der Start-Aufruf von applyLang
+    // weiter unten tut das NICHT — sonst waere jeder Besucher sofort gesperrt,
+    // auch der, der nie etwas gewaehlt hat.
+    alsKnopf(lb, function () { waehleSprache(lang === "de" ? "en" : "de"); },
+      function () { return nameMitSichtbarem(lb, getLang() === "de"
+        ? "Sprache umschalten, Deutsch oder Englisch. Langer Druck: Browser-Übersetzer wieder zulassen"
+        : "switch language, German or English. Long press: allow the browser translator again"); });
+    langerDruckZuruecknehmen(lb);
     var tb = document.getElementById("themeBtn");
     alsKnopf(tb, function () { applyTheme(ti + 1); },
       function () { return nameMitSichtbarem(tb, getLang() === "de" ? "Farbthema wechseln" : "switch colour theme"); });
@@ -913,6 +1065,8 @@
   global.FP = {
     init: init, applyLang: applyLang, applyTheme: applyTheme,
     getLang: getLang, t: t, wireAllMics: wireAllMics,
+    waehleSprache: waehleSprache, googleHatUebersetzt: googleHatUebersetzt,
+    wahlZuruecknehmen: wahlZuruecknehmen,
     enhanceBareInputs: enhanceBareInputs, THEMES: THEMES
   };
 })(typeof window !== "undefined" ? window : this);

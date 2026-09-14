@@ -128,6 +128,38 @@ fall "der Suchen-Knopf rutscht in die dritte Zeile" assets/style.css \
   '.searchrow > .mic-sprache{order:2;margin:2px 2px 0}' \
   '.searchrow > .mic-sprache{margin:2px 2px 0}'
 
+echo; echo "═══ E · der Sprachriegel ═══"
+# Der Riegel im <head> ist der eigentliche: er laeuft VOR dem ersten Anstrich.
+# Faellt er aus, hat Chrome laengst entschieden, wenn app.js dran ist.
+fall "der Riegel im <head> faellt aus" markt.html \
+  'if(localStorage.getItem("fp_lang_wahl")!=="1")return;' \
+  'if(true)return;'
+# Der Klick muss die Wahl MERKEN — sonst greift der head-Riegel beim naechsten
+# Aufbau nicht, und alles ist wie vorher.
+fall "der Klick merkt die Wahl nicht mehr" assets/app.js \
+  '    try { localStorage.setItem(LS_WAHL, "1"); } catch (_e) {}' \
+  '    /* nicht gemerkt */'
+# Gesperrt wird auf drei Wegen zugleich, weil keiner allein ueberall greift.
+fall "das meta google/notranslate faellt weg" assets/app.js \
+  '      m.name = "google"; m.content = "notranslate";' \
+  '      m.name = "google-AUS"; m.content = "notranslate";'
+fall "der Knopf waehlt nicht mehr ausdruecklich (nur applyLang)" assets/app.js \
+  'alsKnopf(lb, function () { waehleSprache(lang === "de" ? "en" : "de"); },' \
+  'alsKnopf(lb, function () { applyLang(lang === "de" ? "en" : "de"); },'
+# Der Hinweis ist der dritte Fall: Google war schneller. Ohne ihn raet der
+# Nutzer, warum die Seite zurueckspringt.
+fall "der Beobachter fuer den Uebersetzer wird abgeschaltet" assets/app.js \
+  '    if (!gewaehlt) return;                       // wer nicht gewaehlt hat, wird nicht belaestigt' \
+  '    return;'
+# Die Gegenrichtung, und sie ist die wichtigere: ein Riegel, der IMMER greift,
+# nimmt fremdsprachigen Besuchern den einzigen Weg.
+fall "gesperrt wird auch OHNE Wahl (Google fuer alle tot)" markt.html \
+  'if(localStorage.getItem("fp_lang_wahl")!=="1")return;' \
+  'if(false)return;'
+# Der Weg zurueck: ohne ihn ist ein Klick eine Einbahnstrasse.
+fall "der lange Druck nimmt die Wahl nicht mehr zurueck" assets/app.js \
+  '    langerDruckZuruecknehmen(lb);' '    /* abgeschaltet */'
+
 echo; echo "═══ D · sicherheit.html traegt ihre Uebersetzung selbst ═══"
 # Die Seite laedt kein app.js. Faellt ihr eigenes Woerterbuch oder der Anwender
 # aus, steht sie im Englisch-Modus wieder vollstaendig auf Deutsch — genau der

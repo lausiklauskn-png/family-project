@@ -132,6 +132,21 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
    nicht mehr als Pille in der Kopfleiste neben dem DE/EN-Knopf. Dort standen
    zwei Sprach-Bedienelemente nebeneinander, von denen das groessere die Seite
    gar nicht uebersetzt (Klaus 2026-09-14). */
+/* Der Hinweis, wenn der Browser ZUSAETZLICH uebersetzt. `position:fixed`, weil
+   er nachtraeglich erscheint — im Seitenfluss schoebe er alles darunter weg,
+   genau der Sprung, den diese Seite sonst vermeidet. */
+.fp-ue-hinweis{position:fixed;left:12px;right:12px;bottom:12px;z-index:9998;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  max-width:720px;margin:0 auto;padding:11px 14px;border-radius:14px;
+  background:var(--card,rgba(20,24,34,.92));border:1px solid var(--line,rgba(120,140,160,.28));
+  box-shadow:0 6px 24px rgba(0,0,0,.35);backdrop-filter:blur(6px);
+  color:var(--text,#e8edf4);font-size:.84rem;line-height:1.45}
+.fp-ue-hinweis .fp-ue-weg{color:var(--muted,#9aa7b6);flex:1 1 100%}
+.fp-ue-zu{margin-left:auto;background:none;border:0;color:var(--muted,#9aa7b6);
+  font-size:1rem;cursor:pointer;padding:4px 6px;border-radius:8px;line-height:1}
+.fp-ue-zu:hover{color:var(--text,#e8edf4)}
+.fp-ue-zu:focus-visible{outline:2px solid var(--focus,#ffe14d);outline-offset:2px}
+
 .mic-sprache{display:flex;align-items:center;gap:7px;margin:7px 2px 0;
   font-size:.82rem;color:var(--muted);flex-wrap:wrap}
 .mic-sprache-ic{font-size:.95rem;line-height:1}

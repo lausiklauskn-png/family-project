@@ -11,6 +11,7 @@
 -->
 <html lang="de">
 <head>
+<script>/* FP-SPRACHRIEGEL — Begruendung in assets/app.js § Sprachriegel. MUSS inline und vor dem ersten Anstrich laufen: danach hat Chrome laengst entschieden. */(function(){try{if(localStorage.getItem("fp_lang_wahl")!=="1")return;var h=document.documentElement;h.lang=localStorage.getItem("fp_lang")==="en"?"en":"de";h.setAttribute("translate","no");h.classList.add("notranslate");var m=document.createElement("meta");m.name="google";m.content="notranslate";(document.head||h).appendChild(m);}catch(e){}})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0c0f12">
@@ -155,7 +156,7 @@
     </dl>
   </div>
 
-<script src="assets/notranslate.js?v=109"></script>
+<script src="assets/notranslate.js?v=110"></script>
 <script>
 /* Diese Seite traegt ihre Uebersetzung SELBST.
  *
@@ -247,10 +248,33 @@
   var lang = gewaehlt();
   if (lang === "en") setze("en");
   var knopf = document.getElementById("shLang");
+  /* Sperrt den Auto-Uebersetzer, wenn hier ausdruecklich gewaehlt wird — genau
+   * wie der Knopf auf den uebrigen Seiten. Ohne das zieht Chrome sofort wieder
+   * herueber, und der Knopf sieht kaputt aus (Klaus 2026-09-14). Der
+   * eigentliche Riegel steht ganz oben im <head>; der hier gilt fuer den
+   * Augenblick des Klicks. */
+  function sperreUebersetzer() {
+    var h = document.documentElement;
+    h.setAttribute("translate", "no");
+    h.classList.add("notranslate");
+    if (!document.querySelector('meta[name="google"][content="notranslate"]')) {
+      var m = document.createElement("meta");
+      m.name = "google"; m.content = "notranslate";
+      (document.head || h).appendChild(m);
+    }
+  }
+  function googleHatUebersetzt() {
+    return /(^|\s)translated-(ltr|rtl)(\s|$)/.test(document.documentElement.className || "");
+  }
   if (knopf) knopf.addEventListener("click", function () {
     lang = (lang === "en") ? "de" : "en";
     try { localStorage.setItem("fp_lang", lang); } catch (e) {}
+    try { localStorage.setItem("fp_lang_wahl", "1"); } catch (e) {}
     setze(lang);
+    sperreUebersetzer();
+    // Hat Chrome schon uebersetzt, greift das Sperren erst beim naechsten
+    // Aufbau — also neu laden. Nur auf Klick, daher keine Schleife.
+    if (googleHatUebersetzt()) { try { location.reload(); } catch (e) {} }
   });
 })();
 </script>
