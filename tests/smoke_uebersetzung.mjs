@@ -209,8 +209,14 @@ console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
         if (eigen.length < 4 || !DE.test(eigen)) return;
         rest.push(el.tagName + ": " + eigen.replace(/\s+/g, " ").slice(0, 60));
       });
+      /* Eigennamen MUESSEN stehen bleiben — „Hyphe" heisst auch auf Englisch
+       * „Hyphe", und ein Begriff, der im Woerterbuch erklaert wird, muss in
+       * beiden Sprachen derselbe sein. Ohne diese Zeile waere „alles ist
+       * uebersetzt" auch dann gruen, wenn die Eigennamen mit uebersetzt
+       * waeren. */
+      const eigen = [...document.querySelectorAll("dt")].map((n) => n.textContent.trim());
       return { lang: document.documentElement.lang, h1: document.querySelector("h1").textContent,
-               haken: document.querySelectorAll("[data-i18n]").length, rest };
+               haken: document.querySelectorAll("[data-i18n]").length, eigen, rest };
     });
     await ctx.close();
     return r;
@@ -227,6 +233,10 @@ console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
   // Sie folgt derselben Wahl wie die übrigen Seiten — wer auf dem Marktplatz
   // Englisch gewählt hat, bekommt diese Erklärung auf Englisch.
   ok(en.h1 !== de.h1, "sie folgt der Wahl aus fp_lang, ohne eigene Einstellung");
+  for (const begriff of ["Hyphe", "Spore", "Apoptose", "PWA"]) {
+    ok(en.eigen.includes(begriff), `der Eigenname „${begriff}“ bleibt auch auf Englisch stehen`,
+       en.eigen.join(" · "));
+  }
 }
 
 console.log("\nFail-soft und Quellen");

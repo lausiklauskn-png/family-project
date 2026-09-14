@@ -13,7 +13,11 @@ cd "$(dirname "$0")/.." || exit 1
 
 gefangen=0; durch=0; tot=0
 
-heile() { git checkout -- assets/ tests/ markt.html index.html werkzeuge.html 2>/dev/null; }
+# ⚠ JEDE Datei, die ein Fall anfasst, MUSS hier stehen. Fehlt eine, bleibt die
+# Sabotage liegen, die Faelle stapeln sich, und der naechste meldet die rote
+# Zeile des vorigen — gefangen aus dem falschen Grund. Genau so geschehen am
+# 2026-09-14 mit sicherheit.html.
+heile() { git checkout -- assets/ tests/ markt.html index.html werkzeuge.html sicherheit.html 2>/dev/null; }
 
 # ersetze <datei> <alt> <neu> -- meldet, wenn der Anker NICHT sass. Ein toter
 # Anker aendert nichts und sieht danach aus wie ein blinder Waechter.
@@ -137,10 +141,15 @@ fall "der Anwender schreibt nichts mehr" sicherheit.html \
 fall "die Seite folgt fp_lang nicht mehr" sicherheit.html \
   '  var lang = gewaehlt();' \
   '  var lang = "de";'
-# Die Gegenrichtung: ein Waechter, der Eigennamen mitzaehlt, verlangte ihre
-# Uebersetzung — „Hyphe" soll „Hyphe" bleiben.
-fall "ein Eigenname verliert seinen Riegel (Waechter darf NICHT meckern)" sicherheit.html \
-  '<dt translate="no">Hyphe</dt>' '<dt>Hyphe</dt>'
+# Ein EINZELNER Woerterbuch-Eintrag verliert seine englische Fassung — dann
+# steht dort wieder deutscher Text, und genau das soll auffallen.
+fall "ein einzelner Woerterbuch-Eintrag verliert seine EN-Fassung" sicherheit.html \
+  '    sh_g_hyphe: "a single fungal thread' \
+  '    sh_g_hyphe_AUS: "a single fungal thread'
+# Die Gegenrichtung: Eigennamen sollen STEHEN BLEIBEN. Bekommt „Hyphe" eine
+# Uebersetzung, ist das ein Fehler, den der Waechter fangen muss.
+fall "ein Eigenname wird faelschlich uebersetzt" sicherheit.html \
+  '<dt translate="no">Hyphe</dt>' '<dt data-i18n="sh_gt_hyphe">Hyphe</dt>'
 
 echo
 echo "$gefangen gefangen · $durch durchgerutscht · $tot tote Anker"
