@@ -184,6 +184,61 @@ console.log("\nMikrofon-Sprache wandert zum benutzten Mikrofon");
   await ctx.close();
 }
 
+console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
+{
+  /* Diese Seite lädt kein assets/app.js (keine Kopfleiste, keine Themen, kein
+   * Mikrofon — sie wird auch im Siegel als iframe eingebettet). Bis zum
+   * 2026-09-14 hatte sie deshalb GAR KEINE Übersetzung: 43 Stellen standen im
+   * Englisch-Modus auf Deutsch. */
+  const lies = async (sp) => {
+    const ctx = await browser.newContext({ viewport: { width: 900, height: 1200 } });
+    await ctx.addInitScript((l) => { try { localStorage.setItem("fp_lang", l); } catch (_e) {} }, sp);
+    const page = await ctx.newPage();
+    await page.goto(`${base}/sicherheit.html`, { waitUntil: "load" });
+    await page.waitForFunction(() => !!document.querySelector("h1"));
+    const r = await page.evaluate(() => {
+      /* Gemessen wird deutscher Text, den man SIEHT. Eigennamen (Mycel, Hyphe,
+       * Spore, Apoptose …) tragen `translate="no"` und sind ausgenommen — ein
+       * Wächter, der sie mitzählt, verlangte ihre Übersetzung. */
+      const DE = /\b(und|oder|nicht|eine[nmrs]?|der|die|das|dein[e]?|wird|sich|auch|mit|für|über|ohne|damit|wenn|beim|zum|zur|vom|nach|noch|hier|kein[e]?|sind|haben|Knoten|Seite|Schlüssel)\b|[äöüß]/;
+      const rest = [];
+      document.querySelectorAll("body *").forEach((el) => {
+        if (/^(SCRIPT|STYLE)$/.test(el.tagName)) return;
+        if (el.getAttribute("translate") === "no") return;
+        const eigen = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(" ").trim();
+        if (eigen.length < 4 || !DE.test(eigen)) return;
+        rest.push(el.tagName + ": " + eigen.replace(/\s+/g, " ").slice(0, 60));
+      });
+      /* Eigennamen MUESSEN stehen bleiben — „Hyphe" heisst auch auf Englisch
+       * „Hyphe", und ein Begriff, der im Woerterbuch erklaert wird, muss in
+       * beiden Sprachen derselbe sein. Ohne diese Zeile waere „alles ist
+       * uebersetzt" auch dann gruen, wenn die Eigennamen mit uebersetzt
+       * waeren. */
+      const eigen = [...document.querySelectorAll("dt")].map((n) => n.textContent.trim());
+      return { lang: document.documentElement.lang, h1: document.querySelector("h1").textContent,
+               haken: document.querySelectorAll("[data-i18n]").length, eigen, rest };
+    });
+    await ctx.close();
+    return r;
+  };
+  const de = await lies("de"), en = await lies("en");
+  ok(de.haken > 40, `die Seite hat Übersetzungs-Haken (${de.haken})`);
+  ok(de.rest.length > 10, `auf Deutsch steht deutscher Text da (${de.rest.length} Stellen)`);
+  ok(en.lang === "en", "im Englisch-Modus steht lang=en am Dokument", en.lang);
+  ok(/How the mycelium works/.test(en.h1), "die Überschrift ist übersetzt", en.h1.slice(0, 60));
+  // Der Befund, um den es geht — und die Gegenrichtung gleich mit: auf Deutsch
+  // MUSS deutscher Text dastehen, sonst misst die Zeile darüber nichts.
+  ok(en.rest.length === 0, `im Englisch-Modus steht kein deutscher Text mehr (${en.rest.length})`,
+     en.rest.slice(0, 3).join(" | "));
+  // Sie folgt derselben Wahl wie die übrigen Seiten — wer auf dem Marktplatz
+  // Englisch gewählt hat, bekommt diese Erklärung auf Englisch.
+  ok(en.h1 !== de.h1, "sie folgt der Wahl aus fp_lang, ohne eigene Einstellung");
+  for (const begriff of ["Hyphe", "Spore", "Apoptose", "PWA"]) {
+    ok(en.eigen.includes(begriff), `der Eigenname „${begriff}“ bleibt auch auf Englisch stehen`,
+       en.eigen.join(" · "));
+  }
+}
+
 console.log("\nFail-soft und Quellen");
 {
   // Der Such-Korpus darf sich NICHT geaendert haben: aus `text` werden die

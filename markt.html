@@ -36,7 +36,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=108" />
+  <link rel="stylesheet" href="assets/style.css?v=109" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -89,6 +89,13 @@
       <div class="wrap">
         <h2 data-i18n="mk_listings_h">Einträge</h2>
         <p class="sub" id="mkCount"></p>
+        <!-- Der kurze Weg zur Anfrage. Der Abschnitt „Eigene App oder Website
+             gewünscht?" steht hinter allen Karten; wer etwas in Auftrag geben
+             will, müsste sonst erst an siebzehn davon vorbeiscrollen.
+             Hier wird nichts verkauft, sondern zum Gespräch eingeladen —
+             kein Betrag, kein Anteil. -->
+        <p class="sub mk-anfrage-weg"><span data-i18n="mk_build_teaser">Du suchst nichts davon, sondern etwas Eigenes?</span>
+          <a href="#anfrage" data-i18n="mk_build_link">→ Unverbindlich anfragen</a></p>
         <div class="listings" id="mkListings"><!-- statische-listen:anfang -->
 <div class="glass listing"><div class="img"><img src="https://lausiklauskn-png.github.io/Mein-Rezeptbuch/icons/icon-book-blue-512.png" alt="Mein Rezeptbuch" loading="lazy" referrerpolicy="no-referrer"></div><div class="body"><h3 translate="no">Mein Rezeptbuch</h3><p class="by" translate="no">@klaus</p><p>Rezeptbuch und Kochbuch für die Küche: eigene Rezepte sammeln, ordnen, suchen und kochen. Zutaten, Mengen, Einkaufsliste und Wochenplan / Menüplan. Läuft offlin</p><div class="listing-actions"><div class="listing-foot"><a class="btn ghost ext" href="https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/" target="_blank" rel="noopener">→ Zur Seite</a></div></div></div></div>
 <div class="glass listing"><div class="img"><img src="https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png" alt="Mein Mixarium" loading="lazy" referrerpolicy="no-referrer"></div><div class="body"><h3 translate="no">Mein Mixarium</h3><p class="by" translate="no">@klaus</p><p>Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol. Bar zuh</p><div class="listing-actions"><div class="listing-foot"><a class="btn ghost ext" href="https://lausiklauskn-png.github.io/Mein-Mixarium-Page/" target="_blank" rel="noopener">→ Zur Seite</a></div></div></div></div>
@@ -114,7 +121,7 @@
       </div>
     </section>
 
-    <section>
+    <section id="anfrage">
       <div class="wrap">
         <div class="glass" style="padding:22px;border-left:3px solid var(--accent)">
           <h2 style="margin-top:0" data-i18n="mk_build_h">Eigene App oder Website gewünscht?</h2>
@@ -193,7 +200,7 @@
     <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
   </footer>
 
-  <script type="module" src="assets/mycel-bg.js?v=108"></script>
+  <script type="module" src="assets/mycel-bg.js?v=109"></script>
   <script>window.SBKIM_DB_SUFFIX="familyprojekt";</script>
   <script src="sbkim/01_storage.js"></script>
   <script src="sbkim/02_spore.js"></script>
@@ -222,6 +229,8 @@
         mk_semantic: "Nach Bedeutung suchen (lädt einmalig ein Sprachmodell, ~30 MB)",
         mk_listings_h: "Einträge",
         mk_empty: "Noch keine Einträge. Trag unten die erste Seite ein. Sie erscheint nach Freigabe und, mit Bild, auch in der Weekly Discovery.",
+        mk_build_teaser: "Du suchst nichts davon, sondern etwas Eigenes?",
+        mk_build_link: "→ Unverbindlich anfragen",
         mk_build_h: "Eigene App oder Website gewünscht?",
         mk_build_txt: "Die Apps oben sind Beispiele. Genau so etwas baue ich dir auch: eine App oder Internetseite für dich, deinen Verein oder deine Firma. Wenn du Interesse hast, melde dich einfach, ganz unverbindlich.",
         ct_f_name: "Dein Name (optional)", ct_ph_name: "Name oder Verein / Firma",
@@ -368,6 +377,8 @@
         mk_semantic: "Search by meaning (loads a language model once, ~30 MB)",
         mk_listings_h: "Entries",
         mk_empty: "No entries yet. Add the first site below. It appears after approval and, with an image, in Weekly Discovery.",
+        mk_build_teaser: "Looking for something of your own instead?",
+        mk_build_link: "→ Get in touch, no obligation",
         mk_build_h: "Want your own app or website?",
         mk_build_txt: "The apps above are examples. I can build you one too: an app or website for you, your club or your business. If you're interested, just get in touch, no obligation.",
         ct_f_name: "Your name (optional)", ct_ph_name: "Name or club / company",
@@ -500,10 +511,10 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/notranslate.js?v=108"></script>
-  <script src="assets/app.js?v=108"></script>
-  <script src="assets/vec-codec.js?v=108"></script>
-  <script src="assets/status-widget.js?v=108"></script>
+  <script src="assets/notranslate.js?v=109"></script>
+  <script src="assets/app.js?v=109"></script>
+  <script src="assets/vec-codec.js?v=109"></script>
+  <script src="assets/status-widget.js?v=109"></script>
   <script>
     (function () {
       function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -992,11 +1003,12 @@
       var msOpener = null;
       function closeMess() {
         var d = document.getElementById("mkMessOv");
-        if (!d) return;
+        if (!d) { hintergrundFreigeben(); return; }
         try { if (d.close) d.close(); else d.removeAttribute("open"); } catch (_e) {}
         if (d.parentNode) d.parentNode.removeChild(d);
         if (msOpener && document.contains(msOpener)) { try { msOpener.focus(); } catch (_e) {} }
         msOpener = null;
+        hintergrundFreigeben();
       }
 
       function openMess(id, opener) {
@@ -1132,6 +1144,7 @@
           '</div>';
         document.body.appendChild(d);
         try { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); } catch (_e) { d.setAttribute("open", ""); }
+        hintergrundHalten();
         d.addEventListener("close", closeMess);
         d.addEventListener("cancel", function () { closeMess(); });
         d.addEventListener("click", function (e) { if (e.target === d) closeMess(); });
@@ -1198,6 +1211,53 @@
       function kartenText(x) {
         var en = FP.getLang() === "en";
         return String((en && x.text_en) ? x.text_en : (x.text || ""));
+      }
+
+      /* HINTERGRUND FESTHALTEN, solange ein Fenster offen ist.
+       *
+       * Hier stand „showModal() bringt Fokus + Escape + Hintergrund-Sperre
+       * mit". Fokus und Escape ja — die Sperre NICHT. Gemessen am 2026-09-14:
+       * in drei von vier Laeufen scrollte die Seite hinter dem offenen
+       * Melde-Fenster weiter. Der vierte war gruen, weil die Seite zufaellig
+       * schon ganz unten stand und `scrollBy` nichts mehr bewegen konnte —
+       * gruen aus dem falschen Grund, und genau deshalb fiel es nie auf. */
+      var _haltStand = null;
+      function hintergrundHalten() {
+        if (_haltStand) return;                       // zwei Fenster, ein Riegel
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        var w = window.innerWidth - document.documentElement.clientWidth;
+        var b = document.body.style;
+        _haltStand = { y: y, position: b.position, top: b.top, left: b.left,
+                       right: b.right, width: b.width, padRechts: b.paddingRight };
+        /* `overflow:hidden` am Wurzelelement haelt nur den FINGER auf —
+         * `scrollBy()` aus einem Skript scrollt weiter (gemessen 2026-09-14,
+         * die Probe blieb rot). Wirklich fest wird der Hintergrund erst, wenn
+         * der Rumpf aus dem Bildlauf genommen wird; die alte Position wandert
+         * nach `top`, damit die Seite nicht nach oben springt. */
+        b.position = "fixed";
+        b.top = (-y) + "px";
+        b.left = "0";
+        b.right = "0";
+        b.width = "100%";
+        if (w > 0) {
+          // Die Breite der Bildlaufleiste ausgleichen, sonst rutscht die Seite
+          // beim Oeffnen um ebendiese Breite zur Seite — derselbe Sprung, den
+          // diese Seite sonst ueberall vermeidet.
+          var alt = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+          b.paddingRight = (alt + w) + "px";
+        }
+      }
+      function hintergrundFreigeben() {
+        if (!_haltStand) return;
+        // Erst nachsehen, ob wirklich keines mehr offen ist: sonst gaebe das
+        // eine Fenster den Hintergrund frei, waehrend das andere dasteht.
+        if (document.querySelector("dialog[open]")) return;
+        var st = _haltStand, b = document.body.style;
+        _haltStand = null;
+        b.position = st.position; b.top = st.top; b.left = st.left;
+        b.right = st.right; b.width = st.width; b.paddingRight = st.padRechts;
+        // Zurueck an die Stelle, an der man war — ohne das landet man oben.
+        try { window.scrollTo(0, st.y); } catch (_e) {}
       }
 
       function card(x) {
@@ -1544,12 +1604,13 @@
 
       function closeReport() {
         var d = document.getElementById("mkRepOv");
-        if (!d) return;
+        if (!d) { hintergrundFreigeben(); return; }
         try { if (d.close) d.close(); else d.removeAttribute("open"); } catch (_e) {}
         if (d.parentNode) d.parentNode.removeChild(d);
         // Fokus zurück auf den auslösenden Knopf: man landet dort, wo man war.
         if (repOpener && document.contains(repOpener)) { try { repOpener.focus(); } catch (_e) {} }
         repOpener = null;
+        hintergrundFreigeben();
       }
 
       function openReport(id, label, opener) {
@@ -1579,9 +1640,11 @@
             '<pre id="mkRepOut" style="display:none;margin-top:10px"></pre>' +
           "</div>";
         document.body.appendChild(d);
-        // showModal() bringt Fokus + Escape + Hintergrund-Sperre mit; ältere
-        // Browser bekommen wenigstens ein offenes, sichtbares Fenster.
+        // showModal() bringt Fokus und Escape mit; ältere Browser bekommen
+        // wenigstens ein offenes, sichtbares Fenster. Die HINTERGRUND-SPERRE
+        // bringt es NICHT mit — siehe hintergrundHalten() weiter oben.
         try { if (d.showModal) d.showModal(); else d.setAttribute("open", ""); } catch (_e) { d.setAttribute("open", ""); }
+        hintergrundHalten();
         // Escape löst "cancel"/"close" aus — dabei sauber aufräumen.
         d.addEventListener("close", closeReport);
         d.addEventListener("cancel", function () { closeReport(); });
@@ -1867,6 +1930,6 @@
   <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
        App-spezifischer Speicher-Präfix; Token nur im Browser. -->
   <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
-  <script src="assets/studio-markt.js?v=108" defer></script>
+  <script src="assets/studio-markt.js?v=109" defer></script>
 </body>
 </html>

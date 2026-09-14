@@ -13,7 +13,11 @@ cd "$(dirname "$0")/.." || exit 1
 
 gefangen=0; durch=0; tot=0
 
-heile() { git checkout -- assets/ tests/ markt.html index.html werkzeuge.html 2>/dev/null; }
+# ⚠ JEDE Datei, die ein Fall anfasst, MUSS hier stehen. Fehlt eine, bleibt die
+# Sabotage liegen, die Faelle stapeln sich, und der naechste meldet die rote
+# Zeile des vorigen — gefangen aus dem falschen Grund. Genau so geschehen am
+# 2026-09-14 mit sicherheit.html.
+heile() { git checkout -- assets/ tests/ markt.html index.html werkzeuge.html sicherheit.html 2>/dev/null; }
 
 # ersetze <datei> <alt> <neu> -- meldet, wenn der Anker NICHT sass. Ein toter
 # Anker aendert nichts und sieht danach aus wie ein blinder Waechter.
@@ -123,6 +127,33 @@ fall "die Suchzeile bricht nicht mehr um (Feld wird gequetscht)" assets/style.cs
 fall "der Suchen-Knopf rutscht in die dritte Zeile" assets/style.css \
   '.searchrow > .mic-sprache{order:2;margin:2px 2px 0}' \
   '.searchrow > .mic-sprache{margin:2px 2px 0}'
+
+echo; echo "═══ D · sicherheit.html traegt ihre Uebersetzung selbst ═══"
+# Die Seite laedt kein app.js. Faellt ihr eigenes Woerterbuch oder der Anwender
+# aus, steht sie im Englisch-Modus wieder vollstaendig auf Deutsch — genau der
+# Zustand vor dem 2026-09-14.
+fall "die Ueberschrift verliert ihre englische Fassung" sicherheit.html \
+  'sh_h1: "How the mycelium works, and how you are protected.",' \
+  'sh_h1_AUS: "How the mycelium works, and how you are protected.",'
+fall "der Anwender schreibt nichts mehr" sicherheit.html \
+  '      if (w[k] != null) el.textContent = w[k];' \
+  '      /* abgeschaltet */'
+fall "die Seite folgt fp_lang nicht mehr" sicherheit.html \
+  '  var lang = gewaehlt();' \
+  '  var lang = "de";'
+# Ein EINZELNER Woerterbuch-Eintrag verliert seine englische Fassung — dann
+# steht dort wieder deutscher Text, und genau das soll auffallen.
+fall "ein einzelner Woerterbuch-Eintrag verliert seine EN-Fassung" sicherheit.html \
+  '    sh_g_hyphe: "a single fungal thread' \
+  '    sh_g_hyphe_AUS: "a single fungal thread'
+# Die Gegenrichtung: Eigennamen sollen STEHEN BLEIBEN. Bekommt „Hyphe" eine
+# Uebersetzung, ist das ein Fehler, den der Waechter fangen muss.
+# ⚠ Der Haken muss auf einen Schluessel zeigen, den es im englischen
+# Woerterbuch WIRKLICH gibt. Die erste Fassung nahm `sh_gt_hyphe` — den gibt es
+# nicht, `w[k] != null` war false, der Text blieb stehen, und der Fall aenderte
+# gar nichts. Eine Sabotage, die nichts aendert, misst nichts.
+fall "ein Eigenname wird faelschlich uebersetzt" sicherheit.html \
+  '<dt translate="no">Hyphe</dt>' '<dt data-i18n="sh_gt_knoten">Hyphe</dt>'
 
 echo
 echo "$gefangen gefangen · $durch durchgerutscht · $tot tote Anker"
