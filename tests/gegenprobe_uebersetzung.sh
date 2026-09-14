@@ -131,7 +131,12 @@ fall "der Suchen-Knopf rutscht in die dritte Zeile" assets/style.css \
 echo; echo "═══ E · der Sprachriegel ═══"
 # Der Riegel im <head> ist der eigentliche: er laeuft VOR dem ersten Anstrich.
 # Faellt er aus, hat Chrome laengst entschieden, wenn app.js dran ist.
-fall "der Riegel im <head> faellt aus" markt.html \
+# ⚠ DIE SABOTAGE MUSS DIE SEITE TREFFEN, DIE DER WAECHTER MISST. Die erste
+# Fassung nahm markt.html — dort wird geklickt, aber der Waechter „der Riegel
+# steht schon VOR dem ersten Anstrich" misst die NAECHSTE Seite, werkzeuge.html.
+# Der Fall aenderte also eine Seite, auf die keine Zusicherung zeigt, und
+# meldete sich als „nicht gefangen", obwohl der Waechter tadellos ist.
+fall "der Riegel im <head> faellt aus" werkzeuge.html \
   'if(localStorage.getItem("fp_lang_wahl")!=="1")return;' \
   'if(true)return;'
 # Der Klick muss die Wahl MERKEN — sonst greift der head-Riegel beim naechsten
