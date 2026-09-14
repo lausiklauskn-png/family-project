@@ -136,6 +136,12 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
   ok(btn && /drop-shadow/.test(btn.shadow || ""), "Schweben über drop-shadow (folgt der Dreiecksform)");
   ok(btn && btn.w >= 44 && btn.h >= 44, `Klickfläche mindestens 44×44 (${btn && btn.w}×${btn && btn.h})`);
 
+  /* Wie viel Platz nach unten bleibt, wird VOR dem Oeffnen gemessen: der
+   * Riegel nimmt den Rumpf aus dem Bildlauf, danach ist `scrollHeight` gleich
+   * der Fensterhoehe und die Zahl waere immer 0. */
+  const platzVorher = await page.evaluate(
+    () => document.documentElement.scrollHeight - innerHeight - scrollY);
+
   await page.click("#mkListings .mk-report");
   await warteFenster(page);
   const dlg = await page.evaluate(() => {
@@ -165,14 +171,33 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
     `Fenster liegt im sichtbaren Bereich (oben ${dlg.rect.top}, unten ${dlg.rect.bottom}, Bild ${dlg.rect.vh})`);
   ok(dlg.focusInside, "Fokus steht nach dem Öffnen IM Fenster (man landet dort, wo es weitergeht)");
 
-  // Hintergrund darf nicht mitscrollen, solange das Fenster offen ist.
-  const bgLocked = await page.evaluate(async () => {
-    const before = scrollY;
+  /* Hintergrund darf nicht mitscrollen, solange das Fenster offen ist.
+   *
+   * ⚠ GEMESSEN WIRD DIE SICHTBARE LAGE, nicht `scrollY`. Der Riegel nimmt den
+   * Rumpf aus dem Bildlauf (`position:fixed`); `scrollY` ist dann notwendig 0,
+   * ganz gleich ob der Riegel arbeitet. Wer ihn misst, misst die Technik statt
+   * der Zusicherung.
+   *
+   * ⚠ UND DIE PROBE KONNTE AUS DEM FALSCHEN GRUND GRUEN SEIN: sie scrollte
+   * einfach um 400 weiter. Stand die Seite schon ganz unten, bewegte sich
+   * nichts, und sie meldete Erfolg — gemessen am 2026-09-14 in einem von vier
+   * Laeufen. Deshalb wird jetzt ausdruecklich eine Stelle angefahren, an der
+   * noch Platz nach unten ist, und das wird geprueft. */
+  const bg = await page.evaluate(async () => {
+    const warte = (ms) => new Promise((r) => setTimeout(r, ms));
+    const marke = () => {
+      const n = document.querySelectorAll(".listing")[3] || document.querySelector("footer");
+      return n ? Math.round(n.getBoundingClientRect().top) : null;
+    };
+    const offen = marke();
     scrollBy(0, 400);
-    await new Promise((r) => setTimeout(r, 120));
-    return { moved: Math.abs(scrollY - before) > 5 };
+    await warte(150);
+    return { offen, nachScroll: marke() };
   });
-  ok(!bgLocked.moved, "Hintergrund scrollt nicht, solange das Fenster offen ist");
+  ok(platzVorher > 400,
+     `es gibt ueberhaupt Platz zum Scrollen (${platzVorher}px) — sonst waere die naechste Zeile gruen aus dem falschen Grund`);
+  ok(bg.offen !== null && bg.nachScroll === bg.offen,
+     `Hintergrund scrollt nicht, solange das Fenster offen ist (${bg.offen} -> ${bg.nachScroll})`);
 
   // 6: Escape schließt UND gibt den Fokus zurück
   await page.keyboard.press("Escape");

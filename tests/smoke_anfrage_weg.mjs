@@ -31,9 +31,25 @@ for (const k of ['mk_build_teaser', 'mk_build_link']) {
   ok(`${k} ist zweisprachig`, (html.match(new RegExp(k + ':', 'g')) || []).length >= 2);
 }
 
-// Kein Versprechen, das Stufe 2 wäre (§ 8d): keine Preise, keine Provision.
-const teaserBereich = html.slice(posLink - 400, posLink + 200);
-ok('der Hinweis nennt keinen Preis', !/€|EUR|Prozent|%/.test(teaserBereich));
+/* Kein Versprechen, das Stufe 2 wäre (§ 8d): keine Preise, keine Provision.
+ *
+ * ⚠ GEMESSEN WIRD, WAS EIN BESUCHER SIEHT — nicht ein Zeichen-Fenster um den
+ * Verweis herum. Die erste Fassung nahm `html.slice(posLink-400, posLink+200)`
+ * und schlug am 2026-09-14 an einem ERKLÄR-KOMMENTAR an, in dem das Wort
+ * „Prozentsatz" stand: eine rote Zeile, ohne dass eine Zusicherung gefallen
+ * wäre. Dieselbe Falle wie ein Wächter, der seinen Suchbegriff im Kommentar
+ * findet, nur von der anderen Seite.
+ *
+ * Und das Fenster war auch in der Gegenrichtung blind: ein Preis, der 401
+ * Zeichen vor dem Verweis steht, lag außerhalb. Gemessen wird jetzt der
+ * BLOCK — der Hinweis-Absatz und der Anfrage-Abschnitt —, und zwar ohne
+ * Kommentare. */
+const ohneKommentare = (t) => t.replace(/<!--[\s\S]*?-->/g, ' ');
+const teaser = (html.match(/<p class="sub mk-anfrage-weg">[\s\S]*?<\/p>/) || [''])[0];
+const anfrageBlock = html.slice(posZiel, html.indexOf('</section>', posZiel));
+const sichtbar = ohneKommentare(teaser + anfrageBlock);
+ok('der Hinweis-Absatz ist da', teaser.length > 0);
+ok('der Hinweis nennt keinen Preis', !/€|EUR|Prozent|%/.test(sichtbar));
 
 console.log(`\n${pass}/${pass + fail} bestanden`);
 process.exit(fail ? 1 : 0);
