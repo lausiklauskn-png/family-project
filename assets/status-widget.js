@@ -22,6 +22,54 @@
  * ========================================================================== */
 (function (global) {
   "use strict";
+
+  /* ── SPRACHE (Klaus 2026-09-14) ────────────────────────────────────────
+   *
+   * WARUM HIER UND NICHT IM MODUL. Dieses Widget ERSETZT die sichtbare
+   * Modul-17-Pille (SbkimWidget.hide() in sbkim/sbkim-init.js, Klaus
+   * 2026-06-27 gegen die Doppelung). Modul 17 spricht seit dem 2026-09-14
+   * Deutsch und Englisch — auf family-projekt.de sah das aber NIEMAND: was
+   * der Nutzer sieht, sind die Etiketten von hier, und die standen fest im
+   * Code. Gemessen headless mit <html lang="en">: „LEBT · VERKEHR · FREMD ·
+   * SIEGEL" zwischen englischen Zeilen.
+   *
+   * App-eigener Klebstoff ist vom Modul-Rollout grundsaetzlich nicht
+   * erreichbar — dieselbe Lage wie beim Geraetenamen (NETZWEIT §2).
+   *
+   * WIE. Byte-gleiches Verfahren wie Modul 16/17/23 UI: SCHLUESSELLOS, der
+   * deutsche Satz IST der Schluessel, fail-soft auf Deutsch. Rangfolge hier
+   * nur <html lang> — dieses Widget hat kein init({lang}), es wird nicht
+   * konfiguriert. Jeder andere Wert faellt auf Deutsch zurueck.
+   *
+   * ⚠ DIE BEGRIFFE SIND MIT MODUL 17 ABGESTIMMT (alive/traffic/foreign/seal).
+   * Zwei Fassungen desselben Wortes liefen auseinander, und dann hiesse
+   * dieselbe Lampe im Widget anders als im Modul-Fenster daneben.
+   */
+  var TEXTE = { en: {
+      "LEBT": "ALIVE",
+      "VERKEHR": "TRAFFIC",
+      "FREMD": "FOREIGN",
+      "SIEGEL": "SEAL",
+      "SBKIM-Siegel": "SBKIM seal",
+      "SBKIM-Siegel ausgestellt": "SBKIM seal issued",
+      "SBKIM-Siegel öffnen": "Open the SBKIM seal",
+      "Fremdzugriffe ansehen": "View foreign accesses",
+      "Schließen": "Close",
+      "⊕ Status": "⊕ Status",
+      "Status-Widget zurückholen": "Bring the status widget back",
+      "Status-Anzeige zurückholen": "Bring the status display back",
+    } };
+
+  /* Liest die Sprache bei JEDEM Aufruf. Was schon im DOM steht, wechselt
+   * nicht mit — die Leiste wird einmal gebaut. Benannte Grenze, kein Fehler,
+   * dieselbe wie bei Modul 17. */
+  function T(de) {
+    var l = "";
+    try { l = (document.documentElement.getAttribute("lang") || "").slice(0, 2).toLowerCase(); } catch (_e) {}
+    var tab = TEXTE[l];
+    return (tab && Object.prototype.hasOwnProperty.call(tab, de)) ? tab[de] : de;
+  }
+
   var KEY = "fp_widget_state";
   var dock = document.getElementById("fp-dock");
   if (!dock) return;
@@ -41,12 +89,12 @@
   // „Status"-Text. Floating zeigt zusätzlich ein kleines ✕.
   w.innerHTML =
     '<span class="fp-sw-slots">' +
-      '<span class="fp-sw-lamp" data-slot="lebt"><i class="dot"></i>LEBT</span>' +
-      '<span class="fp-sw-lamp" data-slot="verkehr"><i class="dot"></i>VERKEHR</span>' +
-      '<span class="fp-sw-lamp" data-slot="fremd"><i class="dot"></i>FREMD</span>' +
-      '<span class="fp-sw-lamp" data-slot="siegel" title="SBKIM-Siegel"><i class="dot"></i>SIEGEL</span>' +
+      '<span class="fp-sw-lamp" data-slot="lebt"><i class="dot"></i>' + T("LEBT") + '</span>' +
+      '<span class="fp-sw-lamp" data-slot="verkehr"><i class="dot"></i>' + T("VERKEHR") + '</span>' +
+      '<span class="fp-sw-lamp" data-slot="fremd"><i class="dot"></i>' + T("FREMD") + '</span>' +
+      '<span class="fp-sw-lamp" data-slot="siegel" title="' + T("SBKIM-Siegel") + '"><i class="dot"></i>' + T("SIEGEL") + '</span>' +
     '</span>' +
-    '<button type="button" class="fp-sw-x" data-act="close" title="Schließen" aria-label="Schließen">✕</button>';
+    '<button type="button" class="fp-sw-x" data-act="close" title="' + T("Schließen") + '" aria-label="' + T("Schließen") + '">✕</button>';
 
   /* Macht aus einem <span> ein richtiges Bedien-Element (Befund 5.1, 2026-08-01).
    * Die SIEGEL-Lampe und der Zurückhol-Chip waren klickbare <span>-Elemente ohne
@@ -65,11 +113,11 @@
 
   var restore = document.createElement("span");
   restore.className = "fp-sw-restore";
-  restore.textContent = "⊕ Status";
-  restore.title = "Status-Widget zurückholen";
+  restore.textContent = T("⊕ Status");
+  restore.title = T("Status-Widget zurückholen");
   restore.style.display = "none";
   restore.addEventListener("click", function () { setMode("docked"); });
-  alsKnopf(restore, function () { setMode("docked"); }, "Status-Anzeige zurückholen");
+  alsKnopf(restore, function () { setMode("docked"); }, T("Status-Anzeige zurückholen"));
 
   dock.appendChild(w);
   dock.appendChild(restore);
@@ -115,7 +163,7 @@
     if (badge) badge.click();
   }
   siegel.addEventListener("click", siegelOeffnen);
-  alsKnopf(siegel, siegelOeffnen, "SBKIM-Siegel öffnen");
+  alsKnopf(siegel, siegelOeffnen, T("SBKIM-Siegel öffnen"));
 
   /* ---- FREMD-Klick öffnet das Fremdzugriff-Fenster (Modul 15) -------------
    * Befund von Klaus, 2026-08-01, im DuckDuckGo-Browser: die FREMD-Lampe stand
@@ -142,7 +190,7 @@
     var fremdAnker = function () { return document.getElementById("lamp-fremd"); };
     var fremdOeffnen = function () { var a = fremdAnker(); if (a) a.click(); };
     fremd.addEventListener("click", fremdOeffnen);
-    alsKnopf(fremd, fremdOeffnen, "Fremdzugriffe ansehen");
+    alsKnopf(fremd, fremdOeffnen, T("Fremdzugriffe ansehen"));
     /* Der Zeigefinger erscheint erst, wenn es wirklich etwas zu öffnen gibt.
      * Modul 15 hängt seinen Handler beim init() an, also nach uns — deshalb
      * einmal nachsehen, statt sofort zu entscheiden. */
@@ -225,7 +273,7 @@
     lamp("verkehr", verkehrListening ? "on" : "");
   });
   global.addEventListener("sbkim:fremd-alert", function () { lamp("fremd", "warn"); });
-  global.addEventListener("sbkim:siegel-certified", function () { lamp("siegel", "on"); var s = w.querySelector('[data-slot="siegel"]'); if (s) s.title = "SBKIM-Siegel ausgestellt"; });
+  global.addEventListener("sbkim:siegel-certified", function () { lamp("siegel", "on"); var s = w.querySelector('[data-slot="siegel"]'); if (s) s.title = T("SBKIM-Siegel ausgestellt"); });
   setTimeout(function () { lamp("lebt", "on"); }, 1200);   // Spore lebt nach Init
 
   // ---- Start ---------------------------------------------------------------
