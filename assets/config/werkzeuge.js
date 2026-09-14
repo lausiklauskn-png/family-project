@@ -2,7 +2,13 @@
  * werkzeuge/<page>. Wechselbar ohne Code.
  *   open:    Link zum Öffnen/Starten (eigener Tab)
  *   install: Link/Hinweis zum Installieren (leer = nur öffnen)
- * Schema: { id, name, icon, de, en, page, open, install } */
+ * Schema: { id, name, name_en, icon, de, en, page, open, install }
+ *
+ *   name     Anzeige-Name. Bei ECHTEN Eigennamen (Mein Rezeptbuch, Kimboard)
+ *            steht hier alles — ein Name wird nicht uebersetzt.
+ *   name_en  NUR wo der „Name" in Wahrheit eine BESCHREIBUNG ist
+ *            („Ans Netz anschliessen"). Fehlt er, bleibt `name` stehen —
+ *            fail-soft, kein leerer Titel. */
 window.FP_WERKZEUGE = [
   { id: "box", name: "Mycel-Geschenkbox", icon: "🎁",
     badge: { kind: "node", de: "⭐ alle SBKIM-Werkzeuge · downloaden & installieren", en: "⭐ all SBKIM tools · download & install" },
@@ -11,20 +17,20 @@ window.FP_WERKZEUGE = [
     page: "werkzeuge/geschenkbox.html",
     open: "werkzeuge/geschenkbox.html",
     install: "" },
-  { id: "such", name: "Such-Werkzeug", icon: "🔍", iconImg: "assets/appicons/such.webp",
+  { id: "such", name: "Such-Werkzeug", name_en: "Search tool", icon: "🔍", iconImg: "assets/appicons/such.webp",
     badge: { kind: "app", de: "PWA-App · zum Installieren", en: "PWA app · to install" },
     de: "Findet nach Bedeutung, nicht nach Stichwörtern. Läuft ganz im Browser, ohne Server, ohne Konto. Die reine App zum Installieren, ohne Netz-Anmeldung.",
     en: "Finds by meaning, not by keywords. Runs fully in the browser, no server, no account. The plain app to install, without network sign-in.",
     page: "werkzeuge/such-werkzeug.html",
     open: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
     install: "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/" },
-  { id: "andock", name: "Ans Netz anschließen", icon: "🔗",
+  { id: "andock", name: "Ans Netz anschließen", name_en: "Connect to the network", icon: "🔗",
     de: "Hier anfangen: erst verstehen, was das Mycel ist (mit selbst-gravierendem Siegel), dann in der richtigen Reihenfolge einen Knoten erzeugen und andocken.",
     en: "Start here: first understand what the mycelium is (with a self-engraving seal), then create a node and dock, in the right order.",
     page: "werkzeuge/andock-werkzeug.html",
     open: "netzwerk.html#andock",
     install: "" },
-  { id: "knoten", name: "Deine App zum Knoten", icon: "🪢",
+  { id: "knoten", name: "Deine App zum Knoten", name_en: "Turn your app into a node", icon: "🪢",
     de: "Schritt 2, für Entwickler: die offenen SBKIM-Bausteine Datei für Datei in deine eigene PWA einbauen (Identität, Handshake, Status, Siegel).",
     en: "Step 2, for developers: build the open SBKIM blocks into your own PWA, file by file (identity, handshake, status, seal).",
     page: "werkzeuge/knoten-werkzeug.html",

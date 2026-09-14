@@ -60,6 +60,11 @@
     });
     try { renderAppLinks(); } catch (_e) {}
     try { renderToolButtons(); } catch (_e) {}
+    // Der Themen-Name steht NICHT in den Woerterbuechern (er haengt am
+    // gewaehlten Thema, nicht an einem festen Schluessel) — er wird deshalb
+    // hier eigens nachgezogen. Ohne das blieb im Englisch-Modus „Dunkel".
+    try { applyTheme(ti); } catch (_e) {}
+    try { mountMicLangPicker(); } catch (_e) {}
     try { global.dispatchEvent(new CustomEvent("fp:lang", { detail: { lang: lang } })); } catch (_e) {}
   }
   function getLang() { return lang; }
@@ -67,15 +72,15 @@
 
   // ---- Themen --------------------------------------------------------------
   var THEMES = [
-    { name: "Dunkel", vars: {} },
-    { name: "Neon", vars: {
+    { name: "Dunkel", anzeige: { de: "Dunkel", en: "Dark" }, vars: {} },
+    { name: "Neon", anzeige: { de: "Neon", en: "Neon" }, vars: {
       "--bg": "#08081a", "--bg2": "#0e0e22", "--card": "rgba(20,16,40,.55)", "--line": "rgba(157,92,255,.28)", "--header-bg": "rgba(8,8,26,.6)",
       "--text": "#ece4ff", "--muted": "#a79ad0", "--accent": "#ff3f9a", "--accent2": "#9d5cff", "--accent3": "#00c8f0",
       "--focus": "#ffe14d",
       "--glow": "0 0 26px rgba(157,92,255,.45),0 0 60px rgba(255,63,154,.20)",
       "--holo-text": "linear-gradient(100deg,#ff9ed4,#b69bff,#7fe8ff,#ffb0e0,#b69bff,#ff9ed4)",
       "--holo-border": "conic-gradient(from var(--rot),#ff3f9a,#9d5cff,#00c8f0,#ff3f9a,#b69bff,#ff3f9a)" } },
-    { name: "Hell", vars: {
+    { name: "Hell", anzeige: { de: "Hell", en: "Light" }, vars: {
       "--bg": "#f4f6fa", "--bg2": "#eaeef4", "--card": "rgba(255,255,255,.72)", "--line": "rgba(20,30,45,.14)", "--header-bg": "rgba(244,246,250,.80)",
       "--text": "#16202c", "--muted": "#54637a", "--accent": "#0e8f86", "--accent2": "#6a4fd0", "--accent3": "#2f6df0",
       // Gold verschwindet auf Weiß. Auf dem hellen Thema markiert ein kräftiges
@@ -101,7 +106,14 @@
     var th = THEMES[ti];
     Object.keys(th.vars).forEach(function (k) { root.style.setProperty(k, th.vars[k]); });
     var nameEl = document.getElementById("themeName");
-    if (nameEl) nameEl.textContent = th.name;
+    /* ANGEZEIGT wird `anzeige`, GESCHALTET wird mit `name`. Zwei Dinge, zwei
+     * Felder: `name` ist der Schluessel, mit dem MycelBg den Hintergrund
+     * umstellt — wer ihn uebersetzt, haengt den Hintergrund still ab.
+     *
+     * Und `translate="no"` steht am Knopf (assets/notranslate.js), weil Googles
+     * Uebersetzer das deutsche „Hell" fuer das ENGLISCHE Wort haelt und
+     * „Hoelle" daraus macht. Klaus hat genau das am 2026-09-14 fotografiert. */
+    if (nameEl) nameEl.textContent = (th.anzeige && th.anzeige[lang]) || th.name;
     try { themeBtnNachziehen(); } catch (_e) {}   // Vorlese-Name folgt dem neuen Wort
     if (global.MycelBg && typeof global.MycelBg.setTheme === "function") {
       global.MycelBg.setTheme(th.name);
@@ -124,12 +136,23 @@
    * EINE Wahl für alle Mikrofone der Seite (Kopfleiste), nicht acht Auswahlen
    * neben acht Knöpfen: die 🎤 stecken absolut positioniert IN den Feldern,
    * dort ist kein Platz, und niemand stellt dieselbe Sprache achtmal ein. */
+  /* [Code, EIGENNAME, Erklaerung deutsch, Erklaerung englisch]
+   *
+   * Der Eigenname steht immer da und wird NIE uebersetzt — wer Paschtu sucht,
+   * sucht „پښتو", nicht „Pashto". Die Erklaerung in Klammern folgt dagegen der
+   * Oberflaechen-Sprache; vorher stand dort auch im Englisch-Modus „(Russisch)".
+   * Wo Eigenname und Erklaerung dasselbe waeren (Deutsch, Türkçe, Polski …),
+   * steht keine Klammer — „Türkçe (Türkisch)" sagt zweimal dasselbe. */
   var MIC_LANGS = [
-    ["de-DE", "Deutsch"], ["en-US", "English"], ["ru-RU", "Русский (Russisch)"],
-    ["ar-SA", "العربية (Arabisch)"], ["tr-TR", "Türkçe"], ["pl-PL", "Polski"],
-    ["uk-UA", "Українська (Ukrainisch)"], ["fr-FR", "Français"],
-    ["es-ES", "Español"], ["it-IT", "Italiano"],
-    ["ps-AF", "پښتو (Paschtu)"], ["fa-IR", "دری / فارسی (Dari · Persisch)"]
+    ["de-DE", "Deutsch", "", "German"], ["en-US", "English", "Englisch", ""],
+    ["ru-RU", "Русский", "Russisch", "Russian"],
+    ["ar-SA", "العربية", "Arabisch", "Arabic"],
+    ["tr-TR", "Türkçe", "", "Turkish"], ["pl-PL", "Polski", "", "Polish"],
+    ["uk-UA", "Українська", "Ukrainisch", "Ukrainian"],
+    ["fr-FR", "Français", "", "French"],
+    ["es-ES", "Español", "", "Spanish"], ["it-IT", "Italiano", "", "Italian"],
+    ["ps-AF", "پښتو", "Paschtu", "Pashto"],
+    ["fa-IR", "دری / فارسی", "Dari · Persisch", "Dari · Persian"]
   ];
   var LS_MICLANG = "fp_miclang";      // app-eigener Name: geteilter Origin
 
@@ -157,7 +180,12 @@
   }
   var micLang = micLangVorauswahl();
   function micName(code) {
-    for (var i = 0; i < MIC_LANGS.length; i++) if (MIC_LANGS[i][0] === code) return MIC_LANGS[i][1];
+    for (var i = 0; i < MIC_LANGS.length; i++) {
+      if (MIC_LANGS[i][0] !== code) continue;
+      var eigen = MIC_LANGS[i][1];
+      var dazu = (getLang() === "en") ? MIC_LANGS[i][3] : MIC_LANGS[i][2];
+      return dazu ? eigen + " (" + dazu + ")" : eigen;
+    }
     return code;
   }
 
@@ -226,36 +254,97 @@
     } catch (_e) {}
   }
 
+  /* Der Waehler gehoert AN DAS MIKROFON, nicht in die Kopfleiste (Klaus
+   * 2026-09-14: „das Mikrofon fuer die Sprachuebersetzung an der Stelle
+   * positionieren, wo sich der Zusammenhang automatisch ergibt").
+   *
+   * Vorher stand er als Pille NEBEN dem DE/EN-Knopf. Damit standen zwei
+   * Sprach-Bedienelemente nebeneinander, und das laengere von beiden — eine
+   * Liste mit zwoelf Sprachnamen — uebersetzte die Seite nicht. Es SAH aus
+   * wie der Seiten-Sprachwaehler und war der fuers Mikrofon. Genau diese
+   * Doppelung hat Klaus gemeldet.
+   *
+   * Es bleibt bei EINEM Waehler fuer alle Mikrofone der Seite (niemand stellt
+   * dieselbe Sprache achtmal ein) — er WANDERT nur zu dem Feld, dessen
+   * Mikrofon gerade benutzt wird. Damit steht er immer dort, wo gesprochen
+   * wird, ohne dass es acht Stueck braucht. */
+  var micSpracheReihe = null;
+
+  function micLangZuFeld(field) {
+    if (!micSpracheReihe || !field || !field.parentNode) return;
+    // VOR den Hinweis, nicht dahinter: der Hinweis traegt die Fehlermeldung
+    // („Dieser Browser kann Paschtu nicht hoeren"), und die gehoert unter die
+    // Sprache, auf die sie sich bezieht.
+    var hin = field.parentNode.querySelector(".mic-hinweis");
+    field.parentNode.insertBefore(micSpracheReihe, hin || field.nextSibling);
+  }
+
   function mountMicLangPicker() {
-    var nav = document.querySelector("nav.top");
-    if (!nav) return;
-    if (!document.querySelector(".mic")) return;              // keine Mikrofone → keine Wahl
-    var SR = global.SpeechRecognition || global.webkitSpeechRecognition;
-    if (!SR) return;                                          // fail-soft: kein toter Knopf
     var sel = document.getElementById("fpMicLang");
-    if (sel) return;                                          // idempotent
+    if (sel) { micNamenNachziehen(sel); return; }                 // idempotent
+    var ersterMic = document.querySelector(".field .mic");
+    if (!ersterMic) return;                                       // keine Mikrofone → keine Wahl
+    var SR = global.SpeechRecognition || global.webkitSpeechRecognition;
+    if (!SR) return;                                              // fail-soft: kein toter Knopf
+
+    micSpracheReihe = document.createElement("div");
+    micSpracheReihe.className = "mic-sprache";
+
+    var zeichen = document.createElement("span");
+    zeichen.className = "mic-sprache-ic";
+    zeichen.setAttribute("aria-hidden", "true");
+    zeichen.textContent = "🎤";
+
+    var beschriftung = document.createElement("label");
+    beschriftung.className = "mic-sprache-lbl";
+    beschriftung.setAttribute("for", "fpMicLang");
+
     sel = document.createElement("select");
     sel.id = "fpMicLang";
-    sel.className = "pill pill-miclang";
+    sel.className = "mic-sprache-sel";
     for (var i = 0; i < MIC_LANGS.length; i++) {
       var o = document.createElement("option");
-      o.value = MIC_LANGS[i][0]; o.textContent = MIC_LANGS[i][1];
+      o.value = MIC_LANGS[i][0];
       sel.appendChild(o);
     }
     sel.value = micLang;
-    var setLabel = function () {
-      var de = getLang() === "de";
-      sel.title = de ? "🎤 Sprache, in der du sprichst" : "🎤 language you speak";
-      sel.setAttribute("aria-label", sel.title);
-    };
-    setLabel();
-    global.addEventListener("fp:lang", setLabel);
+
+    micSpracheReihe.appendChild(zeichen);
+    micSpracheReihe.appendChild(beschriftung);
+    micSpracheReihe.appendChild(sel);
+
+    micNamenNachziehen(sel);
+    global.addEventListener("fp:lang", function () { micNamenNachziehen(sel); });
+
     sel.addEventListener("change", function () {
       micLang = sel.value;
       try { localStorage.setItem(LS_MICLANG, micLang); } catch (_e) {}
     });
-    var lb = document.getElementById("langBtn");
-    if (lb && lb.parentNode === nav) nav.insertBefore(sel, lb.nextSibling); else nav.appendChild(sel);
+
+    var feld = ersterMic.closest(".field");
+    if (feld) micLangZuFeld(feld);
+    // Der Riegel gegen den Auto-Uebersetzer greift auch hier: Sprachnamen sind
+    // Eigennamen. Er laeuft als Beobachter (assets/notranslate.js) und erwischt
+    // diese Reihe von selbst — der Aufruf hier ist die Rueckfalllinie, falls
+    // die Datei einmal fehlt.
+    try { if (global.FPNoTranslate) global.FPNoTranslate.riegeln(document); } catch (_e) {}
+  }
+
+  /* Beschriftung UND Options-Namen folgen der Oberflaechen-Sprache. Vorher
+   * stand die Erklaerung nur als `title` da — ein Tooltip, den es auf dem
+   * Tablet gar nicht gibt. Wer nicht mit der Maus darueberfaehrt, sah eine
+   * nackte Sprachliste und hielt sie fuer den Seiten-Umschalter. */
+  function micNamenNachziehen(sel) {
+    if (!sel) return;
+    var de = getLang() === "de";
+    for (var i = 0; i < sel.options.length && i < MIC_LANGS.length; i++) {
+      sel.options[i].textContent = micName(MIC_LANGS[i][0]);
+    }
+    var lbl = micSpracheReihe ? micSpracheReihe.querySelector(".mic-sprache-lbl") : null;
+    if (lbl) lbl.textContent = de ? "Ich spreche" : "I speak";
+    sel.setAttribute("aria-label", de
+      ? "Sprache, in der du ins Mikrofon sprichst"
+      : "language you speak into the microphone");
   }
 
   // ---- Mikrofon: automatisch an jedem .mic-Knopf in einem .field -----------
@@ -273,6 +362,9 @@
     var rec = new SR(); rec.interimResults = true; rec.continuous = false;
     var on = false, gehoert = micLang, letzter = "";
     btn.addEventListener("click", function () {
+      // Der Waehler wandert zu DIESEM Feld — auch beim Abbrechen, denn wer
+      // stoppt, will meist die Sprache aendern und wieder starten.
+      try { micLangZuFeld(field); } catch (_e) {}
       if (on) { try { rec.stop(); } catch (_e) {} return; }
       gehoert = micLang;                       // die Wahl gilt ab dem Antippen
       rec.lang = gehoert;
