@@ -148,8 +148,12 @@ fall "ein einzelner Woerterbuch-Eintrag verliert seine EN-Fassung" sicherheit.ht
   '    sh_g_hyphe_AUS: "a single fungal thread'
 # Die Gegenrichtung: Eigennamen sollen STEHEN BLEIBEN. Bekommt „Hyphe" eine
 # Uebersetzung, ist das ein Fehler, den der Waechter fangen muss.
+# ⚠ Der Haken muss auf einen Schluessel zeigen, den es im englischen
+# Woerterbuch WIRKLICH gibt. Die erste Fassung nahm `sh_gt_hyphe` — den gibt es
+# nicht, `w[k] != null` war false, der Text blieb stehen, und der Fall aenderte
+# gar nichts. Eine Sabotage, die nichts aendert, misst nichts.
 fall "ein Eigenname wird faelschlich uebersetzt" sicherheit.html \
-  '<dt translate="no">Hyphe</dt>' '<dt data-i18n="sh_gt_hyphe">Hyphe</dt>'
+  '<dt translate="no">Hyphe</dt>' '<dt data-i18n="sh_gt_knoten">Hyphe</dt>'
 
 echo
 echo "$gefangen gefangen · $durch durchgerutscht · $tot tote Anker"
