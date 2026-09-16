@@ -17,9 +17,16 @@ Docker. Das ändert alles, was mit Auslieferung zu tun hat.
 Dieses Repo hat **keine `package.json`**. Die Proben werden aufgerufen:
 
 ```bash
-node tests/smoke_all.mjs
+node tests/smoke_all.mjs       # die Seiten im echten Browser (110 Prüfungen)
+node tests/smoke_*.mjs         # ⚠ die ÜBRIGEN Proben — smoke_all ruft sie NICHT auf
 bash tests/gegenprobe_*.sh     # jede Gegenprobe baut Fehler ein, die auffallen MÜSSEN
 ```
+
+⚠ **`smoke_all.mjs` ist NICHT „die Prüfung".** Es lädt die Seiten und fasst die
+anderen `tests/smoke_*.mjs` **nicht an**. Gemessen am 2026-09-16: dadurch stand
+`smoke_cache_version.mjs` rot, ohne dass es jemandem auffiel — `ASSET_V` war auf
+**110** stehengeblieben, während die `CACHE_VERSION` bei **v115** war. *Eine
+Probe, die im Sammellauf nicht mitläuft, ist eine Probe, die niemand fährt.*
 
 ## Was hier leicht kaputtgeht
 

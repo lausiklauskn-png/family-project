@@ -109,34 +109,59 @@ const htmlFiles = [];
 for (const dir of [repoRoot, resolve(repoRoot, "werkzeuge")]) {
   for (const f of readdirSync(dir)) if (f.endsWith(".html")) htmlFiles.push(resolve(dir, f));
 }
+
+/* ⚠ DIE LISTE DER ASSETS WIRD GEFUNDEN, NICHT GEPFLEGT (Befund 2026-09-16).
+ *
+ * Hier stand bis dahin eine von Hand gepflegte Aufzählung — style.css, app.js,
+ * status-widget.js, mycel-bg.js, studio-markt.js, vec-codec.js. Sie ist über ein
+ * Jahr DREIMAL erweitert worden, jedes Mal NACH einem Schaden: status-widget.js
+ * (2026-08-01), mycel-bg.js (2026-08-02), studio-markt.js + vec-codec.js
+ * (2026-08-03). Jedes Mal stand daneben „dritter Fall desselben Fehlers".
+ *
+ * Und beim vierten Mal fiel auf, dass die Liste schon wieder unvollständig war:
+ * `assets/notranslate.js` steht in ZWÖLF Verweisen und kam in dieser Aufzählung
+ * NICHT vor — es wurde von niemandem geprüft. Gemessen: der Wächter sah 40 von
+ * 52 Verweisen.
+ *
+ * Eine gepflegte Liste hätte denselben Fehler ein fünftes Mal gemacht. Gesucht
+ * wird jetzt JEDER Verweis auf `assets/…` in JEDER Seite — dieselbe Lehre wie
+ * beim Kanon-Verteiler in Sage und beim gleichen Befund in PWA-Toolpoint.
+ *
+ * ⚠ UND DIE REGEL HAT ZWEI HÄLFTEN, nicht eine. „Alles muss ein ?v= tragen"
+ * wäre falsch: `assets/tool-landing.js` trägt keines und ist trotzdem in
+ * Ordnung, weil es in CORE steht und der Worker CORE mit `cache:"reload"` holt
+ * — also am HTTP-Cache vorbei. Wogegen das ?v= schützt, ist der ANDERE Fall:
+ * eine Datei, die WEDER in CORE steht NOCH eine Versionsnummer trägt, hängt
+ * frei am HTTP-Cache, den niemand bustet. Genau das war studio-markt.js am
+ * 2026-08-03. */
+const FREMD = /^https?:\/\//;
 const wrong = [];
 let refs = 0;
 for (const f of htmlFiles) {
   const t = readFileSync(f, "utf8");
-  /* mycel-bg.js seit 2026-08-02 mit in der Liste: Die Datei stand weder in
-   * CORE noch trug sie ein ?v= — sie hing frei am HTTP-Cache, den niemand
-   * bustet. Nach dem Einbau der Selbst-Bremse wäre die Änderung auf neun von
-   * zehn Seiten womöglich nie angekommen (Caddy setzt keinen Cache-Header,
-   * dann rät der Browser selbst). Derselbe Fehlertyp wie am 2026-08-01 bei
-   * status-widget.js. Der Pfad-Teil erlaubt ../, weil die Seiten unter
-   * werkzeuge/ eine Ebene tiefer liegen. */
-  /* studio-markt.js + vec-codec.js seit 2026-08-03 mit in der Liste — dritter
-   * Fall desselben Fehlers. Beide standen fest auf ?v=84, während alles andere
-   * bei 89 war, und keine der beiden steht in CORE. Sie hingen damit frei am
-   * HTTP-Cache. Real passiert: das Studio bekam die Fähigkeit, von Hand
-   * eingetragene Werte anzuzeigen — im Browser blieb die alte Datei, und Klaus
-   * sah dort weiter Leistung 46, während die Karte daneben 94 zeigte. Der Test
-   * war grün, weil er genau diese zwei Dateien nicht ansah. */
-  for (const m of t.matchAll(/(?:href|src)="[^"]*assets\/(style\.css|app\.js|status-widget\.js|mycel-bg\.js|studio-markt\.js|vec-codec\.js)(\?v=(\d+))?"/g)) {
+  const kurz = f.replace(repoRoot + "/", "");
+  for (const m of t.matchAll(/(?:href|src)="([^"]*assets\/[A-Za-z0-9._-]+)(\?v=(\d+))?"/g)) {
+    if (FREMD.test(m[1])) continue;              // fremder Wirt — nicht unsere Adresse
+    const pfad = m[1].replace(/^(\.\.\/)+/, ""); // werkzeuge/ liegt eine Ebene tiefer
     refs++;
-    if (m[3] !== assetV) wrong.push(`${f.replace(repoRoot + "/", "")}: assets/${m[1]}${m[2] || " (ohne ?v=)"}`);
+    if (m[2]) {
+      if (m[3] !== assetV) wrong.push(`${kurz}: ${pfad}${m[2]} (erwartet ?v=${assetV})`);
+    } else if (!core.includes(pfad)) {
+      wrong.push(`${kurz}: ${pfad} — ohne ?v= UND nicht in CORE: hängt frei am HTTP-Cache`);
+    }
   }
 }
 ok(refs > 0, `Asset-Verweise in HTML gefunden (${refs})`);
 ok(wrong.length === 0,
   wrong.length === 0
-    ? `alle ${refs} Verweise tragen ?v=${assetV}`
+    ? `alle ${refs} Verweise sind versorgt (?v=${assetV} oder in CORE)`
     : `Verweise mit falscher/fehlender Version: ${wrong.slice(0, 4).join(" · ")}`);
+
+/* … und die GEFUNDENE Liste muss wirklich mehr sein als die alte von Hand.
+ * Fiele die Suche auf eine Teilmenge zurück — ein zu enger Ausdruck, ein
+ * vergessenes Verzeichnis —, wäre der Wächter wieder der Wächter am Einzelfall,
+ * von dem er herkommt, und man sähe es an keiner roten Zeile. */
+ok(refs >= 50, `… und gefunden wurden ALLE Verweise, nicht nur die früher gepflegten (${refs}, früher 40)`);
 
 let base = null;
 try { git("rev-parse", "--verify", "origin/main"); base = "origin/main"; }
