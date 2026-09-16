@@ -9,7 +9,22 @@
 // queryLocalMulti) + A1 (hybrid BM25+Vektor), fail-soft.
 //
 // Dieser Test beweist die API-Kette mit der TATSÄCHLICH AUSGELIEFERTEN Karte
-// FP_QUERY_SYNONYMS aus sbkim/15_membran.js (mini Drift-Guard der Verdrahtung).
+// FP_QUERY_SYNONYMS (mini Drift-Guard der Verdrahtung).
+//
+// ⚠ TAFEL-EVOLUTIONS-KLAUSEL, AUSDRÜCKLICH BENANNT (2026-09-16). Bis heute las
+// dieser Test die Karte aus `sbkim/15_membran.js`. Das war richtig, solange sie
+// dort stand — und genau daran lag der Fehler: `15_membran.js` ist eine
+// byte-1:1-Kopie aus dem Sage-Kanon, die „kopieren, nicht klonen" gar nicht zu
+// ändern erlaubt. Das Nachziehen des Kanons an diesem Tag hätte die Karte
+// LAUTLOS gelöscht; aufgefallen ist es nur, weil der sha der Kopie nicht in
+// Sages Historie stand.
+//
+// Seit dem 2026-08-14 trägt der Kanon die Mechanik selbst (`queryInclusion`)
+// mit der Auflage: die MECHANIK in den Kanon, die FACHWORTE zu der App, die sie
+// kennt. Die Karte liegt deshalb jetzt in `sbkim/sbkim-init.js`. Der Test liest
+// sie von dort — die Zusicherung ist ERSETZT, nicht stillschweigend getauscht.
+// Dass sie im laufenden Modul wirklich ankommt, misst `smoke_wortkarte.mjs` im
+// echten Browser; dieser Test hier misst die API-Kette.
 // Der 0.80-Cosinus-Boden (Modul 05 Andock-Riegel) bleibt unberührt; der Gewinn
 // ist INKLUSION über den lexikalischen BM25-Pfad.
 
@@ -36,13 +51,23 @@ new Function("global", "window", "globalThis", "console", src)(
 );
 const M = globalThis.SbkimMatch;
 
-// FP_QUERY_SYNONYMS aus dem AUSGELIEFERTEN Modul 15 extrahieren.
+// FP_QUERY_SYNONYMS aus dem app-eigenen Glue extrahieren (seit 2026-09-16 dort,
+// siehe Kopf). Gelesen wird die AUSGELIEFERTE Datei, nicht eine Nachbildung.
+const glue = readFileSync(resolve(repoRoot, "sbkim/sbkim-init.js"), "utf8");
+const a = glue.indexOf("FP_QUERY_SYNONYMS = {");
+if (a < 0) { console.error("FAIL: FP_QUERY_SYNONYMS nicht in sbkim-init.js gefunden"); process.exit(1); }
+const eq = glue.indexOf("=", a);
+const end = glue.indexOf("};", eq) + 2;
+const FP_QUERY_SYNONYMS = new Function("return " + glue.slice(eq + 1, end).trim())();
+
+// ⚠ UND DIE GEGENRICHTUNG: sie darf NICHT mehr in der byte-1:1-Kopie stehen.
+// Ohne diese Hälfte wäre der Test auch dann grün, wenn jemand die Karte dorthin
+// zurückschiebt — und das nächste Nachziehen des Kanons löschte sie wieder.
 const membran = readFileSync(resolve(repoRoot, "sbkim/15_membran.js"), "utf8");
-const a = membran.indexOf("var FP_QUERY_SYNONYMS");
-if (a < 0) { console.error("FAIL: FP_QUERY_SYNONYMS nicht in 15_membran.js gefunden"); process.exit(1); }
-const eq = membran.indexOf("=", a);
-const end = membran.indexOf("};", eq) + 2;
-const FP_QUERY_SYNONYMS = new Function("return " + membran.slice(eq + 1, end).trim())();
+if (membran.includes("FP_QUERY_SYNONYMS")) {
+  console.error("FAIL: FP_QUERY_SYNONYMS steht wieder in der byte-1:1-Kopie 15_membran.js");
+  process.exit(1);
+}
 
 // queryWithInclusion aus Modul 15 nachbilden (die Kette, die der Empfänger fährt).
 async function queryWithInclusion(text, k) {
