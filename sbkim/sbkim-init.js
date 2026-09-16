@@ -64,7 +64,28 @@
         try { if (SbkimWidget.hide) SbkimWidget.hide(); } catch (_e) {}
       }
       if (window.SbkimMembrane) {
-        await SbkimMembrane.init({ allowedOrigins: FP.allowedOrigins });
+        /* ── Die eigene Wortkarte dieser Seite (Umzug 2026-09-16) ────────
+         * SIE STAND BIS HEUTE IN DER MODUL-KOPIE `sbkim/15_membran.js` — in
+         * einer byte-1:1-Datei, die "kopieren, nicht klonen" gar nicht zu
+         * aendern erlaubt. Das naechste Nachziehen des Kanons haette sie
+         * LAUTLOS geloescht.
+         *
+         * Seit dem 2026-08-14 traegt der Kanon die Mechanik selbst
+         * (`queryInclusion`) — mit der Auflage: die MECHANIK in den Kanon,
+         * die FACHWORTE zu der App, die sie kennt. Der Inhalt der Karte ist
+         * Zeichen fuer Zeichen derselbe. Vorgabe im Kanon ist `null` = aus. */
+        const FP_QUERY_SYNONYMS = {
+        "kfz": ["auto"], "auto": ["kfz", "wagen"], "wagen": ["auto"],
+        "notebook": ["laptop"], "laptop": ["notebook"],
+        "handy": ["smartphone"], "smartphone": ["handy"],
+        "arznei": ["medikament"], "medikament": ["arznei", "arzneimittel"],
+        "foto": ["bild"], "bild": ["foto"],
+        };
+
+        await SbkimMembrane.init({
+          allowedOrigins: FP.allowedOrigins,
+          queryInclusion: { synonyms: FP_QUERY_SYNONYMS },
+        });
       }
       if (window.SbkimSiegel) {
         SbkimSiegel.init({ badgeSelector: "#sbkim-siegel-badge", repoUrl: FP.repoUrl, ribbonText: "FAMILY PROJEKT" });
