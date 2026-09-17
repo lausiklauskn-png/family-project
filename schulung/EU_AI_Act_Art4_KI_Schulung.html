@@ -20,45 +20,45 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
 @media print{
   @page{size:A4;margin:14mm}
   body{background:white;font-size:10.7pt}.wrap{max-width:none;margin:0;padding:0}.controls{display:none!important}.sheet{box-shadow:none;border:0;border-radius:0;padding:0;margin:0 0 10mm}.pagebreak{break-before:page}.avoid{break-inside:avoid}.meta input{border:0;border-bottom:1px solid #555;border-radius:0;padding:5px 0}.q{break-inside:avoid}
-  /* Eine Ueberschrift bleibt bei ihrem Text (Klaus 17.09.2026). Vorher endete
-     Seite 1 mit der blossen Zeile "2. KI ist hilfreich - aber nicht automatisch
-     richtig" samt Unterstrich, und der Abschnitt dazu begann auf Seite 2 - so
-     laesst sich Punkt 2 nicht als eigener Bogen ausdrucken. */
+  /* Eine Überschrift bleibt bei ihrem Text (Klaus 17.09.2026). Vorher endete
+     Seite 1 mit der bloßen Zeile "2. KI ist hilfreich, aber nicht automatisch
+     richtig" samt Unterstrich, und der Abschnitt dazu begann erst auf Seite 2.
+     So ließ sich Punkt 2 nicht als eigener Bogen ausdrucken. */
   .training h2{break-after:avoid}
-  /* Und der Platz dafuer kommt aus dem ZWEITEN Bogen selbst, nicht aus Rand
-     oder Schriftgroesse: die Abschnitte 2 bis 5 ruecken ihre Ueberschriften
-     etwas enger. Gemessen (A4, 14mm Rand, Chromium): Seite 2 traegt damit
-     wieder genau bis "Bei Entscheidungen ueber Menschen ...", und Seite 3
-     beginnt unveraendert mit "6. Transparenz und Kennzeichnung". Ein
-     schmalerer Seitenrand haette JEDE Seite veraendert - hier aendern sich
+  /* Und der Platz dafür kommt aus dem ZWEITEN Bogen selbst, nicht aus Rand
+     oder Schriftgröße: die Abschnitte 2 bis 5 rücken ihre Überschriften
+     etwas enger. Gemessen (A4, 14mm Rand, Chromium): Seite 2 trägt damit
+     wieder genau bis "Bei Entscheidungen über Menschen ...", und Seite 3
+     beginnt unverändert mit "6. Transparenz und Kennzeichnung". Ein
+     schmalerer Seitenrand hätte JEDE Seite verändert; hier ändern sich
      nur Seite 1 und 2. */
   .training h2.bogen2{margin-top:19px;margin-bottom:9px;padding-bottom:5px}
   /* Und derselbe Griff eine Seite weiter (Klaus 17.09.2026): der Bereich
-     "Hochrisiko-Anwendungen" - Ueberschrift, Absatz und die interne
-     Eskalationsregel - bleibt als EIN Block zusammen. Vorher riss der
+     "Hochrisiko-Anwendungen" mit Überschrift, Absatz und der internen
+     Eskalationsregel bleibt als EIN Block zusammen. Vorher riss der
      Seitenwechsel ihn auseinander; jetzt steht er geschlossen auf dem Bogen
-     mit den Punkten 8, 9 und 10, und der laesst sich fuer sich ausdrucken.
-     Der Platz war da: Seite 3 gibt fuenf Zeilen ab, Seite 4 nimmt sie auf,
+     mit den Punkten 8, 9 und 10, und der lässt sich für sich ausdrucken.
+     Der Platz war da: Seite 3 gibt fünf Zeilen ab, Seite 4 nimmt sie auf,
      und die Seite dahinter beginnt ohnehin mit einem erzwungenen Umbruch
-     (der Wissenstest). Gemessen: nur diese zwei Seiten aendern sich. */
+     (der Wissenstest). Gemessen: nur diese zwei Seiten ändern sich. */
   .training .bogen4{break-inside:avoid}
-  /* Der Schluss als Fussnote (Klaus 17.09.2026): "Quellen und Stand" und der
-     Hinweis standen bei groesseren Seitenraendern allein auf einer letzten,
-     fast leeren Seite. Sie ruecken jetzt hoch und stehen kleiner - eine
-     Fussnote, wie Klaus es vorgeschlagen hat.
-     ⚠ ES WIRKT NUR AUF DEN SCHLUSS, und das ist der Grund fuer die Auswahl:
-     die Regel fasst NICHTS an, was vor dem Ergebnis-Feld steht. Haette ich
-     die Testfragen gestrafft, waere auf jede Wissenstest-Seite mehr gepasst
-     und die Seiten davor haetten sich mitverschoben.
-     Gemessen an zwei Seitenraendern: bei 22mm (so druckt Klaus' Browser)
-     9 -> 8 Seiten, Seiten 1-7 unveraendert; bei 14mm bleiben es 7 Seiten und
-     nur die letzte ist anders gesetzt. */
+  /* Der Schluss als Fußnote (Klaus 17.09.2026): "Quellen und Stand" und der
+     Hinweis standen bei größeren Seitenrändern allein auf einer letzten,
+     fast leeren Seite. Sie rücken jetzt hoch und stehen kleiner, als Fußnote,
+     wie Klaus es vorgeschlagen hat.
+     ⚠ ES WIRKT NUR AUF DEN SCHLUSS, und das ist der Grund für die Auswahl:
+     die Regel fasst NICHTS an, was vor dem Ergebnis-Feld steht. Hätte ich
+     die Testfragen gestrafft, wäre auf jede Wissenstest-Seite mehr gepasst
+     und die Seiten davor hätten sich mitverschoben.
+     Gemessen an zwei Seitenrändern: bei 22mm (so druckt Klaus' Browser)
+     9 auf 8 Seiten, Seiten 1 bis 7 unverändert; bei 14mm bleiben es 7 Seiten
+     und nur die letzte ist anders gesetzt. */
   .training #result{margin:10px 0 0;padding:7px 9px}
   .training h2.fuss{font-size:14px;margin:12px 0 5px;padding-bottom:3px;border-bottom-width:1px}
   .training h2.fuss ~ .ref{font-size:8.4pt;line-height:1.34;margin:5px 0 6px}.cert{min-height:250mm;border:7px double #33465e;padding:24mm 16mm}.screen-only{display:none!important}
   body.print-cert .training{display:none!important} body.print-cert .certificate{display:block!important}
   body.print-training .certificate{display:none!important} body.print-training .training{display:block!important}
-  /* Der Loesungsschluessel bleibt beim Drucken IMMER weg - auch bei "Beides drucken"
+  /* Der Lösungsschlüssel bleibt beim Drucken IMMER weg, auch bei "Beides drucken"
      und bei Strg+P. Nur der eigene Knopf holt ihn hervor. Wer eine Unterlage
      austeilt, soll die Antworten nicht versehentlich mitverteilen. */
   .solution{display:none!important}
@@ -74,7 +74,7 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
     <button class="btn" onclick="printTraining()">Schulung als PDF / drucken</button>
     <button class="btn alt" onclick="printCertificate()">Bescheinigung drucken</button>
     <button class="btn light" onclick="printBoth()">Schulung + Bescheinigung</button>
-    <button class="btn light" onclick="printSolution()" title="Nur fuer die Schulungsleitung - die Antworten stehen darauf.">Loesungsschluessel drucken</button>
+    <button class="btn light" onclick="printSolution()" title="Nur für die Schulungsleitung; die Antworten stehen darauf.">Lösungsschlüssel drucken</button>
   </div>
 
   <section class="sheet training">
@@ -97,7 +97,7 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
     <h3>Beispiele im Betrieb</h3>
     <ul><li>Texte, E-Mails, Zusammenfassungen oder Konzepte erzeugen lassen</li><li>Bilder oder Grafiken generieren oder bearbeiten</li><li>Dokumente auswerten, strukturieren oder übersetzen</li><li>Kundendaten analysieren oder Antworten vorbereiten</li><li>Automatisierte Vorschläge, Bewertungen oder Entscheidungen unterstützen</li></ul>
 
-    <h2 class="bogen2">2. KI ist hilfreich - aber nicht automatisch richtig</h2>
+    <h2 class="bogen2">2. KI ist hilfreich, aber nicht automatisch richtig</h2>
     <p>Generative KI kann überzeugend formulieren und trotzdem falsche Angaben erzeugen. Solche Fehler werden häufig als Halluzinationen bezeichnet. Die Ausgabe muss deshalb passend zum Risiko geprüft werden.</p>
     <ul><li><strong>Fakten prüfen:</strong> Zahlen, Namen, Termine, Gesetze, technische Daten und Quellen nicht ungeprüft übernehmen.</li><li><strong>Aktualität prüfen:</strong> KI-Ausgaben können veraltet sein.</li><li><strong>Kontext prüfen:</strong> Eine sprachlich gute Antwort kann fachlich unpassend sein.</li><li><strong>Verantwortung behalten:</strong> Die menschliche Entscheidung darf nicht blind an die KI abgegeben werden.</li></ul>
 
@@ -117,18 +117,18 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
     <p>Je nach Einsatz können Transparenzpflichten gelten. Nutzer sollen in relevanten Fällen erkennen können, dass sie mit KI interagieren oder dass Inhalte künstlich erzeugt oder manipuliert wurden. Für konkrete Einsatzfälle sind die jeweils einschlägigen Pflichten zu prüfen.</p>
 
     <h2>7. Verbotene und besonders kritische Anwendungen</h2>
-    <p>Manche Anwendungen sind nicht bloß riskant, sondern <strong>verboten</strong> — unabhängig davon, ob jemand zustimmt, ob eine Betriebsvereinbarung dazu vorliegt oder wie gut der Zweck gemeint ist. Art. 5 zählt diese Praktiken abschließend auf. Für einen normalen Betrieb sind vor allem die Punkte 5 und 6 wichtig, weil sie in ganz gewöhnlicher Software stecken können.</p>
+    <p>Manche Anwendungen sind nicht bloß riskant, sondern <strong>verboten</strong>. Das gilt unabhängig davon, ob jemand zustimmt, ob eine Betriebsvereinbarung dazu vorliegt oder wie gut der Zweck gemeint ist. Art. 5 zählt diese Praktiken abschließend auf. Für einen normalen Betrieb sind vor allem die Punkte 5 und 6 wichtig, weil sie in ganz gewöhnlicher Software stecken können.</p>
     <ol class="avoid">
       <li><strong>Unterschwellige oder täuschende Beeinflussung</strong>, die das Verhalten wesentlich verzerrt und erheblichen Schaden anrichten kann.</li>
-      <li><strong>Ausnutzen von Schutzbedürftigkeit</strong> — Alter, Behinderung, soziale oder wirtschaftliche Lage.</li>
+      <li><strong>Ausnutzen von Schutzbedürftigkeit</strong>: Alter, Behinderung, soziale oder wirtschaftliche Lage.</li>
       <li><strong>Soziale Bewertung von Menschen</strong> (Social Scoring), die zu Benachteiligung in Lebensbereichen führt, die mit den erhobenen Daten nichts zu tun haben. Gilt auch für private Stellen, nicht nur für Behörden.</li>
       <li><strong>Vorhersage von Straftaten allein aus Profilbildung</strong> oder Persönlichkeitsmerkmalen.</li>
       <li><strong>Ungezieltes Absammeln von Gesichtsbildern</strong> aus dem Internet oder aus Überwachungsaufnahmen, um damit Gesichtserkennungs-Datenbanken aufzubauen.</li>
-      <li><strong>Emotionserkennung am Arbeitsplatz und in Bildungseinrichtungen</strong> — verboten, außer aus medizinischen oder Sicherheitsgründen. Das trifft auch Software, die Stimmung, Stress, Zufriedenheit oder Aufmerksamkeit von Beschäftigten aus Stimme, Gesicht, Kamerabild oder Tippverhalten ableiten will. <em>Zustimmung der Beschäftigten macht es nicht zulässig.</em></li>
+      <li><strong>Emotionserkennung am Arbeitsplatz und in Bildungseinrichtungen</strong> ist verboten, außer aus medizinischen oder Sicherheitsgründen. Das trifft auch Software, die Stimmung, Stress, Zufriedenheit oder Aufmerksamkeit von Beschäftigten aus Stimme, Gesicht, Kamerabild oder Tippverhalten ableiten will. <em>Zustimmung der Beschäftigten macht es nicht zulässig.</em></li>
       <li><strong>Biometrische Kategorisierung</strong>, um auf ethnische Herkunft, politische Einstellung, Gewerkschaftszugehörigkeit, religiöse oder weltanschauliche Überzeugung, Sexualleben oder sexuelle Ausrichtung zu schließen.</li>
-      <li><strong>Biometrische Echtzeit-Fernidentifizierung in öffentlich zugänglichen Räumen zu Strafverfolgungszwecken</strong> — nur in eng umgrenzten Ausnahmen und mit vorheriger Genehmigung.</li>
+      <li><strong>Biometrische Echtzeit-Fernidentifizierung in öffentlich zugänglichen Räumen zu Strafverfolgungszwecken</strong> ist nur in eng umgrenzten Ausnahmen und mit vorheriger Genehmigung erlaubt.</li>
     </ol>
-    <div class="note warning"><strong>Was ein Verstoß kostet:</strong> Für verbotene Praktiken nach Art. 5 sieht die Verordnung Geldbußen bis zu <strong>35 Mio. €</strong> oder <strong>7 % des weltweiten Jahresumsatzes</strong> vor — es gilt der höhere Betrag. Die Bußgeldvorschriften greifen seit dem 2. August 2025.</div>
+    <div class="note warning"><strong>Was ein Verstoß kostet:</strong> Für verbotene Praktiken nach Art. 5 sieht die Verordnung Geldbußen bis zu <strong>35 Mio. €</strong> oder <strong>7 % des weltweiten Jahresumsatzes</strong> vor; es gilt der höhere Betrag. Die Bußgeldvorschriften greifen seit dem 2. August 2025.</div>
     <div class="bogen4">
     <h3>Hochrisiko-Anwendungen</h3>
     <p>Daneben stellt der AI Act für Hochrisiko-Systeme zusätzliche Anforderungen auf. Wer ein KI-System für Personalentscheidungen, biometrische Zwecke, kritische Infrastruktur, Bildung, Kreditwürdigkeitsprüfung oder andere regulierte Hochrisiko-Bereiche einsetzen möchte, muss vor dem Einsatz gesondert prüfen, welche Pflichten gelten.</p>
@@ -147,7 +147,7 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
     <h2>10. Dokumentation der Schulung</h2>
     <p>Für eine nachvollziehbare interne Dokumentation sollte festgehalten werden: Teilnehmer, Datum, Dauer, Inhalte, verwendete oder vorgesehene KI-Systeme, betriebliche Regeln, ggf. Ergebnis eines Wissenstests sowie die verantwortliche Person für die Schulung. Die Maßnahmen sollten zum tatsächlichen Einsatz und Risiko passen und bei wesentlichen Änderungen aktualisiert werden.</p>
 
-    <h2 class="pagebreak">Wissenstest - 15 Fragen</h2>
+    <h2 class="pagebreak">Wissenstest mit <span id="quizCount">16</span> Fragen</h2>
     <p><span id="passHint">Interner Richtwert: 13 von 16 richtigen Antworten (81 %).</span> Dieser Schwellenwert ist eine betriebliche Festlegung und keine gesetzlich vorgeschriebene Prüfungsquote.</p>
     <form id="quiz"><fieldset class="q"><legend>1. Was ist bei KI-Ausgaben grundsätzlich zu beachten?</legend><label class="answer"><input type="radio" name="q0" value="0"> A. Sie sind immer richtig</label><label class="answer"><input type="radio" name="q0" value="1"> B. Wichtige Angaben müssen angemessen geprüft werden</label><label class="answer"><input type="radio" name="q0" value="2"> C. Sie dürfen nur privat genutzt werden</label></fieldset><fieldset class="q"><legend>2. Welche Daten gehören nicht in einen KI-Prompt?</legend><label class="answer"><input type="radio" name="q1" value="0"> A. Öffentlich bekannte Produktdaten</label><label class="answer"><input type="radio" name="q1" value="1"> B. Allgemeine Arbeitsanweisungen</label><label class="answer"><input type="radio" name="q1" value="2"> C. Passwörter und geheime Zugangstoken</label></fieldset><fieldset class="q"><legend>3. Was bedeutet eine KI-Halluzination?</legend><label class="answer"><input type="radio" name="q2" value="0"> A. Die KI wird langsamer</label><label class="answer"><input type="radio" name="q2" value="1"> B. Die KI erzeugt überzeugend klingende, aber falsche Angaben</label><label class="answer"><input type="radio" name="q2" value="2"> C. Die KI speichert automatisch jede Eingabe</label></fieldset><fieldset class="q"><legend>4. Was verlangt Art. 4 im Kern?</legend><label class="answer"><input type="radio" name="q3" value="0"> A. Ein staatliches Zertifikat für jeden Mitarbeiter</label><label class="answer"><input type="radio" name="q3" value="1"> B. Angemessene Maßnahmen für ausreichende KI-Kompetenz</label><label class="answer"><input type="radio" name="q3" value="2"> C. Den vollständigen Verzicht auf generative KI</label></fieldset><fieldset class="q"><legend>5. Was gilt bei personenbezogenen Daten?</legend><label class="answer"><input type="radio" name="q4" value="0"> A. Sie dürfen immer eingegeben werden</label><label class="answer"><input type="radio" name="q4" value="1"> B. Sie sind bei KI rechtlich irrelevant</label><label class="answer"><input type="radio" name="q4" value="2"> C. Nur zulässig und nach betrieblichen Regeln verarbeiten; möglichst minimieren</label></fieldset><fieldset class="q"><legend>6. Wer trägt Verantwortung für eine wichtige betriebliche Entscheidung?</legend><label class="answer"><input type="radio" name="q5" value="0"> A. Immer allein das KI-System</label><label class="answer"><input type="radio" name="q5" value="1"> B. Die verantwortlichen Menschen bzw. die Organisation</label><label class="answer"><input type="radio" name="q5" value="2"> C. Der Hersteller des Computers</label></fieldset><fieldset class="q"><legend>7. Warum können KI-Ergebnisse unfair sein?</legend><label class="answer"><input type="radio" name="q6" value="0"> A. Weil KI keine Sprache versteht</label><label class="answer"><input type="radio" name="q6" value="1"> B. Weil Trainingsdaten und Modelle Verzerrungen enthalten können</label><label class="answer"><input type="radio" name="q6" value="2"> C. Weil KI immer zufällig entscheidet</label></fieldset><fieldset class="q"><legend>8. Wann ist besondere Vorsicht nötig?</legend><label class="answer"><input type="radio" name="q7" value="0"> A. Beim Umformulieren eines neutralen Satzes</label><label class="answer"><input type="radio" name="q7" value="1"> B. Bei der Erstellung einer Einkaufsliste</label><label class="answer"><input type="radio" name="q7" value="2"> C. Wenn KI Entscheidungen über Menschen wesentlich beeinflusst</label></fieldset><fieldset class="q"><legend>9. Was ist bei KI-generierten Bildern oder Texten zu beachten?</legend><label class="answer"><input type="radio" name="q8" value="0"> A. Sie sind automatisch gemeinfrei</label><label class="answer"><input type="radio" name="q8" value="1"> B. Rechte Dritter und Nutzungsbedingungen müssen geprüft werden</label><label class="answer"><input type="radio" name="q8" value="2"> C. Sie dürfen nie veröffentlicht werden</label></fieldset><fieldset class="q"><legend>10. Was sollte bei einer neuen KI-Anwendung zuerst geklärt werden?</legend><label class="answer"><input type="radio" name="q9" value="0"> A. Nur die Farbe der Benutzeroberfläche</label><label class="answer"><input type="radio" name="q9" value="1"> B. Nur der Preis</label><label class="answer"><input type="radio" name="q9" value="2"> C. Zweck, Daten, Risiken und Verantwortlichkeit</label></fieldset><fieldset class="q"><legend>11. Wie geht man mit einer unsicheren KI-Antwort um?</legend><label class="answer"><input type="radio" name="q10" value="0"> A. Ungeprüft weiterleiten</label><label class="answer"><input type="radio" name="q10" value="1"> B. Mit Quellen oder Fachwissen verifizieren</label><label class="answer"><input type="radio" name="q10" value="2"> C. Als sicher markieren</label></fieldset><fieldset class="q"><legend>12. Ist für Art. 4 zwingend ein extern gekauftes Zertifikat vorgeschrieben?</legend><label class="answer"><input type="radio" name="q11" value="0"> A. Ja, immer</label><label class="answer"><input type="radio" name="q11" value="1"> B. Nein</label><label class="answer"><input type="radio" name="q11" value="2"> C. Nur bei Unternehmen unter 50 Mitarbeitern</label></fieldset><fieldset class="q"><legend>13. Was gehört zu guter interner Dokumentation?</legend><label class="answer"><input type="radio" name="q12" value="0"> A. Nur der Name des KI-Tools</label><label class="answer"><input type="radio" name="q12" value="1"> B. Nur die Unterschrift des Chefs</label><label class="answer"><input type="radio" name="q12" value="2"> C. Teilnehmer, Datum, Inhalte und Verantwortlichkeit; ggf. Testergebnis</label></fieldset><fieldset class="q"><legend>14. Was soll bei Datenschutzvorfällen passieren?</legend><label class="answer"><input type="radio" name="q13" value="0"> A. Löschen und niemandem sagen</label><label class="answer"><input type="radio" name="q13" value="1"> B. Nach betrieblicher Regel melden und bearbeiten</label><label class="answer"><input type="radio" name="q13" value="2"> C. Die KI erneut fragen</label></fieldset><fieldset class="q"><legend>15. Wann sollte eine Schulung aktualisiert werden?</legend><label class="answer"><input type="radio" name="q14" value="0"> A. Nie</label><label class="answer"><input type="radio" name="q14" value="1"> B. Bei wesentlichen Änderungen von Systemen, Einsatz oder Risiken</label><label class="answer"><input type="radio" name="q14" value="2"> C. Nur alle zehn Jahre</label></fieldset><fieldset class="q"><legend>16. Eine Software soll die Stimmung von Beschäftigten aus dem Kamerabild ablesen. Was gilt?</legend><label class="answer"><input type="radio" name="q15" value="0"> A. Erlaubt, wenn alle Beschäftigten zustimmen</label><label class="answer"><input type="radio" name="q15" value="1"> B. Emotionserkennung am Arbeitsplatz ist nach Art. 5 grundsätzlich verboten; Ausnahmen nur aus medizinischen oder Sicherheitsgründen</label><label class="answer"><input type="radio" name="q15" value="2"> C. Erlaubt, solange die Auswertung anonym bleibt</label></fieldset></form>
     <button class="btn screen-only" type="button" onclick="grade()">Test auswerten</button>
@@ -158,13 +158,13 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
     <p class="ref"><strong>Hinweis:</strong> Diese Vorlage ersetzt keine Einzelfallprüfung. Für Hochrisiko-KI, sensible personenbezogene Daten, Beschäftigtenentscheidungen oder andere regulierte Einsätze können zusätzliche Pflichten gelten.</p>
   </section>
 
-  <!-- Eigener Bogen, damit er sich vom Rest trennen laesst. Auf dem Schirm zugeklappt,
-       beim Drucken grundsaetzlich weg - nur der eigene Knopf holt ihn hervor. -->
+  <!-- Eigener Bogen, damit er sich vom Rest trennen lässt. Auf dem Schirm zugeklappt,
+       beim Drucken grundsätzlich weg; nur der eigene Knopf holt ihn hervor. -->
   <section class="sheet solution">
     <details id="solutionBox">
-      <summary>Lösungsschlüssel anzeigen — nur für die Schulungsleitung</summary>
+      <summary>Lösungsschlüssel anzeigen (nur für die Schulungsleitung)</summary>
       <p class="ref" id="solutionKey">Für die Schulungsleitung: 1B, 2C, 3B, 4B, 5C, 6B, 7B, 8C, 9B, 10C, 11B, 12B, 13C, 14B, 15B, 16B.</p>
-      <p class="ref">Dieser Bogen druckt <strong>nicht</strong> mit der Schulungsunterlage mit — auch nicht über Strg+P. Wer ihn braucht, nimmt den Knopf „Lösungsschlüssel drucken" oben.</p>
+      <p class="ref">Dieser Bogen druckt <strong>nicht</strong> mit der Schulungsunterlage mit, auch nicht über Strg+P. Wer ihn braucht, nimmt den Knopf „Lösungsschlüssel drucken" oben.</p>
     </details>
   </section>
 
@@ -203,7 +203,11 @@ const questions=[
 ["Eine Software soll die Stimmung von Beschäftigten aus dem Kamerabild ablesen. Was gilt?",["Erlaubt, wenn alle Beschäftigten zustimmen","Emotionserkennung am Arbeitsplatz ist nach Art. 5 grundsätzlich verboten; Ausnahmen nur aus medizinischen oder Sicherheitsgründen","Erlaubt, solange die Auswertung anonym bleibt"],1]
 ];
 // Anzahl und Schwelle werden aus der Fragenliste GERECHNET. Wer eine Frage
-// ergaenzt, aendert nur die Liste oben - Text, Zeugnis und Schluessel ziehen nach.
+// ergänzt, ändert nur die Liste oben; Überschrift, Zeugnis und Schlüssel ziehen nach.
+// ⚠ DIE ÜBERSCHRIFT ZOG BIS ZUM 17.09.2026 NICHT NACH: dort stand fest "15 Fragen",
+// im Formular und in der Auswertung standen 16, und die Bescheinigung rechnete
+// mit 16. Der Kommentar hier versprach die Kopplung, die es nicht gab. Jetzt
+// gibt es sie; der feste Wert im Markup bleibt als Rückfall ohne JavaScript.
 const TOTAL=questions.length, PASS=Math.ceil(TOTAL*0.8);
 function sync(){const n=document.getElementById('participant').value||'Teilnehmer/in';const c=document.getElementById('company').value||'____________________________';const d=document.getElementById('date').value||'________________';document.getElementById('certName').textContent=n;document.getElementById('certCompany').textContent=c;document.getElementById('certDate').textContent=d}
 ['participant','company','date'].forEach(id=>document.getElementById(id).addEventListener('input',sync));
@@ -213,15 +217,16 @@ function druckAls(klasse,vorher){if(vorher)vorher();document.body.classList.remo
 function printTraining(){druckAls('print-training')}
 function printCertificate(){druckAls('print-cert',sync)}
 function printBoth(){druckAls(null,sync)}
-// Ein zugeklapptes <details> gibt seinen Inhalt auch im Druck nicht her - deshalb
-// wird es hier wirklich aufgeklappt und danach in den alten Zustand zurueckgesetzt.
+// Ein zugeklapptes <details> gibt seinen Inhalt auch im Druck nicht her. Es wird
+// deshalb wirklich aufgeklappt und danach in den alten Zustand zurückgesetzt.
 function printSolution(){const d=document.getElementById('solutionBox');const war=d.open;d.open=true;druckAls('print-solution');setTimeout(()=>{d.open=war},600)}
-// Der Schluessel wird aus derselben Liste erzeugt, gegen die auch ausgewertet wird.
-// Von Hand getippt koennte er still von der Auswertung abweichen - so nicht.
+// Der Schlüssel wird aus derselben Liste erzeugt, gegen die auch ausgewertet wird.
+// Von Hand getippt könnte er still von der Auswertung abweichen.
 const BUCHSTABE='ABC';
 document.getElementById('solutionKey').textContent='Für die Schulungsleitung: '+questions.map((q,i)=>`${i+1}${BUCHSTABE[q[2]]}`).join(', ')+'.';
 document.getElementById('passHint').textContent=`Interner Richtwert: ${PASS} von ${TOTAL} richtigen Antworten (${Math.round(PASS/TOTAL*100)} %).`;
 document.getElementById('certScore').textContent=`____ / ${TOTAL}`;
+document.getElementById('quizCount').textContent=TOTAL;
 if(!document.getElementById('date').value){document.getElementById('date').value=new Date().toISOString().slice(0,10)}sync();
 </script>
 </body>
