@@ -133,7 +133,16 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>!!document.querySelector('#toolMain .dl-item[href$="EU_AI_Act_Art4_KI_Schulung.html"][download]')), "ki-schulung: die Unterlage als echter Download");
   ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .dl-sec .dl-item").length>=4), "ki-schulung: Original und amtliche Quellen verlinkt");
   ok(await page.evaluate(()=>[...document.querySelectorAll("#toolMain .lm-link,#toolMain .dl-item,#toolMain a.rf-step")].every(a=>a.getAttribute("href")&&a.getAttribute("href")!=="#")), "ki-schulung: kein leerer Link");
-  ok(await page.evaluate(()=>/nicht übersetzt/.test(document.querySelector("#toolMain .lead").textContent)), "ki-schulung: sagt, dass die Unterlage Deutsch bleibt");
+  /* ⚠ DIE SEITE BEGRÜNDET DAS NICHT-ÜBERSETZEN NICHT MEHR (Klaus 2026-09-17).
+     Der Wächter nagelt die ENTSCHEIDUNG fest statt den alten Satz — sonst
+     verböte er genau das Richtigstellen, das ihn nötig gemacht hat. */
+  ok(await page.evaluate(()=>!/bewusst nicht übersetzt|verbindlich aus, ohne es zu sein/i.test(document.querySelector("#toolMain .lead").textContent)), "ki-schulung: begründet das Nicht-Übersetzen nicht mehr");
+  /* Die Bedienhilfe musste bleiben, aber NUR auf Englisch: der Sprachriegel
+     sperrt den Browser-Übersetzer, sobald jemand eine Sprache gewählt hat. Auf
+     Deutsch wäre derselbe Satz Text ohne Auskunft — wer die Datei öffnet, sieht
+     ihre Sprache. Gemessen wird am Datenobjekt, weil die Seite hier deutsch
+     geladen wird. */
+  ok(await page.evaluate(()=>/press and hold/i.test(String((window.FP_TOOL.en||{}).lead||"")) && !/bersetz/i.test(String((window.FP_TOOL.de||{}).lead||""))), "ki-schulung: der Übersetzer-Weg steht nur in der englischen Fassung");
   ok(await page.evaluate(()=>{const t=document.querySelector("#toolMain .trust").textContent;return /Keine Rechtsberatung/.test(t) && /keine Einzelfallprüfung/.test(t) && !/rechtssicher|konform/i.test(t);}), "ki-schulung: verspricht keine Rechtskonformität");
   ok(await page.evaluate(()=>!!document.querySelector('#toolMain .price a.btn.gold[href^="https://"]')), "ki-schulung: der Spenden-Knopf ist scharf (Klaus: freiwillig, kein Preis)");
   await page.close(); }
