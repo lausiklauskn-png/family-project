@@ -264,6 +264,21 @@ window.FP_LISTINGS = [
     "own": true,
     "sporeUrl": "https://pwa-toolpoint.de/sbkim/pruefer-spore.json"
   },
+  /* Klaus 2026-09-17: „gleich hinter dem Auslieferungsprüfer". Hier ist die
+     Reihenfolge Handarbeit, also steht die Schulung wörtlich dahinter. Kein
+     Knoten, deshalb keine sporeUrl. Kein Preis, kein Versprechen von
+     Rechtskonformität — die Karte sagt „Vorlage", nicht „konform". */
+  {
+    "label": "KI-Schulung nach Art. 4 EU AI Act",
+    "anchorId": "markt-ki-schulung",
+    "text": "KI-Schulung nach Art. 4 EU AI Act: eine Schulungs-Unterlage für Firmen zur KI-Kompetenz. Zehn Abschnitte (was ein KI-System ist, Datenschutz, Urheberrecht, Diskriminierung, Transparenz, verbotene und Hochrisiko-Anwendungen, sicherer Umgang, betriebliche Regeln, Dokumentation), ein Wissenstest mit 15 Fragen und Auswertung im Browser, eine Bescheinigung zum Ausdrucken und ein Lösungsschlüssel für die Schulungsleitung. Eine einzige Datei, läuft offline, nichts wird hochgeladen. Eine Vorlage für die eigene Schulung — keine Rechtsberatung, kein amtliches Zertifikat, ersetzt keine Einzelfallprüfung. Auf Deutsch. Mitarbeiter schulen, KI-Kompetenz nachweisen, KI-Verordnung, Schulungsnachweis, Bescheinigung, Wissenstest, Vorlage.",
+    "text_en": "AI training under Art. 4 EU AI Act: a training document for companies on AI literacy. Ten sections (what an AI system is, data protection, copyright, discrimination, transparency, prohibited and high-risk uses, safe use, company rules, documentation), a knowledge test with 15 questions scored in the browser, a printable certificate and an answer key for the trainer. One single file, runs offline, nothing is uploaded. A template for your own training — not legal advice, not an official certificate, no substitute for a case-by-case review. In German. Train staff, document AI literacy, AI regulation, training record, certificate, knowledge test, template.",
+    "by": "@klaus",
+    "url": "https://family-projekt.de/werkzeuge/ki-schulung.html",
+    "img": "https://family-projekt.de/assets/appicons/ki-schulung.png",
+    "category": "Vorlage",
+    "own": true
+  },
   {
     "label": "Kim Hub Company",
     "anchorId": "markt-kim-hub-company",

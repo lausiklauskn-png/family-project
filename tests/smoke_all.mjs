@@ -51,7 +51,7 @@ async function load(rel){
 }
 
 console.log("Family Projekt — Smoke über alle Seiten");
-for (const rel of ["/index.html","/netzwerk.html","/werkzeuge.html","/markt.html","/impressum.html","/werkzeuge/such-werkzeug.html","/werkzeuge/andock-werkzeug.html","/werkzeuge/knoten-werkzeug.html"]) {
+for (const rel of ["/index.html","/netzwerk.html","/werkzeuge.html","/markt.html","/impressum.html","/werkzeuge/such-werkzeug.html","/werkzeuge/andock-werkzeug.html","/werkzeuge/knoten-werkzeug.html","/werkzeuge/ki-schulung.html"]) {
   const { page, real } = await load(rel);
   ok(real.length===0, rel+" — keine kritischen Fehler"+(real.length?" — "+JSON.stringify(real.slice(0,3)):""));
   ok(await page.evaluate(()=>!!window.FP), rel+" — app.js geladen");
@@ -121,6 +121,21 @@ console.log("\nDetail-Checks");
   ok(await page.evaluate(()=>[...document.querySelectorAll("#toolMain .lm-link,#toolMain .dl-item,#toolMain a.rf-step")].every(a=>a.getAttribute("href")&&a.getAttribute("href")!=="#")), "andock: kein Link ins Leere (jeder href gesetzt)");
   ok(await page.evaluate(()=>!!document.querySelector('#toolMain .dl-item[href$="sbkim-siegel-wappen.svg"][download]')), "andock: Siegel-SVG als echter Download");
   ok(await page.evaluate(()=>!document.querySelector("#mainlabel")), "andock: kein leerer Screenshot-Platzhalter");
+  await page.close(); }
+{ const { page } = await load("/werkzeuge/ki-schulung.html");
+  /* Die KI-Schulung (2026-09-17): eine Vorlage, kein Knoten. Gemessen wird, was
+     ein Nutzer sieht — dass sie als Vorlage gekennzeichnet ist, dass die
+     Unterlage wirklich als Datei zu haben ist, und dass die Seite sagt, was
+     sie NICHT ist. Ein Wächter auf „die Seite ist da" misst nicht, ob sie
+     etwas verspricht. */
+  ok(await page.evaluate(()=>/Vorlage/.test(document.querySelector("#toolMain .eyebrow").textContent)), "ki-schulung: als Vorlage gekennzeichnet");
+  ok(await page.evaluate(()=>{const a=document.querySelector('#toolMain .cta a.btn.primary');return !!a && /schulung\/EU_AI_Act_Art4_KI_Schulung\.html$/.test(a.getAttribute("href"));}), "ki-schulung: der Haupt-Knopf öffnet die Unterlage");
+  ok(await page.evaluate(()=>!!document.querySelector('#toolMain .dl-item[href$="EU_AI_Act_Art4_KI_Schulung.html"][download]')), "ki-schulung: die Unterlage als echter Download");
+  ok(await page.evaluate(()=>document.querySelectorAll("#toolMain .dl-sec .dl-item").length>=4), "ki-schulung: Original und amtliche Quellen verlinkt");
+  ok(await page.evaluate(()=>[...document.querySelectorAll("#toolMain .lm-link,#toolMain .dl-item,#toolMain a.rf-step")].every(a=>a.getAttribute("href")&&a.getAttribute("href")!=="#")), "ki-schulung: kein leerer Link");
+  ok(await page.evaluate(()=>/nicht übersetzt/.test(document.querySelector("#toolMain .lead").textContent)), "ki-schulung: sagt, dass die Unterlage Deutsch bleibt");
+  ok(await page.evaluate(()=>{const t=document.querySelector("#toolMain .trust").textContent;return /Keine Rechtsberatung/.test(t) && /keine Einzelfallprüfung/.test(t) && !/rechtssicher|konform/i.test(t);}), "ki-schulung: verspricht keine Rechtskonformität");
+  ok(await page.evaluate(()=>!!document.querySelector('#toolMain .price a.btn.gold[href^="https://"]')), "ki-schulung: der Spenden-Knopf ist scharf (Klaus: freiwillig, kein Preis)");
   await page.close(); }
 { const { page } = await load("/werkzeuge/knoten-werkzeug.html");
   ok(await page.evaluate(()=>/Entwickler/.test(document.querySelector("#toolMain .eyebrow").textContent)), "knoten: als Entwickler-Thema gekennzeichnet");

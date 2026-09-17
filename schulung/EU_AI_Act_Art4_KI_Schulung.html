@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interne KI-Kompetenzschulung - Art. 4 EU AI Act</title>
+<style>
+:root{--ink:#172033;--muted:#596579;--line:#d9e0e8;--paper:#fff;--soft:#f5f7fa;--accent:#244a77;--ok:#176b45;--warn:#9a5c00}
+*{box-sizing:border-box} body{margin:0;background:#eef2f6;color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.48}
+.wrap{max-width:980px;margin:28px auto;padding:0 18px}.sheet{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 24px rgba(20,40,70,.08);padding:34px;margin-bottom:20px}
+h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px 0 12px;border-bottom:2px solid var(--line);padding-bottom:7px}h3{font-size:17px;margin:20px 0 7px}p{margin:8px 0 12px}ul{margin:8px 0 14px;padding-left:22px}li{margin:5px 0}
+.badge{display:inline-block;background:#eaf0f7;color:var(--accent);padding:5px 9px;border-radius:999px;font-size:13px;font-weight:700}.note{border-left:4px solid var(--accent);background:var(--soft);padding:12px 14px;margin:14px 0}.warning{border-left-color:var(--warn);background:#fff7e8}.ok{border-left-color:var(--ok);background:#edf8f2}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.field label{font-size:12px;color:var(--muted);display:block;margin-bottom:4px}.field input{width:100%;padding:9px 10px;border:1px solid #bfc9d5;border-radius:7px;font-size:15px}
+.controls{position:sticky;top:0;z-index:4;background:rgba(238,242,246,.96);backdrop-filter:blur(6px);padding:10px 0;margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap}.btn{border:0;border-radius:8px;padding:10px 13px;background:var(--accent);color:white;font-weight:700;cursor:pointer}.btn.alt{background:#5f6c7c}.btn.light{background:white;color:var(--ink);border:1px solid var(--line)}
+.q{padding:14px 0;border-bottom:1px solid var(--line);border-top:0;border-left:0;border-right:0;margin:0;min-width:0}.q:last-child{border-bottom:0}.q legend{display:block;padding:0;margin-bottom:6px;font-weight:700}.answer{display:block;margin:6px 0}.answer input{margin-right:7px}.result{font-size:18px;font-weight:700;margin-top:18px;padding:12px;border-radius:8px;background:var(--soft)}
+.cert{min-height:650px;border:8px double #33465e;padding:44px;text-align:center;display:flex;flex-direction:column;justify-content:center}.cert h1{font-size:38px;letter-spacing:.4px}.cert .name{font-size:30px;font-weight:700;margin:26px 0 16px;border-bottom:1px solid #8e99a7;padding-bottom:8px}.cert .small{font-size:13px;color:var(--muted)}.sig{display:grid;grid-template-columns:1fr 1fr;gap:60px;margin-top:70px}.sig div{border-top:1px solid #657386;padding-top:5px;font-size:12px;color:var(--muted)}
+.ref{font-size:13px;color:var(--muted)} a{color:var(--accent)}
+.solution summary{cursor:pointer;font-weight:700;color:var(--accent);padding:4px 0}.solution{border-left:4px solid var(--warn);background:#fff7e8}
+@media (max-width:700px){.sheet{padding:22px}.meta{grid-template-columns:1fr}.cert{padding:26px}.sig{grid-template-columns:1fr;gap:42px}.cert h1{font-size:30px}}
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:white;font-size:10.7pt}.wrap{max-width:none;margin:0;padding:0}.controls{display:none!important}.sheet{box-shadow:none;border:0;border-radius:0;padding:0;margin:0 0 10mm}.pagebreak{break-before:page}.avoid{break-inside:avoid}.meta input{border:0;border-bottom:1px solid #555;border-radius:0;padding:5px 0}.q{break-inside:avoid}.cert{min-height:250mm;border:7px double #33465e;padding:24mm 16mm}.screen-only{display:none!important}
+  body.print-cert .training{display:none!important} body.print-cert .certificate{display:block!important}
+  body.print-training .certificate{display:none!important} body.print-training .training{display:block!important}
+  /* Der Loesungsschluessel bleibt beim Drucken IMMER weg - auch bei "Beides drucken"
+     und bei Strg+P. Nur der eigene Knopf holt ihn hervor. Wer eine Unterlage
+     austeilt, soll die Antworten nicht versehentlich mitverteilen. */
+  .solution{display:none!important}
+  body.print-solution .solution{display:block!important}
+  body.print-solution .solution summary{display:none!important}
+  body.print-solution .training,body.print-solution .certificate{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="controls">
+    <button class="btn" onclick="printTraining()">Schulung als PDF / drucken</button>
+    <button class="btn alt" onclick="printCertificate()">Bescheinigung drucken</button>
+    <button class="btn light" onclick="printBoth()">Schulung + Bescheinigung</button>
+    <button class="btn light" onclick="printSolution()" title="Nur fuer die Schulungsleitung - die Antworten stehen darauf.">Loesungsschluessel drucken</button>
+  </div>
+
+  <section class="sheet training">
+    <span class="badge">Interne Schulungsunterlage</span>
+    <h1>KI-Kompetenzschulung nach Art. 4 EU AI Act</h1>
+    <p><strong>Dauer:</strong> ca. 60-90 Minuten &nbsp;|&nbsp; <strong>Zielgruppe:</strong> Beschäftigte und sonstige Personen, die im Auftrag einer Organisation KI-Systeme nutzen.</p>
+    <div class="meta">
+      <div class="field"><label>Unternehmen / Organisation</label><input id="company" placeholder="z. B. Musterfirma GmbH"></div>
+      <div class="field"><label>Schulungsleitung</label><input id="trainer" placeholder="Name"></div>
+      <div class="field"><label>Teilnehmer/in</label><input id="participant" placeholder="Vor- und Nachname"></div>
+      <div class="field"><label>Datum</label><input id="date" type="date"></div>
+    </div>
+
+    <div class="note"><strong>Rechtlicher Rahmen:</strong> Art. 4 der Verordnung (EU) 2024/1689 verlangt, dass Anbieter und Betreiber von KI-Systemen nach bestem Wissen und Gewissen Maßnahmen treffen, um ein ausreichendes Maß an KI-Kompetenz bei Personal und sonstigen Personen sicherzustellen, die in ihrem Auftrag KI-Systeme betreiben oder nutzen. Dabei sind insbesondere technisches Wissen, Erfahrung, Ausbildung, Schulung sowie Einsatzkontext und betroffene Personen zu berücksichtigen.</div>
+    <div class="note"><strong>Seit wann das gilt:</strong> Die Verordnung ist am 1. August 2024 in Kraft getreten. Die Pflicht zur KI-Kompetenz (Art. 4) und das Verbot bestimmter Praktiken (Art. 5) gelten <strong>seit dem 2. Februar 2025</strong>. Der Rest folgt gestaffelt: Pflichten für allgemeine KI-Modelle seit dem 2. August 2025, der größere Teil der Hochrisiko-Regeln ab dem 2. August 2026.</div>
+    <div class="note ok"><strong>Wichtig:</strong> Für Art. 4 ist kein bestimmtes externes Zertifikat vorgeschrieben. Diese Unterlage ist eine interne Schulungs- und Dokumentationshilfe, keine behördliche Zulassung und keine Rechtsberatung.</div>
+
+    <h2>1. Was ist ein KI-System?</h2>
+    <p>KI-Systeme sind maschinengestützte Systeme, die aus Eingaben Ergebnisse wie Vorhersagen, Inhalte, Empfehlungen oder Entscheidungen ableiten können. Im Arbeitsalltag zählen dazu zum Beispiel generative Text- und Bildsysteme, Übersetzungsdienste, Assistenten, automatische Klassifikation, Analyse- und Empfehlungssysteme.</p>
+    <h3>Beispiele im Betrieb</h3>
+    <ul><li>Texte, E-Mails, Zusammenfassungen oder Konzepte erzeugen lassen</li><li>Bilder oder Grafiken generieren oder bearbeiten</li><li>Dokumente auswerten, strukturieren oder übersetzen</li><li>Kundendaten analysieren oder Antworten vorbereiten</li><li>Automatisierte Vorschläge, Bewertungen oder Entscheidungen unterstützen</li></ul>
+
+    <h2>2. KI ist hilfreich - aber nicht automatisch richtig</h2>
+    <p>Generative KI kann überzeugend formulieren und trotzdem falsche Angaben erzeugen. Solche Fehler werden häufig als Halluzinationen bezeichnet. Die Ausgabe muss deshalb passend zum Risiko geprüft werden.</p>
+    <ul><li><strong>Fakten prüfen:</strong> Zahlen, Namen, Termine, Gesetze, technische Daten und Quellen nicht ungeprüft übernehmen.</li><li><strong>Aktualität prüfen:</strong> KI-Ausgaben können veraltet sein.</li><li><strong>Kontext prüfen:</strong> Eine sprachlich gute Antwort kann fachlich unpassend sein.</li><li><strong>Verantwortung behalten:</strong> Die menschliche Entscheidung darf nicht blind an die KI abgegeben werden.</li></ul>
+
+    <h2>3. Datenschutz und vertrauliche Informationen</h2>
+    <div class="note warning"><strong>Grundregel:</strong> Nur Daten in ein KI-System eingeben, die dort verarbeitet werden dürfen. Interne, personenbezogene oder besonders sensible Daten dürfen nicht allein deshalb eingegeben werden, weil die KI technisch dazu in der Lage ist.</div>
+    <ul><li>Keine Passwörter, Zugangstoken, privaten Schlüssel oder vertraulichen Zugangsdaten eingeben.</li><li>Personenbezogene Daten möglichst vermeiden, anonymisieren oder pseudonymisieren.</li><li>Kunden-, Mitarbeiter-, Gesundheits-, Finanz- und Vertragsdaten nur nach den betrieblichen Regeln und einer zulässigen Rechtsgrundlage verarbeiten.</li><li>Prüfen, welcher KI-Dienst verwendet wird, welche Einstellungen gelten und ob Daten zu Trainingszwecken weiterverwendet werden können.</li></ul>
+
+    <h2>4. Urheberrecht, Marken und fremde Inhalte</h2>
+    <p>KI-Ausgaben sind nicht automatisch frei von Rechten Dritter. Besonders bei Bildern, Logos, Texten, Musik, Designs und Softwarecode muss geprüft werden, ob eine Nutzung zulässig ist.</p>
+    <ul><li>Keine geschützten Werke oder umfangreiche fremde Texte ohne Berechtigung hochladen.</li><li>KI-generierte Inhalte vor Veröffentlichung auf erkennbare Übernahmen, Marken, Persönlichkeitsrechte und Lizenzen prüfen.</li><li>Bei kommerzieller Nutzung die Nutzungsbedingungen des eingesetzten KI-Dienstes beachten.</li></ul>
+
+    <h2>5. Diskriminierung, Verzerrungen und faire Entscheidungen</h2>
+    <p>KI kann Verzerrungen aus Trainingsdaten übernehmen oder bestimmte Gruppen benachteiligen. Besonders kritisch sind Anwendungen mit Auswirkungen auf Beschäftigung, Bildung, Kredit, Versicherung, Zugang zu Leistungen oder andere wesentliche Entscheidungen.</p>
+    <ul><li>Ergebnisse nicht allein wegen einer KI-Empfehlung als objektiv ansehen.</li><li>Auf systematische Benachteiligungen achten.</li><li>Bei Entscheidungen über Menschen eine angemessene menschliche Kontrolle sicherstellen.</li></ul>
+
+    <h2>6. Transparenz und Kennzeichnung</h2>
+    <p>Je nach Einsatz können Transparenzpflichten gelten. Nutzer sollen in relevanten Fällen erkennen können, dass sie mit KI interagieren oder dass Inhalte künstlich erzeugt oder manipuliert wurden. Für konkrete Einsatzfälle sind die jeweils einschlägigen Pflichten zu prüfen.</p>
+
+    <h2>7. Verbotene und besonders kritische Anwendungen</h2>
+    <p>Manche Anwendungen sind nicht bloß riskant, sondern <strong>verboten</strong> — unabhängig davon, ob jemand zustimmt, ob eine Betriebsvereinbarung dazu vorliegt oder wie gut der Zweck gemeint ist. Art. 5 zählt diese Praktiken abschließend auf. Für einen normalen Betrieb sind vor allem die Punkte 5 und 6 wichtig, weil sie in ganz gewöhnlicher Software stecken können.</p>
+    <ol class="avoid">
+      <li><strong>Unterschwellige oder täuschende Beeinflussung</strong>, die das Verhalten wesentlich verzerrt und erheblichen Schaden anrichten kann.</li>
+      <li><strong>Ausnutzen von Schutzbedürftigkeit</strong> — Alter, Behinderung, soziale oder wirtschaftliche Lage.</li>
+      <li><strong>Soziale Bewertung von Menschen</strong> (Social Scoring), die zu Benachteiligung in Lebensbereichen führt, die mit den erhobenen Daten nichts zu tun haben. Gilt auch für private Stellen, nicht nur für Behörden.</li>
+      <li><strong>Vorhersage von Straftaten allein aus Profilbildung</strong> oder Persönlichkeitsmerkmalen.</li>
+      <li><strong>Ungezieltes Absammeln von Gesichtsbildern</strong> aus dem Internet oder aus Überwachungsaufnahmen, um damit Gesichtserkennungs-Datenbanken aufzubauen.</li>
+      <li><strong>Emotionserkennung am Arbeitsplatz und in Bildungseinrichtungen</strong> — verboten, außer aus medizinischen oder Sicherheitsgründen. Das trifft auch Software, die Stimmung, Stress, Zufriedenheit oder Aufmerksamkeit von Beschäftigten aus Stimme, Gesicht, Kamerabild oder Tippverhalten ableiten will. <em>Zustimmung der Beschäftigten macht es nicht zulässig.</em></li>
+      <li><strong>Biometrische Kategorisierung</strong>, um auf ethnische Herkunft, politische Einstellung, Gewerkschaftszugehörigkeit, religiöse oder weltanschauliche Überzeugung, Sexualleben oder sexuelle Ausrichtung zu schließen.</li>
+      <li><strong>Biometrische Echtzeit-Fernidentifizierung in öffentlich zugänglichen Räumen zu Strafverfolgungszwecken</strong> — nur in eng umgrenzten Ausnahmen und mit vorheriger Genehmigung.</li>
+    </ol>
+    <div class="note warning"><strong>Was ein Verstoß kostet:</strong> Für verbotene Praktiken nach Art. 5 sieht die Verordnung Geldbußen bis zu <strong>35 Mio. €</strong> oder <strong>7 % des weltweiten Jahresumsatzes</strong> vor — es gilt der höhere Betrag. Die Bußgeldvorschriften greifen seit dem 2. August 2025.</div>
+    <h3>Hochrisiko-Anwendungen</h3>
+    <p>Daneben stellt der AI Act für Hochrisiko-Systeme zusätzliche Anforderungen auf. Wer ein KI-System für Personalentscheidungen, biometrische Zwecke, kritische Infrastruktur, Bildung, Kreditwürdigkeitsprüfung oder andere regulierte Hochrisiko-Bereiche einsetzen möchte, muss vor dem Einsatz gesondert prüfen, welche Pflichten gelten.</p>
+    <div class="note warning"><strong>Interne Eskalationsregel:</strong> Wenn eine KI-Ausgabe über Einstellung, Kündigung, Zugang zu Leistungen, Bonität, Gesundheit, Sicherheit oder andere wesentliche Rechte einer Person mitentscheiden soll, darf die Anwendung nicht ohne vorherige fachliche/rechtliche Prüfung eingeführt werden.</div>
+
+    <h2>8. Sicherer Umgang im Arbeitsalltag</h2>
+    <ul><li>Nur freigegebene KI-Dienste und Konten verwenden.</li><li>Prompts so formulieren, dass möglichst wenige vertrauliche Daten nötig sind.</li><li>Wichtige Ergebnisse mit einer zweiten Quelle oder fachkundigen Person prüfen.</li><li>Entscheidungen mit erheblicher Auswirkung nicht vollautomatisch treffen, wenn dafür keine geprüfte Grundlage besteht.</li><li>Fehler, Datenschutzvorfälle oder ungewöhnliches KI-Verhalten intern melden.</li><li>Bei neuen KI-Anwendungen vorab Zweck, Daten, Risiko und Verantwortlichkeit festhalten.</li></ul>
+
+    <h2>9. Einfache betriebliche KI-Regeln</h2>
+    <div class="avoid">
+    <p><strong>Die 7-Punkte-Regel:</strong></p>
+    <ol><li>Freigegebenes System verwenden.</li><li>Nur zulässige Daten eingeben.</li><li>Keine Geheimnisse oder Zugangsdaten eingeben.</li><li>Ergebnis fachlich prüfen.</li><li>Rechte Dritter beachten.</li><li>Bei Entscheidungen über Menschen besonders vorsichtig sein.</li><li>Unsicherheit oder Vorfälle melden.</li></ol>
+    </div>
+
+    <h2>10. Dokumentation der Schulung</h2>
+    <p>Für eine nachvollziehbare interne Dokumentation sollte festgehalten werden: Teilnehmer, Datum, Dauer, Inhalte, verwendete oder vorgesehene KI-Systeme, betriebliche Regeln, ggf. Ergebnis eines Wissenstests sowie die verantwortliche Person für die Schulung. Die Maßnahmen sollten zum tatsächlichen Einsatz und Risiko passen und bei wesentlichen Änderungen aktualisiert werden.</p>
+
+    <h2 class="pagebreak">Wissenstest - 15 Fragen</h2>
+    <p><span id="passHint">Interner Richtwert: 13 von 16 richtigen Antworten (81 %).</span> Dieser Schwellenwert ist eine betriebliche Festlegung und keine gesetzlich vorgeschriebene Prüfungsquote.</p>
+    <form id="quiz"><fieldset class="q"><legend>1. Was ist bei KI-Ausgaben grundsätzlich zu beachten?</legend><label class="answer"><input type="radio" name="q0" value="0"> A. Sie sind immer richtig</label><label class="answer"><input type="radio" name="q0" value="1"> B. Wichtige Angaben müssen angemessen geprüft werden</label><label class="answer"><input type="radio" name="q0" value="2"> C. Sie dürfen nur privat genutzt werden</label></fieldset><fieldset class="q"><legend>2. Welche Daten gehören nicht in einen KI-Prompt?</legend><label class="answer"><input type="radio" name="q1" value="0"> A. Öffentlich bekannte Produktdaten</label><label class="answer"><input type="radio" name="q1" value="1"> B. Allgemeine Arbeitsanweisungen</label><label class="answer"><input type="radio" name="q1" value="2"> C. Passwörter und geheime Zugangstoken</label></fieldset><fieldset class="q"><legend>3. Was bedeutet eine KI-Halluzination?</legend><label class="answer"><input type="radio" name="q2" value="0"> A. Die KI wird langsamer</label><label class="answer"><input type="radio" name="q2" value="1"> B. Die KI erzeugt überzeugend klingende, aber falsche Angaben</label><label class="answer"><input type="radio" name="q2" value="2"> C. Die KI speichert automatisch jede Eingabe</label></fieldset><fieldset class="q"><legend>4. Was verlangt Art. 4 im Kern?</legend><label class="answer"><input type="radio" name="q3" value="0"> A. Ein staatliches Zertifikat für jeden Mitarbeiter</label><label class="answer"><input type="radio" name="q3" value="1"> B. Angemessene Maßnahmen für ausreichende KI-Kompetenz</label><label class="answer"><input type="radio" name="q3" value="2"> C. Den vollständigen Verzicht auf generative KI</label></fieldset><fieldset class="q"><legend>5. Was gilt bei personenbezogenen Daten?</legend><label class="answer"><input type="radio" name="q4" value="0"> A. Sie dürfen immer eingegeben werden</label><label class="answer"><input type="radio" name="q4" value="1"> B. Sie sind bei KI rechtlich irrelevant</label><label class="answer"><input type="radio" name="q4" value="2"> C. Nur zulässig und nach betrieblichen Regeln verarbeiten; möglichst minimieren</label></fieldset><fieldset class="q"><legend>6. Wer trägt Verantwortung für eine wichtige betriebliche Entscheidung?</legend><label class="answer"><input type="radio" name="q5" value="0"> A. Immer allein das KI-System</label><label class="answer"><input type="radio" name="q5" value="1"> B. Die verantwortlichen Menschen bzw. die Organisation</label><label class="answer"><input type="radio" name="q5" value="2"> C. Der Hersteller des Computers</label></fieldset><fieldset class="q"><legend>7. Warum können KI-Ergebnisse unfair sein?</legend><label class="answer"><input type="radio" name="q6" value="0"> A. Weil KI keine Sprache versteht</label><label class="answer"><input type="radio" name="q6" value="1"> B. Weil Trainingsdaten und Modelle Verzerrungen enthalten können</label><label class="answer"><input type="radio" name="q6" value="2"> C. Weil KI immer zufällig entscheidet</label></fieldset><fieldset class="q"><legend>8. Wann ist besondere Vorsicht nötig?</legend><label class="answer"><input type="radio" name="q7" value="0"> A. Beim Umformulieren eines neutralen Satzes</label><label class="answer"><input type="radio" name="q7" value="1"> B. Bei der Erstellung einer Einkaufsliste</label><label class="answer"><input type="radio" name="q7" value="2"> C. Wenn KI Entscheidungen über Menschen wesentlich beeinflusst</label></fieldset><fieldset class="q"><legend>9. Was ist bei KI-generierten Bildern oder Texten zu beachten?</legend><label class="answer"><input type="radio" name="q8" value="0"> A. Sie sind automatisch gemeinfrei</label><label class="answer"><input type="radio" name="q8" value="1"> B. Rechte Dritter und Nutzungsbedingungen müssen geprüft werden</label><label class="answer"><input type="radio" name="q8" value="2"> C. Sie dürfen nie veröffentlicht werden</label></fieldset><fieldset class="q"><legend>10. Was sollte bei einer neuen KI-Anwendung zuerst geklärt werden?</legend><label class="answer"><input type="radio" name="q9" value="0"> A. Nur die Farbe der Benutzeroberfläche</label><label class="answer"><input type="radio" name="q9" value="1"> B. Nur der Preis</label><label class="answer"><input type="radio" name="q9" value="2"> C. Zweck, Daten, Risiken und Verantwortlichkeit</label></fieldset><fieldset class="q"><legend>11. Wie geht man mit einer unsicheren KI-Antwort um?</legend><label class="answer"><input type="radio" name="q10" value="0"> A. Ungeprüft weiterleiten</label><label class="answer"><input type="radio" name="q10" value="1"> B. Mit Quellen oder Fachwissen verifizieren</label><label class="answer"><input type="radio" name="q10" value="2"> C. Als sicher markieren</label></fieldset><fieldset class="q"><legend>12. Ist für Art. 4 zwingend ein extern gekauftes Zertifikat vorgeschrieben?</legend><label class="answer"><input type="radio" name="q11" value="0"> A. Ja, immer</label><label class="answer"><input type="radio" name="q11" value="1"> B. Nein</label><label class="answer"><input type="radio" name="q11" value="2"> C. Nur bei Unternehmen unter 50 Mitarbeitern</label></fieldset><fieldset class="q"><legend>13. Was gehört zu guter interner Dokumentation?</legend><label class="answer"><input type="radio" name="q12" value="0"> A. Nur der Name des KI-Tools</label><label class="answer"><input type="radio" name="q12" value="1"> B. Nur die Unterschrift des Chefs</label><label class="answer"><input type="radio" name="q12" value="2"> C. Teilnehmer, Datum, Inhalte und Verantwortlichkeit; ggf. Testergebnis</label></fieldset><fieldset class="q"><legend>14. Was soll bei Datenschutzvorfällen passieren?</legend><label class="answer"><input type="radio" name="q13" value="0"> A. Löschen und niemandem sagen</label><label class="answer"><input type="radio" name="q13" value="1"> B. Nach betrieblicher Regel melden und bearbeiten</label><label class="answer"><input type="radio" name="q13" value="2"> C. Die KI erneut fragen</label></fieldset><fieldset class="q"><legend>15. Wann sollte eine Schulung aktualisiert werden?</legend><label class="answer"><input type="radio" name="q14" value="0"> A. Nie</label><label class="answer"><input type="radio" name="q14" value="1"> B. Bei wesentlichen Änderungen von Systemen, Einsatz oder Risiken</label><label class="answer"><input type="radio" name="q14" value="2"> C. Nur alle zehn Jahre</label></fieldset><fieldset class="q"><legend>16. Eine Software soll die Stimmung von Beschäftigten aus dem Kamerabild ablesen. Was gilt?</legend><label class="answer"><input type="radio" name="q15" value="0"> A. Erlaubt, wenn alle Beschäftigten zustimmen</label><label class="answer"><input type="radio" name="q15" value="1"> B. Emotionserkennung am Arbeitsplatz ist nach Art. 5 grundsätzlich verboten; Ausnahmen nur aus medizinischen oder Sicherheitsgründen</label><label class="answer"><input type="radio" name="q15" value="2"> C. Erlaubt, solange die Auswertung anonym bleibt</label></fieldset></form>
+    <button class="btn screen-only" type="button" onclick="grade()">Test auswerten</button>
+    <div id="result" class="result">Noch nicht ausgewertet.</div>
+
+    <h2>Quellen und Stand</h2>
+    <p class="ref">Stand dieser Unterlage: 20.08.2026. Maßgebliche Primärquellen sind insbesondere die Verordnung (EU) 2024/1689 und die Informationsangebote der Europäischen Kommission / des AI Act Service Desk. Offizielle Hinweise: <a href="https://digital-strategy.ec.europa.eu/en/faqs/ai-literacy-questions-answers">EU-Kommission: AI Literacy - Questions & Answers</a> und <a href="https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-4">AI Act Service Desk: Article 4 - AI literacy</a>.</p>
+    <p class="ref"><strong>Hinweis:</strong> Diese Vorlage ersetzt keine Einzelfallprüfung. Für Hochrisiko-KI, sensible personenbezogene Daten, Beschäftigtenentscheidungen oder andere regulierte Einsätze können zusätzliche Pflichten gelten.</p>
+  </section>
+
+  <!-- Eigener Bogen, damit er sich vom Rest trennen laesst. Auf dem Schirm zugeklappt,
+       beim Drucken grundsaetzlich weg - nur der eigene Knopf holt ihn hervor. -->
+  <section class="sheet solution">
+    <details id="solutionBox">
+      <summary>Lösungsschlüssel anzeigen — nur für die Schulungsleitung</summary>
+      <p class="ref" id="solutionKey">Für die Schulungsleitung: 1B, 2C, 3B, 4B, 5C, 6B, 7B, 8C, 9B, 10C, 11B, 12B, 13C, 14B, 15B, 16B.</p>
+      <p class="ref">Dieser Bogen druckt <strong>nicht</strong> mit der Schulungsunterlage mit — auch nicht über Strg+P. Wer ihn braucht, nimmt den Knopf „Lösungsschlüssel drucken" oben.</p>
+    </details>
+  </section>
+
+  <section class="sheet certificate pagebreak">
+    <div class="cert">
+      <div class="small">INTERNE TEILNAHMEBESCHEINIGUNG</div>
+      <h1>KI-Kompetenzschulung</h1>
+      <p>nach Art. 4 der Verordnung (EU) 2024/1689 (EU AI Act)</p>
+      <div class="name" id="certName">Teilnehmer/in</div>
+      <p>hat an einer internen Schulung zur sicheren, verantwortungsvollen und risikobewussten Nutzung von KI-Systemen teilgenommen.</p>
+      <p>Behandelte Themen: Grundlagen von KI, Fehler und Halluzinationen, Datenschutz und Vertraulichkeit, Urheber- und Nutzungsrechte, Verzerrungen und faire Entscheidungen, Transparenz, verbotene bzw. besonders kritische Anwendungen, menschliche Kontrolle und betriebliche Regeln.</p>
+      <p><strong>Schulungsdauer:</strong> ca. 60-90 Minuten<br><strong>Wissenstest:</strong> <span id="certScore">____ / 16</span></p>
+      <p><strong>Organisation:</strong> <span id="certCompany">____________________________</span><br><strong>Datum:</strong> <span id="certDate">________________</span></p>
+      <div class="sig"><div>Teilnehmer/in</div><div>Schulungsleitung / Verantwortliche Person</div></div>
+      <p class="small" style="margin-top:45px">Diese Bescheinigung dokumentiert eine interne KI-Kompetenzmaßnahme. Sie ist kein behördliches oder akkreditiertes Zertifikat.</p>
+    </div>
+  </section>
+</div>
+<script>
+const questions=[
+["Was ist bei KI-Ausgaben grundsätzlich zu beachten?",["Sie sind immer richtig","Wichtige Angaben müssen angemessen geprüft werden","Sie dürfen nur privat genutzt werden"],1],
+["Welche Daten gehören nicht in einen KI-Prompt?",["Öffentlich bekannte Produktdaten","Allgemeine Arbeitsanweisungen","Passwörter und geheime Zugangstoken"],2],
+["Was bedeutet eine KI-Halluzination?",["Die KI wird langsamer","Die KI erzeugt überzeugend klingende, aber falsche Angaben","Die KI speichert automatisch jede Eingabe"],1],
+["Was verlangt Art. 4 im Kern?",["Ein staatliches Zertifikat für jeden Mitarbeiter","Angemessene Maßnahmen für ausreichende KI-Kompetenz","Den vollständigen Verzicht auf generative KI"],1],
+["Was gilt bei personenbezogenen Daten?",["Sie dürfen immer eingegeben werden","Sie sind bei KI rechtlich irrelevant","Nur zulässig und nach betrieblichen Regeln verarbeiten; möglichst minimieren"],2],
+["Wer trägt Verantwortung für eine wichtige betriebliche Entscheidung?",["Immer allein das KI-System","Die verantwortlichen Menschen bzw. die Organisation","Der Hersteller des Computers"],1],
+["Warum können KI-Ergebnisse unfair sein?",["Weil KI keine Sprache versteht","Weil Trainingsdaten und Modelle Verzerrungen enthalten können","Weil KI immer zufällig entscheidet"],1],
+["Wann ist besondere Vorsicht nötig?",["Beim Umformulieren eines neutralen Satzes","Bei der Erstellung einer Einkaufsliste","Wenn KI Entscheidungen über Menschen wesentlich beeinflusst"],2],
+["Was ist bei KI-generierten Bildern oder Texten zu beachten?",["Sie sind automatisch gemeinfrei","Rechte Dritter und Nutzungsbedingungen müssen geprüft werden","Sie dürfen nie veröffentlicht werden"],1],
+["Was sollte bei einer neuen KI-Anwendung zuerst geklärt werden?",["Nur die Farbe der Benutzeroberfläche","Nur der Preis","Zweck, Daten, Risiken und Verantwortlichkeit"],2],
+["Wie geht man mit einer unsicheren KI-Antwort um?",["Ungeprüft weiterleiten","Mit Quellen oder Fachwissen verifizieren","Als sicher markieren"],1],
+["Ist für Art. 4 zwingend ein extern gekauftes Zertifikat vorgeschrieben?",["Ja, immer","Nein","Nur bei Unternehmen unter 50 Mitarbeitern"],1],
+["Was gehört zu guter interner Dokumentation?",["Nur der Name des KI-Tools","Nur die Unterschrift des Chefs","Teilnehmer, Datum, Inhalte und Verantwortlichkeit; ggf. Testergebnis"],2],
+["Was soll bei Datenschutzvorfällen passieren?",["Löschen und niemandem sagen","Nach betrieblicher Regel melden und bearbeiten","Die KI erneut fragen"],1],
+["Wann sollte eine Schulung aktualisiert werden?",["Nie","Bei wesentlichen Änderungen von Systemen, Einsatz oder Risiken","Nur alle zehn Jahre"],1],
+["Eine Software soll die Stimmung von Beschäftigten aus dem Kamerabild ablesen. Was gilt?",["Erlaubt, wenn alle Beschäftigten zustimmen","Emotionserkennung am Arbeitsplatz ist nach Art. 5 grundsätzlich verboten; Ausnahmen nur aus medizinischen oder Sicherheitsgründen","Erlaubt, solange die Auswertung anonym bleibt"],1]
+];
+// Anzahl und Schwelle werden aus der Fragenliste GERECHNET. Wer eine Frage
+// ergaenzt, aendert nur die Liste oben - Text, Zeugnis und Schluessel ziehen nach.
+const TOTAL=questions.length, PASS=Math.ceil(TOTAL*0.8);
+function sync(){const n=document.getElementById('participant').value||'Teilnehmer/in';const c=document.getElementById('company').value||'____________________________';const d=document.getElementById('date').value||'________________';document.getElementById('certName').textContent=n;document.getElementById('certCompany').textContent=c;document.getElementById('certDate').textContent=d}
+['participant','company','date'].forEach(id=>document.getElementById(id).addEventListener('input',sync));
+function grade(){let score=0,answered=0;questions.forEach((q,i)=>{const e=document.querySelector(`input[name=q${i}]:checked`);if(e){answered++;if(Number(e.value)===q[2])score++;}});const pass=score>=PASS&&answered===TOTAL;document.getElementById('result').textContent=`Ergebnis: ${score} von ${TOTAL} richtig${answered<TOTAL?` (${TOTAL-answered} unbeantwortet)`:''}. ${pass?'Interner Wissenstest bestanden.':'Interner Wissenstest noch nicht bestanden.'}`;document.getElementById('certScore').textContent=`${score} / ${TOTAL}${pass?' - bestanden':''}`;sync()}
+const DRUCK=['print-training','print-cert','print-solution'];
+function druckAls(klasse,vorher){if(vorher)vorher();document.body.classList.remove(...DRUCK);if(klasse)document.body.classList.add(klasse);window.print();setTimeout(()=>document.body.classList.remove(...DRUCK),500)}
+function printTraining(){druckAls('print-training')}
+function printCertificate(){druckAls('print-cert',sync)}
+function printBoth(){druckAls(null,sync)}
+// Ein zugeklapptes <details> gibt seinen Inhalt auch im Druck nicht her - deshalb
+// wird es hier wirklich aufgeklappt und danach in den alten Zustand zurueckgesetzt.
+function printSolution(){const d=document.getElementById('solutionBox');const war=d.open;d.open=true;druckAls('print-solution');setTimeout(()=>{d.open=war},600)}
+// Der Schluessel wird aus derselben Liste erzeugt, gegen die auch ausgewertet wird.
+// Von Hand getippt koennte er still von der Auswertung abweichen - so nicht.
+const BUCHSTABE='ABC';
+document.getElementById('solutionKey').textContent='Für die Schulungsleitung: '+questions.map((q,i)=>`${i+1}${BUCHSTABE[q[2]]}`).join(', ')+'.';
+document.getElementById('passHint').textContent=`Interner Richtwert: ${PASS} von ${TOTAL} richtigen Antworten (${Math.round(PASS/TOTAL*100)} %).`;
+document.getElementById('certScore').textContent=`____ / ${TOTAL}`;
+if(!document.getElementById('date').value){document.getElementById('date').value=new Date().toISOString().slice(0,10)}sync();
+</script>
+</body>
+</html>
