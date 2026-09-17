@@ -60,6 +60,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/ki-schulung.html</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
   <!-- Und die vier eigenständigen Seiten, die es längst gibt. -->
   <url>

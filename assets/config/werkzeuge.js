@@ -36,6 +36,17 @@ window.FP_WERKZEUGE = [
     page: "werkzeuge/knoten-werkzeug.html",
     open: "https://lausiklauskn-png.github.io/SB-KIMTool-Point/web/tools/mycelknoten.html",
     install: "" },
+  /* Die KI-Schulung nach Art. 4 EU AI Act (Klaus 2026-09-17): eine Vorlage für
+   * Firmen, kein Knoten. `open` zeigt auf die byte-gleiche Kopie der Unterlage
+   * (Original: Sage-Protokol/docs/schulung); die Seite unter werkzeuge/ ist der
+   * Rahmen — was es ist, was es nicht ist, was auf dem Gerät bleibt. */
+  { id: "ki-schulung", name: "KI-Schulung nach Art. 4 EU AI Act", name_en: "AI training under Art. 4 EU AI Act", icon: "🎓", iconImg: "assets/appicons/ki-schulung.png",
+    badge: { kind: "node", de: "📄 Vorlage für Firmen · Test + Bescheinigung", en: "📄 template for companies · test + certificate" },
+    de: "Schulungs-Unterlage zur KI-Kompetenz: zehn Abschnitte, Wissenstest mit 15 Fragen, Bescheinigung zum Ausdrucken, Lösungsschlüssel. Eine Datei, ohne Konto, nichts wird hochgeladen. Keine Rechtsberatung. Auf Deutsch.",
+    en: "Training document on AI literacy: ten sections, a 15-question knowledge test, a printable certificate, an answer key. One file, no account, nothing is uploaded. Not legal advice. In German.",
+    page: "werkzeuge/ki-schulung.html",
+    open: "schulung/EU_AI_Act_Art4_KI_Schulung.html",
+    install: "" },
 
   /* Klaus' EIGENE, öffentliche Apps (2026-06-27 freigeschaltet). external:true →
    * die Karte öffnet die LIVE-App direkt in einem neuen Tab (keine eigene

@@ -169,6 +169,13 @@
       "repo": "PWA-Toolpoint",
       "aktiv": false,
       "grund": "steht seit 2026-09-13 selbst im Marktplatz (markt-auslieferungspruefer) und wird dort gemessen. Zweimal gefuehrt hiesse zweimal in der Rangliste, einmal je Quelle — man haelt sie dann fuer zwei verschiedene Seiten. Dasselbe Muster wie PWA Toolpoint selbst: im Marktplatz, kein eigenes Ziel. Faellt der Marktplatz-Eintrag weg, hier wieder auf true."
+    },
+    {
+      "id": "eigen-ki-schulung",
+      "name": "KI-Schulung Art. 4 (PWA Toolpoint)",
+      "url": "https://pwa-toolpoint.de/ki-schulung.html",
+      "repo": "PWA-Toolpoint",
+      "aktiv": true
     }
   ]
 }

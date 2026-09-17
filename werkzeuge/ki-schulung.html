@@ -1,0 +1,125 @@
+<!doctype html>
+<!-- Family Projekt — Werkzeug-Seite: KI-Schulung nach Art. 4 EU AI Act. Inhalt in FP_TOOL.
+     Die Unterlage selbst liegt byte-gleich unter ../schulung/ (Original: Sage-Protokol/docs/schulung). -->
+<html lang="de">
+<head>
+<script>/* FP-SPRACHRIEGEL — Begruendung in assets/app.js § Sprachriegel. MUSS inline und vor dem ersten Anstrich laufen: danach hat Chrome laengst entschieden. */(function(){try{if(localStorage.getItem("fp_lang_wahl")!=="1")return;var h=document.documentElement;h.lang=localStorage.getItem("fp_lang")==="en"?"en":"de";h.setAttribute("translate","no");h.classList.add("notranslate");var m=document.createElement("meta");m.name="google";m.content="notranslate";(document.head||h).appendChild(m);}catch(e){}})();</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>KI-Schulung nach Art. 4 EU AI Act — Family Projekt</title>
+  <meta name="description" content="Schulungs-Unterlage für Firmen: KI-Kompetenz nach Artikel 4 der EU-KI-Verordnung, mit Wissenstest und Bescheinigung zum Ausdrucken. Eine Datei, läuft im Browser, ohne Konto, kostenlos." />
+  <meta name="theme-color" content="#0b0d14" />
+  <!-- Eigenes Zeichen (Klaus 2026-09-17): ein Blatt und ein Siegel mit Haken — dasselbe Bild wie auf pwa-toolpoint.de/ki-schulung.html. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230c1016'/%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M140 96h170l66 66v230a24 24 0 0 1-24 24H140a24 24 0 0 1-24-24V120a24 24 0 0 1 24-24z' stroke='%23f2b544' stroke-width='30'/%3E%3Cpath d='M310 96v66h66' stroke='%23f2b544' stroke-width='30'/%3E%3Cpath d='M176 220h140M176 268h140M176 316h84' stroke='%23f2b544' stroke-width='26'/%3E%3C/g%3E%3Ccircle cx='366' cy='372' r='86' fill='%230c1016'/%3E%3Ccircle cx='366' cy='372' r='64' fill='none' stroke='%237fb2e8' stroke-width='26'/%3E%3Cpath d='M330 374l24 24 46-52' fill='none' stroke='%237fb2e8' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="../assets/style.css?v=119" />
+  <script type="importmap">{ "imports": { "three": "../vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset=".5" stop-color="#7c9cff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#hg)"/><g fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M20 42 L32 22 L44 42"/><path d="M20 42 L44 42"/></g><circle cx="32" cy="22" r="5" fill="white"/><circle cx="20" cy="42" r="5" fill="white"/><circle cx="44" cy="42" r="5" fill="white"/></svg>
+        <a href="../index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="../index.html" data-i18n="nav_start">Start</a>
+        <a href="../werkzeuge.html" class="active" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="../markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span class="pill pill-reload" id="fpReload" title="Seite frisch laden, holt die neueste Version (Cache leeren)"><span class="rl-ic" aria-hidden="true">↻</span> Aktualisieren</span>
+        <span class="pill" id="langBtn" title="Sprache / Language">DE&nbsp;/&nbsp;EN</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+        <span class="pill pill-eng" id="bgPauseBtn" role="button" tabindex="0"
+              aria-pressed="false" title="Hintergrund-Bewegung anhalten"><span id="bgPauseZeichen" aria-hidden="true">⏸</span><span id="bgPauseName" class="nur-vorlesen">Bewegung anhalten</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main id="toolMain"></main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="holo">Family Projekt</span></span>
+      <a href="../werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="../netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+      <a href="../impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
+  </footer>
+
+  <script type="module" src="../assets/mycel-bg.js?v=119"></script>
+  <script>
+    window.FP_TOOL = {
+      id: "ki-schulung", icon: "🎓",
+      /* Die Unterlage liegt DANEBEN, byte-gleich mit dem Original in
+         Sage-Protokol/docs/schulung — kein iframe, keine zweite Fassung. */
+      openUrl: "../schulung/EU_AI_Act_Art4_KI_Schulung.html",
+      installUrl: "",
+      de: {
+        back: "← zurück zu Family Projekt", eyebrow: "Vorlage für Firmen · läuft im Browser · auf Deutsch",
+        h1pre: "KI-Schulung nach", h1hl: "Art. 4 EU AI Act", h1post: "— Unterlage, Wissenstest, Bescheinigung.",
+        lead: "Was Beschäftigte über KI wissen sollten, bevor sie damit arbeiten: zehn Abschnitte, ein Wissenstest mit 15 Fragen, eine Bescheinigung zum Ausdrucken und ein Lösungsschlüssel für die Schulungsleitung. Eine einzige Datei, ohne Konto, nichts wird hochgeladen. Die Unterlage ist auf Deutsch und wird bewusst nicht übersetzt: eine selbst gemachte englische Fassung eines Textes zu einer EU-Verordnung sähe verbindlich aus, ohne es zu sein.",
+        open: "Unterlage öffnen", install: "",
+        microcopy: "Kostenlos · ohne Konto · offline nach dem ersten Öffnen · Stand der Unterlage: 20.08.2026",
+        featTitle: "Was in der Datei steckt", featSub: "Vier Teile, ein Dokument. Vier Knöpfe steuern den Druck, alles auf A4.",
+        dlTitle: "Zum Mitnehmen", dlSub: "Die Datei speichern, das Original ansehen, die amtlichen Quellen lesen.",
+        costTitle: "Was es kostet", costSub: "Die Unterlage ist frei. Sie hat Arbeit gekostet; wer das honorieren möchte, kann es freiwillig tun. Wer nichts gibt, bekommt genau dieselbe Datei.",
+        cost0: "kostenlos nutzen", costNote: "Öffnen, ausfüllen, drucken — ohne Konto, ohne Tracker. Keine Freischaltung, kein Verkauf.",
+        donate: "Spenden", soon: "bald", donateNote: "Freiwillige Unterstützung (PayPal), kommt später.",
+        trustTitle: "Worauf du dich verlassen kannst", trustSub: "Ehrlich und nachprüfbar — und ehrlich auch darüber, was die Unterlage nicht ist."
+      },
+      en: {
+        back: "← back to Family Projekt", eyebrow: "Template for companies · runs in the browser · in German",
+        h1pre: "AI training under", h1hl: "Art. 4 EU AI Act", h1post: "— document, knowledge test, certificate.",
+        lead: "What staff should know about AI before they work with it: ten sections, a knowledge test with 15 questions, a printable certificate and an answer key for the trainer. One single file, no account, nothing is uploaded. The document is in German and is deliberately not translated: a home-made English version of a text about an EU regulation would look binding without being it. To let your browser translate it anyway, press and hold the DE / EN button for about a second.",
+        open: "Open the document", install: "",
+        microcopy: "Free · no account · offline after the first opening · document dated 20 August 2026",
+        featTitle: "What is in the file", featSub: "Four parts, one document. Four buttons control printing, all on A4.",
+        dlTitle: "To take with you", dlSub: "Save the file, view the original, read the official sources.",
+        costTitle: "What it costs", costSub: "The document is free. It took work; whoever wants to honour that can do so voluntarily. Whoever gives nothing gets exactly the same file.",
+        cost0: "use for free", costNote: "Open, fill in, print — no account, no tracker. Nothing unlocked, nothing sold.",
+        donate: "Donate", soon: "soon", donateNote: "Voluntary support (PayPal), coming later.",
+        trustTitle: "What you can rely on", trustSub: "Honest and verifiable — and honest about what the document is not."
+      },
+      features: [
+        { icon: "📘", de: { h: "Schulung", p: "Zehn Abschnitte: was ein KI-System ist, warum KI hilfreich und trotzdem nicht automatisch richtig ist, Datenschutz, Urheberrecht, Diskriminierung, Transparenz, verbotene und Hochrisiko-Anwendungen, sicherer Umgang, betriebliche Regeln, Dokumentation." },
+          en: { h: "Training", p: "Ten sections: what an AI system is, why AI is helpful yet not automatically right, data protection, copyright, discrimination, transparency, prohibited and high-risk uses, safe use, company rules, documentation." } },
+        { icon: "✅", de: { h: "Wissenstest", p: "15 Fragen mit Auswertung im Browser und Bestehens-Hinweis. Nichts wird abgeschickt." },
+          en: { h: "Knowledge test", p: "15 questions, scored in the browser, with a pass note. Nothing is sent anywhere." } },
+        { icon: "🎓", de: { h: "Bescheinigung", p: "Eine eigene Druckseite mit Feldern für Teilnehmer, Unternehmen und Datum; sie übernimmt den Punktestand." },
+          en: { h: "Certificate", p: "A separate print page with fields for participant, company and date; it takes over the score." } },
+        { icon: "🔑", de: { h: "Lösungsschlüssel", p: "Nur über einen eigenen Knopf für die Schulungsleitung. Beim normalen Drucken bleibt er immer weg, auch bei Strg+P." },
+          en: { h: "Answer key", p: "Only via its own button, for the trainer. It never comes out with a normal print, not even with Ctrl+P." } }
+      ],
+      downloads: [
+        { icon: "⤓", href: "../schulung/EU_AI_Act_Art4_KI_Schulung.html", dl: true,
+          de: { h: "Unterlage als Datei speichern", p: "Eine HTML-Datei, die alles enthält — auch im Firmennetz ohne Internet zu öffnen." },
+          en: { h: "Save the document as a file", p: "One HTML file that contains everything — opens on a company network without internet too." } },
+        { icon: "🍄", href: "https://github.com/lausiklauskn-png/Sage-Protokol/blob/main/docs/schulung/EU_AI_Act_Art4_KI_Schulung.html",
+          de: { h: "Das Original im Depot", p: "Sage-Protokol, docs/schulung. Hier liegt eine byte-gleiche Kopie; überarbeitet wird dort." },
+          en: { h: "The original in the repository", p: "Sage-Protokol, docs/schulung. What lies here is a byte-identical copy; revisions happen there." } },
+        { icon: "🇪🇺", href: "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-4",
+          de: { h: "Artikel 4 im Wortlaut", p: "KI-Service-Desk der Europäischen Kommission." },
+          en: { h: "Article 4 in full", p: "AI Service Desk of the European Commission." } },
+        { icon: "📄", href: "https://digital-strategy.ec.europa.eu/en/faqs/ai-literacy-questions-answers",
+          de: { h: "Fragen und Antworten zur KI-Kompetenz", p: "Digitalstrategie der Europäischen Kommission." },
+          en: { h: "AI literacy questions and answers", p: "Digital Strategy of the European Commission." } }
+      ],
+      trust: [
+        { de: { b: "Keine Rechtsberatung.", p: "Kein amtliches Zertifikat, keine Zusage, ob ein Betrieb die Verordnung erfüllt. Artikel 4 schreibt kein bestimmtes externes Zertifikat vor; die Unterlage ist eine Vorlage für die eigene Schulung und ersetzt keine Einzelfallprüfung." },
+          en: { b: "Not legal advice.", p: "Not an official certificate, no promise about whether a company meets the regulation. Article 4 prescribes no particular external certificate; the document is a template for your own training and replaces no case-by-case review." } },
+        { de: { b: "Alles bleibt auf deinem Gerät.", p: "Die Datei lädt nichts nach und schickt nichts ab. Was du einträgst, steht nur auf deinem Bildschirm und auf dem Ausdruck. Zwei Links führen bewusst nach außen, zu den Seiten der EU-Kommission — erst wenn du sie antippst." },
+          en: { b: "Everything stays on your device.", p: "The file fetches nothing and sends nothing. What you type in exists only on your screen and on the printout. Two links deliberately lead outside, to the EU Commission's pages — only when you tap them." } },
+        { de: { b: "Ein Stand, eine Quelle.", p: "Das Original liegt offen im Depot Sage-Protokol. Hier liegt eine byte-gleiche Kopie; wird die Unterlage überarbeitet, kommt sie von dort neu." },
+          en: { b: "One version, one source.", p: "The original lies openly in the Sage-Protokol repository. What lies here is a byte-identical copy; when the document is revised, it comes from there afresh." } },
+        { de: { b: "Der Lösungsschlüssel bleibt beim Drucken aus.", p: "Wer die Unterlage austeilt, verteilt die Antworten nicht versehentlich mit — nur der eigene Knopf holt sie hervor." },
+          en: { b: "The answer key stays out of the print.", p: "Whoever hands out the document does not hand out the answers by accident — only its own button brings them up." } }
+      ]
+    };
+  </script>
+  <script src="../assets/notranslate.js?v=119"></script>
+  <script src="../assets/app.js?v=119"></script>
+  <script src="../assets/config/spenden.js"></script>
+  <script src="../assets/tool-landing.js"></script>
+</body>
+</html>

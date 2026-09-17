@@ -217,7 +217,7 @@ console.log("\nsitemap.xml");
 
   /* Die vier Werkzeug-Unterseiten sind der Grund, warum die Sitemap überhaupt
    * angefasst wurde. Wenn eine davon wieder herausfällt, soll es auffallen. */
-  for (const p of ["geschenkbox", "such-werkzeug", "andock-werkzeug", "knoten-werkzeug"]) {
+  for (const p of ["geschenkbox", "such-werkzeug", "andock-werkzeug", "knoten-werkzeug", "ki-schulung"]) {
     ok(xml.includes(`/werkzeuge/${p}.html`), `Sitemap führt werkzeuge/${p}.html`);
   }
 }
