@@ -1,6 +1,14 @@
 <!doctype html>
 <!-- Family Projekt — Werkzeug-Seite: KI-Schulung nach Art. 4 EU AI Act. Inhalt in FP_TOOL.
-     Die Unterlage selbst liegt byte-gleich unter ../schulung/ (Original: Sage-Protokol/docs/schulung). -->
+     Die Unterlage selbst liegt byte-gleich unter ../schulung/ (Original: Sage-Protokol/docs/schulung).
+     ⚠ SEIT DEM 2026-09-17 STEHT AUF DER SEITE NICHT MEHR, WARUM sie nicht
+     übersetzt wird (Klaus: „das ist eine Erklärung, die du gegeben hast").
+     Die Entscheidung gilt weiter; der Grund gehört hierher, nicht in den
+     Fließtext. Geblieben ist die BEDIENHILFE, und nur im englischen Lead:
+     der Sprachriegel sperrt den Browser-Übersetzer, sobald jemand eine
+     Sprache gewählt hat — ohne diesen Halbsatz hat ein englischer Leser vor
+     der deutschen Datei keinen Weg mehr. Auf Deutsch braucht es ihn nicht:
+     wer die Datei öffnet, sieht ihre Sprache. -->
 <html lang="de">
 <head>
 <script>/* FP-SPRACHRIEGEL — Begruendung in assets/app.js § Sprachriegel. MUSS inline und vor dem ersten Anstrich laufen: danach hat Chrome laengst entschieden. */(function(){try{if(localStorage.getItem("fp_lang_wahl")!=="1")return;var h=document.documentElement;h.lang=localStorage.getItem("fp_lang")==="en"?"en":"de";h.setAttribute("translate","no");h.classList.add("notranslate");var m=document.createElement("meta");m.name="google";m.content="notranslate";(document.head||h).appendChild(m);}catch(e){}})();</script>
@@ -11,7 +19,7 @@
   <meta name="theme-color" content="#0b0d14" />
   <!-- Eigenes Zeichen (Klaus 2026-09-17): ein Blatt und ein Siegel mit Haken — dasselbe Bild wie auf pwa-toolpoint.de/ki-schulung.html. -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230c1016'/%3E%3Cg fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M140 96h170l66 66v230a24 24 0 0 1-24 24H140a24 24 0 0 1-24-24V120a24 24 0 0 1 24-24z' stroke='%23f2b544' stroke-width='30'/%3E%3Cpath d='M310 96v66h66' stroke='%23f2b544' stroke-width='30'/%3E%3Cpath d='M176 220h140M176 268h140M176 316h84' stroke='%23f2b544' stroke-width='26'/%3E%3C/g%3E%3Ccircle cx='366' cy='372' r='86' fill='%230c1016'/%3E%3Ccircle cx='366' cy='372' r='64' fill='none' stroke='%237fb2e8' stroke-width='26'/%3E%3Cpath d='M330 374l24 24 46-52' fill='none' stroke='%237fb2e8' stroke-width='26' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="../assets/style.css?v=119" />
+  <link rel="stylesheet" href="../assets/style.css?v=120" />
   <script type="importmap">{ "imports": { "three": "../vendor/three.module.min.js" } }</script>
 </head>
 <body>
@@ -47,7 +55,7 @@
     <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
   </footer>
 
-  <script type="module" src="../assets/mycel-bg.js?v=119"></script>
+  <script type="module" src="../assets/mycel-bg.js?v=120"></script>
   <script>
     window.FP_TOOL = {
       id: "ki-schulung", icon: "🎓",
@@ -58,7 +66,7 @@
       de: {
         back: "← zurück zu Family Projekt", eyebrow: "Vorlage für Firmen · läuft im Browser · auf Deutsch",
         h1pre: "KI-Schulung nach", h1hl: "Art. 4 EU AI Act", h1post: "— Unterlage, Wissenstest, Bescheinigung.",
-        lead: "Was Beschäftigte über KI wissen sollten, bevor sie damit arbeiten: zehn Abschnitte, ein Wissenstest mit 15 Fragen, eine Bescheinigung zum Ausdrucken und ein Lösungsschlüssel für die Schulungsleitung. Eine einzige Datei, ohne Konto, nichts wird hochgeladen. Die Unterlage ist auf Deutsch und wird bewusst nicht übersetzt: eine selbst gemachte englische Fassung eines Textes zu einer EU-Verordnung sähe verbindlich aus, ohne es zu sein.",
+        lead: "Was Beschäftigte über KI wissen sollten, bevor sie damit arbeiten: zehn Abschnitte, ein Wissenstest mit 15 Fragen, eine Bescheinigung zum Ausdrucken und ein Lösungsschlüssel für die Schulungsleitung. Eine einzige Datei, ohne Konto, nichts wird hochgeladen.",
         open: "Unterlage öffnen", install: "",
         microcopy: "Kostenlos · ohne Konto · offline nach dem ersten Öffnen · Stand der Unterlage: 20.08.2026",
         featTitle: "Was in der Datei steckt", featSub: "Vier Teile, ein Dokument. Vier Knöpfe steuern den Druck, alles auf A4.",
@@ -71,7 +79,7 @@
       en: {
         back: "← back to Family Projekt", eyebrow: "Template for companies · runs in the browser · in German",
         h1pre: "AI training under", h1hl: "Art. 4 EU AI Act", h1post: "— document, knowledge test, certificate.",
-        lead: "What staff should know about AI before they work with it: ten sections, a knowledge test with 15 questions, a printable certificate and an answer key for the trainer. One single file, no account, nothing is uploaded. The document is in German and is deliberately not translated: a home-made English version of a text about an EU regulation would look binding without being it. To let your browser translate it anyway, press and hold the DE / EN button for about a second.",
+        lead: "What staff should know about AI before they work with it: ten sections, a knowledge test with 15 questions, a printable certificate and an answer key for the trainer. One single file, no account, nothing is uploaded. The document is in German; to let your browser translate it, press and hold the DE / EN button for about a second.",
         open: "Open the document", install: "",
         microcopy: "Free · no account · offline after the first opening · document dated 20 August 2026",
         featTitle: "What is in the file", featSub: "Four parts, one document. Four buttons control printing, all on A4.",
@@ -117,8 +125,8 @@
       ]
     };
   </script>
-  <script src="../assets/notranslate.js?v=119"></script>
-  <script src="../assets/app.js?v=119"></script>
+  <script src="../assets/notranslate.js?v=120"></script>
+  <script src="../assets/app.js?v=120"></script>
   <script src="../assets/config/spenden.js"></script>
   <script src="../assets/tool-landing.js"></script>
 </body>

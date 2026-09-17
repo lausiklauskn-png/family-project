@@ -19,7 +19,20 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
 @media (max-width:700px){.sheet{padding:22px}.meta{grid-template-columns:1fr}.cert{padding:26px}.sig{grid-template-columns:1fr;gap:42px}.cert h1{font-size:30px}}
 @media print{
   @page{size:A4;margin:14mm}
-  body{background:white;font-size:10.7pt}.wrap{max-width:none;margin:0;padding:0}.controls{display:none!important}.sheet{box-shadow:none;border:0;border-radius:0;padding:0;margin:0 0 10mm}.pagebreak{break-before:page}.avoid{break-inside:avoid}.meta input{border:0;border-bottom:1px solid #555;border-radius:0;padding:5px 0}.q{break-inside:avoid}.cert{min-height:250mm;border:7px double #33465e;padding:24mm 16mm}.screen-only{display:none!important}
+  body{background:white;font-size:10.7pt}.wrap{max-width:none;margin:0;padding:0}.controls{display:none!important}.sheet{box-shadow:none;border:0;border-radius:0;padding:0;margin:0 0 10mm}.pagebreak{break-before:page}.avoid{break-inside:avoid}.meta input{border:0;border-bottom:1px solid #555;border-radius:0;padding:5px 0}.q{break-inside:avoid}
+  /* Eine Ueberschrift bleibt bei ihrem Text (Klaus 17.09.2026). Vorher endete
+     Seite 1 mit der blossen Zeile "2. KI ist hilfreich - aber nicht automatisch
+     richtig" samt Unterstrich, und der Abschnitt dazu begann auf Seite 2 - so
+     laesst sich Punkt 2 nicht als eigener Bogen ausdrucken. */
+  .training h2{break-after:avoid}
+  /* Und der Platz dafuer kommt aus dem ZWEITEN Bogen selbst, nicht aus Rand
+     oder Schriftgroesse: die Abschnitte 2 bis 5 ruecken ihre Ueberschriften
+     etwas enger. Gemessen (A4, 14mm Rand, Chromium): Seite 2 traegt damit
+     wieder genau bis "Bei Entscheidungen ueber Menschen ...", und Seite 3
+     beginnt unveraendert mit "6. Transparenz und Kennzeichnung". Ein
+     schmalerer Seitenrand haette JEDE Seite veraendert - hier aendern sich
+     nur Seite 1 und 2. */
+  .training h2.bogen2{margin-top:19px;margin-bottom:9px;padding-bottom:5px}.cert{min-height:250mm;border:7px double #33465e;padding:24mm 16mm}.screen-only{display:none!important}
   body.print-cert .training{display:none!important} body.print-cert .certificate{display:block!important}
   body.print-training .certificate{display:none!important} body.print-training .training{display:block!important}
   /* Der Loesungsschluessel bleibt beim Drucken IMMER weg - auch bei "Beides drucken"
@@ -61,19 +74,19 @@ h1{font-size:30px;line-height:1.15;margin:0 0 10px}h2{font-size:22px;margin:28px
     <h3>Beispiele im Betrieb</h3>
     <ul><li>Texte, E-Mails, Zusammenfassungen oder Konzepte erzeugen lassen</li><li>Bilder oder Grafiken generieren oder bearbeiten</li><li>Dokumente auswerten, strukturieren oder übersetzen</li><li>Kundendaten analysieren oder Antworten vorbereiten</li><li>Automatisierte Vorschläge, Bewertungen oder Entscheidungen unterstützen</li></ul>
 
-    <h2>2. KI ist hilfreich - aber nicht automatisch richtig</h2>
+    <h2 class="bogen2">2. KI ist hilfreich - aber nicht automatisch richtig</h2>
     <p>Generative KI kann überzeugend formulieren und trotzdem falsche Angaben erzeugen. Solche Fehler werden häufig als Halluzinationen bezeichnet. Die Ausgabe muss deshalb passend zum Risiko geprüft werden.</p>
     <ul><li><strong>Fakten prüfen:</strong> Zahlen, Namen, Termine, Gesetze, technische Daten und Quellen nicht ungeprüft übernehmen.</li><li><strong>Aktualität prüfen:</strong> KI-Ausgaben können veraltet sein.</li><li><strong>Kontext prüfen:</strong> Eine sprachlich gute Antwort kann fachlich unpassend sein.</li><li><strong>Verantwortung behalten:</strong> Die menschliche Entscheidung darf nicht blind an die KI abgegeben werden.</li></ul>
 
-    <h2>3. Datenschutz und vertrauliche Informationen</h2>
+    <h2 class="bogen2">3. Datenschutz und vertrauliche Informationen</h2>
     <div class="note warning"><strong>Grundregel:</strong> Nur Daten in ein KI-System eingeben, die dort verarbeitet werden dürfen. Interne, personenbezogene oder besonders sensible Daten dürfen nicht allein deshalb eingegeben werden, weil die KI technisch dazu in der Lage ist.</div>
     <ul><li>Keine Passwörter, Zugangstoken, privaten Schlüssel oder vertraulichen Zugangsdaten eingeben.</li><li>Personenbezogene Daten möglichst vermeiden, anonymisieren oder pseudonymisieren.</li><li>Kunden-, Mitarbeiter-, Gesundheits-, Finanz- und Vertragsdaten nur nach den betrieblichen Regeln und einer zulässigen Rechtsgrundlage verarbeiten.</li><li>Prüfen, welcher KI-Dienst verwendet wird, welche Einstellungen gelten und ob Daten zu Trainingszwecken weiterverwendet werden können.</li></ul>
 
-    <h2>4. Urheberrecht, Marken und fremde Inhalte</h2>
+    <h2 class="bogen2">4. Urheberrecht, Marken und fremde Inhalte</h2>
     <p>KI-Ausgaben sind nicht automatisch frei von Rechten Dritter. Besonders bei Bildern, Logos, Texten, Musik, Designs und Softwarecode muss geprüft werden, ob eine Nutzung zulässig ist.</p>
     <ul><li>Keine geschützten Werke oder umfangreiche fremde Texte ohne Berechtigung hochladen.</li><li>KI-generierte Inhalte vor Veröffentlichung auf erkennbare Übernahmen, Marken, Persönlichkeitsrechte und Lizenzen prüfen.</li><li>Bei kommerzieller Nutzung die Nutzungsbedingungen des eingesetzten KI-Dienstes beachten.</li></ul>
 
-    <h2>5. Diskriminierung, Verzerrungen und faire Entscheidungen</h2>
+    <h2 class="bogen2">5. Diskriminierung, Verzerrungen und faire Entscheidungen</h2>
     <p>KI kann Verzerrungen aus Trainingsdaten übernehmen oder bestimmte Gruppen benachteiligen. Besonders kritisch sind Anwendungen mit Auswirkungen auf Beschäftigung, Bildung, Kredit, Versicherung, Zugang zu Leistungen oder andere wesentliche Entscheidungen.</p>
     <ul><li>Ergebnisse nicht allein wegen einer KI-Empfehlung als objektiv ansehen.</li><li>Auf systematische Benachteiligungen achten.</li><li>Bei Entscheidungen über Menschen eine angemessene menschliche Kontrolle sicherstellen.</li></ul>
 
