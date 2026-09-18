@@ -99,6 +99,27 @@ probe "jeder Unterstrich-Schlüssel kommt durch" \
 probe "der Wertebereich der Nächte fällt weg" \
       "s|if (!is_int(\$v) \|\| \$v < 1 \|\| \$v > 30)  return 'automatik_invalid';|if (false) return 'automatik_invalid';|"
 
+# ── 12–15 · DIE WARTUNG (Klaus 2026-09-18) ──────────────────────────────────
+# Sie darf als einziges Feld in BEIDE Richtungen, weil sie keine Ampel trägt
+# und nur wegnehmen kann. Genau diese vier Lücken sind gefährlich:
+#
+# 12 · Der Zweig fehlt ganz — dann geht die Wartung gar nicht, und der Knopf
+#      im Studio scheitert mit `field_not_allowed`.
+probe "der Wartungs-Zweig fehlt ganz" \
+      "s|if (\$feld === 'wartung') {|if (false) {|"
+# 13 · NUR EINE RICHTUNG. Das ist die Lücke, die aussieht wie ein Feature:
+#      hinein mit einem Klick, heraus nur mit einem Commit von Hand.
+probe "nur das Einschalten ist erlaubt (kein Rückweg)" \
+      "s|if (!is_bool(\$wert)) out(array('ok' => false, 'error' => 'bad_wartung'), 422);|if (\$wert !== true) out(array('ok' => false, 'error' => 'bad_wartung'), 422);|"
+# 14 · Das Feld nimmt jeden Wert — ein Loch in genau der Datei, die die
+#      Sperren trägt.
+probe "die Wartung nimmt jeden Wert an" \
+      "s|if (!is_bool(\$wert)) out(array('ok' => false, 'error' => 'bad_wartung'), 422);||"
+# 15 · Die Datums-Form fällt weg. `wartungBis` ist nicht nur Beschriftung:
+#      daran zählt der Messlauf die Gelb-Strähne ab.
+probe "die Form der Wartungs-Daten wird nicht mehr geprüft" \
+      "s|error' => 'bad_wartung_datum'), 422);||"
+
 echo
 echo "$gruen Wächter schlagen an, $blind blind"
 [ "$blind" -eq 0 ] || exit 1

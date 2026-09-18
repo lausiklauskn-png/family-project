@@ -251,6 +251,9 @@ if ($action === 'commit_vectors') {
  *   - GESETZT werden dürfen je Eintrag "gesehen" (eine Hex-Prüfsumme),
  *     "gesehen_am" (das Datum der Durchsicht, reine Beschriftung) und —
  *     das ist neu — "ampel"/"grund"/"seit", ABER NUR IN RICHTUNG STRENGER.
+ *   - Seit dem 2026-09-18 dazu "wartung"/"wartungSeit"/"wartungBis" — in BEIDE
+ *     Richtungen, weil die Wartung keine Ampel trägt und nur wegnehmen kann,
+ *     nie freigeben. Die Begründung steht unten am Feld selbst.
  *   - Alles andere darf weiterhin nur BYTEGLEICH durchgereicht werden, so wie
  *     es schon in der Datei steht.
  *   - Schlüssel müssen wie eine anchorId aussehen; "_hinweis" bleibt erlaubt,
@@ -425,6 +428,43 @@ if ($action === 'commit_wache') {
           // Steuerzeichen, sonst ist er kein Satz mehr.
           if (strlen($wert) > 300 || preg_match('~[\x00-\x08\x0b\x0c\x0e-\x1f]~', $wert)) out(array('ok' => false, 'error' => 'bad_grund'), 422);
         }
+        continue;
+      }
+      /* ── DIE WARTUNG — und warum sie in BEIDE Richtungen darf (2026-09-18)
+       *
+       * Klaus: „Angenommen, ein Kunde bittet mich darum, seine App vorlaeufig
+       * unsichtbar zu schalten … damit er an der App arbeiten kann und keine
+       * weiteren negativen Bewertungen kommen oder Messungen … auch durch
+       * einen einfachen Klick und auch wieder anzuschalten."
+       *
+       * Das sieht auf den ersten Blick wie ein Loch in der Regel „gesperrt
+       * wird im Studio, geloest nur in der Datei" aus. Es ist keins, und der
+       * Grund laesst sich pruefen statt behaupten:
+       *
+       *   · Die Wartung traegt KEINE Ampel. Sie kann keine setzen und keine
+       *     herabstufen — der Rang-Vergleich oben laeuft unveraendert weiter.
+       *   · **Sie kann nur wegnehmen, nie freigeben.** Ein Eintrag in Wartung
+       *     ist unsichtbar; ein Eintrag ohne Wartung ist genau so sichtbar,
+       *     wie die Ampel es sagt. Wer sie ausschaltet, holt ein rotes Band
+       *     zurueck statt es loszuwerden.
+       *   · Und ein gesperrter Eintrag wird gar nicht erst unsichtbar — das
+       *     entscheidet die Anzeige (PWA-Toolpoint/assets/karte.js,
+       *     `istWartung`), damit „erst sperren, dann Wartung" nicht der Weg
+       *     ist, eine Sperre spurlos verschwinden zu lassen.
+       *
+       * Der Satz, der die Ampel einseitig macht, lautet: ein Fehlgriff beim
+       * LOESEN ist still. Hier ist er es nicht — ein Fehlgriff blendet einen
+       * Eintrag ein, der ohnehin eingeblendet gehoert, oder aus, und beides
+       * sieht man sofort auf der Seite.
+       *
+       * `wartungBis` ist NICHT nur Beschriftung: daran liest
+       * tools/messwerte-holen.mjs ab, ab wann die Gelb-Straehne wieder zaehlt. */
+      if ($feld === 'wartung') {
+        if (!is_bool($wert)) out(array('ok' => false, 'error' => 'bad_wartung'), 422);
+        continue;
+      }
+      if ($feld === 'wartungSeit' || $feld === 'wartungBis') {
+        if (!is_string($wert) || !preg_match('~^\d{4}-\d{2}-\d{2}$~', $wert)) out(array('ok' => false, 'error' => 'bad_wartung_datum'), 422);
         continue;
       }
       // Alles Uebrige nur, wenn es BYTEGLEICH schon dort steht.
