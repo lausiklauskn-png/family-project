@@ -75,19 +75,51 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Browser bereitstellen
+      # ⚠ BEIDE PAKETE IN EINEM AUFRUF — und das ist keine Schönheit, sondern
+      # die Ursache eines siebentägigen Stillstands (Klaus 2026-09-18).
+      #
+      # Hier standen zwei getrennte `npm install … --no-save`. Dieses Repo hat
+      # KEINE package.json; ein nicht gespeichertes Paket gilt beim nächsten
+      # `npm install` deshalb als überzählig und wird ENTFERNT. Der zweite
+      # Aufruf (lighthouse) hat also jede Nacht `playwright` weggeräumt.
+      #
+      # GEMESSEN am 2026-09-18, nicht vermutet:
+      #   npm install A --no-save ; npm install B --no-save   → node_modules: B
+      #   npm install A B --no-save                           → node_modules: A B
+      #
+      # WAS ES GEKOSTET HAT: sechs Nächte in Folge (Läufe 44–49, 12.–17.09.)
+      # ist der Lauf mit `Cannot find package 'playwright'` gestorben — NACH
+      # der Messung („12 gemessen, 2 veraltet") und VOR dem Commit. Die Arbeit
+      # war jede Nacht getan und jede Nacht weg. Vier neue Einträge standen
+      # dabei auf den Plätzen 1 bis 4 der Reihenfolge und wurden nie gemessen;
+      # PWA Toolpoint liest dieselbe Messreihe und stand damit still mit.
+      #
+      # Lighthouse darf weiter fehlen (Stufe 5, Weg A): dann wird nicht
+      # gemessen und der Bericht sagt ehrlich „nicht gemessen". Der Rückfall
+      # holt in dem Fall wenigstens playwright — ohne das stünde die ganze
+      # nächtliche Arbeit, nicht nur die Messung.
+      - name: Werkzeuge bereitstellen
         run: |
           set -euo pipefail
-          npm install playwright --no-save
+          npm install playwright lighthouse --no-save \
+            || { echo "::warning::lighthouse ließ sich nicht installieren — es wird heute nicht gemessen"; \
+                 npm install playwright --no-save; }
           npx playwright install --with-deps chromium
 
-      # Stufe 5, Weg A. Schlägt die Installation fehl, bricht der Lauf NICHT ab:
-      # ohne Lighthouse wird nicht gemessen, und der Bericht sagt ehrlich
-      # „nicht gemessen" — genau wie der Safe-Browsing-Steckplatz ohne Schlüssel.
-      # Eine ausgefallene Messung darf die nächtliche Arbeit nicht anhalten.
-      - name: Lighthouse bereitstellen (Stufe 5, darf fehlschlagen)
-        continue-on-error: true
-        run: npm install lighthouse --no-save
+      # ⚠ ERST PRÜFEN, DANN ARBEITEN. Ein Lauf, der mittendrin stirbt, wirft
+      # weg, was er schon getan hat — der Commit-Schritt kommt nie dran. Was
+      # die Arbeit VORAUSSETZT, wird deshalb davor geprüft, mit einer Meldung,
+      # die den Grund nennt statt eines Stacktrace.
+      - name: Werkzeuge nachzählen
+        run: |
+          set -euo pipefail
+          node -e "import('playwright').then(()=>console.log('  ✓ playwright da'))" || {
+            echo "::error::playwright fehlt — der Lauf bricht HIER ab, bevor Arbeit verloren geht."
+            echo "Häufigste Ursache: ein zweites 'npm install --no-save' hat es entfernt."
+            exit 1
+          }
+          node -e "import('lighthouse').then(()=>console.log('  ✓ lighthouse da'))" \
+            || echo "::warning::lighthouse fehlt — es wird heute nicht gemessen (der Bericht sagt das auch so)"
 
       - name: Probelauf (ändert nichts, zeigt was anstünde; misst nicht)
         env:

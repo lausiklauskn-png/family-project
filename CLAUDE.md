@@ -135,6 +135,73 @@ Karte für den Bruchteil einer Sekunde ist der Preis; ein zweiter Leseweg im
 Bau-Werkzeug wäre eine zweite Quelle für dieselbe Frage — und genau die hat oben
 den Riegel gebrochen.
 
+## ⏱ DIE MESSUNG STAND SIEBEN TAGE — und die Reihenfolge war nicht schuld (Klaus 2026-09-18)
+
+Klaus: *„Ich sehe, dass im Family Project die letzten vier nicht gemessen
+wurden, schon mehrere Tage. Und genauso in PWA Toolpoint. … Die Reihenfolge der
+Messung sollte festgeregelt werden, sonst werden die ja nie gemessen."*
+
+**Der Befund stimmte, die vermutete Ursache nicht.** Nachgerechnet an den echten
+Daten standen die vier nie gemessenen Einträge auf den **Plätzen 1 bis 4** — sie
+wären sofort drangekommen. `reihenfolge()` sortiert seit jeher nach ältestem
+Messdatum, nie Gemessene mit `""` ganz vorn.
+
+**Gestorben ist der nächtliche LAUF.** Sechs Nächte in Folge (Läufe 44–49,
+12.–17.09.), jedes Mal mit `Cannot find package 'playwright'` — **nach** der
+Messung (*„12 gemessen, 2 veraltet"*) und **vor** dem Commit. Die Arbeit war
+jede Nacht getan und jede Nacht weg. Das letzte Messdatum aller vierzehn
+Einträge war deshalb der **11.09.**
+
+### Die Ursache: zwei `npm install --no-save` hintereinander
+
+Dieses Repo hat **keine `package.json`**. Ein nicht gespeichertes Paket gilt beim
+nächsten `npm install` deshalb als überzählig und wird **entfernt**. Der Schritt
+„Lighthouse bereitstellen" räumte also jede Nacht `playwright` weg.
+
+**Gemessen am 2026-09-18, nicht vermutet:**
+
+| | `node_modules` danach |
+|---|---|
+| `npm install A --no-save` ; `npm install B --no-save` | **nur B** |
+| `npm install A B --no-save` | **A und B** |
+
+⚠ **UND PWA TOOLPOINT STAND DAMIT STILL MIT.** Es misst nicht selbst, sondern
+liest `family-project/forschung/messreihe.json`. **Eine Ursache, zwei
+Symptome** — genau wie Klaus es an beiden Seiten gesehen hat.
+
+### ⚠ Ein Lauf, der mittendrin stirbt, wirft weg, was er schon getan hat
+
+Das ist die Lehre über den Einzelfall hinaus, und sie steht in Kimhubs
+Verfassung an anderer Stelle schon: die Messung lief durch, die Zahlen lagen
+vor, und weil ein **späterer** Schritt starb, kam der Commit nie dran.
+
+Deshalb steht jetzt **vor** der Arbeit ein Schritt „Werkzeuge nachzählen", der
+mit einer Meldung abbricht, die den Grund nennt, statt mit einem Stacktrace
+nach getaner Arbeit. *Was die Arbeit voraussetzt, wird geprüft, bevor gearbeitet
+wird.*
+
+⚠ **Lighthouse darf weiter fehlen** (Stufe 5, Weg A) — dann wird nicht gemessen
+und der Bericht sagt ehrlich „nicht gemessen". Der Rückfall hinter `||` holt in
+dem Fall wenigstens `playwright`: ohne das stünde die ganze nächtliche Arbeit
+still, nicht nur die Messung.
+
+### ⚠ Ein Wächter auf die Reihenfolge allein wäre sechs Nächte grün gewesen
+
+`tests/smoke_messreihenfolge.mjs` misst deshalb **beides**: die Sortierung (die
+stimmte) und die Voraussetzung dafür, dass sie überhaupt je angewandt wird (die
+fehlte). Dazu die Zusicherung, um die Klaus gebeten hat, an den **echten**
+Daten: *jeder nie gemessene Eintrag kommt im nächsten Lauf dran.*
+
+Und ein Gegenprobe-Fall stellt **genau Klaus' vermutete Ursache** nach — ein
+Deckel, der für die Alten reicht, aber nicht für alle Neuen. Er schlägt an:
+*„jeder NIE gemessene Eintrag kommt im nächsten Lauf dran → markt-pwa-toolpoint"*.
+
+```bash
+node tests/smoke_messreihenfolge.mjs        # 10 grün · 0 rot
+bash tests/gegenprobe_messreihenfolge.sh    # 6 schlagen an · 0 blind · 0 tote Anker
+```
+
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere
