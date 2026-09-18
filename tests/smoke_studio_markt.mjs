@@ -303,6 +303,49 @@ ok(/studio_key/.test(cfg), "freigabe-config.example.php: studio_key vorhanden");
     erwarte("ein anderer Unterstrich-Schlüssel bleibt gesperrt", leer,
             { _hinweis: "x", _sonstwas: { an: true } }, "bad_key");
 
+    /* ── DIE WARTUNG (Klaus 2026-09-18) ─────────────────────────────────
+     * Sie darf als einziges Feld in BEIDE Richtungen — weil sie keine Ampel
+     * trägt und nur wegnehmen kann, nie freigeben. Genau das wird hier
+     * gemessen: dass sie hin UND zurück geht, und dass sie dabei an keiner
+     * Stelle zum zweiten Weg zur Sperre oder zum Lösen wird. */
+    const inWartung = { _hinweis: "x", "markt-probe": { wartung: true, wartungSeit: "2026-09-17" } };
+
+    erwarte("Wartung einschalten ist erlaubt", leer,
+            { _hinweis: "x", "markt-probe": { wartung: true, wartungSeit: "2026-09-17" } }, null);
+    /* DIE ZWEITE RICHTUNG. Ohne sie wäre die Wartung eine Falle: hinein mit
+       einem Klick, heraus nur mit einem Commit von Hand. */
+    erwarte("Wartung wieder ausschalten ist erlaubt", inWartung,
+            { _hinweis: "x", "markt-probe": { wartung: false, wartungSeit: "2026-09-17", wartungBis: "2026-09-20" } }, null);
+    erwarte("Wartung ganz weglassen ist erlaubt", inWartung,
+            { _hinweis: "x" }, null);
+    /* An einem GESPERRTEN Eintrag darf sie stehen — wirken tut sie dort nicht
+       (das entscheidet die Anzeige, siehe PWA-Toolpoint/assets/karte.js).
+       Ein Riegel hier wäre der falsche Ort: rot kann auch NACH der Wartung
+       dazukommen, und dann stünde beides ohnehin nebeneinander. */
+    erwarte("Wartung neben einer Sperre ist erlaubt", gesperrt,
+            { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "Verlangt eine Anmeldung.", seit: "2026-08-11", wartung: true, wartungSeit: "2026-09-17" } }, null);
+    /* Aber sie ist kein Weg AN der Sperre vorbei: wer die Ampel dabei fallen
+       lässt, wird abgewiesen wie immer. */
+    erwarte("Wartung setzen und die Sperre dabei weglassen", gesperrt,
+            { _hinweis: "x", "markt-probe": { wartung: true, wartungSeit: "2026-09-17" } }, "entsperren_nur_in_datei");
+    erwarte("Wartung setzen und die Sperre dabei herabstufen", gesperrt,
+            { _hinweis: "x", "markt-probe": { ampel: "gelb", grund: "x", wartung: true } }, "entsperren_nur_in_datei");
+
+    /* ── Form. Ein Feld, das jeden Wert schluckt, ist ein Loch in genau der
+       Datei, die die Sperren trägt. ─────────────────────────────────────── */
+    erwarte("Wartung als Text", leer,
+            { _hinweis: "x", "markt-probe": { wartung: "ja" } }, "bad_wartung");
+    erwarte("Wartung als Zahl", leer,
+            { _hinweis: "x", "markt-probe": { wartung: 1 } }, "bad_wartung");
+    erwarte("Wartungs-Datum in falscher Form", leer,
+            { _hinweis: "x", "markt-probe": { wartung: true, wartungSeit: "17.09.2026" } }, "bad_wartung_datum");
+    erwarte("Wartungs-Enddatum in falscher Form", leer,
+            { _hinweis: "x", "markt-probe": { wartung: false, wartungBis: "gestern" } }, "bad_wartung_datum");
+    /* Und der Name gilt genau so, wie er dasteht — ein Nachbar-Feld bleibt
+       draußen. Sonst wäre „wartung" der Türöffner für alles, was so heißt. */
+    erwarte("ein erfundenes Wartungs-Feld bleibt gesperrt", leer,
+            { _hinweis: "x", "markt-probe": { wartungGrund: "baut um" } }, "field_not_allowed");
+
     /* ── FAIL-CLOSED: ohne die vorhandene Fassung wird nichts geschaltet ── */
     erwarte("Vorlage unlesbar → Sperre wird NICHT gesetzt", "FEHLER",
             { _hinweis: "x", "markt-probe": { ampel: "rot", grund: "x" } }, "vorlage_nicht_lesbar");
