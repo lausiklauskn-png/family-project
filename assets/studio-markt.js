@@ -96,6 +96,12 @@
       wa_ohne_datum: "Quittung veröffentlicht, aber ohne Datum — dafür muss marktplatz-api.php auf dem Server neu hochgeladen werden.",
       wa_quittiert: "✓ Quittiert — jetzt noch auf Veröffentlichen drücken.",
       wa_keine_summe: "Für diesen Eintrag liegt keine Prüfsumme vor — nichts zu quittieren.",
+      wa_wartung: "🛠 Wartung",
+      wa_wartung_aus: "✅ Wartung beenden",
+      wa_wartung_zeile: "🛠 in Wartung — für Besucher unsichtbar",
+      wa_wartung_an: "🛠 in Wartung — jetzt noch auf Veröffentlichen drücken.",
+      wa_wartung_ab: "✅ Wartung beendet — jetzt noch auf Veröffentlichen drücken.",
+      wa_wartung_gesperrt: "Der Eintrag ist gesperrt — eine Sperre bleibt sichtbar und geht der Wartung vor.",
       wa_sperren: "⛔ Sperren",
       wa_vorbehalt: "⚠ Vorbehalt",
       wa_grund_rot: "Grund der Sperre (steht öffentlich an der Karte)",
@@ -252,6 +258,12 @@
       wa_ohne_datum: "Acknowledgement published, but without a date — marktplatz-api.php needs re-uploading to the server for that.",
       wa_quittiert: "✓ Acknowledged — now press Publish.",
       wa_keine_summe: "No checksum for this entry — nothing to acknowledge.",
+      wa_wartung: "🛠 Maintenance",
+      wa_wartung_aus: "✅ End maintenance",
+      wa_wartung_zeile: "🛠 under maintenance — hidden from visitors",
+      wa_wartung_an: "🛠 Under maintenance — now press Publish.",
+      wa_wartung_ab: "✅ Maintenance ended — now press Publish.",
+      wa_wartung_gesperrt: "This entry is blocked — a block stays visible and takes precedence over maintenance.",
       wa_sperren: "⛔ Block",
       wa_vorbehalt: "⚠ Flag",
       wa_grund_rot: "Reason for blocking (shown publicly on the card)",
@@ -619,8 +631,12 @@
         '<img src="' + esc(safeImg(e.img) || "") + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
         '<div class="fpst-item__b"><b>' + esc(e.label) + '</b>' + (e.own ? ' <span class="fpst-own">eigen</span>' : "") +
         (e.mycel ? ' <span class="fpst-myc">🧬</span>' : "") +
-        '<small>' + esc((e.text || "").slice(0, 90)) + '</small></div>' +
+        '<small>' + esc((e.text || "").slice(0, 90)) + '</small>' +
+        (wartungVon(e.anchorId) ? '<small class="fpst-wartung">' + esc(T("wa_wartung_zeile")) + '</small>' : "") +
+        '</div>' +
         '<div class="fpst-item__a"><button data-edit="' + i + '">' + esc(T("edit")) + '</button>' +
+        '<button data-wartung="' + i + '">' +
+          esc(wartungVon(e.anchorId) ? T("wa_wartung_aus") : T("wa_wartung")) + '</button>' +
         '<button data-del="' + i + '" class="fpst-danger">' + esc(T("del")) + '</button></div>' +
         '</div>';
     }).join("");
@@ -1403,6 +1419,59 @@
     return (w && typeof w.ampel === "string") ? w.ampel : null;
   }
 
+  /* ── DIE WARTUNG (Klaus 2026-09-18) ─────────────────────────────────────
+   *
+   * „Angenommen, ein Kunde bittet mich darum, seine App vorläufig unsichtbar
+   * zu schalten … damit er an der App arbeiten kann und keine weiteren
+   * negativen Bewertungen kommen oder Messungen … auch durch einen einfachen
+   * Klick und auch wieder anzuschalten."
+   *
+   * ⚠ SIE IST KEINE AMPEL, und deshalb darf sie in BEIDE Richtungen. Die
+   * Ampel ist ein URTEIL des Marktplatzes über eine App und geht aus dem
+   * Browser nur nach oben („ein Fehlgriff beim Lösen ist still"). Die Wartung
+   * ist eine BITTE ihres Anbieters, und sie kann nur wegnehmen, nie
+   * freigeben: wer sie ausschaltet, stellt genau den Zustand her, den die
+   * Ampel ohnehin vorgibt — ein rotes Band kommt dabei ZURÜCK, nicht abhanden.
+   *
+   * ⚠ DIE SPERRE GEHT VOR. Ein rot geschalteter Eintrag wird nicht unsichtbar;
+   * sonst wäre „erst sperren, dann Wartung" der Weg, eine Sperre spurlos
+   * verschwinden zu lassen — und sie ist ausdrücklich dafür gebaut, sichtbar
+   * zu bleiben. Bei GELB gilt das nicht: ein Vorbehalt ist kein öffentliches
+   * Protokoll einer Entscheidung. */
+  function wartungVon(id) {
+    var w = wacheVon(id);
+    return (w && w.wartung === true) ? w : null;
+  }
+  /* Gibt true zurück, wenn wirklich geschaltet wurde — die Probe misst die TAT. */
+  function wartungSetzen(id, an) {
+    if (!id) return false;
+    if (an && wacheAmpel(id) === "rot") { toast(T("wa_wartung_gesperrt"), false); return false; }
+    var vorher = wacheVon(id) || {};
+    var neu = {};
+    for (var f in vorher) if (Object.prototype.hasOwnProperty.call(vorher, f)) neu[f] = vorher[f];
+    if (an) {
+      neu.wartung = true;
+      neu.wartungSeit = heuteOrt();
+      delete neu.wartungBis;
+    } else {
+      delete neu.wartung;
+      delete neu.wartungSeit;
+      /* `wartungBis` BLEIBT stehen, und das ist der halbe Zweck: der Messlauf
+       * zählt eine Gelb-Strähne erst ab dem Tag DANACH wieder. Ohne das trüge
+       * der Anbieter im Augenblick des Wiedereinschaltens ein gelbes Band für
+       * genau die Nächte, in denen er gearbeitet hat. */
+      neu.wartungBis = heuteOrt();
+    }
+    WACHEHAND[id] = neu;
+    /* Wie beim Sperren NICHT `dirty`: die Einträge selbst ändern sich nicht,
+     * sonst ginge bei jedem Klick eine unveränderte listings.js mit raus. */
+    wacheDirty = true; markDirty();
+    renderList();
+    renderSporen(SPORENSTAND);
+    toast(an ? T("wa_wartung_an") : T("wa_wartung_ab"));
+    return true;
+  }
+
   /* Gibt true zurück, wenn wirklich geschaltet wurde. Der Rückgabewert ist
    * Absicht: so kann die Probe die TAT messen statt den Wortlaut dieser Datei. */
   function wacheSetzen(id, ampel, grund) {
@@ -2026,6 +2095,12 @@
     panel.querySelector("[data-role=list]").addEventListener("click", function (e) {
       var ed = e.target.closest("[data-edit]"); if (ed) { editEntry(+ed.getAttribute("data-edit")); return; }
       var wd = e.target.closest("[data-withdraw]"); if (wd) { withdrawEntry(+wd.getAttribute("data-withdraw")); return; }
+      var wt = e.target.closest("[data-wartung]");
+      if (wt) {
+        var we = WORK[+wt.getAttribute("data-wartung")];
+        if (we && we.anchorId) wartungSetzen(we.anchorId, !wartungVon(we.anchorId));
+        return;
+      }
       var dl = e.target.closest("[data-del]"); if (dl) { delEntry(+dl.getAttribute("data-del")); return; }
     });
     var qf = panel.querySelector("[data-role=qfetch]"); if (qf) qf.addEventListener("click", fetchQueue);
@@ -2090,6 +2165,7 @@
       ".fpst-item__b{flex:1;min-width:0}.fpst-item__b b{font-size:.9rem}.fpst-item__b small{display:block;opacity:.6;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
       ".fpst-item__a{display:flex;gap:6px;flex:none}.fpst-item__a button{font-size:.78rem;border-radius:7px;padding:5px 8px;border:1px solid rgba(255,255,255,.2);background:transparent;color:#eef1f7;cursor:pointer}" +
       ".fpst-own{font-size:.68rem;background:rgba(120,160,255,.25);border-radius:5px;padding:1px 5px}.fpst-myc{font-size:.8rem}" +
+      ".fpst-wartung{display:block;font-size:.68rem;color:#ffcf6b;margin-top:2px}" +
       ".fpst-queue,.fpst-vec{border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;margin:.6rem 0}" +
       ".fpst-vec .fpst-qbtnrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}" +
       ".fpst-vecstatus{font-size:.8rem;opacity:.85;margin-top:.6rem}" +

@@ -611,5 +611,58 @@ ok(/wacheSetzen\(sid,/.test(studio), "…und ruft wirklich wacheSetzen");
 ok(/\(sperrZeile && sperrZeile\.ampel\)/.test(studio),
    "die Ampel kommt aus dem Zustand, nicht aus dem Markup");
 
+/* ── DIE WARTUNG IM STUDIO (Klaus 2026-09-18) ──────────────────────────────
+ *
+ * ⚠ BENANNTE GRENZE, und sie steht hier statt in einem Kommentar am Rand:
+ * das ist eine STRUKTUR-Probe, sie liest den Quelltext. Ob ein Klick im
+ * Studio wirklich schaltet, ist damit NICHT gemessen — dafür bräuchte es den
+ * Langdruck auf die Fußzeile im echten Browser. Gemessen ist die Wirkung
+ * dort, wo sie zählt: `tests/smoke_wartung.mjs` fährt den Marktplatz im
+ * Browser und misst, dass die Karte verschwindet und wiederkommt.
+ *
+ * Was hier steht, sind die Zusicherungen, die sich am Text prüfen lassen —
+ * und das sind genau die, die am 2026-09-18 hätten fehlen können. */
+ok(/data-wartung=/.test(studio), "der Wartungs-Knopf steht an jeder Zeile der Liste");
+ok(/function wartungSetzen\(/.test(studio), "es gibt eine benannte Schaltung dafür");
+ok(/closest\("\[data-wartung\]"\)/.test(studio), "und der Knopf ist verdrahtet");
+
+/* Die Sperre geht vor — der Riegel muss VOR dem Schreiben stehen, nicht
+   danach. Ein `return false` hinter der Zuweisung hätte die Wartung schon
+   gesetzt und nur die Meldung unterdrückt. */
+{
+  const f = studio.slice(studio.indexOf("function wartungSetzen("));
+  const rumpf = f.slice(0, f.indexOf("\n  }") + 4);
+  const riegel = rumpf.indexOf('wacheAmpel(id) === "rot"');
+  const schreiben = rumpf.indexOf("WACHEHAND[id] = neu");
+  ok(riegel > -1 && schreiben > -1 && riegel < schreiben,
+     "die Sperre wird geprüft, BEVOR die Wartung geschrieben wird");
+  /* Beide Richtungen: an- UND ausschalten. Eine Schaltung, die nur in eine
+     Richtung geht, wäre genau das, was Klaus nicht wollte. */
+  /* ⚠ MIT SEMIKOLON. `delete neu.wartung` trifft ohne es AUCH
+     `delete neu.wartungSeit`, das eine Zeile weiter steht — der Wächter blieb
+     dadurch grün, als die Aus-Richtung ausgebaut war. Ein Name, der der
+     Anfang eines anderen ist, wird mitgefangen; die Falle steht netzweit
+     dreimal aufgeschrieben und ist hier zum vierten Mal zugeschnappt.
+     Gefunden hat es die Gegenprobe, nicht das Nachdenken. */
+  ok(/neu\.wartung = true;/.test(rumpf) && /delete neu\.wartung;/.test(rumpf),
+     "sie schaltet in BEIDE Richtungen");
+  /* `wartungBis` bleibt beim Ausschalten stehen — daran erkennt der Messlauf,
+     dass die Nächte während der Arbeit nicht gegen die App zählen. */
+  ok(/neu\.wartungBis = heuteOrt\(\)/.test(rumpf),
+     "beim Beenden wird `wartungBis` gesetzt (der Messlauf braucht es)");
+  /* Wie beim Sperren NICHT `dirty` — sonst ginge bei jedem Klick eine
+     unveränderte listings.js mit raus. */
+  ok(/wacheDirty = true/.test(rumpf) && !/\bdirty = true/.test(rumpf),
+     "sie setzt `wacheDirty`, nicht `dirty`");
+}
+
+/* Zweisprachig, wie alles andere im Studio auch. Ein deutscher Knopf in einer
+   englischen Oberfläche ist die halb übersetzte Tafel, gegen die netzweit
+   gebaut wird. */
+for (const k of ["wa_wartung", "wa_wartung_aus", "wa_wartung_zeile", "wa_wartung_gesperrt"]) {
+  ok((studio.match(new RegExp(k + ":", "g")) || []).length >= 2,
+     `\`${k}\` steht auf Deutsch UND auf Englisch`);
+}
+
 console.log(`\nMarktplatz-Studio-Struktur-Smoke: ${pass} bestanden, ${fail} fehlgeschlagen.`);
 process.exit(fail > 0 ? 1 : 0);

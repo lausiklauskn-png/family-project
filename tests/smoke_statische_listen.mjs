@@ -222,5 +222,44 @@ console.log("\nsitemap.xml");
   }
 }
 
+/* ── 8 · Die Wartung: ein Eintrag, dessen Anbieter gerade arbeitet ──────────
+ *
+ * Klaus 2026-09-18: „damit er an der App arbeiten kann und keine weiteren
+ * negativen Bewertungen kommen oder Messungen".
+ *
+ * Gemessen wird die FUNKTION mit gestellten Lagen, nicht der Quelltext: die
+ * echte Datenlage trägt heute keine Wartung, und ein Wächter, der nur die
+ * echten Daten fragt, misst dann gar nichts.
+ *
+ * ⚠ UND DAS IST DIE LEHRE VON DEMSELBEN TAG AUS PWA TOOLPOINT. Dort maßen
+ * zwei Wächter eine ZAHL („so viele Karten wie Einträge", „die Datei ist
+ * leer"); beide wurden ROT, sobald wirklich etwas geschaltet war — und weil
+ * die Prüfung dort VOR dem Commit steht, legten sie die ganze Veröffentlichung
+ * still. Hier wird deshalb von Anfang an die Zusicherung gemessen, in allen
+ * vier Lagen und in beide Richtungen. */
+{
+  console.log("\n── 8 · Wartung ──");
+  const BILD = "https://example.org/x.png";
+  const L = [{ anchorId: "a", label: "A", img: BILD, url: "https://a.example/" },
+             { anchorId: "b", label: "B", img: BILD, url: "https://b.example/" },
+             { anchorId: "c", label: "C", img: BILD, url: "https://c.example/" }];
+  const ids = (w) => markteintraege(L, w).map((e) => e.anchorId).join(",");
+
+  ok(ids({}) === "a,b,c", "ohne Schaltung stehen alle drei in der Seite");
+  ok(ids({ b: { wartung: true } }) === "a,c",
+     "ein Eintrag in Wartung steht NICHT in der Seite");
+  /* Die Gegenrichtung zur Sperre: „erst sperren, dann Wartung" darf keine
+     Sperre spurlos verschwinden lassen. */
+  const gesperrtUndWartung = markteintraege(L, { b: { wartung: true, ampel: "rot" } });
+  ok(gesperrtUndWartung.map((e) => e.anchorId).join(",") === "a,b,c",
+     "ein GESPERRTER Eintrag bleibt sichtbar, auch in Wartung");
+  ok((gesperrtUndWartung.find((e) => e.anchorId === "b") || {}).aufEis === true,
+     "… und trägt dabei weiter seine Sperre");
+  /* Und eine blosse Sperre nimmt niemanden weg — sonst wäre oben nicht
+     gemessen, was die Wartung tut, sondern was die Sperre tut. */
+  ok(ids({ b: { ampel: "rot" } }) === "a,b,c",
+     "eine blosse Sperre nimmt keinen Eintrag aus der Seite");
+}
+
 console.log(`\n${pass} bestanden, ${fail} durchgefallen.`);
 process.exit(fail ? 1 : 0);

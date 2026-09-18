@@ -369,6 +369,44 @@ console.log("\n7 — Handschalter: Klaus' Notbremse und seine Entwarnung");
   ok(wacheVon(dir3, "markt-a").ampel === "rot", "dieselbe Lage OHNE Freigabe ist rot");
 }
 
+/* ── Fall 7c: die Wartung — der Wächter sieht NICHT nach ──────────────────
+ *
+ * Klaus 2026-09-18: ein Kunde nimmt seine App zum Arbeiten offline und bittet
+ * darum, sie so lange unsichtbar zu schalten. OHNE Wartungs-Zweig zählte der
+ * nächtliche Lauf die Nächte mit und sperrte sie nach der zweiten ROT — der
+ * Kunde bittet um Unsichtbarkeit und bekommt eine öffentliche Sperre.
+ *
+ * ⚠ DER UNTERSCHIED ZUR HAND-FREIGABE (7b) IST DER ZÄHLER, und daran hängt die
+ * Schärfe dieser Probe: dort läuft er im Stillen weiter (2), hier steht er
+ * still (0). Wäre die Wartung nur eine zweite Art Freigabe, sähe man es an
+ * genau dieser Zahl. */
+console.log("\n7c — Wartung: zwei tote Nächte, und trotzdem keine Sperre");
+{
+  SEITEN = {};
+  const dirW = baueRepo([eintrag("markt-a", "/a")], { hand: { "markt-a": { wartung: true } } });
+  await lauf(dirW); await lauf(dirW);         // zweimal tot — OHNE Wartung wäre das ROT
+  const w = wacheVon(dirW, "markt-a");
+  ok(w.ampel !== "rot", "zwei tote Nächte in Wartung sperren NICHT (" + w.ampel + ")");
+  ok(w.grund === "in_wartung", "und der Grund sagt, warum hier nichts Neues steht (" + w.grund + ")");
+  ok(w.fehlschlaege === 0, "der Zähler steht STILL, statt im Stillen zu laufen (" + w.fehlschlaege + ")");
+  ok(w.wartung === true, "der Bericht sagt, dass gewartet wird");
+  // Die Gegenrichtung: dieselbe Lage OHNE Wartung ist rot. Ohne sie sagt der
+  // Fall nichts — eine tote Seite könnte aus ganz anderem Grund grün stehen.
+  const dirO = baueRepo([eintrag("markt-a", "/a")]);
+  await lauf(dirO); await lauf(dirO);
+  ok(wacheVon(dirO, "markt-a").ampel === "rot", "dieselbe Lage OHNE Wartung ist rot");
+
+  // Und die Wartung hebt eine Sperre NICHT auf. Sonst wäre „erst sperren, dann
+  // Wartung" der Weg, eine Sperre spurlos verschwinden zu lassen — und sie ist
+  // ausdrücklich dafür gebaut, sichtbar zu bleiben.
+  SEITEN = { "/a": "<html>Tadellos</html>" };
+  const dirS = baueRepo([eintrag("markt-a", "/a")],
+    { hand: { "markt-a": { ampel: "rot", grund: "Gesperrt und zugleich in Wartung.", wartung: true } } });
+  await lauf(dirS);
+  const s7 = wacheVon(dirS, "markt-a");
+  ok(s7.ampel === "rot" && s7.grund === "hand_gesperrt", "die Sperre geht der Wartung vor (" + s7.grund + ")");
+}
+
 /* ── Fall 8: Safe Browsing ────────────────────────────────────────────────── */
 console.log("\n8 — Safe Browsing (der Steckplatz)");
 {
