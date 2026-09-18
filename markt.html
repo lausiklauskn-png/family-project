@@ -37,7 +37,7 @@
   <meta name="apple-mobile-web-app-title" content="Family Projekt" />
   <script>if("serviceWorker" in navigator){addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){});});}</script>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="assets/style.css?v=122" />
+  <link rel="stylesheet" href="assets/style.css?v=123" />
   <style>/* Honigtopf: unsichtbar für Menschen, sichtbar für Bots (Spam-Falle). */
     .fp-hp{position:absolute!important;left:-9999px!important;top:auto;width:1px;height:1px;overflow:hidden}</style>
   <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
@@ -202,7 +202,7 @@
     <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
   </footer>
 
-  <script type="module" src="assets/mycel-bg.js?v=122"></script>
+  <script type="module" src="assets/mycel-bg.js?v=123"></script>
   <script>window.SBKIM_DB_SUFFIX="familyprojekt";</script>
   <script src="sbkim/01_storage.js"></script>
   <script src="sbkim/02_spore.js"></script>
@@ -513,10 +513,10 @@
   </script>
   <script src="assets/config/meineapps.js"></script>
   <script src="assets/config/publicapps.js"></script>
-  <script src="assets/notranslate.js?v=122"></script>
-  <script src="assets/app.js?v=122"></script>
-  <script src="assets/vec-codec.js?v=122"></script>
-  <script src="assets/status-widget.js?v=122"></script>
+  <script src="assets/notranslate.js?v=123"></script>
+  <script src="assets/app.js?v=123"></script>
+  <script src="assets/vec-codec.js?v=123"></script>
+  <script src="assets/status-widget.js?v=123"></script>
   <script>
     (function () {
       function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -545,11 +545,19 @@
         if (offen > 0) await new Promise(function (f) { setTimeout(f, offen); });
       }
 
+      /* ⚠ STEHT HIER, NICHT WEITER UNTEN. `neuAufbauen()` wird gleich
+       * darunter zum ersten Mal gerufen, und `inWartung()` liest diese Liste.
+       * Stünde die Deklaration bei den übrigen (~Zeile 600), wäre sie zu
+       * diesem Zeitpunkt `undefined` — die Seite stürbe an ihrem eigenen
+       * ersten Aufbau. Tote Zone, wortgleich dieselbe Falle wie
+       * `const schonGebumpt` in Sages Kanon-Verteiler. */
+      var WARTUNG = {};
+
       // Bild-Pflicht, und ab Stufe 5 zusätzlich der Schieberegler (gelistet()).
       // Beim ersten Aufbau greift er noch nicht — die Messwerte kommen erst mit
       // dem Bericht; deshalb wird die Liste danach einmal neu aufgebaut.
       function neuAufbauen() {
-        ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img) && gelistet(x); });
+        ALL = (window.FP_LISTINGS || []).filter(function (x) { return x && safeImg(x.img) && gelistet(x) && !inWartung(x); });
       }
       var ALL = [];
       neuAufbauen();
@@ -579,6 +587,41 @@
        * `handgrund` ist von Klaus geschriebener Text und wird escaped. */
       var WACHE = {};
       function wacheVon(x) { return (x && x.anchorId && WACHE[x.anchorId]) || null; }
+      /* ── DIE WARTUNG (Klaus 2026-09-18) ────────────────────────────────────
+       * „damit er an der App arbeiten kann und keine weiteren negativen
+       * Bewertungen kommen oder Messungen".
+       *
+       * ⚠ DIE SPERRE GEHT VOR. Ein rot geschalteter Eintrag wird NICHT
+       * unsichtbar — sonst wäre „erst sperren, dann Wartung" der Weg, eine
+       * Sperre spurlos verschwinden zu lassen, und sie ist ausdrücklich dafür
+       * gebaut, sichtbar zu bleiben.
+       *
+       * ⚠ ZWEI QUELLEN, EINE FRAGE. `wache-hand.json` ist die Arbeitskopie und
+       * gilt SOFORT; der nächtliche Bericht trägt dieselbe Marke, aber erst ab
+       * dem nächsten Lauf. Ohne die erste Quelle bliebe die Karte bis 02:40 UTC
+       * stehen — für den Anbieter also fast einen ganzen Tag. */
+      function inWartung(x) {
+        if (!x || !x.anchorId) return false;
+        /* Beim ERSTEN Aufbau ist noch kein Bericht da (WACHE steht weiter
+         * unten und ist hier `undefined`). Dann ist nichts bekannt, also auch
+         * keine Wartung — die Liste wird nach dem Laden ohnehin neu gebaut. */
+        var hand = WARTUNG[x.anchorId] || null;        // die Arbeitskopie
+        var w = (WACHE && WACHE[x.anchorId]) || null;  // der nächtliche Bericht
+        if (!(hand && hand.wartung === true) && !(w && w.wartung === true)) return false;
+        /* ⚠ DIE SPERRE GEHT VOR — UND ZWAR AUS BEIDEN QUELLEN. Die erste
+         * Fassung las die Wartung aus der Arbeitskopie und die Ampel nur aus
+         * dem Bericht. Eine frisch im Studio gesetzte Sperre steht aber noch
+         * nicht im Bericht (dorthin trägt sie erst der nächtliche Lauf), und
+         * damit war „erst sperren, dann Wartung" genau der Weg, eine Sperre
+         * spurlos verschwinden zu lassen — gegen den dieser Riegel gebaut ist.
+         *
+         * Gefunden hat es die Browser-Probe, nicht das Nachdenken: im
+         * Quelltext stand der Riegel da und sah richtig aus. *Zwei Quellen für
+         * dieselbe Frage, und nur eine wurde gefragt.* */
+        if (hand && hand.ampel === "rot") return false;
+        if (w && w.ampel === "rot") return false;
+        return true;
+      }
       function wacheText(w) {
         if (w.ampel === "rot") {
           if (w.grund === "safebrowsing") return FP.t("mk_wa_rot_sb");
@@ -1903,6 +1946,25 @@
             // echtes Objekt gilt; alles andere bleibt null und damit „aus".
             AUTOMATIK = (wacheHand._automatik && typeof wacheHand._automatik === "object")
               ? wacheHand._automatik : null;
+            /* Die Wartung gilt SOFORT, nicht erst nach dem nächsten
+             * nächtlichen Lauf — sie ist eine Bitte des Anbieters, und der
+             * wartet nicht bis 02:40 UTC. */
+            for (var wk in wacheHand) {
+              if (wk.charAt(0) === "_") continue;
+              /* Der GANZE Eintrag, nicht nur `true`: `inWartung` braucht aus
+               * derselben Quelle auch die Ampel — siehe den Riegel dort. */
+              if (!wacheHand[wk] || typeof wacheHand[wk] !== "object") continue;
+              WARTUNG[wk] = wacheHand[wk];
+              /* ⚠ GEZÄHLT WIRD NUR EINE WARTUNG, nicht jeder Eintrag der Datei.
+               * `n` entscheidet weiter unten, ob die Liste überhaupt neu gebaut
+               * wird — und die Datei trägt auch Quittungen und den
+               * Automatik-Schalter. Die erste Fassung zählte alles mit und hat
+               * damit `smoke_stufe5_messung` (C6d „ohne Bericht gar kein Band")
+               * umgeworfen: der Aufbau lief plötzlich auch dort, wo es nichts
+               * aufzubauen gab. Der Eintrag wird trotzdem gemerkt — `inWartung`
+               * braucht aus derselben Quelle auch die Ampel. */
+              if (wacheHand[wk].wartung === true) n++;
+            }
             n += quittungenAuflegen(wacheHand);
           }
           sichttestHalt();
@@ -1932,6 +1994,6 @@
   <!-- Selbst-Pflege-Studio (Marktplatz): Langdruck auf die Copyright-Zeile.
        App-spezifischer Speicher-Präfix; Token nur im Browser. -->
   <script>window.FP_STUDIO_CONFIG = { owner: "lausiklauskn-png", repo: "family-project", branch: "main" };</script>
-  <script src="assets/studio-markt.js?v=122" defer></script>
+  <script src="assets/studio-markt.js?v=123" defer></script>
 </body>
 </html>

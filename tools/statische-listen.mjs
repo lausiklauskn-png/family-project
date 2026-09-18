@@ -145,6 +145,25 @@ export function markteintraege(listings, wache) {
    * kein Eintrag. Was die Seite nicht zeigt, darf auch nicht im HTML stehen. */
   return listings
     .filter((x) => x && safeImg(x.img))
+    /* ── WARTUNG (Klaus 2026-09-18) ─────────────────────────────────────────
+     * Ein Eintrag, dessen Anbieter gerade an seiner App arbeitet, steht gar
+     * nicht erst in der Seite. Das ist etwas anderes als ROT: dort bleibt die
+     * Karte sichtbar und nur der Link geht aus, weil ein stilles Verschwinden
+     * für den Anbieter nicht nachvollziehbar wäre (Falle 2 oben). Hier hat
+     * genau er darum gebeten.
+     *
+     * ⚠ DIE SPERRE GEHT VOR. Sonst wäre „erst sperren, dann Wartung" der Weg,
+     * eine Sperre spurlos verschwinden zu lassen.
+     *
+     * ⚠ DIE MARKE KOMMT AUS spore-stand.json, nicht aus wache-hand.json —
+     * diese Datei liest nur die erste. Der nächtliche Wächter trägt sie von
+     * der einen in die andere. Daraus folgt eine BENANNTE GRENZE: statisch
+     * wirkt die Wartung erst nach dem nächsten Lauf. Im Browser wirkt sie
+     * sofort, weil markt.html wache-hand.json selbst liest. */
+    .filter((x) => {
+      const w = (x.anchorId && wache[x.anchorId]) || null;
+      return !(w && w.wartung === true && w.ampel !== "rot");
+    })
     .map((x) => {
       const w = (x.anchorId && wache[x.anchorId]) || null;
       const aufEis = !!(w && w.ampel === "rot");

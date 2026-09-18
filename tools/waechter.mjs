@@ -267,6 +267,35 @@ export function ampelBilden(a) {
     // Eintrag heraus oder schaltet Safe Browsing ab — beides sieht man.
     w.ampel = "rot"; w.grund = "safebrowsing";
     w.fehlschlaege = Number(vorher.fehlschlaege) || 0;
+  } else if (hand.wartung === true) {
+    /* ── WARTUNG: der Waechter sieht NICHT nach (Klaus 2026-09-18) ──────────
+     *
+     * Klaus: „Angenommen, ein Kunde bittet mich darum, seine App vorlaeufig
+     * unsichtbar zu schalten … damit er an der App arbeiten kann und keine
+     * weiteren negativen Bewertungen kommen oder Messungen."
+     *
+     * OHNE DIESE ZEILEN WAERE DIE WARTUNG AN IHREM ZWECK VORBEIGEBAUT — und
+     * zwar schlimmer als nur wirkungslos. Wer seine App zum Arbeiten offline
+     * nimmt, antwortet nicht; zwei Naechte spaeter steht sie auf ROT
+     * (`nicht_erreichbar`), und die Sperre geht der Wartung vor. Der Kunde
+     * bittet um Unsichtbarkeit und bekommt eine oeffentliche Sperre.
+     *
+     * Also: waehrend der Wartung wird NICHTS geurteilt. Der Befund von vorher
+     * bleibt stehen, die Fehlschlaege werden eingefroren statt gezaehlt, und
+     * der Grund sagt, warum hier nichts Neues steht.
+     *
+     * ⚠ DIE REIHENFOLGE IST DIE GANZE SACHE. Diese Stufe steht UNTER
+     * `hand_gesperrt` und UNTER Safe Browsing: eine Sperre und ein
+     * Google-Treffer lassen sich nicht in Wartung wegschalten. Sie steht UEBER
+     * allem Uebrigen, weil genau dort die Naechte gezaehlt werden.
+     *
+     * ⚠ BENANNTE GRENZE: der Abruf der Seite findet trotzdem statt (er
+     * geschieht im Aufrufer, nicht hier). Er kostet nichts und aendert nichts
+     * — sein Ergebnis wird in diesem Zweig schlicht nicht gelesen. */
+    w.ampel = AMPELN.includes(vorher.ampel) ? vorher.ampel : "gruen";
+    w.grund = "in_wartung";
+    w.fehlschlaege = Number(vorher.fehlschlaege) || 0;
+    w.wartung = true;
   } else if (handAmpel === "gruen") {
     // Klaus' Entwarnung gilt auch für eine Seite, die gerade nicht antwortet
     // („ich weiß, die zieht gerade um"). Die Grundlage wandert dabei NICHT
