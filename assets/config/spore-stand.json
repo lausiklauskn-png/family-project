@@ -1,6 +1,6 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-09-11T07:28:01.200Z",
+  "geprueft": "2026-09-18T07:36:04.663Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
@@ -54,27 +54,26 @@
           }
         ],
         "frisch": {
-          "leistung": 90,
+          "leistung": 99,
           "bedienbarkeit": 100,
           "gute_praxis": 96,
           "auffindbarkeit": 100,
-          "gemessen": "2026-09-11",
+          "gemessen": "2026-09-18",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
             {
               "k": "leistung",
               "t": "JavaScript komprimieren",
-              "ms": 750
-            },
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendetes JavaScript",
               "ms": 150
             },
             {
               "k": "leistung",
               "t": "Effiziente Verweildauer im Cache verwenden"
+            },
+            {
+              "k": "leistung",
+              "t": "Netzwerkabhängigkeitsbaum"
             },
             {
               "k": "gute_praxis",
@@ -83,7 +82,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-09-11"
         },
@@ -100,15 +99,15 @@
       "neuerText": "Mein-Tresor ist ein Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Verwandt mit dem Schwester-Tresor Jasons-Tresor und angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "ccca36b1",
-        "grundlage": "8360591d0dda5996",
+        "grundlage": "caffb0a5a5c801bc",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "8360591d0dda5996",
+        "pruefsumme": "caffb0a5a5c801bc",
         "status": 200,
         "seit": "2026-08-10",
         "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
@@ -151,15 +150,15 @@
       "neuerText": "Jasons-Tresor ist Jasons eigener Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Schwester-Knoten von Mein-Tresor, angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "efaa71bf",
-        "grundlage": "87372c61c53be3ac",
+        "grundlage": "02982227e54a3498",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "87372c61c53be3ac",
+        "pruefsumme": "02982227e54a3498",
         "status": 200,
         "seit": "2026-08-10",
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
@@ -169,6 +168,7 @@
         "bedienbarkeit": 97,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-11",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -190,7 +190,6 @@
             "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
       }
     },
@@ -246,23 +245,23 @@
           }
         ],
         "frisch": {
-          "leistung": 93,
+          "leistung": 92,
           "bedienbarkeit": 100,
           "gute_praxis": 96,
           "auffindbarkeit": 100,
-          "gemessen": "2026-09-11",
+          "gemessen": "2026-09-18",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
             {
               "k": "leistung",
               "t": "JavaScript komprimieren",
-              "ms": 470
+              "ms": 880
             },
             {
               "k": "leistung",
               "t": "Reduziere nicht verwendetes JavaScript",
-              "ms": 20
+              "ms": 150
             },
             {
               "k": "leistung",
@@ -275,7 +274,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-09-11"
         },
@@ -285,7 +284,7 @@
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
-          "gemessen": "2026-09-11",
+          "gemessen": "2026-09-18",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
@@ -317,15 +316,15 @@
       "neuerText": "Kim-Bell — die Glocke, mit der man sich sauber im gemeinsamen SBKIM-Raum anmeldet: eigene stabile Identität, Spore erzeugen, im Raum sichtbar werden und andere Knoten finden. Server-los, direkt im Browser, ohne Anmeldung.",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "cb59a0ec",
-        "grundlage": "9d4d7eb0e32c4e94",
+        "grundlage": "269c0771159e0d26",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "9d4d7eb0e32c4e94",
+        "pruefsumme": "269c0771159e0d26",
         "status": 200,
         "handgrund": "Der Abdruck hat sich geaendert, weil am 2026-08-23 Eruda ausgebaut wurde — cdn.jsdelivr.net faellt damit weg. Nachgerechnet mit tools/waechter.mjs gegen origin/main: keine fremde Herkunft, kein Kennze",
         "seit": "2026-09-11",
@@ -336,6 +335,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-11",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -357,7 +357,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
       }
     },
@@ -371,15 +370,15 @@
       "neuerText": "Kimseek — semantisches Such-Werkzeug, das die Bedeutung und Absicht hinter einer Frage versteht (nicht nur Stichwörter). Ordnet Treffer nach Bedeutungs-Nähe, server-los im Browser; optional Spracheingabe, Bild-/Handschrift-Erkennung (OCR) und eine KI-Brücke mit Web-Suche.",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "d9520216",
-        "grundlage": "80bf75f035683cba",
+        "grundlage": "e89ee13a282c1f11",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "80bf75f035683cba",
+        "pruefsumme": "e89ee13a282c1f11",
         "status": 200,
         "handgrund": "Wie Kim-Bell: Eruda am 2026-08-23 ausgebaut, cdn.jsdelivr.net faellt weg. Nachgerechnet gegen origin/main: keine fremde Herkunft, kein Kennzeichen (Abdruck d03a998f4df78896).",
         "seit": "2026-09-11",
@@ -390,15 +389,13 @@
         "bedienbarkeit": 93,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-09-10",
+        "gemessen": "2026-09-18",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "JavaScript komprimieren",
-            "ms": 300
+            "t": "Netzwerkabhängigkeitsbaum"
           },
           {
             "k": "leistung",
@@ -406,7 +403,7 @@
           },
           {
             "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
+            "t": "Bildübermittlung verbessern"
           },
           {
             "k": "bedienbarkeit",
@@ -425,6 +422,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kimseek/"
       }
     },
@@ -443,13 +441,13 @@
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "10dc52a2",
-        "grundlage": "e0cc22e1fe7c170a",
+        "grundlage": "e3de0c927f5ae3cf",
         "fgrundlage": "3d2d90abc0a740af",
         "fingerabdruck": "3d2d90abc0a740af",
         "kennzeichen": [
           "atob"
         ],
-        "pruefsumme": "e0cc22e1fe7c170a",
+        "pruefsumme": "e3de0c927f5ae3cf",
         "status": 200,
         "seit": "2026-08-04",
         "url": "https://lausiklauskn-png.github.io/Kimboard/"
@@ -459,6 +457,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-11",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -481,7 +480,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kimboard/"
       }
     },
@@ -495,18 +493,18 @@
       "neuerText": "Private Brain — dein privates zweites Gehirn: durchsucht deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) nach Bedeutung, offline, ohne dass Originale bewegt werden. Es liest jede Datei einmal, behält nur einen winzigen Bedeutungs-Katalog und lässt die Originale unangetastet — liest nur, schlägt vor, bewegt nichts.",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "55b9ac52",
-        "grundlage": "a6bf748962097966",
+        "grundlage": "240d688fd4ce330e",
         "fgrundlage": "3d2d90abc0a740af",
         "fingerabdruck": "3d2d90abc0a740af",
         "kennzeichen": [
           "atob"
         ],
-        "pruefsumme": "a6bf748962097966",
+        "pruefsumme": "240d688fd4ce330e",
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
@@ -552,25 +550,27 @@
           }
         ],
         "frisch": {
-          "leistung": 97,
+          "leistung": 74,
           "bedienbarkeit": 91,
           "gute_praxis": 96,
           "auffindbarkeit": 100,
-          "gemessen": "2026-09-11",
+          "gemessen": "2026-09-18",
           "quelle": "google",
           "werkzeug": "13.4.1",
           "hinweise": [
             {
               "k": "leistung",
+              "t": "JavaScript komprimieren",
+              "ms": 900
+            },
+            {
+              "k": "leistung",
+              "t": "Reduziere nicht verwendetes JavaScript",
+              "ms": 150
+            },
+            {
+              "k": "leistung",
               "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "leistung",
-              "t": "Erzwungener dynamischer Umbruch"
-            },
-            {
-              "k": "leistung",
-              "t": "Bildübermittlung verbessern"
             },
             {
               "k": "bedienbarkeit",
@@ -591,7 +591,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-09-11"
         },
@@ -602,25 +602,25 @@
       "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/sbkim/spore.json",
       "lage": "abweichend",
       "nodeName": "WorkFloh",
-      "nodeId": "foFm64sA1SZkw9kz-Uy6u-MKi8XlxTdTrDyTU9_gLoo",
+      "nodeId": "LEIbBDaSseCDmgHvtLj830a6uON2mMw22zeVwRQ3H58",
       "modell": "Xenova/multilingual-e5-small",
       "sporeHash": "ab9d4f1c",
       "neuerText": "WorkFloh ist ein Endknoten im SBKIM-Mycel und arbeitet auf Grundlage des Sage-Protokolls — semantisch verbunden mit den verwandten Knoten Tomys Hub (Digitaldruck und Werbeartikel), BookLedgerPro (Buchhaltung, Angebot und Rechnung), Kimseek (Bedeutungs-Suche) und dem SB-KIMTool-Point. Sein Kern ist der digitale Auftragszettel eines Betriebs: von der Kundenannahme über die Produktion (Schilder, Folierung, Beschriftung, Druck) bis zur Übergabe, samt Zeiterfassung sowie Angebot und Rechnung. Zugleich ist WorkFloh ein wandelbares Arbeitstool, nicht auf eine Branche festgelegt: jede Firma installiert ihren eigenen, firmenspezifischen Auftragszettel — aus dem Werbetechnik-Zettel wird ebenso der Werkstatt-, Handwerks-, Montage-, Reinigungs- oder Dienstleistungs-Auftrag. Wie die Schwester-Knoten Rezeptbuch und Mixarium ein Baukasten: Kategorien umbenennen, Felder anpassen, ein neues Auftrags-Pake",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "ab9d4f1c",
-        "grundlage": "49a4bf85c3abe8c1",
+        "grundlage": "b3c0c2c3fd4b41d8",
         "fgrundlage": "cc483804be31b217",
         "fingerabdruck": "cc483804be31b217",
         "kennzeichen": [
           "atob",
           "document-write"
         ],
-        "pruefsumme": "49a4bf85c3abe8c1",
+        "pruefsumme": "b3c0c2c3fd4b41d8",
         "status": 200,
         "seit": "2026-08-10",
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
@@ -660,6 +660,97 @@
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
       }
     },
+    "markt-pwa-toolpoint": {
+      "url": "https://pwa-toolpoint.de/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "PWA Toolpoint",
+      "nodeId": "WJ14jzCKnqlzXxFqmWPX4EhP2S_wudtR5H_Qa2ocQI4",
+      "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "cd9214a2",
+      "neuerText": "PWA Toolpoint — der offene Marktplatz für Progressive Web Apps: Apps finden, die im Browser laufen und sich ohne App-Store installieren lassen, und eigene Apps eintragen. Gesucht wird nach Bedeutung statt nach Stichwörtern; jeder Eintrag wird gemessen, und jede Zahl trägt ihr Datum.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "ankuendigung": "spore_unveraendert",
+        "sporeHash": "cd9214a2",
+        "grundlage": "627d02612bb38150",
+        "fgrundlage": "e49bf89e183c97bb",
+        "fingerabdruck": "e49bf89e183c97bb",
+        "fremde": [
+          "family-projekt.de",
+          "lausiklauskn-png.github.io"
+        ],
+        "pruefsumme": "627d02612bb38150",
+        "status": 200,
+        "seit": "2026-09-18",
+        "url": "https://pwa-toolpoint.de/"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "PageSpeed antwortete HTTP 500",
+        "url": "https://pwa-toolpoint.de/"
+      }
+    },
+    "markt-auslieferungspruefer": {
+      "url": "https://pwa-toolpoint.de/sbkim/pruefer-spore.json",
+      "lage": "geaendert",
+      "nodeName": "Auslieferungsprüfer",
+      "nodeId": "yF1ONN8LQskao9MoTyRADywKYIHLr0BM9CUXQj5X9GM",
+      "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "623a4f66",
+      "neuerText": "Der Auslieferungsprüfer prüft, was eine Internetseite wirklich ins Netz gibt, statt was sie zu geben vorgibt. Er findet fremde Adressen, von denen eine Seite ungefragt nachlädt, versehentlich mitgelieferte Server-Dateien, offene Zugangsdaten und Schlüssel, und Personenbezug, der dort nicht hingehört: Kontonummern werden nachgerechnet, Telefonnummern brauchen eine Ländervorwahl, und wo sich ein echtes Etikett nicht von einem vergessenen Platzhalter unterscheiden lässt, meldet er nichts. Er läuft in zwei Fassungen — eine im Browser, eine als Textleser ohne Browser — und der Unterschied zwischen beiden ist selbst ein Befund: was der Browser lädt und der Textleser nicht sieht, ist ein Versteck. Ein Link, den ein Mensch anklickt, ist kein Abruf und steht deshalb nicht in der Fundliste.",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "ankuendigung": "spore_unveraendert",
+        "sporeHash": "623a4f66",
+        "grundlage": "8b8332ba5bfcad81",
+        "fgrundlage": "d03a998f4df78896",
+        "fingerabdruck": "d03a998f4df78896",
+        "pruefsumme": "8b8332ba5bfcad81",
+        "status": 200,
+        "seit": "2026-09-18",
+        "url": "https://pwa-toolpoint.de/auslieferungspruefer.html"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "PageSpeed antwortete HTTP 500",
+        "url": "https://pwa-toolpoint.de/auslieferungspruefer.html"
+      }
+    },
+    "markt-kim-hub-company": {
+      "url": "https://lausiklauskn-png.github.io/kim-hub-company/sbkim/spore.json",
+      "lage": "geaendert",
+      "nodeName": "Kim Hub Company",
+      "nodeId": "eNxEFbgof9x69RyVABOCMGExEb66iwuLtqBxXtfeGnM",
+      "modell": "Xenova/multilingual-e5-small",
+      "sporeHash": "ee317af5",
+      "neuerText": "Kim Hub Company ist eine Werkstatt für brauchbare Werkzeuge. ZWECK: aus einer Idee in eigenen Worten in einem Durchgang einen ausgearbeiteten Auftrag, ein geprüftes Werkstück und ein Übergabe-Blatt zu machen — einen Auftrag in Worten, den man an ein großes Sprachmodell weiterreichen kann. Damit auch jemand, der nicht programmiert, am Ende ein Werkzeug in der Hand hält, das er wirklich benutzen kann, statt einer Antwort, mit der er nichts anfangen kann. FORSCHUNG: Kim Hub Company ist ein Endknoten im SBKIM-Mycel und Bestandteil der Sage-Forschung am SBKIM-Protokoll — Semantisches Bidirektionales KI-Matching. Untersucht wird, ob agentenbasiertes Matching brauchbare Werkzeuge hervorbringt: Knoten, die einander über Bedeutungs-Vektoren finden statt über Stichwörter, und Rollen, die einen Auftrag gemeinsam bearbeiten statt eines einzelnen Modells. Untersucht wird ebenso, wie Regeln und Grunds",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "ankuendigung": "spore_unveraendert",
+        "sporeHash": "ee317af5",
+        "grundlage": "1226772c03181877",
+        "fgrundlage": "d03a998f4df78896",
+        "fingerabdruck": "d03a998f4df78896",
+        "pruefsumme": "1226772c03181877",
+        "status": 200,
+        "seit": "2026-09-18",
+        "url": "https://lausiklauskn-png.github.io/kim-hub-company/"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "PageSpeed antwortete HTTP 500",
+        "url": "https://lausiklauskn-png.github.io/kim-hub-company/"
+      }
+    },
     "markt-rezeptbuch": {
       "lage": "ohne_spore",
       "wache": {
@@ -677,12 +768,11 @@
         "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
       },
       "messung": {
-        "leistung": 85,
+        "leistung": 82,
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "veraltet",
-        "gemessen": "2026-09-06",
+        "gemessen": "2026-09-18",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -693,11 +783,12 @@
           },
           {
             "k": "leistung",
-            "t": "Effiziente Verweildauer im Cache verwenden"
+            "t": "JavaScript komprimieren",
+            "ms": 150
           },
           {
             "k": "leistung",
-            "t": "Bildübermittlung verbessern"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "gute_praxis",
@@ -708,44 +799,7 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "frisch": {
-          "leistung": 84,
-          "bedienbarkeit": 100,
-          "gute_praxis": 96,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-09-11",
-          "quelle": "google",
-          "werkzeug": "13.4.1",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendetes JavaScript",
-              "ms": 750
-            },
-            {
-              "k": "leistung",
-              "t": "JavaScript komprimieren",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Es wurden Browserfehler in der Konsole protokolliert"
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 2,
-          "noetig": 3,
-          "seit": "2026-09-10"
-        },
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
         "schaufenster": {
           "leistung": 98,
@@ -771,11 +825,11 @@
             }
           ],
           "frisch": {
-            "leistung": 81,
+            "leistung": 97,
             "bedienbarkeit": 100,
             "gute_praxis": 100,
             "auffindbarkeit": 100,
-            "gemessen": "2026-09-11",
+            "gemessen": "2026-09-18",
             "quelle": "google",
             "werkzeug": "13.4.1",
             "hinweise": [
@@ -785,16 +839,16 @@
               },
               {
                 "k": "leistung",
-                "t": "Erzwungener dynamischer Umbruch"
+                "t": "Bildübermittlung verbessern"
               },
               {
                 "k": "leistung",
-                "t": "Bildübermittlung verbessern"
+                "t": "Netzwerkabhängigkeitsbaum"
               }
             ]
           },
           "zurueckgehalten": {
-            "zahl": 1,
+            "zahl": 2,
             "noetig": 3,
             "seit": "2026-09-11"
           },
@@ -806,14 +860,14 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
-        "grundlage": "d20e43e8e76806ad",
+        "grundlage": "1324ecb530af6c8b",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "d20e43e8e76806ad",
+        "pruefsumme": "1324ecb530af6c8b",
         "status": 200,
         "seit": "2026-08-10",
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
@@ -823,6 +877,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-11",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -849,7 +904,6 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
         "schaufenster": {
           "leistung": 100,
@@ -874,34 +928,6 @@
               "t": "Netzwerkabhängigkeitsbaum"
             }
           ],
-          "frisch": {
-            "leistung": 99,
-            "bedienbarkeit": 100,
-            "gute_praxis": 100,
-            "auffindbarkeit": 100,
-            "gemessen": "2026-09-11",
-            "quelle": "google",
-            "werkzeug": "13.4.1",
-            "hinweise": [
-              {
-                "k": "leistung",
-                "t": "Effiziente Verweildauer im Cache verwenden"
-              },
-              {
-                "k": "leistung",
-                "t": "Bildübermittlung verbessern"
-              },
-              {
-                "k": "leistung",
-                "t": "Netzwerkabhängigkeitsbaum"
-              }
-            ]
-          },
-          "zurueckgehalten": {
-            "zahl": 2,
-            "noetig": 3,
-            "seit": "2026-09-10"
-          },
           "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
         }
       }
@@ -910,14 +936,14 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
-        "grundlage": "81dd25a1ece3bda3",
+        "grundlage": "623e9ef97e210d6c",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "81dd25a1ece3bda3",
+        "pruefsumme": "623e9ef97e210d6c",
         "status": 200,
         "seit": "2026-08-11",
         "url": "https://perfectskinbeauty.de/"
@@ -965,14 +991,13 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "unveraendert",
+        "grund": "in_wartung",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
-        "ankuendigung": "ohne_spore",
+        "wartung": true,
         "grundlage": "f1516c7c6018dbd3",
         "fgrundlage": "d03a998f4df78896",
-        "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "f1516c7c6018dbd3",
+        "pruefsumme": "9158b7b34d4c21a4",
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
@@ -982,6 +1007,7 @@
         "bedienbarkeit": 94,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-11",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -1016,7 +1042,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
       }
     },
@@ -1028,10 +1053,10 @@
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
-        "grundlage": "7f0fd569d6b2a649",
+        "grundlage": "d8343d062860a398",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "7f0fd569d6b2a649",
+        "pruefsumme": "d8343d062860a398",
         "status": 200,
         "seit": "2026-08-01",
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
@@ -1069,16 +1094,38 @@
         ],
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
       }
+    },
+    "markt-ki-schulung": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "ankuendigung": "ohne_spore",
+        "grundlage": "45ea04ad10f05fbd",
+        "fgrundlage": "d03a998f4df78896",
+        "fingerabdruck": "d03a998f4df78896",
+        "pruefsumme": "45ea04ad10f05fbd",
+        "status": 200,
+        "seit": "2026-09-18",
+        "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
+      },
+      "messung": {
+        "stand": "nicht_gemessen",
+        "grund": "PageSpeed antwortete HTTP 500",
+        "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
+      }
     }
   },
   "wacheZaehler": {
-    "gruen": 14,
+    "gruen": 18,
     "gelb": 0,
     "rot": 0
   },
   "messungZaehler": {
-    "gemessen": 12,
-    "veraltet": 2,
-    "nicht_gemessen": 0
+    "gemessen": 13,
+    "veraltet": 1,
+    "nicht_gemessen": 4
   }
 }
