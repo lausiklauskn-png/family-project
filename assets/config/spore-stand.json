@@ -1,6 +1,6 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-09-18T07:36:04.663Z",
+  "geprueft": "2026-09-19T07:31:21.775Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
@@ -26,66 +26,35 @@
         "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
       },
       "messung": {
-        "leistung": 100,
+        "leistung": 90,
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-09-09",
+        "gemessen": "2026-09-19",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
-            "t": "CSS komprimieren",
+            "t": "JavaScript komprimieren",
+            "ms": 610
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript",
             "ms": 150
           },
           {
             "k": "leistung",
-            "t": "Effiziente Verweildauer im Cache verwenden"
-          },
-          {
-            "k": "leistung",
-            "t": "Netzwerkabhängigkeitsbaum"
+            "t": "CSS komprimieren",
+            "ms": 10
           },
           {
             "k": "gute_praxis",
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "frisch": {
-          "leistung": 99,
-          "bedienbarkeit": 100,
-          "gute_praxis": 96,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-09-18",
-          "quelle": "google",
-          "werkzeug": "13.4.1",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "JavaScript komprimieren",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "leistung",
-              "t": "Netzwerkabhängigkeitsbaum"
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Es wurden Browserfehler in der Konsole protokolliert"
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 2,
-          "noetig": 3,
-          "seit": "2026-09-11"
-        },
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
       }
     },
@@ -99,7 +68,7 @@
       "neuerText": "Mein-Tresor ist ein Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Verwandt mit dem Schwester-Tresor Jasons-Tresor und angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -117,7 +86,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-09-10",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -137,6 +106,7 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
       }
     },
@@ -150,7 +120,7 @@
       "neuerText": "Jasons-Tresor ist Jasons eigener Endknoten im SBKIM-Mycel zum sicheren Verwahren: er verschlüsselt und speichert JSON-Dateien und SBKIM-Schlüssel offline im Browser (AES-256-GCM), Tresor und Bibliothek zugleich. Backups lassen sich passwortgeschützt exportieren und auf einem anderen Gerät zurückspielen; der private Schlüssel verlässt den Browser nie. Schwester-Knoten von Mein-Tresor, angedockt ans Netz aus Sage, SB-KIMTool-Point, Rezeptbuch und Mixarium.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -217,73 +187,41 @@
         "url": "https://lausiklauskn-png.github.io/Tomys-Hub/showcase/"
       },
       "messung": {
-        "leistung": 100,
+        "leistung": 93,
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-09-08",
+        "gemessen": "2026-09-19",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
           {
             "k": "leistung",
             "t": "JavaScript komprimieren",
-            "ms": 280
+            "ms": 750
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript",
+            "ms": 150
           },
           {
             "k": "leistung",
             "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
-            "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
-          },
-          {
             "k": "gute_praxis",
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "frisch": {
-          "leistung": 92,
-          "bedienbarkeit": 100,
-          "gute_praxis": 96,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-09-18",
-          "quelle": "google",
-          "werkzeug": "13.4.1",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "JavaScript komprimieren",
-              "ms": 880
-            },
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendetes JavaScript",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Es wurden Browserfehler in der Konsole protokolliert"
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 2,
-          "noetig": 3,
-          "seit": "2026-09-11"
-        },
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Tomys-Hub/",
         "schaufenster": {
           "leistung": 100,
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
+          "stand": "veraltet",
           "gemessen": "2026-09-18",
           "quelle": "google",
           "werkzeug": "13.4.1",
@@ -301,7 +239,7 @@
               "t": "Netzwerkabhängigkeitsbaum"
             }
           ],
-          "stand": "gemessen",
+          "grund": "PageSpeed antwortete HTTP 500",
           "url": "https://lausiklauskn-png.github.io/Tomys-Hub/showcase/"
         }
       }
@@ -316,7 +254,7 @@
       "neuerText": "Kim-Bell — die Glocke, mit der man sich sauber im gemeinsamen SBKIM-Raum anmeldet: eigene stabile Identität, Spore erzeugen, im Raum sichtbar werden und andere Knoten finden. Server-los, direkt im Browser, ohne Anmeldung.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -370,7 +308,7 @@
       "neuerText": "Kimseek — semantisches Such-Werkzeug, das die Bedeutung und Absicht hinter einer Frage versteht (nicht nur Stichwörter). Ordnet Treffer nach Bedeutungs-Nähe, server-los im Browser; optional Spracheingabe, Bild-/Handschrift-Erkennung (OCR) und eine KI-Brücke mit Web-Suche.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -389,6 +327,7 @@
         "bedienbarkeit": 93,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-18",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -422,7 +361,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kimseek/"
       }
     },
@@ -436,7 +374,7 @@
       "neuerText": "Kimboard — semantische Pinnwand: Fragen und Notizen an ein geborgtes „dummes Brett“ (Nostr) heften, geräteübergreifend und nach Bedeutung sortiert. Merken, Notizen, Frage-Antwort — server-los direkt im Browser, ohne Server und ohne Konto.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -493,7 +431,7 @@
       "neuerText": "Private Brain — dein privates zweites Gehirn: durchsucht deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) nach Bedeutung, offline, ohne dass Originale bewegt werden. Es liest jede Datei einmal, behält nur einen winzigen Bedeutungs-Katalog und lässt die Originale unangetastet — liest nur, schlägt vor, bewegt nichts.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -514,8 +452,7 @@
         "bedienbarkeit": 91,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-09-09",
+        "gemessen": "2026-09-19",
         "quelle": "google",
         "werkzeug": "13.4.1",
         "hinweise": [
@@ -526,11 +463,11 @@
           },
           {
             "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
+            "t": "Netzwerkabhängigkeitsbaum"
           },
           {
             "k": "leistung",
-            "t": "Netzwerkabhängigkeitsbaum"
+            "t": "Effiziente Verweildauer im Cache verwenden"
           },
           {
             "k": "bedienbarkeit",
@@ -549,52 +486,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "frisch": {
-          "leistung": 74,
-          "bedienbarkeit": 91,
-          "gute_praxis": 96,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-09-18",
-          "quelle": "google",
-          "werkzeug": "13.4.1",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "JavaScript komprimieren",
-              "ms": 900
-            },
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendetes JavaScript",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "bedienbarkeit",
-              "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
-            },
-            {
-              "k": "bedienbarkeit",
-              "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
-            },
-            {
-              "k": "bedienbarkeit",
-              "t": "Dokument hat keine Hauptmarkierung."
-            },
-            {
-              "k": "gute_praxis",
-              "t": "Es wurden Browserfehler in der Konsole protokolliert"
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 2,
-          "noetig": 3,
-          "seit": "2026-09-11"
-        },
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
       }
     },
@@ -608,7 +500,7 @@
       "neuerText": "WorkFloh ist ein Endknoten im SBKIM-Mycel und arbeitet auf Grundlage des Sage-Protokolls — semantisch verbunden mit den verwandten Knoten Tomys Hub (Digitaldruck und Werbeartikel), BookLedgerPro (Buchhaltung, Angebot und Rechnung), Kimseek (Bedeutungs-Suche) und dem SB-KIMTool-Point. Sein Kern ist der digitale Auftragszettel eines Betriebs: von der Kundenannahme über die Produktion (Schilder, Folierung, Beschriftung, Druck) bis zur Übergabe, samt Zeiterfassung sowie Angebot und Rechnung. Zugleich ist WorkFloh ein wandelbares Arbeitstool, nicht auf eine Branche festgelegt: jede Firma installiert ihren eigenen, firmenspezifischen Auftragszettel — aus dem Werbetechnik-Zettel wird ebenso der Werkstatt-, Handwerks-, Montage-, Reinigungs- oder Dienstleistungs-Auftrag. Wie die Schwester-Knoten Rezeptbuch und Mixarium ein Baukasten: Kategorien umbenennen, Felder anpassen, ein neues Auftrags-Pake",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -662,7 +554,7 @@
     },
     "markt-pwa-toolpoint": {
       "url": "https://pwa-toolpoint.de/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "PWA Toolpoint",
       "nodeId": "WJ14jzCKnqlzXxFqmWPX4EhP2S_wudtR5H_Qa2ocQI4",
       "modell": "Xenova/multilingual-e5-small",
@@ -670,32 +562,57 @@
       "neuerText": "PWA Toolpoint — der offene Marktplatz für Progressive Web Apps: Apps finden, die im Browser laufen und sich ohne App-Store installieren lassen, und eigene Apps eintragen. Gesucht wird nach Bedeutung statt nach Stichwörtern; jeder Eintrag wird gemessen, und jede Zahl trägt ihr Datum.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "nur_inhalt",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "cd9214a2",
-        "grundlage": "627d02612bb38150",
+        "grundlage": "56cb6194d7309d88",
         "fgrundlage": "e49bf89e183c97bb",
         "fingerabdruck": "e49bf89e183c97bb",
         "fremde": [
           "family-projekt.de",
           "lausiklauskn-png.github.io"
         ],
-        "pruefsumme": "627d02612bb38150",
+        "pruefsumme": "56cb6194d7309d88",
         "status": 200,
         "seit": "2026-09-18",
         "url": "https://pwa-toolpoint.de/"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "PageSpeed antwortete HTTP 500",
+        "leistung": 86,
+        "bedienbarkeit": 100,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-19",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren",
+            "ms": 150
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "Erzwungener dynamischer Umbruch"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+          }
+        ],
+        "stand": "gemessen",
         "url": "https://pwa-toolpoint.de/"
       }
     },
     "markt-auslieferungspruefer": {
       "url": "https://pwa-toolpoint.de/sbkim/pruefer-spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Auslieferungsprüfer",
       "nodeId": "yF1ONN8LQskao9MoTyRADywKYIHLr0BM9CUXQj5X9GM",
       "modell": "Xenova/multilingual-e5-small",
@@ -703,7 +620,7 @@
       "neuerText": "Der Auslieferungsprüfer prüft, was eine Internetseite wirklich ins Netz gibt, statt was sie zu geben vorgibt. Er findet fremde Adressen, von denen eine Seite ungefragt nachlädt, versehentlich mitgelieferte Server-Dateien, offene Zugangsdaten und Schlüssel, und Personenbezug, der dort nicht hingehört: Kontonummern werden nachgerechnet, Telefonnummern brauchen eine Ländervorwahl, und wo sich ein echtes Etikett nicht von einem vergessenen Platzhalter unterscheiden lässt, meldet er nichts. Er läuft in zwei Fassungen — eine im Browser, eine als Textleser ohne Browser — und der Unterschied zwischen beiden ist selbst ein Befund: was der Browser lädt und der Textleser nicht sieht, ist ein Versteck. Ein Link, den ein Mensch anklickt, ist kein Abruf und steht deshalb nicht in der Fundliste.",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -717,14 +634,45 @@
         "url": "https://pwa-toolpoint.de/auslieferungspruefer.html"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "PageSpeed antwortete HTTP 500",
+        "leistung": 97,
+        "bedienbarkeit": 94,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-19",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren",
+            "ms": 300
+          },
+          {
+            "k": "leistung",
+            "t": "CSS komprimieren",
+            "ms": 150
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendete CSS",
+            "ms": 150
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Die Formularelemente sind nicht mit Labels verknüpft"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+          }
+        ],
+        "stand": "gemessen",
         "url": "https://pwa-toolpoint.de/auslieferungspruefer.html"
       }
     },
     "markt-kim-hub-company": {
       "url": "https://lausiklauskn-png.github.io/kim-hub-company/sbkim/spore.json",
-      "lage": "geaendert",
+      "lage": "abweichend",
       "nodeName": "Kim Hub Company",
       "nodeId": "eNxEFbgof9x69RyVABOCMGExEb66iwuLtqBxXtfeGnM",
       "modell": "Xenova/multilingual-e5-small",
@@ -732,7 +680,7 @@
       "neuerText": "Kim Hub Company ist eine Werkstatt für brauchbare Werkzeuge. ZWECK: aus einer Idee in eigenen Worten in einem Durchgang einen ausgearbeiteten Auftrag, ein geprüftes Werkstück und ein Übergabe-Blatt zu machen — einen Auftrag in Worten, den man an ein großes Sprachmodell weiterreichen kann. Damit auch jemand, der nicht programmiert, am Ende ein Werkzeug in der Hand hält, das er wirklich benutzen kann, statt einer Antwort, mit der er nichts anfangen kann. FORSCHUNG: Kim Hub Company ist ein Endknoten im SBKIM-Mycel und Bestandteil der Sage-Forschung am SBKIM-Protokoll — Semantisches Bidirektionales KI-Matching. Untersucht wird, ob agentenbasiertes Matching brauchbare Werkzeuge hervorbringt: Knoten, die einander über Bedeutungs-Vektoren finden statt über Stichwörter, und Rollen, die einen Auftrag gemeinsam bearbeiten statt eines einzelnen Modells. Untersucht wird ebenso, wie Regeln und Grunds",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -772,6 +720,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-18",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -799,7 +748,6 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
         "schaufenster": {
           "leistung": 98,
@@ -824,34 +772,6 @@
               "t": "Netzwerkabhängigkeitsbaum"
             }
           ],
-          "frisch": {
-            "leistung": 97,
-            "bedienbarkeit": 100,
-            "gute_praxis": 100,
-            "auffindbarkeit": 100,
-            "gemessen": "2026-09-18",
-            "quelle": "google",
-            "werkzeug": "13.4.1",
-            "hinweise": [
-              {
-                "k": "leistung",
-                "t": "Effiziente Verweildauer im Cache verwenden"
-              },
-              {
-                "k": "leistung",
-                "t": "Bildübermittlung verbessern"
-              },
-              {
-                "k": "leistung",
-                "t": "Netzwerkabhängigkeitsbaum"
-              }
-            ]
-          },
-          "zurueckgehalten": {
-            "zahl": 2,
-            "noetig": 3,
-            "seit": "2026-09-11"
-          },
           "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
         }
       }
@@ -860,7 +780,7 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
@@ -936,7 +856,7 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
@@ -1049,7 +969,7 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
@@ -1092,6 +1012,42 @@
             "t": "Die Formularelemente sind nicht mit Labels verknüpft"
           }
         ],
+        "frisch": {
+          "leistung": 99,
+          "bedienbarkeit": 88,
+          "gute_praxis": 100,
+          "auffindbarkeit": 100,
+          "gemessen": "2026-09-19",
+          "quelle": "google",
+          "werkzeug": "13.4.1",
+          "hinweise": [
+            {
+              "k": "leistung",
+              "t": "Erzwungener dynamischer Umbruch"
+            },
+            {
+              "k": "leistung",
+              "t": "Netzwerkabhängigkeitsbaum"
+            },
+            {
+              "k": "leistung",
+              "t": "JavaScript komprimieren"
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Die Formularelemente sind nicht mit Labels verknüpft"
+            }
+          ]
+        },
+        "zurueckgehalten": {
+          "zahl": 1,
+          "noetig": 3,
+          "seit": "2026-09-19"
+        },
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
       }
     },
@@ -1099,7 +1055,7 @@
       "lage": "ohne_spore",
       "wache": {
         "ampel": "gruen",
-        "grund": "erste_pruefung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
@@ -1112,8 +1068,30 @@
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
       },
       "messung": {
-        "stand": "nicht_gemessen",
-        "grund": "PageSpeed antwortete HTTP 500",
+        "leistung": 91,
+        "bedienbarkeit": 100,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-19",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren",
+            "ms": 150
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendete CSS",
+            "ms": 130
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          }
+        ],
+        "stand": "gemessen",
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
       }
     }
@@ -1124,8 +1102,8 @@
     "rot": 0
   },
   "messungZaehler": {
-    "gemessen": 13,
-    "veraltet": 1,
-    "nicht_gemessen": 4
+    "gemessen": 15,
+    "veraltet": 2,
+    "nicht_gemessen": 1
   }
 }
