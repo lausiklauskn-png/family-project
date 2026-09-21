@@ -171,7 +171,22 @@ export function markteintraege(listings, wache) {
         label: String(x.label || ""),
         anchorId: String(x.anchorId || ""),
         by: String(x.by || ""),
-        text: String(x.text || "").slice(0, 160),
+        /* ⚠ UNGEKUERZT — bis zum 2026-09-21 stand hier `.slice(0, 160)`.
+         * Gemessen an dem Tag: 15 von 18 gekuerzten Texten brachen MITTEN IM
+         * WORT ab, und zwar so im ausgelieferten HTML („Laeuft offlin",
+         * „Geld und F"). Der statische Block trug damit 2.880 Zeichen fuer
+         * 18 Eintraege; ungekuerzt sind es 6.983.
+         * WARUM DAS OHNE FOLGEN FUER DIE ANZEIGE IST: `.listing p` klemmt in
+         * assets/style.css auf drei Zeilen (`-webkit-line-clamp:3`) und haelt
+         * seine Hoehe ueber `min-height`. Die Karte sieht also gleich aus; nur
+         * ein Crawler und eine Vorlesehilfe sehen jetzt den ganzen Satz.
+         * Der Preis sind 4 KB in einer 144-KB-Seite, die Caddy ohnehin
+         * komprimiert — und das ist der guenstigste indexierbare Text, den
+         * diese Seite zu haben ist.
+         * ⚠ DIE ZWEITE STELLE GEHOERT DAZU: markt.html kuerzte in
+         * `neuAufbauen()` genauso. Zwei Fassungen desselben Textes laufen
+         * auseinander; beide sind zugleich geaendert. */
+        text: String(x.text || ""),
         img: safeImg(x.img),
         url: aufEis ? "" : safeUrl(x.url),      // Falle 2
         eigen: x.own === true,                   // Falle 3
