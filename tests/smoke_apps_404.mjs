@@ -34,6 +34,22 @@
  * Das wird hier hingeschrieben statt umfahren: ein Riegel, den keine Probe von
  * seinem Fehlen unterscheiden kann, ist eine Behauptung — hier ist der
  * Nachweis ein Befehl statt einer Probe, und genau das steht dabei.
+ *
+ * ✅ UND ER IST GEFAHREN — Klaus am 2026-09-21, 23:45 UTC, an seinem Server:
+ *
+ *     /apps/gibtesnicht/  → 404     (vorher hätte dort 200 gestanden)
+ *     /markt.html         → 200     (die Seite läuft unverändert)
+ *
+ * Der Block steht seitdem in `/opt/relay/Caddyfile` (die Datei, die der
+ * Docker-Container `caddy` als `/etc/caddy/Caddyfile` sieht), `caddy validate`
+ * meldete „Valid configuration", und die Sicherung liegt daneben als
+ * `Caddyfile.bak.apps-20260921-234519`.
+ *
+ * ⚠ WAS DIESE MESSUNG NICHT SAGT, und es bleibt daneben stehen: sie gilt für
+ * den Stand von heute. Wer den Caddyfile später anfasst, misst neu — genau
+ * dafür steht der curl-Befehl oben da. Und sie sagt nichts über die
+ * Detailseiten selbst: die lagen zum Zeitpunkt der Messung noch gar nicht auf
+ * dem Server, `main` trägt sie erst nach dem Merge.
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
