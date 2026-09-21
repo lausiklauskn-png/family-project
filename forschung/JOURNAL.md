@@ -21,6 +21,18 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-09-18 · Alis Moderaum
+
+<https://lausiklauskn-png.github.io/Alis-Moderaum/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 52 → 73** (↑ 21, am 2026-09-21 noch 73)
+
+> Gesehen am 2026-09-18, **bestätigt durch die Messung vom 2026-09-21**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: JavaScript komprimieren
+- Beanstandung neu: leistung: Erzwungener dynamischer Umbruch
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-09-08 · Muttis Rezeptbuch
 
 <https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/> · Quelle der Zahlen: Google PageSpeed Insights
