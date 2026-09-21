@@ -202,6 +202,96 @@ bash tests/gegenprobe_messreihenfolge.sh    # 6 schlagen an · 0 blind · 0 tote
 ```
 
 
+## 🔎 DIE MESS-LISTE WIRD GEFUNDEN, NICHT GEPFLEGT (2026-09-21)
+
+Der Befund kam aus dem SEO-Plan für PWA Toolpoint: **dieser Marktplatz misst
+nicht selbst.** Er *holt* seine Zahlen aus `forschung/messreihe.json`. Steht ein
+Eintrag dort nicht, gibt `juengsteMessung()` nichts zurück, und seine
+Detailseite bleibt leer — also genau die dünne Seite, gegen die der ganze Plan
+gebaut ist.
+
+**Nachgezählt am 2026-09-21, nicht geschätzt:** von 29 Einträgen bei PWA
+Toolpoint hatte **einer** keine Messreihe (`eigen-kim-hub-company`). Die anderen
+28 tragen dieselbe Kennung wie ein Eintrag hier im Marktplatz oder in
+`forschung/messziele.json` und werden dadurch längst gemessen.
+
+⚠ **HEUTE EIN EINZELFALL, MORGEN DIE REGEL.** Jeder fremde Eintrag, den Klaus
+bei PWA Toolpoint freigibt, steht **nur** dort. Eine von Hand gepflegte
+Mess-Liste macht dabei denselben Fehler wie ein vergessener Eintrag — nur
+dauerhaft, und niemand merkt es, weil eine gepflegte Liste immer vollständig
+*aussieht*. Dieselbe Lehre wie beim Kanon-Verteiler in Sage, wo genau das am
+2026-09-14 BookLedgerPro aus einem Rollout hat fallen lassen.
+
+`tools/lib/fremdmarkt.mjs` liest deshalb die Liste des fremden Marktes und hängt
+die Einträge, die **niemand** misst, an `--messen` an.
+
+### ⚠ Die Netz-Adresse ist die ausgelieferte SEITE, nicht das Depot
+
+Mein erster Anlauf nahm `raw.githubusercontent.com/…/PWA-Toolpoint/main/…` und
+bekam **HTTP 404**. Kein Tippfehler: das Depot steht auf **privat** (über die
+GitHub-API nachgesehen, `"private": true`), und `raw` gibt einem privaten Depot
+ohne Token genau diese 404. Zum Vergleich in derselben Messung: family-projects
+eigene `messreihe.json` über `raw` antwortet mit **200**.
+
+Die Seite wird trotzdem ausgeliefert — dieselbe Lage, die in Kimhubs Verfassung
+unter *„PRIVAT STELLEN IST EIN HALBER SCHRITT"* steht. **Der Plan hatte es
+vorgegeben** (*„gelesen aus der öffentlich ausgelieferten `listings.js`"*), und
+ich bin daran vorbeigebaut. Genommen wird jetzt `pwa-toolpoint.de`.
+
+⚠ **BENANNTE GRENZE:** aus dem Behälter einer Sitzung ist diese Adresse **nicht**
+erreichbar (der Ausgangs-Proxy sperrt sie, gemessen HTTP 000). Der Netz-Weg ist
+deshalb nur an einem **gestellten Server** gemessen — die Mechanik, nicht die
+Adresse. Ob sie im GitHub-Lauf antwortet, sagt erst der erste nächtliche Lauf;
+tut sie es nicht, steht „Liste nicht erreichbar" im Protokoll, statt dass etwas
+still fehlt.
+
+### Drei Riegel, und jeder hat seinen eigenen Schaden
+
+| | |
+|---|---|
+| **Nichts wird überstimmt** | eine Kennung, die in `messziele.json` steht, wird übersprungen — **auch mit `aktiv: false`**. Dort hängen Entscheidungen mit Begründung dran (*„steht seit 2026-09-13 selbst im Marktplatz und wird dort gemessen"*). Ein gefundenes Ziel, das eine davon still wieder anschaltet, wäre der leiseste Weg, eine Entscheidung zurückzunehmen |
+| **Nichts wird doppelt gemessen** | der eigene Marktplatz zählt mit in die Menge „misst schon jemand". Ohne diese Hälfte liefe dieselbe Adresse zweimal je Nacht durch die Messung, und die Reihe bekäme für denselben Tag zwei Punkte aus zwei Wegen |
+| **Fail-soft, ausnahmslos** | kommt der fremde Markt nicht herein, wird das **gesagt** und mit den eigenen Zielen weitergemessen. Es wird nie geworfen. Der Grund steht eine Überschrift weiter oben: dieser Lauf ist im September sechs Nächte hintereinander gestorben, und die Arbeit war jedes Mal weg |
+
+⚠ **UND DAS FINDEN ALLEIN NÜTZT NICHTS.** Ein Ziel, das zwar in der Liste steht,
+aber hinter dem Deckel liegt, wird trotzdem nie gemessen. Es trägt, weil
+`reihenfolge()` nie Gemessene ganz vorn einsortiert — **gemessen an genau diesem
+Fall:** beim ersten Lauf stand `Kim Hub Company` auf Platz 1.
+
+### ⚠ Ein Wächter war blind, und gefunden hat ihn nur das Nachstellen von Hand
+
+*„Der Lauf fragt die fremden Märkte überhaupt"* suchte `PWA Toolpoint` im
+Protokoll — und traf ein **Mess-Ziel**, das zufällig so heißt
+(`Auslieferungsprüfer (PWA Toolpoint)`). Er wäre grün geblieben, während gar
+nichts gefragt wurde. Der Gegenprobe-Lauf hat es **nicht** gemeldet: der Fall
+fiel über den Zähler daneben und galt damit als gefangen.
+
+> *„Gefangen" allein ist keine Messung.* Die Zahl sagt, ob die Probe rot wird —
+> nicht, ob die rote Zeile den Namen ihrer Zusicherung trägt. Gemessen wird
+> jetzt die **Meldung dieses Blocks**, die kein Ziel-Name tragen kann.
+
+### Geprüft
+
+```bash
+node tests/smoke_fremdmarkt.mjs           # 27 grün · 0 rot
+bash tests/gegenprobe_fremdmarkt.sh       # 16 schlagen an · 0 blind · 0 tote Anker
+node tools/forschung.mjs --messen         # FORSCHUNG_MAX=0 macht daraus einen Trockenlauf
+```
+
+Vier Fälle zusätzlich **von Hand** nachgestellt und die roten Zeilen gelesen;
+einer davon hat den blinden Wächter oben ans Licht gebracht.
+
+⚠ **FÜNF PROBEN DIESES DEPOTS SIND ROT, UND KEINE DAVON GEHÖRT DIESER ARBEIT.**
+Gemessen am 2026-09-21 gegen einen Auszug von `origin/main` mit verwiesenem
+`node_modules` — **zahlengleich** in beiden Bäumen: `smoke_all` 121/122 ·
+`smoke_start` 13/15 · `smoke_markt_vecpack` 6/3 · `smoke_stufe5_messung` 152/1 ·
+`smoke_wortkarte` stürzt ab. Eingereiht, nicht nebenbei repariert.
+
+⚠ **Und `smoke_wortkarte` ist OHNE `node_modules` grün und MIT rot** — der
+Auszug ohne Pakete meldete „4 grün, 0 rot, 1 nicht lauffähig". Das ist kein
+Befund über den Code, sondern einer über die Umgebung, und er steht hier, damit
+die nächste Sitzung nicht denselben Vergleich zweimal falsch zieht.
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

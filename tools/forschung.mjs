@@ -501,6 +501,48 @@ function rangliste() {
   console.log(`   Wo das ein Punkt ist, steht ·  — dann gibt es noch keinen Verlauf.\n`);
 }
 
+/* ---- Ziele aus einem fremden Marktplatz FINDEN ---------------------------- */
+
+/* PWA Toolpoint misst nicht selbst — es holt die Zahlen aus `messreihe.json`.
+ * Ein Eintrag, der nur dort steht, wird also nie gemessen, und seine
+ * Detailseite bleibt leer. Heute trifft das genau einen von 29 Einträgen
+ * (gemessen 2026-09-21); morgen trifft es JEDEN fremden Eintrag, den Klaus
+ * dort freigibt.
+ *
+ * ⚠ DIE LISTE WIRD GEFUNDEN, NICHT GEPFLEGT. Eine zweite, von Hand geführte
+ * Aufzählung machte denselben Fehler wie ein vergessener Eintrag — nur
+ * dauerhaft, und niemand merkte es, weil eine gepflegte Liste ja immer
+ * vollständig AUSSIEHT.
+ *
+ * ⚠ ÜBERSPRUNGEN WIRD, WAS SCHON JEMAND MISST — und zwar aus ZWEI Quellen:
+ * den eigenen Mess-Zielen (auch den abgeschalteten! dort hängen Entscheidungen
+ * mit Begründung dran, und ein gefundenes Ziel, das eine davon still wieder
+ * anschaltet, wäre der leiseste Weg, eine Entscheidung zurückzunehmen) und dem
+ * eigenen Marktplatz, den der nächtliche Lauf ohnehin misst. Fehlte die zweite
+ * Hälfte, liefe dieselbe Adresse zweimal je Nacht durch die Messung und die
+ * Reihe bekäme für denselben Tag zwei Punkte aus zwei Wegen.
+ *
+ * ⚠ FAIL-SOFT: kommt der fremde Markt nicht herein, wird das gesagt und mit den
+ * eigenen Zielen weitergemessen. Der nächtliche Lauf ist im September 2026
+ * sechs Nächte hintereinander an einem fehlenden Paket gestorben — an dieser
+ * Stelle wird deshalb nie geworfen. */
+async function gefundeneZiele(eigene) {
+  try {
+    const { fremdeZiele, bekannteKennungen } = await import("./lib/fremdmarkt.mjs");
+    const log = (t) => console.log(t);
+    let marktQuelle = "";
+    try {
+      marktQuelle = fs.readFileSync(path.join(WURZEL, "assets", "config", "listings.js"), "utf8");
+    } catch (e) {
+      log(`  ! eigener Marktplatz nicht gefunden (${e.message}) — es kann doppelt gemessen werden.`);
+    }
+    return await fremdeZiele({ bekannt: bekannteKennungen({ ziele: eigene, marktQuelle, log }), log });
+  } catch (e) {
+    console.log(`  ! fremde Märkte nicht abgefragt (${e.message}) — nur die eigenen Ziele.`);
+    return [];
+  }
+}
+
 /* ---- Eigene Ziele messen (die, die NICHT im Marktplatz stehen) ------------ */
 
 /* Klaus 2026-08-04: „wir wollen bitte kein Repo auslassen, was dazu geeignet
@@ -514,7 +556,8 @@ function rangliste() {
 async function messen() {
   const liste = lesen(path.join(WURZEL, "forschung", "messziele.json"), null);
   if (!liste) { console.error("forschung/messziele.json fehlt."); process.exit(1); }
-  const alle = liste.ziele || [];
+  const eigene = liste.ziele || [];
+  const alle = [...eigene, ...(await gefundeneZiele(eigene))];
   const aus = alle.filter((z) => z.aktiv === false);
   const an = alle.filter((z) => z.aktiv !== false);
 
