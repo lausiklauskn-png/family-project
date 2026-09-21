@@ -129,3 +129,38 @@ EOF
 lauf "eigen, aber noreferrer" rot
 heile
 lauf "Endstand wieder grün" gruen
+
+echo; echo "I · Der Kartentext wird wieder gekürzt (Prüfung 2b, Befund 2026-09-21)"
+# Bis zum 2026-09-21 schnitt `markteintraege()` bei 160 Zeichen hart ab — 15 von
+# 18 Texten brachen dabei mitten im Wort ab, so im ausgelieferten HTML.
+# ⚠ `heile` stellt `tools/` NICHT wieder her. Dieser Fall legt das Werkzeug
+# deshalb selbst zurück; ohne die Zeile liefe jeder folgende Fall gegen ein
+# sabotiertes Bau-Werkzeug, und niemand wüsste warum.
+sed -i 's|text: String(x.text \|\| ""),|text: String(x.text \|\| "").slice(0, 160),|' tools/statische-listen.mjs
+node tools/statische-listen.mjs > /dev/null
+lauf "Kartentext wieder auf 160 gekürzt" rot
+git checkout -- tools/statische-listen.mjs
+heile
+
+echo; echo "J · Ein Absatz bricht mitten im Wort ab (Prüfung 2b, Gegenrichtung)"
+# Die eigentliche Zusicherung, direkt am Erzeugnis: hier wird EIN Absatz im
+# gebauten HTML abgeschnitten. Der Wächter darf sich nicht damit begnügen, dass
+# die übrigen sechzehn vollständig sind.
+python3 - <<'EOF'
+import re
+p='markt.html'; s=open(p).read()
+m=re.search(r'<p>([^<]{200,})</p>', s)
+s=s.replace('<p>'+m.group(1)+'</p>', '<p>'+m.group(1)[:160]+'</p>', 1)
+open(p,'w').write(s)
+EOF
+lauf "ein Absatz endet mitten im Wort" rot
+heile
+
+echo; echo "K · Der Browser-Weg kürzt wieder (Prüfung 2b, dritte Stelle)"
+# Zwei Fassungen desselben Textes laufen auseinander: kürzte nur markt.html,
+# sähe ein Besucher etwas anderes als ein Crawler — und die beiden Wächter
+# darüber blieben beide grün, weil das STATISCHE HTML in Ordnung ist.
+sed -i "s|esc(kartenText(x))|esc(kartenText(x).slice(0, 160))|" markt.html
+lauf "markt.html kürzt im Browser wieder" rot
+heile
+lauf "Endstand wieder grün" gruen
