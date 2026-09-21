@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 import {
   ANFANG, ENDE, EIGENE_HOSTS,
   leseConfig, leseWache, markteintraege, werkzeugeintraege,
-  marktHtml, werkzeugeHtml, einsetzen, safeUrl, istEigenerHost
+  marktHtml, werkzeugeHtml, einsetzen, safeUrl, istEigenerHost, esc
 } from "../tools/statische-listen.mjs";
 
 const WURZEL = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -91,6 +91,51 @@ console.log("\nmarkt.html");
   ok(fremdLink.length === 0,
     fremdLink.length ? `Link ohne Eintrag in listings.js: ${fremdLink.map((l) => l.href).join(", ")}`
                      : "kein Link im HTML, der nicht aus listings.js stammt");
+
+  /* ── 2b · DER TEXT STEHT GANZ DA (Befund 2026-09-21) ──────────────────────
+   * Bis dahin schnitt `markteintraege()` bei 160 Zeichen hart ab. Gemessen an
+   * dem Tag: 15 von 18 gekuerzten Texten brachen MITTEN IM WORT ab, und zwar
+   * so im ausgelieferten HTML — „Laeuft offlin", „Geld und F", „Bar zuh".
+   * Der statische Block trug damit 3.311 Zeichen sichtbaren Text fuer 18
+   * Eintraege; ungekuerzt sind es 7.335.
+   * Fuer die ANZEIGE aendert das nichts: `.listing p` klemmt in style.css auf
+   * drei Zeilen und haelt seine Hoehe ueber `min-height`. Fuer einen Crawler
+   * und eine Vorlesehilfe aendert es alles.
+   * ⚠ GEMESSEN WIRD DER TEXT, NICHT DIE ZAHL 160. Eine Zahl in einer Pruefung
+   * ist kein Vertrag: sie waere auch bei einer Kuerzung auf 200 gruen. */
+  const fehlenderText = markt
+    .map((e) => listings.find((x) => x.anchorId === e.anchorId))
+    .filter((x) => x && x.text && !b.includes(esc(x.text)));
+  ok(fehlenderText.length === 0,
+    fehlenderText.length
+      ? `Text nicht vollstaendig im HTML: ${fehlenderText.map((x) => x.label).join(", ")}`
+      : `jeder Kartentext steht ungekuerzt im HTML (${markt.length} Eintraege)`);
+
+  /* Die Gegenrichtung, und sie ist die eigentliche Zusicherung: KEIN Absatz
+   * bricht mitten im Wort ab. Gemessen am letzten Zeichen des Absatzes —
+   * steht dort ein Buchstabe, wo im Quelltext der Satz weitergeht, ist genau
+   * der alte Fehler zurueck.
+   * ⚠ Geholt wird der Absatz ueber seine STELLE in der Karte, nicht ueber
+   * „irgendein <p>": `<p class="by">@klaus</p>` endet auf einem Buchstaben
+   * und ist trotzdem in Ordnung. Mein erster Zaehler hat genau die
+   * mitgezaehlt und deshalb 33 statt 15 gemeldet. */
+  const absaetze = [...b.matchAll(/<p>([^<]*)<\/p>/g)].map((m) => m[1]);
+  const abgebrochen = absaetze.filter((t) => {
+    const voll = listings.find((x) => x.text && esc(x.text) === t);
+    return !voll && /[A-Za-zÄÖÜäöüß]$/.test(t.trim());
+  });
+  ok(abgebrochen.length === 0,
+    abgebrochen.length
+      ? `Absatz bricht mitten im Wort ab: "…${abgebrochen[0].slice(-40)}"`
+      : `kein Kartentext bricht mitten im Wort ab (${absaetze.length} Absaetze)`);
+
+  /* ⚠ UND DER BROWSER-WEG MUSS DASSELBE TUN. markt.html zeichnet die Liste
+   * beim Laden neu (`neuAufbauen()`); bis zum 2026-09-21 kuerzte es dort
+   * ebenfalls auf 160. Zwei Fassungen desselben Textes laufen auseinander,
+   * und dann sieht ein Besucher etwas anderes als ein Crawler. */
+  const mkJs = lies("markt.html");
+  ok(!/kartenText\(x\)\.slice\(/.test(mkJs),
+    "markt.html kuerzt den Kartentext nicht mehr (derselbe Text wie statisch)");
 
   // 3 · Rote Ampel → kein Link. Der Eintrag selbst bleibt sichtbar.
   const rot = markt.filter((e) => e.aufEis);
