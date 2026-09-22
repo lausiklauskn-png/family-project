@@ -200,6 +200,27 @@ export function marktHtml(eintraege) {
     const link = e.url
       ? `<a class="btn ghost ext" href="${esc(e.url)}" target="_blank" rel="${relFuer(e.eigen)}">→ Zur Seite</a>`
       : "";
+    /* ⚠ OHNE DIESEN KNOPF SIND DIE 17 SEITEN UNTER /apps/ VERWAIST.
+     *
+     * Sie standen ab dem 2026-09-22 in der Sitemap und waren von KEINER Seite
+     * verlinkt — Klaus hat es am selben Tag gesehen: "bei PWA Toolpoint gibt
+     * es den Button Einzelheiten … in Family Project nicht." Eine verwaiste
+     * Seite ist für einen Menschen unerreichbar und für Google ein schlechtes
+     * Zeichen: sie steht in der Einladung und nirgendwo im Haus.
+     *
+     * ⚠ ER IST BEDINGUNGSLOS, UND DAS IST GEMESSEN, NICHT GERATEN.
+     * tools/detailseiten.mjs baut seine Seiten aus DERSELBEN Liste, die hier
+     * ankommt (markteintraege) — wer hier gezeichnet wird, hat auch eine
+     * Seite. Eine zweite Bedingung wäre eine zweite Fassung derselben Regel,
+     * und die zwei liefen auseinander; dann zeigte der Knopf ins Leere oder
+     * fehlte an einer Seite, die es gibt. Nur eine leere Kennung kann keine
+     * Adresse tragen.
+     *
+     * ⚠ KEIN target="_blank": die Detailseite gehört zu DIESER Seite. Ein
+     * neuer Tab je Karte ist der Weg, wie man zwanzig Tabs bekommt. */
+    const einzeln = e.anchorId
+      ? `<a class="btn ghost" href="apps/${esc(e.anchorId)}/">Einzelheiten →</a>`
+      : "";
     return '<div class="glass listing">' +
       '<div class="img">' +
         `<img src="${esc(e.img)}" alt="${esc(e.label)}" loading="lazy" referrerpolicy="no-referrer">` +
@@ -212,7 +233,7 @@ export function marktHtml(eintraege) {
         `<h3 translate="no">${esc(e.label)}</h3>` +
         (e.by ? `<p class="by" translate="no">${esc(e.by)}</p>` : "") +
         `<p>${esc(e.text)}</p>` +
-        '<div class="listing-actions"><div class="listing-foot">' + link + "</div></div>" +
+        '<div class="listing-actions"><div class="listing-foot">' + einzeln + link + "</div></div>" +
       "</div>" +
       "</div>";
   }).join("\n");
