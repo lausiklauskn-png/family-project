@@ -11,7 +11,7 @@ cd "$(dirname "$0")/.." || exit 1
 
 DATEIEN=(tools/vorlagen/detail.html tools/detailseiten.mjs tools/statische-listen.mjs
          assets/style.css markt.html assets/config/listings.js
-         tests/smoke_markt_vecpack.mjs)
+         tests/smoke_markt_vecpack.mjs tests/lib/vec-stub.mjs)
 SICH="/tmp/gp_dg.$$"; mkdir -p "$SICH"
 for d in "${DATEIEN[@]}"; do mkdir -p "$SICH/$(dirname "$d")"; cp "$d" "$SICH/$d"; done
 for a in apps/*/index.html; do mkdir -p "$SICH/$(dirname "$a")"; cp "$a" "$SICH/$a"; done
@@ -186,18 +186,26 @@ echo; echo "═══ VEKTOR-STUB: misst er Raenge oder Rauschen? (2026-09-22) �
 #         lang gruen gemeldet und bei neunzehn die Raenge kippen lassen — nicht
 #         weil der Code kaputt war, sondern weil zwei Zahlen gleich waren.
 #         DIESER FALL IST DER BELEG, dass die Reparatur eine ist.
-fall 'VEC: der alte Stub mit % 40 und gefaltetem Kosinus kommt zurueck' tests/smoke_markt_vecpack.mjs \
-  '      const c = s.startsWith("q:") ? 1' \
-  '      const w40 = ((s.length % 40) / 40) * Math.PI * 0.5; v[0] = Math.cos(w40); v[1] = Math.sin(w40); return v; const c = s.startsWith("q:") ? 1' \
+fall 'VEC: der alte Stub mit % 40 und gefaltetem Kosinus kommt zurueck' tests/lib/vec-stub.mjs \
+  '    const c = s.startsWith("q:") ? 1' \
+  '    const w40 = ((s.length % 40) / 40) * Math.PI * 0.5; v[0] = Math.cos(w40); v[1] = Math.sin(w40); return v; const c = s.startsWith("q:") ? 1' \
   'liegen WEITER auseinander' tests/smoke_markt_vecpack.mjs
 
 # VEC-2 · die Abstaende werden eng, ohne gleich zu sein. Dann ist der
 #         Gleichstands-Gedanke erfuellt und die Raenge kippen trotzdem am
 #         Runden — genau der Fehler meines ERSTEN Reparatur-Versuchs.
-fall 'VEC: die Abstaende schrumpfen unter die Quantisierung' tests/smoke_markt_vecpack.mjs \
+fall 'VEC: die Abstaende schrumpfen unter die Quantisierung' tests/lib/vec-stub.mjs \
   'const SCHRITT = 0.8 / (N + 1);' \
   'const SCHRITT = 0.001 / (N + 1);' \
   'liegen WEITER auseinander' tests/smoke_markt_vecpack.mjs
+
+# VEC-3 · ⚠ UND DIE ZWEITE PROBE HAENGT AM SELBEN STUB. Bis zum 2026-09-22
+#         stand er zweimal; dieser Fall belegt, dass es jetzt EINE Fassung
+#         ist — eine Sabotage dort wirft auch die Studio-Probe um.
+fall 'VEC: die Studio-Probe haengt am selben Stub' tests/lib/vec-stub.mjs \
+  'const SCHRITT = 0.8 / (N + 1);' \
+  'const SCHRITT = 0.0 / (N + 1);' \
+  'Reihenfolge identisch' tests/smoke_studio_vectors.mjs
 
 echo; echo "═══ SYNTAX: jede JS-Datei laedt ═══"
 # 7 · genau der Fehler, der mir an EINEM Tag fuenfmal passiert ist.
