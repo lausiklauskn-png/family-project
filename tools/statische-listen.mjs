@@ -136,6 +136,45 @@ export const hostVon = (u) => { try { return new URL(u).host.toLowerCase(); } ca
 export const istEigenerHost = (u) => EIGENE_HOSTS.includes(hostVon(u));
 
 /* Falle 3 + 4 in einer Zeile. */
+/* ── DIE MESS-STUFEN, UND ZWAR DIESELBEN WIE IM MARKTPLATZ ──────────────────
+ *
+ * Klaus 2026-09-22, nach dem Sichttest der Detailseite: „die Messung, das sind
+ * die Werte nicht farbig gestaltet, so wie bei der ersten Seite. Also unter 85
+ * gelb oder wie auch immer und die anderen gruen."
+ *
+ * Die Schwellen sind LIGHTHOUSES EIGENE (ab 90 gut, ab 50 mittel) — nicht
+ * erfunden und nicht gerundet. Klaus' „85 oder wie auch immer" ist eine
+ * ungefaehre Angabe; genommen wird die Zahl, die im ganzen Marktplatz gilt.
+ *
+ * ⚠ BENANNTE DOPPELUNG. Dieselbe Rechnung steht in `markt.html` als
+ * `msStufe()` — dort im Browser, hier in Node. Den Browser-Weg auf eine
+ * geteilte Datei umzubauen kostete einen weiteren Netz-Abruf auf genau der
+ * Seite, an der die Ladezeit gemessen wird. Bewacht wird deshalb die
+ * ZUSICHERUNG statt der Zeile: eine Probe vergleicht beide Fassungen und
+ * faellt um, sobald eine sich bewegt.
+ *
+ * Die Farbklassen (`.mk-ms-w.is-gut` …) stehen in `assets/style.css` und
+ * gelten je Thema — die Detailseite erbt sie, sie braucht kein eigenes CSS. */
+export function messStufe(n) {
+  /* ⚠ „NICHTS" WIRD AUSDRUECKLICH ABGEWIESEN, BEVOR `Number` ES DEUTET.
+   * `Number(null)` ist 0, nicht NaN — und `Number("")` ebenso. Ohne diese
+   * Zeile bekaeme eine FEHLENDE Zahl die Stufe „schwach", also eine rote
+   * Pille fuer eine Messung, die es gar nicht gibt. Gefunden beim ersten
+   * Aufruf, nicht beim Schreiben. Dieselbe Familie wie `a ?? b` bei `null`,
+   * `${X:-vorgabe}` bei leerem X und `toggle(n, undefined)` — ein Ausdruck,
+   * den die Schnittstelle anders deutet als der Schreibende. */
+  if (n === null || n === undefined || n === "" || typeof n === "boolean") return "";
+  const z = Number(n);
+  if (!Number.isFinite(z)) return "";
+  return z >= 90 ? "gut" : (z >= 50 ? "mittel" : "schwach");
+}
+/* Dieselben Symbole wie an der Karte — sonst staende neben derselben Zahl auf
+   zwei Seiten ein anderes Zeichen. */
+export const MESS_SYMBOL = {
+  leistung: "\u26a1", bedienbarkeit: "\u267f",
+  gute_praxis: "\ud83d\udee1", auffindbarkeit: "\ud83d\udd0e"
+};
+
 export const relFuer = (eigen) => (eigen ? "noopener" : "nofollow ugc noopener noreferrer");
 
 /* ---- Marktplatz ----------------------------------------------------------- */

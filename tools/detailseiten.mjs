@@ -68,7 +68,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from 
 import { fileURLToPath } from "node:url";
 import { dirname, resolve, join } from "node:path";
 import {
-  leseConfig, leseWache, markteintraege, esc, relFuer
+  leseConfig, leseWache, markteintraege, esc, relFuer, messStufe, MESS_SYMBOL
 } from "./statische-listen.mjs";
 
 const WURZEL = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -217,10 +217,21 @@ export function inhalt(e, punkte, alle) {
   T.push('    <section class="glass">');
   T.push('      <h2>Zuletzt gemessen</h2>');
   if (jung) {
+    /* ⚠ DIESELBEN PILLEN WIE AN DER KARTE, mit Farbe und Symbol.
+     * Klaus 2026-09-22: „die Werte nicht farbig gestaltet, so wie bei der
+     * ersten Seite." Sie standen hier als graue `.det-band span` — richtig
+     * gerechnet, nur nicht ablesbar: gut und schwach sahen gleich aus.
+     * `.mk-ms-w.is-gut/.is-mittel/.is-schwach` steht in `assets/style.css`
+     * und gilt je Thema; die Stufe kommt aus `messStufe()`, derselben
+     * Rechnung wie im Marktplatz. */
     T.push('      <p class="det-band">');
     for (const [k, name] of SPALTEN) {
       const v = Number(jung[k]);
-      T.push(`        <span>${esc(name)} <b>${Number.isFinite(v) ? v : "—"}</b></span>`);
+      const st = messStufe(jung[k]);
+      const sym = MESS_SYMBOL[k] || "";
+      T.push(`        <span class="mk-ms-w${st ? " is-" + st : ""}">` +
+             `<span aria-hidden="true">${sym}</span> ${esc(name)} ` +
+             `<b>${Number.isFinite(v) ? v : "—"}</b></span>`);
     }
     T.push('      </p>');
     T.push(`      <p class="klein">Gemessen am ${esc(datumLang(jung.bis || jung.von))}` +
@@ -248,8 +259,13 @@ export function inhalt(e, punkte, alle) {
         ? `${esc(p.von)} – ${esc(p.bis)}` : esc(p.bis || p.von || "");
       T.push(`            <tr><td>${zeit}</td>` +
         SPALTEN.map(([k]) => {
+          /* Im Verlauf steht die Stufe als KLASSE an der Zelle, nicht als
+           * Pille: 26 Zeilen mal vier bunte Pillen wären eine Wand. Gefärbt
+           * wird nur die Ziffer — dann sieht man beim Überfliegen, wo eine
+           * Reihe abgesackt ist, ohne dass die Tabelle flimmert. */
           const v = Number(p[k]);
-          return `<td class="zahl">${Number.isFinite(v) ? v : "—"}</td>`;
+          const st = messStufe(p[k]);
+          return `<td class="zahl${st ? " st-" + st : ""}">${Number.isFinite(v) ? v : "—"}</td>`;
         }).join("") + "</tr>");
     }
     T.push("          </tbody>");
