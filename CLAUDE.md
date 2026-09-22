@@ -281,16 +281,53 @@ node tools/forschung.mjs --messen         # FORSCHUNG_MAX=0 macht daraus einen T
 Vier Fälle zusätzlich **von Hand** nachgestellt und die roten Zeilen gelesen;
 einer davon hat den blinden Wächter oben ans Licht gebracht.
 
-⚠ **FÜNF PROBEN DIESES DEPOTS SIND ROT, UND KEINE DAVON GEHÖRT DIESER ARBEIT.**
-Gemessen am 2026-09-21 gegen einen Auszug von `origin/main` mit verwiesenem
-`node_modules` — **zahlengleich** in beiden Bäumen: `smoke_all` 121/122 ·
-`smoke_start` 13/15 · `smoke_markt_vecpack` 6/3 · `smoke_stufe5_messung` 152/1 ·
-`smoke_wortkarte` stürzt ab. Eingereiht, nicht nebenbei repariert.
+✅ **DIE FÜNF ROTEN SIND WEG — und KEINE war aus dem richtigen Grund rot
+(2026-09-22).** Hier stand: *„FÜNF PROBEN DIESES DEPOTS SIND ROT, UND KEINE
+DAVON GEHÖRT DIESER ARBEIT … Eingereiht, nicht nebenbei repariert."*
 
-⚠ **Und `smoke_wortkarte` ist OHNE `node_modules` grün und MIT rot** — der
-Auszug ohne Pakete meldete „4 grün, 0 rot, 1 nicht lauffähig". Das ist kein
-Befund über den Code, sondern einer über die Umgebung, und er steht hier, damit
-die nächste Sitzung nicht denselben Vergleich zweimal falsch zieht.
+**Die Autorschaft stimmte, die Einordnung nicht.** Vier waren in Minuten zu
+reparieren, und eine hat nie gemessen:
+
+| Probe | vorher | jetzt | was wirklich los war |
+|---|---|---|---|
+| `smoke_all` | 121/122 | **125/125** | eine **Zahl** statt einer Zusicherung (#323) |
+| `smoke_start` | 13/15 | **15/15** | Proxy-Wortlaut fehlte im Filter · die three.js-Zusicherung war nicht nachgezogen, als der Hintergrund am Grafikchip hängen gelernt hat |
+| `smoke_markt_vecpack` | 6/3 | **10/0** | Maßstab zählte **Einträge** (18), gemessen wurden **gezeichnete Karten** (17) |
+| `smoke_stufe5_messung` | 152/1 | **153/0** | **zwei Quellen** fürs Messband, gesperrt wurde nur eine |
+| `smoke_wortkarte` | **Absturz** | **6/0** | las `PW_CHROME`, die 21 Nachbarn lesen `PW_CHROMIUM`, **ohne Rückfall** |
+
+⚠ **DIE WARTUNG VOM 2026-09-18 HAT DREI WÄCHTER AUF EINMAL UMGEWORFEN**, weil
+alle drei Einträge gegen Karten zählten. *Eine Zahl in einer Prüfung ist kein
+Vertrag* — und es war nicht einmal eine festgenagelte, sondern eine gerechnete
+aus der falschen Quelle.
+
+⚠ **UND `smoke_wortkarte` IST NIE GELAUFEN.** Sie starb nach der **ersten**
+Zeile an einem Startfehler; die rote Zeile trug den Namen des Absturzes, und
+fünf Zusicherungen dahinter maßen nichts. *Ein Name, der fast der Name des
+Nachbarn ist.* Ein fehlender Browser wird seitdem **gemeldet statt geworfen**:
+⊘ nicht lauffähig ist nicht grün, aber auch kein Befund über den Code.
+
+> **Der Satz, der hier stand, war die eigentliche Falle.** Er hat eine
+> **Beobachtung** („fünf sind rot, keine von uns") stillschweigend in eine
+> **Entscheidung** verwandelt („eingereiht"), und niemand hat nachgesehen.
+> Genau die Sorte, die niemand nachprüft — in der Datei, die mit *„eine
+> Prüfung, die dir recht gibt, ist der Ort, an dem du am genauesten hinsehen
+> musst"* beginnt.
+
+⚠ **`smoke_wortkarte` war OHNE `node_modules` grün und MIT rot** — der Auszug
+ohne Pakete meldete „4 grün, 0 rot, 1 nicht lauffähig". Das war richtig
+beobachtet und hat in die falsche Richtung gewiesen: es sah nach Umgebung aus
+und war ein fehlender Rückfall im Browser-Pfad.
+
+**Gemessen am 2026-09-22: 40 Proben, KEINE rot.** Gegenproben:
+`gegenprobe_markt_liste.sh` 4/0/0/0 · `gegenprobe_dauerrote.sh` 7/0/0/0.
+
+⚠ **UND DIE AUFRÄUM-FALLE EINER GEGENPROBE ÜBERLEBT KEINEN NEUSTART DES
+BEHÄLTERS.** Am selben Tag startete er mitten im Lauf neu, und
+`smoke_stufe5_messung.mjs` lag danach **sabotiert** im Arbeitsbaum. Ein
+`git add -A` hätte sie mitgenommen. Der einzige Schutz, der das trägt, ist die
+Reihenfolge: **vor dem Lauf festschreiben** — dann steht sie in `git status`
+und ist in einem Griff zurückzuholen, ohne eigene Arbeit mitzunehmen.
 
 ## 🔘 DIE KNÖPFE EINER KARTE SIND EINE FAMILIE (Klaus 2026-09-22)
 
@@ -577,11 +614,64 @@ node tests/smoke_detail_gestalt.mjs        # 35 grün · 0 ROT
 bash tests/gegenprobe_detail_gestalt.sh    # 10 schlagen an · 0 blind · 0 tote Anker
 ```
 
-⚠ **ES IST EIN MUSTER, KEIN ROLLOUT.** Nur **Mein Mixarium** hat die Felder —
-die übrigen sechzehn warten auf Klaus' Wort zum Ton. Sechzehn Texte zu raten
-wäre dasselbe wie eine geratene Zahl.
+✅ **AUSGEROLLT AM 2026-09-22 — 18 von 18.** Hier stand: *„ES IST EIN MUSTER,
+KEIN ROLLOUT. Nur Mein Mixarium hat die Felder — die übrigen sechzehn warten
+auf Klaus' Wort zum Ton."* Der Satz war richtig, solange das Wort fehlte.
+Klaus: *„Die Beschreibung im Mixarium ist sehr gut, können wir so lassen.
+Übertrage das bitte auf die anderen."*
 
-⚠ **Cache-Bump v128 → v129.**
+⚠ **Es waren SIEBZEHN, nicht sechzehn.** 18 Einträge minus den einen, der die
+Felder schon trug. Die Zahl stand hier und in zwei Chat-Antworten falsch, bis
+sie einmal gezählt wurde.
+
+**Die Verbindungen untereinander stehen jetzt drin, wo sie belegt sind** —
+Klaus hat ausdrücklich danach gefragt:
+
+| App | die Verbindung | Beleg |
+|---|---|---|
+| **WorkFloh** | ein fertiger Auftrag geht an BookLedgerPro | `Mein-WorkFloh/CLAUDE.md` |
+| **Kim-Bell** | die Vorarbeit für den Verbinden-Knopf aller anderen Apps, läuft trotzdem allein | `Kim-Bell/CLAUDE.md` |
+| **Auslieferungsprüfer** | eingebaut in PWA Toolpoints App-Seiten als „Prüf es selbst" | `PWA-Toolpoint/tools/detailseiten.mjs` |
+| **Mycel-Karte** | macht sichtbar, wie die Apps einander finden | |
+
+⚠ **DIE BEGRIFFE, WEIL KLAUS UNSICHER WAR.** **SBKIM** ist das **Protokoll**
+(Semantisches Bidirektionales KI-Matching), **Sage-Protokol** das **Repo**, in
+dem es entsteht, **Mycel** das Netz daraus. Ein „Wahrheitsprotokoll" kommt in
+keiner Verfassung vor. In den Texten steht es **erklärt statt abgekürzt**.
+
+⚠ **ZWEI NAMEN AUS DEM AUFTRAG STEHEN NICHT IM MARKTPLATZ:** Muttis Rezeptbuch
+und Sage-Protokol haben hier keine Karte. Es wird kein Eintrag erfunden.
+
+⚠ **BENANNTE ABWEICHUNGEN VOM WORTLAUT:** Wort-Bindestriche bleiben („KI-Labor"
+ohne wäre kein Deutsch); bei der KI-Schulung steht in `besonders` eine
+Einschränkung mit drin, weil wer überfliegt nur diese fette Zeile liest.
+
+### ⚠ Und der Selbst-Riegel ist dabei rot geworden — genau wie gebaut
+
+Er hieß *„… und mindestens eine faellt auf den alten Text zurueck"* und meldete
+**„0 Stueck"**. Der Kommentar von einem Tag zuvor sagte es voraus: *„heute
+trägt genau einer sie; morgen alle — dann meldet der Riegel, dass der Rückfall
+nicht mehr messbar ist, statt still grün zu bleiben."*
+
+**Die Abhilfe ist nicht, ihn zu schwächen, sondern das Messen zu verlegen:**
+das echte Werkzeug läuft jetzt in einer **Wegwerf-Kopie** über einen Eintrag,
+dem `vorstellung` und `besonders` genommen wurden. Damit trägt der Rückfall
+auch, wenn morgen ein **fremder** Eintrag ohne die Felder dazukommt.
+Tafel-Evolutions-Klausel: ersetzt, nicht stillschweigend getauscht.
+
+⚠ Dabei fehlte `sw.js` in der Kopie — das Werkzeug liest daraus die
+Cache-Fassung, starb mit ENOENT, und die rote Zeile trug den Namen eines
+**Lesefehlers** statt den einer Zusicherung.
+
+⚠ **UND DER CACHE-WÄCHTER HAT `ASSET_V` GEFANGEN** — sie wäre auf 129
+stehengeblieben, während `CACHE_VERSION` auf 130 ging. Genau die Falle vom
+2026-09-16. **78 Stellen** mitgezogen.
+
+Gemessen: `smoke_detail_gestalt` **35 grün · 0 ROT** (drei mehr als vorher,
+weil die gestellte Lage ihre eigene Vorbedingung mitmisst) · voller Lauf
+**40 Proben, keine rot**.
+
+⚠ **Cache-Bump v128 → v129, dann v129 → v130.**
 
 ## Dieses Repo trägt seine eigenen Rezepte
 
