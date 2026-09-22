@@ -199,7 +199,7 @@ export function inhalt(e, punkte, alle) {
    * hat die url bei roter Ampel schon geleert. */
   if (e.url) {
     T.push(`        <p><a class="btn ghost ext" href="${esc(e.url)}" target="_blank"` +
-           ` rel="${relFuer(e.eigen)}">→ Zur Seite</a></p>`);
+           ` rel="${relFuer(e.eigen)}">Zur Seite</a></p>`);
   } else {
     T.push('        <p class="det-hinweis">Der Link ist zurzeit ausgesetzt. Der Eintrag' +
            ' bleibt sichtbar; der Grund steht im Marktplatz an der Karte.</p>');

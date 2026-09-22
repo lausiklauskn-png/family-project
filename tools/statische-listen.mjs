@@ -198,7 +198,7 @@ export function markteintraege(listings, wache) {
 export function marktHtml(eintraege) {
   return eintraege.map((e) => {
     const link = e.url
-      ? `<a class="btn ghost ext" href="${esc(e.url)}" target="_blank" rel="${relFuer(e.eigen)}">→ Zur Seite</a>`
+      ? `<a class="btn ghost ext" href="${esc(e.url)}" target="_blank" rel="${relFuer(e.eigen)}">Zur Seite</a>`
       : "";
     /* ⚠ OHNE DIESEN KNOPF SIND DIE 17 SEITEN UNTER /apps/ VERWAIST.
      *
@@ -219,7 +219,7 @@ export function marktHtml(eintraege) {
      * ⚠ KEIN target="_blank": die Detailseite gehört zu DIESER Seite. Ein
      * neuer Tab je Karte ist der Weg, wie man zwanzig Tabs bekommt. */
     const einzeln = e.anchorId
-      ? `<a class="btn ghost" href="apps/${esc(e.anchorId)}/">Einzelheiten →</a>`
+      ? `<a class="btn ghost" href="apps/${esc(e.anchorId)}/">Einzelheiten</a>`
       : "";
     return '<div class="glass listing">' +
       '<div class="img">' +

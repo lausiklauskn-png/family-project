@@ -136,7 +136,7 @@ probe 'die Sitemap wird vor den Seiten gebaut, die sie liest' .github/workflows/
 #      Dann stehen 17 Seiten in der Sitemap und sind von keiner Seite
 #      erreichbar — verwaist.
 probe 'eine Detailseite wird nicht mehr verlinkt' markt.html \
-      '<a class="btn ghost" href="apps/markt-mixarium/">Einzelheiten →</a>' \
+      '<a class="btn ghost" href="apps/markt-mixarium/">Einzelheiten</a>' \
       ''
 
 # 16 · die UEBERSICHT verwaist. Mein erster Waechter hat genau sie mit
@@ -154,7 +154,7 @@ probe 'der Laufzeit-Zeichner verliert den Einzelheiten-Knopf' markt.html \
 # 18 · er ist nur in einer Sprache beschriftet — dann stuende in der
 #      englischen Oberflaeche der Schluesselname statt eines Wortes.
 probe 'der Knopf ist nur in einer Sprache beschriftet' markt.html \
-      'mk_details: "Details →", search_btn: "Search",' \
+      'mk_details: "Details", search_btn: "Search",' \
       'search_btn: "Search",'
 
 echo

@@ -93,7 +93,7 @@ echo -n "     Kimboard-Link nach Neubau: "; grep -c 'href="https://lausiklauskn-
 echo -n "     Kimboard-Karte trotzdem sichtbar: "; grep -c '>Kimboard<' markt.html
 lauf "rot gebaut: Eintrag sichtbar, Link weg" gruen
 echo "     falsche Reparatur — Link von Hand wieder rein:"
-sed -i 's|<div class="listing-actions"><div class="listing-foot"></div></div></div></div>|<div class="listing-actions"><div class="listing-foot"><a class="btn ghost ext" href="https://lausiklauskn-png.github.io/Kimboard/" target="_blank" rel="noopener">→ Zur Seite</a></div></div></div></div>|' markt.html
+sed -i 's|<div class="listing-actions"><div class="listing-foot"></div></div></div></div>|<div class="listing-actions"><div class="listing-foot"><a class="btn ghost ext" href="https://lausiklauskn-png.github.io/Kimboard/" target="_blank" rel="noopener">Zur Seite</a></div></div></div></div>|' markt.html
 lauf "Link auf Eis-Eintrag wieder eingebaut" rot
 heile
 

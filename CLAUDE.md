@@ -292,6 +292,122 @@ Auszug ohne Pakete meldete „4 grün, 0 rot, 1 nicht lauffähig". Das ist kein
 Befund über den Code, sondern einer über die Umgebung, und er steht hier, damit
 die nächste Sitzung nicht denselben Vergleich zweimal falsch zieht.
 
+## 🔘 DIE KNÖPFE EINER KARTE SIND EINE FAMILIE (Klaus 2026-09-22)
+
+Klaus mit Bild: *„Die Button in Family Project Einzelheiten und zur Seite so
+fett sein. Bei Einzelheiten steht der Pfeil unten unter dem Wort und bei zur
+[Seite] links. Macht bitte einheitlich die Höhe. Maximal so hoch wie Bewertung
+nachlesen. Genauso den Meldebutton auch nicht so eine bombenfunktionösen,
+riesigen Button machen."* Und gleich danach: *„Und Einzelheiten steht auch
+nicht in der Mitte vom Button. Vielleicht musst du auch den Pfeil gar nicht
+mit reinmachen."*
+
+**Gemessen über fünf Breiten, nicht geschätzt:**
+
+| Breite | „Bewertung nachlesen" | „Einzelheiten →" | „→ Zur Seite" |
+|---|---|---|---|
+| 380 px | 44 px, 1 Zeile | **65 px, 2 Zeilen** | 60 px, 2 Zeilen |
+| 412 px | 44 px | **65 px** | 60 px |
+| 900 px | 44 px | **65 px** | 60 px |
+| 1280 px | 44 px | **65 px** | 60 px |
+| 560 px | 44 px | 46 px, 1 Zeile | 44 px, 1 Zeile |
+
+⚠ **VIER VON FÜNF BREITEN BRACHEN UM, und die fünfte ist der Grund für die
+eigene Probe.** Bei 560 px steht die Karte einspaltig und breit — dort war
+auch vorher alles einzeilig. **Ein Wächter, der nur eine Breite misst, hätte
+den Befund nie gemacht**; dieselbe Falle hat in PWA Toolpoint am 2026-09-11
+einen Wächter bei 1280 px blind gelassen. Ein **Selbst-Riegel** besteht
+deshalb darauf, dass mindestens eine gemessene Breite eine schmale Karte
+ergibt.
+
+### Drei Knöpfe, die gleich aussehen sollen, brauchen EINE Regel
+
+Vorher stand die Schrift an **zwei** Stellen (`.listing .ext` und
+`.listing .mk-ms-btn`) und „Einzelheiten" an **gar keiner** — es erbte `.btn`
+mit `.96rem` und `13px 22px` und war damit als einziges anders. Genau das misst
+`smoke_stufe5_messung` seit dem 2026-08-01 (C2d/C2e: gleiche Schrift, gleiches
+Polster, gleiche Rundung) — nur eben an zwei von drei Knöpfen.
+
+| | vorher | nachher |
+|---|---|---|
+| Höhe (alle drei) | 44 · 65 · 60 px | **37 · 37 · 37 px** |
+| Umbruch | 2 Zeilen | **1 Zeile, über alle Breiten** |
+| Ausrichtung | links | **mittig** |
+| Melde-Knopf | 68 × 44 px | **52 × 44 px** |
+| Pfeil | „Einzelheiten →" · „→ Zur Seite" | **keiner** |
+
+### ⚠ Die Höhe des Melde-Knopfes kann NICHT unter 44 — und das hat eine Probe gesagt
+
+Mein erster Anlauf setzte ihn auf 52 × **37**, damit alle vier gleich hoch
+sind. `smoke_markt_melden` wurde prompt rot: *„Klickfläche mindestens 44×44
+(52×37)"*. Der Wächter steht dort seit langem und hat recht — **ein Knopf, den
+ein Finger nicht sicher trifft, ist kein kleinerer Knopf, sondern ein
+schlechterer.** Kleiner geworden ist er deshalb in der **Breite**: 68 → 52 px,
+ein Viertel schmaler, dazu leichterer Schatten und kleinere Schrift. Das
+Dreieck wird dadurch spitzer statt wuchtiger.
+
+⚠ **Der `clip-path` ist neu gerechnet, nicht gequetscht.** Sein eigener
+Kommentar verlangt es: *„Maße fest 68×44, weil path() in absoluten Pixeln
+rechnet. Wer die Größe ändert, MUSS den Pfad neu rechnen."* Die Rechnung steht
+jetzt daneben — Ecken, Längen, Einheitsvektoren.
+
+### ⚠ Vier eigene Fehler, alle in der MESSUNG — keiner im Code
+
+Das ist der Befund dieses Durchgangs, und er gehört so aufgeschrieben: **der
+Code stand nach dem ersten Bau; viermal falsch war die Prüfung.** Gefunden hat
+sie kein Nachdenken, sondern die Gegenprobe und das Lesen der roten Zeilen.
+
+| Was | warum es nichts (oder das Falsche) maß |
+|---|---|
+| `white-space:nowrap` | **am Bestand nicht messbar.** Mit dem kleineren Polster passt „Einzelheiten" ohnehin in jede Karte — nimmt man den Riegel heraus, ändert sich nichts. *Ein Riegel, den keine Probe von seinem Fehlen unterscheiden kann, ist eine Behauptung.* Gemessen wird er jetzt an einer **gestellten Lage**: ein langer Text muss einzeilig bleiben |
+| „der Knopf ragt aus der Karte" | **kann mit `flex-wrap` nie eintreten** — die Reihe bricht um, statt überzustehen. Mein Fall-Name log |
+| „ohne `flex-wrap` ragt es hinaus" | **blind, und der Grund ist der eigentliche Fund:** `.btn` trägt `overflow:hidden`, also darf ein Flex-Kind unter seine Textbreite schrumpfen (`min-width:auto` = 0). Der Knopf ragt **nicht** hinaus, sein Text wird **still abgeschnitten** — die schlimmere Sorte, weil man sie nicht sieht. Gemessen wird jetzt `scrollWidth > clientWidth` |
+| „alle Knöpfe sind gleich hoch" | **strukturell blind gegen eine Polster-Änderung:** seit die drei in EINER Regel stehen, wachsen sie gemeinsam, und „gleich hoch" bleibt wahr. Daneben steht jetzt ein **Nagel** (höchstens 40 px), ausdrücklich als Nagel benannt — 37 ist der Stand, 43 wäre das alte Polster |
+
+⚠ **UND EIN WÄCHTER MASS `undefined`.** „… nicht mehr so breit wie früher"
+las `m.melde.w`, und meine Mess-Funktion gab keine Breite zurück.
+`undefined <= 56` ist `false`, also wurde er rot statt still durchzugehen —
+diesmal hat die Richtung gestimmt.
+
+⚠ **UND DAS DEUTSCHE ANFÜHRUNGSZEICHEN HAT ZUM VIERTEN MAL EINEN STRING
+BEENDET.** `"… „Einzelheiten""` in einer JS-Zeichenkette → `SyntaxError`. Die
+Falle steht in PWA Toolpoints Verfassung dreimal; `node --check` meldet sie in
+Sekunden.
+
+### Ein Wächter, der einen Fund gemacht hat, den ich übersehen hatte
+
+Die Probe sucht den Pfeil im **ganzen** `markt.html` — und fand ihn zweimal
+weiter: der Erklärtext im Bewertungs-Fenster nennt den Knopf beim Namen
+(*„Der Knopf »→ Zur Seite« führt auf ein Schaufenster …"*), und ein Kommentar
+zitierte ihn ebenso. **Und die englische Fassung war schon vorher falsch** —
+sie sprach von *„Visit site"*, während der Knopf *„Open site"* heißt. Beides
+nachgezogen.
+
+### Geprüft
+
+```bash
+node tests/smoke_kartenknoepfe.mjs          # echter Browser, fünf Breiten
+bash tests/gegenprobe_kartenknoepfe.sh      # sabotiert in einer SICHERUNG, nicht per git checkout
+```
+
+Zuletzt gemessen (2026-09-22): **83 grün · 0 ROT** · Gegenprobe **10 schlagen
+an · 0 blind · 0 aus falschem Grund · 0 tote Anker**, jeder Fall von Hand
+nachgestellt und die rote Zeile gelesen. `smoke_markt_melden` wieder **33 grün**,
+`smoke_stufe5_messung`, `smoke_statische_listen`, `smoke_sitemap` unverändert.
+
+⚠ **Die Zahlen davor bleiben daneben stehen, weil sie die Funde gemacht
+haben:** derselbe Durchgang meldete zuerst **7 schlagen an · 1 blind · 2 aus
+falschem Grund**, dann **9 · 1 · 0**, dann **9 · 0 · 1**. Nur die letzte zu
+nennen hieße, die Befunde durch ihre Reparatur zu ersetzen.
+
+⚠ **BENANNTE GRENZE:** bei 900 px Fensterbreite ist eine Karte nur 276 px
+breit, und dort passen drei Knöpfe rechnerisch nicht in eine Reihe — der
+Melde-Knopf rutscht in eine zweite. Jeder Knopf bleibt dabei einzeilig und
+gleich hoch. Die Alternative wäre eine Schrift unter 10 px, und die kann
+niemand lesen.
+
+⚠ **Cache-Bump v126 → v127**, an **78** Stellen, `ASSET_V` mitgezogen.
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere
