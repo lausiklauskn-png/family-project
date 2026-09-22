@@ -10,7 +10,7 @@
 cd "$(dirname "$0")/.." || exit 1
 
 DATEIEN=(tools/vorlagen/detail.html tools/detailseiten.mjs tools/statische-listen.mjs
-         assets/style.css markt.html)
+         assets/style.css markt.html assets/config/listings.js)
 SICH="/tmp/gp_dg.$$"; mkdir -p "$SICH"
 for d in "${DATEIEN[@]}"; do mkdir -p "$SICH/$(dirname "$d")"; cp "$d" "$SICH/$d"; done
 for a in apps/*/index.html; do mkdir -p "$SICH/$(dirname "$a")"; cp "$a" "$SICH/$a"; done
@@ -34,7 +34,7 @@ sys.exit(0 if os.environ['ALT'] in io.open('$datei',encoding='utf-8').read() els
 import io,os
 p='$datei'; s=io.open(p,encoding='utf-8').read()
 io.open(p,'w',encoding='utf-8').write(s.replace(os.environ['ALT'],os.environ['NEU'],1))"
-  [ -n "$neubau" ] && node tools/detailseiten.mjs >/dev/null 2>&1
+  [ -n "$neubau" ] && { node tools/statische-listen.mjs >/dev/null 2>&1; node tools/detailseiten.mjs >/dev/null 2>&1; }
   node "$probe" > /tmp/gp_dg_lauf.txt 2>&1
   local code=$?
   if [ "$code" -eq 0 ]; then
@@ -46,7 +46,7 @@ io.open(p,'w',encoding='utf-8').write(s.replace(os.environ['ALT'],os.environ['NE
     grep '✗' /tmp/gp_dg_lauf.txt | head -3 | sed 's/^/        /'; falsch=$((falsch+1))
   fi
   heile
-  [ -n "$neubau" ] && node tools/detailseiten.mjs >/dev/null 2>&1
+  [ -n "$neubau" ] && { node tools/statische-listen.mjs >/dev/null 2>&1; node tools/detailseiten.mjs >/dev/null 2>&1; }
   return 0
 }
 
@@ -102,6 +102,29 @@ fall 'eine fehlende Zahl wird wieder gedeutet' tools/statische-listen.mjs \
   '  if (n === null || n === undefined || n === "" || typeof n === "boolean") return "";' \
   '  // Riegel raus' \
   'GAR KEINE Stufe'
+
+# 7 · DIE WICHTIGSTE ZUSICHERUNG: die Positivliste laesst das neue Feld
+#     wieder fallen. Genau daran ist der erste Bau gescheitert — die Felder
+#     standen in listings.js, das Werkzeug las sie, und auf der Seite stand
+#     trotzdem der alte Text. Kein Fehler, keine rote Zeile.
+fall 'die Positivliste laesst vorstellung wieder fallen' tools/statische-listen.mjs \
+  '        vorstellung: Array.isArray(x.vorstellung)' \
+  '        vorstellungAUS: Array.isArray(x.vorstellung)' \
+  'zeigt Stichpunkte' tests/smoke_detail_gestalt.mjs neubau
+
+# 8 · die hervorgehobene Funktion faellt weg.
+fall 'die hervorgehobene Funktion faellt weg' tools/detailseiten.mjs \
+  '  if (String(e.besonders || "").trim()) {' \
+  '  if (false) {' \
+  'hervorgehobene Funktion steht' tests/smoke_detail_gestalt.mjs neubau
+
+# 9 · ⚠ DER SUCH-KORPUS WIRD UEBERSCHRIEBEN. Das ist der stillste denkbare
+#     Schaden: die Karte zeigte Werbetext, die Bedeutungs-Vektoren wuerden aus
+#     ihm gerechnet, und niemand saehe einen Fehler.
+fall 'der Werbetext ueberschreibt den Such-Korpus' tools/statische-listen.mjs \
+  '        text: String(x.text || ""),' \
+  '        text: String(x.vorstellung || x.text || ""),' \
+  'zeigt genau ihn, nicht den Werbetext' tests/smoke_detail_gestalt.mjs neubau
 
 echo; echo "═══ SYNTAX: jede JS-Datei laedt ═══"
 # 7 · genau der Fehler, der mir an EINEM Tag fuenfmal passiert ist.

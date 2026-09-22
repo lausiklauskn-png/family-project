@@ -68,6 +68,86 @@ ok(/--ms-gut:\s*#[0-9a-f]{6}/i.test(css) && /--ms-mittel:/.test(css) && /--ms-sc
 ok(/\.mk-ms-w\.is-gut\{color:var\(--ms-gut\)/.test(css),
   "… und die Karten-Pille nimmt dieselbe Variable");
 
+/* ── 2b · Der kurze Text und die EINE hervorgehobene Funktion ──────────────
+ *
+ * Klaus 2026-09-22: „Der Text soll sehr kurz sein. Nur wenige Sätze. Er soll
+ * einfach nur neugierig machen … auf die Landingpage zu klicken." ·
+ * „vielleicht stichwortartig machen." · „Eine besondere Funktion soll
+ * hervorgehoben werden."
+ *
+ * ⚠ DIE WICHTIGSTE ZUSICHERUNG IST, WAS NICHT PASSIERT: `text` bleibt
+ * unberührt. Er ist der SUCH-KORPUS — aus ihm werden die Bedeutungs-Vektoren
+ * gerechnet, und er trägt die Stichwörter, an denen der Marktplatz gefunden
+ * wird. Wer ihn durch Werbetext ersetzt, ändert unbemerkt, WAS gefunden wird.
+ *
+ * ⚠ UND EIN SELBST-RIEGEL FÜR BEIDE LAGEN. Ohne einen Eintrag MIT und einen
+ * OHNE die neuen Felder misst weder der Stichpunkt-Wächter noch der Rückfall
+ * etwas. Heute trägt genau einer sie; morgen alle — dann meldet der Riegel,
+ * dass der Rückfall nicht mehr messbar ist, statt still grün zu bleiben. */
+{
+  const roh = lies("assets/config/listings.js");
+  const mit = [], ohne = [];
+  for (const d of readdirSync(join(WURZEL, "apps"), { withFileTypes: true })) {
+    if (!d.isDirectory()) continue;
+    const h = lies(`apps/${d.name}/index.html`);
+    const b = h.split("Was die App macht")[1] || "";
+    const abschnitt = b.split("</section>")[0];
+    (/<ul class="det-punkte">/.test(abschnitt) ? mit : ohne).push(d.name);
+  }
+  ok(mit.length > 0, "mindestens eine Seite zeigt Stichpunkte", mit.join(", ") || "keine");
+  ok(ohne.length > 0,
+    "… und mindestens eine faellt auf den alten Text zurueck — sonst ist der Rueckfall nicht messbar",
+    `${ohne.length} Stueck`);
+
+  /* Der Rückfall zeigt wirklich `text`, nicht eine leere Zeile. */
+  if (ohne.length) {
+    const h = lies(`apps/${ohne[0]}/index.html`);
+    const abschnitt = (h.split("Was die App macht")[1] || "").split("</section>")[0];
+    const roher = /<p>([^<]{40,})<\/p>/.exec(abschnitt);
+    ok(!!roher, `der Rueckfall traegt einen Absatz (${ohne[0]})`,
+      roher ? `${roher[1].length} Zeichen` : "keiner");
+  }
+
+  /* Die hervorgehobene Funktion steht da, wo sie gesetzt ist — und nur dort. */
+  /* ⚠ NUR IM RUMPF ZAEHLEN. `det-besonders` steht auch im <style>-Block der
+   * Vorlage — mein erster Anlauf zaehlte ihn mit und meldete „zwei
+   * Hervorhebungen" bzw. „eine leere Hervorhebung", wo der Code tadellos war.
+   * Ein Waechter, der im Stil- oder Erklaer-Block fuendig wird, misst nichts;
+   * die Falle steht netzweit mehrfach aufgeschrieben. */
+  const rumpf = (h) => h.split("</style>").pop();
+  if (mit.length) {
+    const h = rumpf(lies(`apps/${mit[0]}/index.html`));
+    ok(/<p class="det-besonders"><b>Besonders:<\/b>/.test(h),
+      `die hervorgehobene Funktion steht auf der Seite (${mit[0]})`);
+    ok((h.match(/det-besonders/g) || []).length === 1,
+      "… und zwar genau EINMAL — zwei Hervorhebungen heben nichts mehr hervor",
+      `${(h.match(/det-besonders/g) || []).length}\u00d7`);
+  }
+  if (ohne.length) {
+    const h = rumpf(lies(`apps/${ohne[0]}/index.html`));
+    ok(!/det-besonders/.test(h),
+      `ohne das Feld erscheint keine leere Hervorhebung (${ohne[0]})`);
+  }
+
+  /* ⚠ `text` UNBERUEHRT — die Karte im Marktplatz zeigt ihn weiter. */
+  const markthtml = lies("markt.html");
+  const mixText = /"anchorId":\s*"markt-mixarium"[\s\S]{0,400}?"text":\s*"([^"]{60,})"/.exec(roh);
+  ok(!!mixText, "listings.js traegt weiterhin den Such-Korpus `text`");
+  if (mixText) {
+    const anfang = mixText[1].slice(0, 45);
+    ok(markthtml.includes(anfang),
+      "… und die Karte im Marktplatz zeigt genau ihn, nicht den Werbetext",
+      `„${anfang}…"`);
+  }
+  /* Und die Suchergebnis-Zeile nimmt den NEUEN Text, wo es ihn gibt. */
+  if (mit.length) {
+    const h = lies(`apps/${mit[0]}/index.html`);
+    const d = /<meta name="description" content="([^"]*)"/.exec(h);
+    ok(!!d && d[1].length >= 80 && d[1].length <= 165,
+      `die Suchergebnis-Zeile ist brauchbar lang (${mit[0]})`, d ? `${d[1].length} Zeichen` : "—");
+  }
+}
+
 /* ── 3 · Und jetzt das, was ein Leser wirklich sieht ───────────────────────*/
 const TYP = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
   ".json": "application/json", ".xml": "application/xml", ".png": "image/png",

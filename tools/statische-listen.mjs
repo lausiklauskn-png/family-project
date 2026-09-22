@@ -229,7 +229,24 @@ export function markteintraege(listings, wache) {
         img: safeImg(x.img),
         url: aufEis ? "" : safeUrl(x.url),      // Falle 2
         eigen: x.own === true,                   // Falle 3
-        aufEis
+        aufEis,
+        /* ── Die zwei Felder der Detailseite (Klaus 2026-09-22) ─────────────
+         * `vorstellung` sind die Stichpunkte, `besonders` die EINE
+         * hervorgehobene Funktion. Die KARTE nimmt sie nicht — dort steht
+         * weiter `text`, der Such-Korpus mit den Stichwörtern.
+         *
+         * ⚠ SIE STEHEN HIER, WEIL DIESE LISTE BESCHNEIDET. Genau daran ist
+         * es beim ersten Bau gescheitert: die Felder standen in
+         * `listings.js`, das Werkzeug las sie, und auf der Seite stand
+         * trotzdem der alte Text — kein Fehler, keine rote Zeile. Dieselbe
+         * Falle steht seit dem 2026-09-18 in dieser Verfassung: „Wer ein
+         * Feld ergänzt, sieht nach, WO die Datei unterwegs beschnitten wird.
+         * Eine Liste, die nur bekannte Felder durchlässt, ist richtig — aber
+         * sie kennt nur, was jemand ihr beigebracht hat." */
+        vorstellung: Array.isArray(x.vorstellung)
+          ? x.vorstellung.map((z) => String(z || ""))
+          : String(x.vorstellung || ""),
+        besonders: String(x.besonders || "")
       };
     });
 }

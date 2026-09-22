@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Mein Mixarium — Family Projekt</title>
-  <meta name="description" content="Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol." />
+  <meta name="description" content="Für alle, die gern selbst mixen. Cocktails, Mocktails, Smoothies und Limonaden sammeln und ordnen. Eigene Rezepte mit Foto, Zutaten und Schritten." />
   <link rel="canonical" href="https://family-projekt.de/apps/markt-mixarium/" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
   <meta name="theme-color" content="#0c0f12" />
@@ -13,11 +13,11 @@
   <meta property="og:site_name" content="Family Projekt" />
   <meta property="og:locale" content="de_DE" />
   <meta property="og:title" content="Mein Mixarium — Family Projekt" />
-  <meta property="og:description" content="Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol." />
+  <meta property="og:description" content="Für alle, die gern selbst mixen. Cocktails, Mocktails, Smoothies und Limonaden sammeln und ordnen. Eigene Rezepte mit Foto, Zutaten und Schritten." />
   <meta property="og:url" content="https://family-projekt.de/apps/markt-mixarium/" />
   <meta property="og:image" content="https://family-projekt.de/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="../../assets/style.css?v=128" />
+  <link rel="stylesheet" href="../../assets/style.css?v=129" />
   <style>
   /* ── Die Mess-Tabelle ────────────────────────────────────────────────────
    * `grep -c table assets/style.css` → 0: dieses Stylesheet hat KEINE
@@ -68,6 +68,18 @@
   .mess-tabelle .st-schwach { color:var(--ms-schwach); }
   .det-hinweis { border-left:3px solid var(--line,#283139); padding:.6em 0 .6em 12px;
     color:var(--muted,#b6c2cc); }
+  /* Stichpunkte statt Fliesstext (Klaus 2026-09-22): „vielleicht
+   * stichwortartig machen. Das laesst sich viel leichter lesen als lange
+   * Saetze." Kein Aufzaehlungszeichen des Browsers, sondern ein eigener
+   * Punkt in der Akzentfarbe — sonst steht er je Thema anders da. */
+  .det-punkte { list-style:none; padding:0; margin:.2em 0 0; }
+  .det-punkte li { position:relative; padding:5px 0 5px 20px; line-height:1.5; }
+  .det-punkte li::before { content:"\2022"; position:absolute; left:4px; top:5px;
+    color:var(--accent,#7ee0c0); font-weight:700; }
+  /* Die EINE hervorgehobene Funktion. Ein Kasten waere zu laut fuer einen
+   * Satz; ein Strich links reicht und traegt die Akzentfarbe. */
+  .det-besonders { margin:14px 0 0; padding:10px 0 10px 12px;
+    border-left:3px solid var(--accent,#7ee0c0); }
   .det-liste { list-style:none; padding:0; }
   .det-liste li { padding:6px 0; border-bottom:1px solid var(--line,#283139); }
   .det-liste li:last-child { border-bottom:0; }
@@ -91,7 +103,14 @@
     </section>
     <section class="glass">
       <h2>Was die App macht</h2>
-      <p>Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol. Bar zuhause, trinken, Rezept, Mixgetränke. Offline nutzbar, kein Konto nötig.</p>
+      <ul class="det-punkte">
+        <li>Für alle, die gern selbst mixen</li>
+        <li>Cocktails, Mocktails, Smoothies und Limonaden sammeln und ordnen</li>
+        <li>Eigene Rezepte mit Foto, Zutaten und Schritten</li>
+        <li>Klassiker aus einer großen öffentlichen Cocktail-Datenbank, in sieben Sprachen</li>
+        <li>Läuft offline auf Handy und Tablet, ohne Konto</li>
+      </ul>
+      <p class="det-besonders"><b>Besonders:</b> Das KI-Labor erfindet Rezepte nach deinem Geschmack. Du bewertest, das Gute bleibt im Buch.</p>
     </section>
     <section class="glass">
       <h2>Zuletzt gemessen</h2>
@@ -161,7 +180,7 @@
   <footer class="wrap">
     <p class="klein"><a href="../../impressum.html">Impressum &amp; Datenschutz</a></p>
   </footer>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Mein Mixarium","description":"Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol.","url":"https://family-projekt.de/apps/markt-mixarium/","inLanguage":"de","operatingSystem":"Web","image":"https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png","author":{"@type":"Person","name":"@klaus"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Mein Mixarium","description":"Für alle, die gern selbst mixen. Cocktails, Mocktails, Smoothies und Limonaden sammeln und ordnen. Eigene Rezepte mit Foto, Zutaten und Schritten.","url":"https://family-projekt.de/apps/markt-mixarium/","inLanguage":"de","operatingSystem":"Web","image":"https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png","author":{"@type":"Person","name":"@klaus"}}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Marktplatz","item":"https://family-projekt.de/markt.html"},{"@type":"ListItem","position":2,"name":"Mein Mixarium","item":"https://family-projekt.de/apps/markt-mixarium/"}]}</script>
 </body>
 </html>

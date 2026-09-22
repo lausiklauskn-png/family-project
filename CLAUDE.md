@@ -504,6 +504,85 @@ kein geratenes Wort. Der Weg dorthin steht im Abschlussbrief.
 
 ⚠ **Cache-Bump v127 → v128.**
 
+## ✍ DER TEXT AUF DER DETAILSEITE — kurz, stichwortartig, für Endnutzer (Klaus 2026-09-22)
+
+Klaus: *„Die Textgestaltung ist eher SEO-mäßig. Also nicht umschrieben."* ·
+*„Der Text soll sehr kurz sein. Nur wenige Sätze. Er soll einfach nur neugierig
+machen, einfach nur kleine Werbung sein, auf die Landingpage zu klicken."* ·
+*„vielleicht stichwortartig machen. Das lässt sich viel leichter lesen als
+lange Sätze."* · *„Eine besondere Funktion soll hervorgehoben werden."*
+
+**Wer die Zielgruppe ist, hat er dabei festgelegt:** *„für Endnutzer … weniger
+für Bastler oder für Programmierer. Also Endnutzer, die sich auch mit KI
+beschäftigen."* Und: *„jede App, die man anklickt, soll einen Nutzen haben …
+oder zumindest sollte man den Nutzen sofort erkennen."*
+
+### ⚠ `text` BLEIBT UNBERÜHRT — das ist der Kern der Lösung
+
+`text` ist der **Such-Korpus**: aus ihm werden die Bedeutungs-Vektoren
+gerechnet, und er trägt die Stichwörter, an denen der Marktplatz gefunden
+wird. **Wer ihn durch Werbetext ersetzt, ändert unbemerkt, WAS gefunden
+wird.** Zwei neue Felder stehen daneben:
+
+| Feld | wo | was |
+|---|---|---|
+| `text` | **Karte** im Marktplatz | Stichwörter, klemmt auf drei Zeilen |
+| `vorstellung` | **Detailseite** | Liste von Stichpunkten, kurz |
+| `besonders` | **Detailseite** | die EINE hervorgehobene Funktion |
+
+**Fail-soft in drei Stufen:** eine Liste wird zu Stichpunkten, ein String zu
+einem Absatz, und fehlt beides, steht wieder `text` da. Kein Eintrag steht je
+leer.
+
+⚠ **GENAU EINE Hervorhebung.** Zwei heben nichts mehr hervor — bewacht.
+
+⚠ **KEINE GEDANKENSTRICHE ALS SATZ-TRENNER** (Klaus: *„keine Trennzeichen oder
+Bindestriche"*). **Wort-Bindestriche bleiben** — „KI-Labor" ohne wäre kein
+Deutsch mehr. Das ist eine benannte Abweichung von seinem Wortlaut, keine
+Nachlässigkeit.
+
+### ⚠ Der erste Bau war still wirkungslos — die Positivliste beschneidet
+
+Die Felder standen in `listings.js`, das Werkzeug las sie, und auf der Seite
+stand **trotzdem der alte Text**. Kein Fehler, keine rote Zeile.
+`markteintraege()` baut ein neues Objekt aus einer **Positivliste**, und was
+sie nicht kennt, fällt weg.
+
+> Die Falle steht seit dem 2026-09-18 in dieser Datei: *„Wer ein Feld ergänzt,
+> sieht nach, WO die Datei unterwegs beschnitten wird. Eine Liste, die nur
+> bekannte Felder durchlässt, ist richtig — aber sie kennt nur, was jemand ihr
+> beigebracht hat."* Vier Tage später ist sie wieder zugeschnappt.
+
+### ⚠ Zwei eigene Wächter waren dabei rot aus dem falschen Grund
+
+`det-besonders` steht auch im **`<style>`-Block** der Vorlage. Mein erster
+Anlauf zählte ihn mit und meldete „zwei Hervorhebungen" bzw. „eine leere
+Hervorhebung", wo der Code tadellos war. *Ein Wächter, der im Stil- oder
+Erklär-Block fündig wird, misst nichts.* Gezählt wird jetzt nur im Rumpf.
+
+Und `punkte` gab es schon — das sind die **Messpunkte** des Verlaufs.
+`node --check` hat es in Sekunden gemeldet; der Syntax-Wächter vom selben Tag
+hat sich sofort bezahlt gemacht.
+
+### Der Selbst-Riegel, der beide Lagen offenhält
+
+Heute trägt **ein** Eintrag die neuen Felder, sechzehn nicht. Ohne beide Lagen
+misst weder der Stichpunkt-Wächter noch der Rückfall etwas — der Riegel meldet
+es, sobald eine der beiden verschwindet, statt still grün zu bleiben.
+
+### Geprüft
+
+```bash
+node tests/smoke_detail_gestalt.mjs        # 35 grün · 0 ROT
+bash tests/gegenprobe_detail_gestalt.sh    # 10 schlagen an · 0 blind · 0 tote Anker
+```
+
+⚠ **ES IST EIN MUSTER, KEIN ROLLOUT.** Nur **Mein Mixarium** hat die Felder —
+die übrigen sechzehn warten auf Klaus' Wort zum Ton. Sechzehn Texte zu raten
+wäre dasselbe wie eine geratene Zahl.
+
+⚠ **Cache-Bump v128 → v129.**
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere
