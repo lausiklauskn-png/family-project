@@ -953,6 +953,90 @@ sortiert auch der Studio-Weg stabil, also blieb er grün. `0.002` bricht die
 Reihenfolge wirklich. *Eine Sabotage muss treffen, was der Wächter misst;
 „gar nichts mehr" ist kein Treffer.*
 
+## 📉 DIE KARTE WUSSTE NICHT, WAS DIE DETAILSEITE LÄNGST HATTE (Klaus 2026-09-22)
+
+Klaus: *„Auf der Hauptseite steht Sage Protokoll und andere Apps noch als noch
+nicht gemessen. Wenn ich aber auf Einzelheiten gehe, kann ich sehen, dass die
+letzten Werte, die gemessen wurden, drinstehen. Also ziehe diese bitte mit auf
+die Hauptseite. Prüfe das bitte bei allen."*
+
+**Sein Befund stimmte, und die Ursache ist eine Reihenfolge.** Zwei Quellen für
+dieselbe Frage — und die Karte las die, in der noch nichts stand:
+
+| | liest |
+|---|---|
+| die **Karte** (`markt.html`, zur Laufzeit) | `assets/config/spore-stand.json` |
+| die **Detailseite** (`tools/detailseiten.mjs`) | `forschung/messreihe.json` |
+
+Die Reihe ist die **Quelle**, `spore-stand` ein daraus abgeleiteter Tagesbericht.
+Im nächtlichen Lauf entsteht die Reihe in Schritt 2 (`forschung --messen`), die
+Karten werden in Schritt 3 gebaut (`statische-listen`) — und der liest den
+Bericht. Ein Eintrag, dessen Reihe erst in Schritt 2 dazukommt, steht in
+Schritt 3 leer da, **obwohl seine Zahlen vorliegen**.
+
+`tools/messung-nachziehen.mjs` steht seitdem **zwischen** 2 und 3.
+
+⚠ **ES FÜLLT NUR, WAS LEER IST — und das ist die ganze Abgrenzung.**
+`spore-stand` trägt eine Politik: ein **besserer** Wert gilt sofort, ein
+**schlechterer** erst nach dreimaligem Messen hintereinander
+(`SCHLECHTER_NOETIG`, Klaus 2026-08-06: *„nach drei Messungen ist OK"*). Wer
+hier überschriebe, entschiede dieselbe Frage ein zweites Mal an einer anderen
+Stelle. Wo noch gar nichts steht, gibt es nichts zu entscheiden.
+
+### ⚠ „Prüfe das bei allen" — es waren ZWEI, und drei andere sind kein Befund
+
+Nachgezählt über alle 19 sichtbaren Einträge:
+
+| | Kennung | warum |
+|---|---|---|
+| **2 wirklich leer** | `eigen-sage` · `eigen-muttis-rezeptbuch` | 13 und 14 Handy-Punkte in der Reihe, nichts auf der Karte — **nachgezogen** |
+| **3 älter als ihre Reihe** | `markt-privat-brain` · `markt-pwa-toolpoint` · `markt-kim-hub-company` | jede mit `zurueckgehalten: {zahl: 1, noetig: 3}` und einer **schlechteren** frischen Leistung (98→84 · 86→82 · 83→76). **Das ist die Haltefrist bei der Arbeit, kein Befund** |
+
+⚠ **UND ICH HATTE DIE RICHTUNG DER HALTEFRIST ZUERST UMGEKEHRT
+HINGESCHRIEBEN** („ein schlechterer gilt sofort"). Nach der falschen Lesart
+sähen genau diese drei wie ein zweiter Fehler aus — und wer sie „nachzieht",
+nimmt Klaus' Entscheidung vom 2026-08-06 zurück, ohne dass es irgendwo steht.
+Richtiggestellt im Kopf des Werkzeugs und hier, statt still getauscht.
+
+⚠ **DER WÄCHTER MISST DIE ÜBEREINSTIMMUNG, NICHT EINE ZAHL.** „19 Karten haben
+eine Messung" wäre an dem Tag rot, an dem Klaus einen Eintrag schaltet. Gemessen
+wird: *jede sichtbare Karte kennt ihre Messung, **wenn** die Reihe eine trägt* —
+und daneben, dass eine ältere Karte ihren **Grund** (`zurueckgehalten`)
+mitbringt. Dazu der Selbst-Riegel, dass es überhaupt Einträge und Reihen gibt:
+ohne ihn wären beide Zeilen bei null trivial wahr.
+
+### ⚠ Vier Fallen beim Bau, und keine im Code
+
+| Was | |
+|---|---|
+| `leseConfig()` **ohne Dateinamen** | `ERR_INVALID_ARG_TYPE: The "path" argument must be of type string` — die Funktion nimmt einen Namen (`leseConfig("listings.js")`), und der Aufruf ohne ihn stirbt an `path.join(…, undefined)` |
+| `{ lage: "ohne_spore" }` sieht erfunden aus | ist es nicht: **wortgleich** die Zeile, mit der `tools/vektoren-bauen.mjs` (Z. 339/373) einen Eintrag ohne Spore anlegt. Beide neuen Karten haben keine `sporeUrl` — der nächtliche Lauf schriebe genau dasselbe |
+| **kein Datum aus der Uhr** | `gemessen` kommt aus dem Punkt der Reihe. Eine Zahl ohne ihr Datum wäre eine Behauptung, und eine mit dem heutigen Datum eine falsche |
+| **nur Handy-Punkte** | die Karte zeigt die Handy-Zahl; zwei Geräte in einer Spalte wären zwei Fragen in einer Antwort |
+
+⚠ **BENANNTE GRENZE:** das **Schaufenster** (`<id>--schaufenster`) wird nicht
+nachgezogen — es hat in `spore-stand` seine eigene Politik samt
+`zurueckgehalten`, und ein Schaufenster ohne Haupt-Messung gibt es nicht.
+
+⚠ **BENANNTE GRENZE:** für „eine ältere Karte trägt ihren Grund mit" steht
+**kein** Gegenprobe-Fall. Der Wächter misst den echten Bestand, und die drei
+Fälle darin entstehen im nächtlichen Messlauf, nicht in diesem Werkzeug. Eine
+Sabotage müsste den Bestand ändern — und dann misst sie den Bestand statt der
+Zusicherung.
+
+### Geprüft
+
+```bash
+node tools/messung-nachziehen.mjs --pruefen    # sagt nur, was anstünde
+node tests/smoke_messung_nachziehen.mjs        # 20 grün · 0 ROT
+bash tests/gegenprobe_messung_nachziehen.sh    # 11 schlagen an · 0 blind · 0 tote Anker
+```
+
+Vier Fälle von Hand nachgestellt und die roten Zeilen gelesen — jede trägt den
+Namen ihrer Zusicherung. **Kein Cache-Bump nötig:** `markt.html` holt den
+Bericht zur Laufzeit (`fetch` mit `no-store`), die statische Liste trägt kein
+Messband. Gemessen: `class="mw` kommt in `markt.html` **null** Mal vor.
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

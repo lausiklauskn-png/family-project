@@ -193,6 +193,20 @@ jobs:
           if [ -x /usr/bin/google-chrome ]; then export CHROME_PATH=/usr/bin/google-chrome; fi
           node tools/forschung.mjs --messen
 
+      # Was der Forschungs-Lauf gerade gemessen hat, steht in der MESSREIHE —
+      # die Karte liest aber den Tagesbericht. Ein Eintrag, dessen Reihe erst
+      # hier oben entsteht (jedes Forschungs-Ziel mit eigener Kennung), stünde
+      # unten leer da, obwohl seine Zahlen vorliegen. Genau das hat Klaus am
+      # 2026-09-22 an zwei Karten gesehen. Deshalb steht dieser Schritt ZWISCHEN
+      # dem Messen und dem Bauen der Karten — und nur hier.
+      #
+      # Er füllt NUR, was leer ist. Die Haltefrist für schlechtere Werte
+      # (tools/messung.mjs, Klaus 2026-08-06) bleibt unberührt: wo schon eine
+      # Zahl steht, wird nichts angefasst.
+      - name: Fehlende Messungen aus der Reihe nachziehen
+        continue-on-error: true
+        run: node tools/messung-nachziehen.mjs
+
       # Klaus' Tabelle neu bauen, gleich nachdem gemessen wurde — sonst zeigt sie
       # gestrige Zahlen und sieht dabei aus, als wären es heutige.
       - name: Tabelle für Klaus neu bauen

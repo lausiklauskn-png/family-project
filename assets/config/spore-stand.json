@@ -1228,6 +1228,78 @@
         ],
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
       }
+    },
+    "eigen-muttis-rezeptbuch": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 93,
+        "bedienbarkeit": 95,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-20",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+          },
+          {
+            "k": "leistung",
+            "t": "Erzwungener dynamischer Umbruch"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/"
+      }
+    },
+    "eigen-sage": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 80,
+        "bedienbarkeit": 100,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-22",
+        "quelle": "google",
+        "werkzeug": "13.5.0",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/"
+      }
     }
   },
   "wacheZaehler": {
