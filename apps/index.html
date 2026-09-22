@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="de">
+<script>/* FP-SPRACHRIEGEL — Begruendung in assets/app.js § Sprachriegel. MUSS inline und vor dem ersten Anstrich laufen: danach hat Chrome laengst entschieden. */(function(){try{if(localStorage.getItem("fp_lang_wahl")!=="1")return;var h=document.documentElement;h.lang=localStorage.getItem("fp_lang")==="en"?"en":"de";h.setAttribute("translate","no");h.classList.add("notranslate");var m=document.createElement("meta");m.name="google";m.content="notranslate";(document.head||h).appendChild(m);}catch(e){}})();</script>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Alle Apps — Family Projekt</title>
+  <meta name="description" content="Alle 17 Apps aus dem Marktplatz von Family Projekt, nach Bereich geordnet — mit Messwerten und Verlauf je App." />
+  <link rel="canonical" href="https://family-projekt.de/apps/" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="theme-color" content="#0c0f12" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Family Projekt" />
+  <meta property="og:locale" content="de_DE" />
+  <meta property="og:title" content="Alle Apps — Family Projekt" />
+  <meta property="og:description" content="Alle 17 Apps aus dem Marktplatz von Family Projekt, nach Bereich geordnet — mit Messwerten und Verlauf je App." />
+  <meta property="og:url" content="https://family-projekt.de/apps/" />
+  <meta property="og:image" content="https://family-projekt.de/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="../assets/style.css?v=125" />
+  <style>
+  /* ── Die Mess-Tabelle ────────────────────────────────────────────────────
+   * `grep -c table assets/style.css` → 0: dieses Stylesheet hat KEINE
+   * Tabellen-Regel. Die hier steht in der Farbwelt des Hauses (nur Variablen,
+   * kein neuer Farbwert — Kontrast gilt pro Thema).
+   *
+   * ⚠ `.mess-huelle` ist kein Schmuck: fuenf Spalten auf 360 px quetschen die
+   * Zahlen auf zwei Zeilen. Der Block scrollt quer, statt zu quetschen. */
+  .det-kopf { display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap; }
+  .det-kopf img { width:72px; height:72px; border-radius:16px; flex-shrink:0; object-fit:cover; }
+  .det-kopf h1 { margin:0 0 .2em; }
+  .det-band { display:flex; gap:8px; flex-wrap:wrap; margin:.4em 0 0; }
+  .det-band span { font-family:ui-monospace,"Geist Mono",monospace; font-size:.72rem;
+    padding:2px 8px; border-radius:6px; border:1px solid var(--line,#283139);
+    color:var(--muted,#b6c2cc); }
+  .mess-huelle { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .mess-tabelle { width:100%; border-collapse:collapse; font-size:.86rem; }
+  .mess-tabelle th { text-align:left; font-weight:600; color:var(--muted,#b6c2cc);
+    font-family:ui-monospace,"Geist Mono",monospace; font-size:.72rem; letter-spacing:.04em;
+    border-bottom:1px solid var(--line,#283139); padding:6px 8px; }
+  .mess-tabelle td { padding:6px 8px; border-bottom:1px solid var(--line,#283139); }
+  .mess-tabelle tr:last-child td { border-bottom:0; }
+  .mess-tabelle .zahl { font-family:ui-monospace,"Geist Mono",monospace; text-align:right; }
+  .det-hinweis { border-left:3px solid var(--line,#283139); padding:.6em 0 .6em 12px;
+    color:var(--muted,#b6c2cc); }
+  .det-liste { list-style:none; padding:0; }
+  .det-liste li { padding:6px 0; border-bottom:1px solid var(--line,#283139); }
+  .det-liste li:last-child { border-bottom:0; }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <p><a class="back" href="../markt.html">← Alle Apps</a></p>
+  </header>
+  <main class="wrap">
+    <h1>Alle Apps</h1>
+    <p class="lead">17 Einträge aus dem Marktplatz, nach Bereich geordnet. Jede hat ihre eigene Seite mit Messwerten und Verlauf.</p>
+    <section class="glass">
+      <h2>Beauty &amp; Kosmetik <span class="klein">1</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-perfect-skin-beauty/">Perfect Skin Beauty</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Büro <span class="klein">3</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-bookledgerpro/">BookLedgerPro</a></li>
+        <li><a href="markt-privat-brain/">Private Brain</a></li>
+        <li><a href="markt-workfloh/">WorkFloh</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Druck &amp; Design <span class="klein">1</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-tomys-hub/">Tomys Hub</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Getränke <span class="klein">1</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-mixarium/">Mein Mixarium</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Küche <span class="klein">1</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-rezeptbuch/">Mein Rezeptbuch</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Sicherheit <span class="klein">3</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-mein-tresor/">Mein Tresor</a></li>
+        <li><a href="markt-jasons-tresor/">Jasons Tresor</a></li>
+        <li><a href="markt-auslieferungspruefer/">Auslieferungsprüfer</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Vorlage <span class="klein">1</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-ki-schulung/">KI-Schulung nach Art. 4 EU AI Act</a></li>
+      </ul>
+    </section>
+    <section class="glass">
+      <h2>Werkzeug <span class="klein">6</span></h2>
+      <ul class="det-liste">
+        <li><a href="markt-mycel-karte/">Mycel-Karte</a></li>
+        <li><a href="markt-kim-bell/">Kim-Bell</a></li>
+        <li><a href="markt-kimseek/">Kimseek</a></li>
+        <li><a href="markt-kimboard/">Kimboard</a></li>
+        <li><a href="markt-pwa-toolpoint/">PWA Toolpoint</a></li>
+        <li><a href="markt-kim-hub-company/">Kim Hub Company</a></li>
+      </ul>
+    </section>
+  </main>
+  <footer class="wrap">
+    <p class="klein"><a href="../impressum.html">Impressum &amp; Datenschutz</a></p>
+  </footer>
+
+</body>
+</html>

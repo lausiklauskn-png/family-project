@@ -52,6 +52,14 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- ⚠ noindex IST HIER EINE ABSICHT, KEIN MANGEL.
+     Diese Seite ist eine interne Forschungs-Ansicht: sie ist von keiner Seite
+     verlinkt, wird nächtlich neu erzeugt, und ihre Tabelle zeichnet ein Skript —
+     ohne JavaScript stehen 1.013 Zeichen da (gemessen 2026-09-22), fast nur Navi.
+     Ohne diese Zeile meldete tools/sitemap-bauen.mjs sie bei JEDEM Lauf als
+     kein-canonical, also als MANGEL AN EINER SEITE, die gar nicht gefunden
+     werden soll. Die zwei Gründe verlangen das Gegenteil voneinander. -->
+<meta name="robots" content="noindex, follow">
 <title>Forschungsstation — Messwerte</title>
 <meta name="description" content="Die gemessenen Werte aller Apps und Seiten von Klaus, mit Verlauf und eigenen Notizen.">
 <style>

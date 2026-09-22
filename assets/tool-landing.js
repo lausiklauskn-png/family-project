@@ -105,11 +105,24 @@
 
   /* ---- Seite zusammensetzen ------------------------------------------------ */
 
-  function render() {
-    var T = global.FP_TOOL; if (!T) return;
-    var l = (global.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de";
+  /* ⚠ AUFGETEILT AM 2026-09-22 — EINE QUELLE FÜR DAS MARKUP.
+   *
+   * Vorher stand hier EINE Funktion: sie las die Globalen, baute den Text und
+   * schrieb ihn ins DOM. Damit konnte der Inhalt nur im Browser entstehen — und
+   * gemessen am 2026-09-22 standen in vier Werkzeug-Seiten ohne JavaScript
+   * 188 Zeichen: Navigation und Fusszeile, sonst nichts. Für einen Crawler, der
+   * kein JavaScript ausführt, waren sie leer. Genau das verbietet die Tafel
+   * "kein sichtbarer Inhalt haengt an JavaScript".
+   *
+   * `seiteHtml` ist jetzt REIN: gleiche Eingabe, gleicher Text, kein DOM. Damit
+   * kann tools/werkzeug-seiten.mjs ihn in Node aufrufen und in die Seite
+   * backen — und der Browser ruft DIESELBE Funktion. Zwei Fassungen desselben
+   * Markups liefen auseinander, und dann spraenge die Seite im Augenblick des
+   * ersten Neuzeichnens, weil die gebackene anders hoch waere als die gezeichnete.
+   * Dasselbe Muster wie assets/karte.js + tools/statische-listen.mjs. */
+  function seiteHtml(T, l, sp) {
     var d = T[l] || T.de || {};
-    var main = document.getElementById("toolMain"); if (!main) return;
+    sp = sp || {};
 
     var feat = (T.features || []).map(function (f) {
       var fd = pick(f, l);
@@ -128,7 +141,6 @@
     // wie in markt.html #support. Gleiche Rezeptbuch-/Mixarium-Beschreibung (keine
     // Garantie, kein Anspruch — echte Spende, wichtig für die Steuer). Fail-soft:
     // ohne Config bleibt der „bald"-Platzhalter.
-    var sp = global.FP_SPENDEN || {};
     var donateOn = !!(sp.enabled && sp.donateUrl);
     var spNote = {
       de: "Die Unterstützung erfolgt freiwillig und ohne Gegenleistung — sie begründet keinen Anspruch auf Funktionen, Updates oder Support und ist keine Garantie. Es ist eine private Spende, kein Kauf. Vielen Dank!",
@@ -140,7 +152,7 @@
       : '<a class="btn gold" href="#">♡ ' + esc(d.donate || "Spenden") + ' <span class="badge-soon">' + esc(d.soon || "bald") + '</span></a>';
     var donateNoteHtml = esc(donateOn ? (spNote[l] || spNote.de) : (d.donateNote || "Freiwillige Unterstützung (PayPal) — kommt später."));
 
-    main.innerHTML =
+    return (
       '<section class="hero"><div class="wrap">' +
         '<a class="back" href="../werkzeuge.html">' + esc(d.back || "← zurück zu Family Projekt") + '</a>' +
         '<div style="height:14px"></div>' +
@@ -170,8 +182,18 @@
 
       '<section><div class="wrap"><h2>' + esc(d.trustTitle || "Worauf du dich verlassen kannst") + '</h2>' +
         '<p class="sub">' + esc(d.trustSub || "Ehrlich und nachprüfbar — kein »vertrau mir«.") + '</p>' +
-        '<div class="trust">' + trust + '</div></div></section>';
+        '<div class="trust">' + trust + '</div></div></section>'
+    );
+  }
 
+  /* Die DOM-Huelle: liest die Globalen, ruft dieselbe reine Funktion, haengt ein
+   * und verdrahtet. Sie schreibt den GLEICHEN Text, den das Werkzeug gebacken
+   * hat — deshalb springt beim ersten Neuzeichnen nichts. */
+  function render() {
+    var T = global.FP_TOOL; if (!T) return;
+    var l = (global.FP && FP.getLang && FP.getLang() === "en") ? "en" : "de";
+    var main = document.getElementById("toolMain"); if (!main) return;
+    main.innerHTML = seiteHtml(T, l, global.FP_SPENDEN);
     wireGallery();
     wireSeal(T);
   }
@@ -229,7 +251,14 @@
     });
   }
 
-  global.addEventListener("fp:lang", render);
-  if (global.FP && FP.init) FP.init();
-  render();
+  /* ⚠ DER SELBSTLAUF STEHT HINTER EINEM DOM-RIEGEL.
+   * In Node gibt es kein `document`; ohne den Riegel stuerbe ein blosser Import
+   * an `document.getElementById`, und das Backen waere gar nicht moeglich. */
+  global.FPToolLanding = { seiteHtml: seiteHtml };
+
+  if (typeof document !== "undefined" && global.addEventListener) {
+    global.addEventListener("fp:lang", render);
+    if (global.FP && FP.init) FP.init();
+    render();
+  }
 })(typeof window !== "undefined" ? window : this);

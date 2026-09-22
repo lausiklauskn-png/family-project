@@ -73,6 +73,33 @@ family-projekt.de, www.family-projekt.de {
 		respond 404
 	}
 
+	# ── /apps/ — ECHTE 404 statt der Startseite ──────────────────────────
+	# Der Auffang darunter beantwortet JEDE unbekannte Adresse mit der
+	# Startseite und HTTP 200. Fuer die Startseite und die Sprungmarken ist
+	# das richtig; fuer die App-Detailseiten ist es der Soft-404, und der
+	# ist teuer: Google bekaeme auf `/apps/gibtesnicht/` die Auskunft „diese
+	# Seite existiert", wuerde sie als Duplikat der Startseite einordnen und
+	# die ganze Domain schlechter bewerten. Eine Sitemap voller Adressen,
+	# die ALLE mit 200 antworten, ist schlechter als gar keine.
+	#
+	# Ohne `try_files` faellt hier nichts zurueck: ein Verzeichnis bekommt
+	# sein eigenes index.html (das macht file_server von selbst), eine
+	# erfundene Adresse ein echtes 404.
+	#
+	# ⚠ DER BLOCK MUSS VOR DEM AUFFANG STEHEN — handle-Bloecke schliessen
+	# sich gegenseitig aus, der erste passende gewinnt. Steht er darunter,
+	# ist er wirkungslos und niemand merkt es: die Seiten werden ja
+	# ausgeliefert, nur der 404-Fall geht weiter an die Startseite.
+	# Dieselbe Reihenfolge-Regel wie beim /server/-Block darueber.
+	#
+	# NACHWEIS, dass er wirkt (auf dem Server, nach dem Neuladen):
+	#   curl -o /dev/null -w "%{http_code}\n" https://family-projekt.de/apps/gibtesnicht/
+	#   → muss 404 sein. Antwortet es 200, steht der Block an der falschen
+	#     Stelle oder Caddy hat die Konfiguration nicht neu gelesen.
+	handle /apps/* {
+		file_server
+	}
+
 	handle {
 		try_files {path} {path}/ /index.html
 		file_server

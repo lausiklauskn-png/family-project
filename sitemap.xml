@@ -1,98 +1,179 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<!--
+  ⚠ DIESE DATEI WIRD GEBAUT, NICHT VON HAND GEPFLEGT.
+
+      node tools/sitemap-bauen.mjs
+
+  Die Seiten werden GEFUNDEN, und jede muss VIER Bedingungen erfüllen: die
+  Datei gibt es · sie antwortet mit 200 · sie trägt kein `noindex` · sie
+  kanonisiert auf sich selbst. Die Adresse kommt AUS dem Canonical — damit ist
+  die vierte Bedingung gemessen statt behauptet.
+
+  Eine Sitemap ist eine EINLADUNG. Eine Adresse, die eingeladen wird und
+  gleichzeitig `noindex` trägt, ist eine Einladung und eine Absage zugleich.
+
+  Nicht hier, und jedes aus eigenem Grund: `impressum.html` trägt `noindex`
+  (§ 5 DDG verlangt Erreichbarkeit, nicht Indexierung) · eine Seite ohne
+  Canonical fällt heraus und wird beim Namen genannt, weil das ein MANGEL ist
+  und keine Absicht.
+
+  `tests/smoke_sitemap.mjs` prüft in BEIDE Richtungen: jede Adresse hier gibt
+  es als Datei, und keine indexierbare Seite fehlt.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://family-projekt.de/</loc>
-    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <image:image>
-      <image:loc>https://family-projekt.de/og-image.png</image:loc>
-      <image:title>Family Projekt — Werkzeuge, Apps und ein freies Netzwerk</image:title>
-    </image:image>
   </url>
   <url>
-    <loc>https://family-projekt.de/netzwerk.html</loc>
-    <lastmod>2026-07-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://family-projekt.de/werkzeuge.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <loc>https://family-projekt.de/apps/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://family-projekt.de/markt.html</loc>
-    <lastmod>2026-07-06</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Die vier Werkzeug-Unterseiten. Bis 2026-08-05 standen sie hier nicht,
-       und im ganzen ausgelieferten HTML gab es genau EINEN Link auf eine von
-       ihnen (netzwerk.html → knoten-werkzeug.html) — alle anderen Wege dorthin
-       baute erst JavaScript. Google kam auf zwei Arten nicht hin. Seit
-       tools/statische-listen.mjs stehen die Links auch statisch auf
-       werkzeuge.html; hier ist der zweite Weg. -->
   <url>
-    <loc>https://family-projekt.de/werkzeuge/geschenkbox.html</loc>
-    <lastmod>2026-08-05</lastmod>
+    <loc>https://family-projekt.de/mycelkarte.html</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://family-projekt.de/werkzeuge/such-werkzeug.html</loc>
-    <lastmod>2026-08-05</lastmod>
+    <loc>https://family-projekt.de/netzwerk.html</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
-  <url>
-    <loc>https://family-projekt.de/werkzeuge/andock-werkzeug.html</loc>
-    <lastmod>2026-08-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://family-projekt.de/werkzeuge/knoten-werkzeug.html</loc>
-    <lastmod>2026-08-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://family-projekt.de/werkzeuge/ki-schulung.html</loc>
-    <lastmod>2026-09-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Und die vier eigenständigen Seiten, die es längst gibt. -->
   <url>
     <loc>https://family-projekt.de/referenzen.html</loc>
-    <lastmod>2026-08-05</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/schulung/EU_AI_Act_Art4_KI_Schulung.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://family-projekt.de/sicherheit.html</loc>
-    <lastmod>2026-08-05</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/andock-werkzeug.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/geschenkbox.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/ki-schulung.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/knoten-werkzeug.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/werkzeuge/such-werkzeug.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-auslieferungspruefer/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://family-projekt.de/mycelkarte.html</loc>
-    <lastmod>2026-08-05</lastmod>
+    <loc>https://family-projekt.de/apps/markt-bookledgerpro/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://family-projekt.de/impressum.html</loc>
-    <lastmod>2026-08-05</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://family-projekt.de/apps/markt-jasons-tresor/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
-  <!-- Bewusst NICHT hier (Klaus 2026-08-05): forschung/tabelle.html ist die
-       interne Messtabelle, google9616…html ist Googles Bestätigungsdatei.
-       Beide gehören keinem Suchenden vorgesetzt. -->
+  <url>
+    <loc>https://family-projekt.de/apps/markt-ki-schulung/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kim-bell/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kim-hub-company/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kimboard/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kimseek/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-mein-tresor/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-mixarium/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-mycel-karte/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-perfect-skin-beauty/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-privat-brain/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-pwa-toolpoint/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-rezeptbuch/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-tomys-hub/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-workfloh/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>
