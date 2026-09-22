@@ -370,7 +370,8 @@ export function inhalt(e, punkte, alle) {
    *
    * ⚠ ROT HEISST AUCH HIER KEIN LINK: `markteintraege` hat `url` bei roter
    * Ampel geleert, und ohne Adresse gibt es nichts vorzubelegen. */
-  if (e.url) {
+  const pruefbar = !!e.url;
+  if (pruefbar) {
     T.push('    <section class="glass">');
     T.push('      <h2>Prüf es selbst</h2>');
     T.push('      <p>Wir sagen dir, was gemessen wurde. Du musst uns das nicht glauben:' +

@@ -134,7 +134,7 @@ echo; echo "═══ PRUEFKNOPF: Pruef es selbst — Klaus 2026-09-22 ═══
 fall 'PRUEF: aus dem Link wird ein <button>' tools/detailseiten.mjs \
   "      <p><a class=\"btn ghost ext\" href=\"\${PRUEFER}?adresse=" \
   "      <p><button class=\"btn ghost ext\" data-x=\"\${PRUEFER}?adresse=" \
-  'der Pr.f-Knopf ist ein <a href>' tests/smoke_detail_gestalt.mjs neubau
+  'Knopf ist ein <a href>' tests/smoke_detail_gestalt.mjs neubau
 
 # PRUEF-2 · vorbelegt wird eine ANDERE Adresse als die, auf die „Zur Seite"
 #           zeigt. Der Nutzer prueft dann etwas anderes, als er ansieht — und
@@ -163,7 +163,7 @@ fall 'PRUEF: rel=noopener faellt weg' tools/detailseiten.mjs \
 fall 'PRUEF: die Grenze des Pruefers faellt weg' tools/detailseiten.mjs \
   'nicht den laufenden Verkehr:' \
   'auch den laufenden Verkehr:' \
-  'die Grenze des Pr.fers steht dabei' tests/smoke_detail_gestalt.mjs neubau
+  'fers steht dabei' tests/smoke_detail_gestalt.mjs neubau
 
 # PRUEF-6 · die Konstante driftet vom Marktplatz-Eintrag weg. Dann fuehrt der
 #           Knopf woandershin als die Karte, und niemand saehe es.
@@ -172,13 +172,16 @@ fall 'PRUEF: die Pruefer-Adresse driftet vom Marktplatz weg' tools/detailseiten.
   'export const PRUEFER = "https://pwa-toolpoint.de/pruefer.html";' \
   'dieselbe Adresse wie seine Karte' tests/smoke_detail_gestalt.mjs neubau
 
-# PRUEF-7 · der Abschnitt kommt AUCH ohne Adresse. Bei roter Ampel hat
-#           `markteintraege` die url geleert; ein Knopf davor belegte dann
-#           nichts vor und fuehrte in ein leeres Feld.
-fall 'PRUEF: der Knopf kommt auch ohne Adresse' tools/detailseiten.mjs \
-  "   * vorzubelegen. */\n  if (e.url) {\n    T.push('    <section class=\"glass\">');\n      T.push('      <h2>Prüf es selbst</h2>');" \
-  "   * vorzubelegen. */\n  if (true) {\n    T.push('    <section class=\"glass\">');\n      T.push('      <h2>Prüf es selbst</h2>');" \
-  'vorbelegt ist genau die Adresse' tests/smoke_detail_gestalt.mjs neubau
+# PRUEF-7 · ⚠ BENANNTE GRENZE: fuer „der Knopf kommt auch ohne Adresse" steht
+#           hier KEIN Fall. Heute steht kein Eintrag auf ROT, es gibt also gar
+#           keine Seite ohne Adresse — eine Sabotage an `const pruefbar =
+#           !!e.url` aenderte nichts Messbares, und der Fall saehe wie Deckung
+#           aus. Der Waechter bleibt trotzdem: er misst die Zusicherung „wer
+#           keinen Knopf hat, hat eine ausgesetzte Adresse" und traegt an dem
+#           Tag, an dem Klaus einen Eintrag sperrt.
+#           (Mein erster Anlauf war zudem ein TOTER ANKER: der mehrzeilige
+#           Anker trug woertliche \n statt Zeilenumbrueche — die Falle steht
+#           netzweit seit dem 2026-08-24 aufgeschrieben.)
 
 echo; echo "═══ VEKTOR-STUB: misst er Raenge oder Rauschen? (2026-09-22) ═══"
 
@@ -204,7 +207,7 @@ fall 'VEC: die Abstaende schrumpfen unter die Quantisierung' tests/lib/vec-stub.
 #         ist — eine Sabotage dort wirft auch die Studio-Probe um.
 fall 'VEC: die Studio-Probe haengt am selben Stub' tests/lib/vec-stub.mjs \
   'const SCHRITT = 0.8 / (N + 1);' \
-  'const SCHRITT = 0.0 / (N + 1);' \
+  'const SCHRITT = 0.002 / (N + 1);' \
   'Reihenfolge identisch' tests/smoke_studio_vectors.mjs
 
 echo; echo "═══ SYNTAX: jede JS-Datei laedt ═══"

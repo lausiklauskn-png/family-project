@@ -910,6 +910,49 @@ Schleife mitspringend → 33/1 · Zuhörer setzt direkt → 29/5 · unverändert
 `tests/gegenprobe_hintergrund.sh`; bis dahin gab es für den Zuhörer-Weg
 **keinen**.
 
+## ⚠ `Pr.f` TRIFFT `Prüf` NICHT — der Punkt ist ein BYTE (2026-09-22)
+
+Die Gegenprobe meldete zwei meiner neuen Fälle als **„rot aus falschem
+Grund"**. Von Hand nachgestellt: der Wächter feuerte tadellos, mit seinem
+eigenen Namen in der roten Zeile. Falsch war **mein grep-Muster**.
+
+```
+LANG=   LC_ALL=            ← leer, also C-Locale
+grep '✗.*der Pr.f-Knopf ist ein <a href>'   → 0 Treffer
+grep '✗.*Knopf ist ein <a href>'            → 1 Treffer
+```
+
+**`.` trifft im C-Locale ein BYTE, und `ü` sind zwei** (`\xc3\xbc`). `Pr.f`
+kann `Prüf` deshalb nie treffen.
+
+⚠ **DAS IST DIE DRITTE SPIELART DERSELBEN FALLE**, und die ersten zwei stehen
+eine Überschrift weiter oben: am 2026-09-22 trafen `traegt` und `laesst`
+daneben, weil die rote Zeile „trägt" und „lässt" trug. Damals war die Abhilfe
+*„schreib den Umlaut"* — ich habe stattdessen versucht, ihn mit `.` zu
+**umgehen**, und bin in eine andere Tür derselben Falle gelaufen.
+
+**Was jetzt gilt: im Muster steht kein Umlaut.** Nicht der echte (der geht,
+solange die Datei UTF-8 ist), nicht `.` als Ersatz — sondern ein Stück der
+Zusicherung **ohne** Umlaut, das trotzdem eindeutig ist (`Knopf ist ein
+<a href>`, `fers steht dabei`).
+
+### ⚠ Und ein Fall war ein toter Anker, den ich selbst gebaut hatte
+
+Mein mehrzeiliger Anker trug **wörtliche `\n`** statt Zeilenumbrüchen — die
+Falle steht netzweit seit dem 2026-08-24 („`\n` ist ein wörtliches
+Backslash-N"). Der Fall ist seitdem kein Anker-Problem mehr, sondern eine
+**benannte Grenze**: heute steht kein Eintrag auf ROT, es gibt also gar keine
+Seite ohne Adresse, und eine Sabotage daran änderte nichts Messbares. *Ein
+Fall, der nichts messen kann, sähe wie Deckung aus.* Der Wächter bleibt und
+trägt an dem Tag, an dem Klaus einen Eintrag sperrt.
+
+### ⚠ Und ein Fall war blind, weil die Sabotage ZU stark war
+
+`SCHRITT = 0.0` macht alle Vektoren gleich — und über lauter gleichen Zahlen
+sortiert auch der Studio-Weg stabil, also blieb er grün. `0.002` bricht die
+Reihenfolge wirklich. *Eine Sabotage muss treffen, was der Wächter misst;
+„gar nichts mehr" ist kein Treffer.*
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere
