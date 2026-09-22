@@ -13,7 +13,7 @@ set -u
 cd "$(dirname "$0")/.."
 
 SICH="/tmp/gp_sitemap.$$"; mkdir -p "$SICH"
-DATEIEN=(sitemap.xml tools/sitemap-bauen.mjs impressum.html sicherheit.html index.html .github/workflows/vektoren-taeglich.yml)
+DATEIEN=(sitemap.xml tools/sitemap-bauen.mjs impressum.html sicherheit.html index.html markt.html .github/workflows/vektoren-taeglich.yml)
 for d in "${DATEIEN[@]}"; do mkdir -p "$SICH/$(dirname "$d")"; cp "$d" "$SICH/$d"; done
 aufraeumen() { for d in "${DATEIEN[@]}"; do cp "$SICH/$d" "$d"; done; rm -rf "$SICH"; }
 trap aufraeumen INT TERM EXIT
@@ -131,6 +131,31 @@ probe 'die Sitemap wird vor den Seiten gebaut, die sie liest' .github/workflows/
         run: node tools/sitemap-bauen.mjs
 
       - name: Detailseiten bauen'
+
+# 15 · DER FUND, DEN KLAUS GEMACHT HAT: der Einzelheiten-Knopf faellt weg.
+#      Dann stehen 17 Seiten in der Sitemap und sind von keiner Seite
+#      erreichbar — verwaist.
+probe 'eine Detailseite wird nicht mehr verlinkt' markt.html \
+      '<a class="btn ghost" href="apps/markt-mixarium/">Einzelheiten →</a>' \
+      ''
+
+# 16 · die UEBERSICHT verwaist. Mein erster Waechter hat genau sie mit
+#      `continue` uebersprungen — und sie war dann als einzige verwaist.
+probe 'der Link zur Uebersicht /apps/ faellt weg' markt.html \
+      '<p class="sub"><a class="mk-alle" href="apps/">' \
+      '<p class="sub" hidden><a class="mk-alle" href="nirgendwo/">'
+
+# 17 · der LAUFZEIT-Zeichner verliert den Knopf. Sichtbar wird das erst, wenn
+#      jemand sucht: vorher steht die gebackene Karte da, danach diese.
+probe 'der Laufzeit-Zeichner verliert den Einzelheiten-Knopf' markt.html \
+      "((x.anchorId || \"\") ? '<a class=\"btn ghost\" href=\"apps/' + esc(x.anchorId) + '/\">' + esc(FP.t(\"mk_details\")) + '</a>' : '') +" \
+      ""
+
+# 18 · er ist nur in einer Sprache beschriftet — dann stuende in der
+#      englischen Oberflaeche der Schluesselname statt eines Wortes.
+probe 'der Knopf ist nur in einer Sprache beschriftet' markt.html \
+      'mk_details: "Details →", search_btn: "Search",' \
+      'search_btn: "Search",'
 
 echo
 echo "$gruen schlagen an, $blind blind, $tot tote Anker"

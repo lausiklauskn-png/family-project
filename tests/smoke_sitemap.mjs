@@ -100,6 +100,42 @@ ok(/\bnoindex\b/i.test(lies("impressum.html")), "impressum.html trägt noindex")
 ok(!angemeldet.some((a) => a.endsWith("/impressum.html")), "… und steht deshalb NICHT in der Sitemap");
 ok(/href="[^"]*impressum\.html"/.test(lies("index.html")), "… bleibt aber von der Startseite verlinkt (§ 5 DDG)");
 
+/* ══ 6b · KEINE VERWAISTE SEITE ═════════════════════════════════════════════
+ * ⚠ DEN FUND HAT KLAUS GEMACHT, NICHT EINE PROBE (2026-09-22):
+ * „bei PWA Toolpoint gibt es den Button Einzelheiten … in Family Project
+ * nicht." Die achtzehn Seiten unter /apps/ standen in der Sitemap und waren
+ * von KEINER Seite verlinkt. Eine verwaiste Seite ist für einen Menschen
+ * unerreichbar und für Google ein schlechtes Zeichen: sie steht in der
+ * Einladung und nirgendwo im Haus.
+ *
+ * Gemessen wird deshalb die ERREICHBARKEIT, nicht die Anwesenheit des Knopfes:
+ * jede angemeldete /apps/-Adresse muss aus dem ausgelieferten HTML heraus
+ * verlinkt sein. */
+const marktRoh = lies("markt.html");
+const appsAdressen = angemeldet.filter((a) => /\/apps\//.test(a));
+ok(appsAdressen.length >= 10, "es gibt überhaupt /apps/-Adressen in der Sitemap", `${appsAdressen.length}`);
+
+const verlinkt = new Set([...marktRoh.matchAll(/href="(apps\/[^"]*)"/g)].map((m) => m[1]));
+for (const a of appsAdressen) {
+  const rel = a.replace(/^https?:\/\/[^/]+\//, "");
+  /* ⚠ KEINE AUSNAHME FUER DIE UEBERSICHT. Mein erster Anlauf hat `apps/` hier
+   * mit `continue` uebersprungen — und genau sie war dann als EINZIGE verwaist,
+   * in BEIDEN Depots. Eine Ausnahme in einem Waechter ist der Ort, an dem der
+   * naechste Fund sitzt. */
+  ok(verlinkt.has(rel), `keine verwaiste Seite: ${rel} ist von markt.html verlinkt`);
+}
+
+/* ⚠ UND DER LAUFZEIT-ZEICHNER MUSS DIESELBE REGEL TRAGEN. Nach einer Suche
+ * baut `card(x)` in markt.html die Karten NEU — ohne den Knopf dort
+ * verschwände er in dem Augenblick, in dem jemand sucht, und die gebackene
+ * Fassung sähe anders aus als die gezeichnete. Genau dieser Unterschied ist
+ * von einer Probe auf das gebaute HTML allein NICHT zu sehen. */
+ok(/href="apps\/' \+ esc\(x\.anchorId\)/.test(marktRoh) || /apps\/' \+ esc\(x\.anchorId\)/.test(marktRoh),
+   "… und der Laufzeit-Zeichner in markt.html baut denselben Knopf");
+ok(/mk_details:/.test(marktRoh) && (marktRoh.match(/mk_details:/g) || []).length >= 2,
+   "… und er ist in BEIDEN Sprachen beschriftet",
+   `${(marktRoh.match(/mk_details:/g) || []).length}× mk_details`);
+
 /* ══ 7 · die Arbeitsabläufe ═════════════════════════════════════════════════
  * ⚠ DIE LISTE DER LÄUFE WIRD GEFUNDEN, NICHT GEPFLEGT. Wer morgen einen
  * zweiten Lauf anlegt, der die statische Liste schreibt, und dabei die

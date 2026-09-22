@@ -72,12 +72,51 @@ console.log("\nmarkt.html");
   const b = block(html);
   ok(b.length > 0, "der statische Block steht zwischen den Marken");
 
-  const gefunden = links(b);
+  /* ⚠ TAFEL-EVOLUTIONS-KLAUSEL, AUSDRUECKLICH BENANNT (2026-09-22).
+   *
+   * Bis heute stand hier EINE Sammlung: `links(b)` nahm jedes <a> der Karten
+   * und die drei Zusicherungen darunter nahmen an, JEDER davon fuehre nach
+   * draussen. Das war richtig, solange eine Karte genau einen Link hatte.
+   *
+   * Seit dem 2026-09-22 traegt jede Karte ZWEI: „Einzelheiten →" auf die
+   * eigene Detailseite unter apps/<id>/ und „→ Zur Seite" nach draussen. Ohne
+   * die Trennung meldete der Waechter „17 erwartet, 34 gefunden" und
+   * verlangte target="_blank" fuer einen Link, der ausdruecklich KEINES haben
+   * darf — ein neuer Tab je Karte ist der Weg, wie man zwanzig Tabs bekommt.
+   *
+   * Getrennt ist es SCHAERFER als vorher, nicht lockerer: jede Sorte hat jetzt
+   * ihre eigene Zusicherung, und der Innen-Link wird ueberhaupt erst gemessen. */
+  const alleLinks = links(b);
+  const gefunden = alleLinks.filter((l) => /^https?:/i.test(l.href));
+  const innen = alleLinks.filter((l) => l.href.startsWith("apps/"));
+  const sonstige = alleLinks.filter((l) => !gefunden.includes(l) && !innen.includes(l));
   const sollLinks = markt.filter((e) => e.url);
 
-  // 1 · Zahl gegen Zahl.
+  // 1 · Zahl gegen Zahl — je Sorte.
   ok(gefunden.length === sollLinks.length,
-    `${sollLinks.length} Einträge mit Link erwartet, ${gefunden.length} gefunden`);
+    `${sollLinks.length} Aussen-Links erwartet, ${gefunden.length} gefunden`);
+  ok(sonstige.length === 0,
+    sonstige.length ? `Link weder nach draussen noch auf eine Detailseite: ${sonstige.map((l) => l.href).join(", ")}`
+                    : "kein Link dritter Art in den Karten");
+
+  /* ⚠ DIE INNEN-LINKS SIND DER GRUND, WARUM DIE 18 SEITEN NICHT VERWAISEN.
+   * Klaus hat den Mangel am 2026-09-22 gesehen: „bei PWA Toolpoint gibt es
+   * den Button Einzelheiten … in Family Project nicht." Gemessen wird Adresse
+   * fuer Adresse, nicht „mindestens einer". */
+  const sollInnen = markt.filter((e) => e.anchorId).map((e) => `apps/${e.anchorId}/`);
+  const innenFehlt = sollInnen.filter((h) => !innen.some((l) => l.href === h));
+  ok(innenFehlt.length === 0,
+    innenFehlt.length ? `keine Detailseite verlinkt: ${innenFehlt.join(", ")}`
+                      : `jeder Eintrag verlinkt seine Detailseite (${sollInnen.length})`);
+  const innenFremd = innen.filter((l) => !sollInnen.includes(l.href));
+  ok(innenFremd.length === 0,
+    innenFremd.length ? `Detailseiten-Link ohne Eintrag: ${innenFremd.map((l) => l.href).join(", ")}`
+                      : "kein Detailseiten-Link, der zu keinem Eintrag gehoert");
+  /* ⚠ UND ER DARF KEIN target="_blank" TRAGEN — die Detailseite gehoert zu
+   * DIESER Seite. Ohne diese Zeile waere die Zusicherung „kein neuer Tab" eine
+   * Behauptung: keine Probe koennte sie von ihrem Fehlen unterscheiden. */
+  ok(innen.every((l) => l.target !== "_blank"),
+    "kein Detailseiten-Link oeffnet einen neuen Tab");
 
   // 2 · Adresse für Adresse, nicht „mindestens einer".
   const fehlend = sollLinks.filter((e) => !gefunden.some((l) => l.href === e.url));
@@ -174,7 +213,7 @@ console.log("\nmarkt.html");
     : relFehler.join(" | "));
 
   // Jeder Außen-Link öffnet im neuen Tab — sonst verlässt der Besucher die Seite.
-  ok(gefunden.every((l) => l.target === "_blank"), "alle Markt-Links mit target=\"_blank\"");
+  ok(gefunden.every((l) => l.target === "_blank"), "alle AUSSEN-Links mit target=\"_blank\"");
 }
 
 /* ── werkzeuge.html ────────────────────────────────────────────────────────── */
