@@ -3,7 +3,7 @@
  *   node tools/detailseiten.mjs                 baut alle + apps/index.html
  *   node tools/detailseiten.mjs --nur=markt-x   baut eine
  *   node tools/detailseiten.mjs --pruefen       meldet nur, ob sie auf dem Stand sind
- *   node tools/detailseiten.mjs --indexierbar   nimmt das `noindex` heraus
+ *   node tools/detailseiten.mjs --noindex       setzt das `noindex` zurück
  *
  * ── WARUM ES DAS GIBT (S5–S9 des SEO-Plans, hier ab 2026-09-22) ────────────
  *
@@ -40,16 +40,29 @@
  *     IST die Messstation. Kein Nachbar-Klon, kein Netz-Weg, keine
  *     fail-soft-Lücke wie drüben.
  *
- * ⚠ VORGABE IST `noindex`, UND DAS IST ABSICHT. Die Seiten gehen live, damit
- * Klaus sie ansehen kann — aber diese Seite läuft hinter Caddy, und dessen
- * Auffang beantwortet JEDE unbekannte Adresse mit der Startseite und HTTP 200.
- * Solange der `handle /apps/*`-Block nicht auf dem Server steht (Nachweis:
- * `curl -o /dev/null -w "%{http_code}" …/apps/gibtesnicht/` → 404), wäre eine
- * Einladung an Google eine Einladung in einen Soft-404. LIVE und INDEXIERBAR
- * sind zwei Schalter; der zweite heißt `--indexierbar`.
+ * ⚠ TAFEL-EVOLUTIONS-KLAUSEL, AUSDRÜCKLICH BENANNT (2026-09-22).
  *
- * Und er erzwingt sich selbst: `tools/sitemap-bauen.mjs` nimmt nur Adressen
- * OHNE `noindex` auf. Vergessen kann man es also nicht.
+ * Hier stand: „VORGABE IST `noindex`, UND DAS IST ABSICHT … solange der
+ * `handle /apps/*`-Block nicht auf dem Server steht, wäre eine Einladung an
+ * Google eine Einladung in einen Soft-404." Der Satz war richtig, SOLANGE die
+ * Bedingung offen war. Sie ist es nicht mehr: der Block steht seit dem
+ * 2026-09-22 auf Klaus' Hetzner-Server, gemessen am laufenden Dienst —
+ * `/apps/gibtesnicht/` → 404, `/markt.html` → 200.
+ *
+ * LIVE und INDEXIERBAR bleiben zwei Schalter — das war und ist der Kern; nur
+ * die Stellung des zweiten hat sich gedreht. Der Weg zurück heißt `--noindex`.
+ *
+ * ⚠ UND DIE RICHTUNG DER VORGABE IST EINE ENTSCHEIDUNG, KEIN GESCHMACK.
+ * Vorher musste der nächtliche Lauf `--indexierbar` MITGEBEN; vergisst ihn
+ * jemand, fallen siebzehn Seiten lautlos aus dem Index, und niemand sieht es
+ * — die Sitemap schrumpft, und das sähe aus, als hätten die Seiten selbst
+ * etwas. Jetzt ist der gespeicherte Zustand die Vorgabe, und wer sie
+ * zurücknimmt, muss es HINSCHREIBEN. Dasselbe Herum wie in PWA Toolpoint;
+ * zwei Depots mit gegenläufigen Schaltern wären zwei Regeln, die man sich
+ * merken muss.
+ *
+ * Und der Schalter erzwingt sich selbst: `tools/sitemap-bauen.mjs` nimmt nur
+ * Adressen OHNE `noindex` auf. Vergessen kann man es also nicht.
  */
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -333,9 +346,9 @@ export function seite({ titel, beschreibung, url, robots, v, inhalt: rumpf, json
 if (import.meta.url === `file://${process.argv[1]}`) {
   const nur = (process.argv.find((a) => a.startsWith("--nur=")) || "").split("=")[1];
   const pruefen = process.argv.includes("--pruefen");
-  const robots = process.argv.includes("--indexierbar")
-    ? "index, follow, max-image-preview:large, max-snippet:-1"
-    : "noindex, follow";
+  const robots = process.argv.includes("--noindex")
+    ? "noindex, follow"
+    : "index, follow, max-image-preview:large, max-snippet:-1";
 
   const wache = leseWache();
   const rohListe = leseConfig("listings.js");

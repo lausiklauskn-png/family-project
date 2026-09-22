@@ -100,5 +100,41 @@ ok(/\bnoindex\b/i.test(lies("impressum.html")), "impressum.html trägt noindex")
 ok(!angemeldet.some((a) => a.endsWith("/impressum.html")), "… und steht deshalb NICHT in der Sitemap");
 ok(/href="[^"]*impressum\.html"/.test(lies("index.html")), "… bleibt aber von der Startseite verlinkt (§ 5 DDG)");
 
+/* ══ 7 · die Arbeitsabläufe ═════════════════════════════════════════════════
+ * ⚠ DIE LISTE DER LÄUFE WIRD GEFUNDEN, NICHT GEPFLEGT. Wer morgen einen
+ * zweiten Lauf anlegt, der die statische Liste schreibt, und dabei die
+ * Detailseiten vergisst, bekommt eine Karte mit den Zahlen von heute Nacht
+ * und eine Detailseite mit denen vom letzten Lauf von Hand — und eine neu
+ * freigegebene App NIE eine eigene Seite.
+ *
+ * ⚠ UND GEBAUT REICHT NICHT, ES MUSS COMMITTET WERDEN. Ein Lauf, dessen
+ * Arbeit weggeworfen wird, ist teurer als einer, der gar nicht läuft: er
+ * sieht aus, als hätte er gewirkt. */
+const laeufe = fs.readdirSync(".github/workflows").filter((n) => n.endsWith(".yml"));
+ok(laeufe.length >= 1, "der Sammler findet die Arbeitsabläufe überhaupt", `${laeufe.length}`);
+const bauende = laeufe.filter((n) => /tools\/statische-listen\.mjs/.test(lies(".github/workflows/" + n)));
+ok(bauende.length >= 1, "… und mindestens einer schreibt die statische Liste", bauende.join(", "));
+for (const n of bauende) {
+  const y = lies(".github/workflows/" + n);
+  ok(/tools\/detailseiten\.mjs/.test(y), `${n}: baut auch die Detailseiten`);
+  ok(/tools\/werkzeug-seiten\.mjs/.test(y), `${n}: backt auch die Werkzeug-Seiten`);
+  ok(/tools\/sitemap-bauen\.mjs/.test(y), `${n}: baut auch die Sitemap`);
+  /* ⚠ KOMMENTARE RAUS, BEVOR GESUCHT WIRD. Der erste Anlauf traf die Zeile
+   * „# `git add <pfad>` statt `git add -A`." — einen ERKLÄRTEXT — und hörte
+   * dort auf; der echte Befehl zwei Zeilen tiefer wurde nie gelesen. Ein
+   * Wächter, der Prosa mitliest, misst nicht, was er zu messen glaubt.
+   * Dieselbe Falle wie beim Caddyfile-Leser eine Datei weiter. */
+  const ohneProsa = y.split("\n").filter((z) => !/^\s*#/.test(z)).join("\n");
+  const gadd = (ohneProsa.match(/git add(?:[^\n]*\\\n)*[^\n]*/g) || []).join(" ");
+  ok(/\bapps\b/.test(gadd) && /\bsitemap\.xml\b/.test(gadd) && /\bwerkzeuge\b/.test(gadd),
+     `${n}: … und committet sie`, gadd.slice(0, 160));
+  /* ⚠ DIE REIHENFOLGE IST DIE ZUSICHERUNG, NICHT DIE ANWESENHEIT: die Sitemap
+   * LIEST die gebauten Seiten. Stünde sie davor, lüde sie den Stand von
+   * gestern ein — und alle vier Zeilen darüber blieben grün. */
+  ok(y.indexOf("tools/sitemap-bauen.mjs") > y.indexOf("tools/detailseiten.mjs") &&
+     y.indexOf("tools/sitemap-bauen.mjs") > y.indexOf("tools/werkzeug-seiten.mjs"),
+     `${n}: … und die Sitemap steht NACH den Seiten, die sie liest`);
+}
+
 console.log(`\n${pass} bestanden, ${fail} fehlgeschlagen`);
 process.exit(fail ? 1 : 0);

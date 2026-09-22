@@ -27,6 +27,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/markt.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -85,5 +90,90 @@
     <loc>https://family-projekt.de/werkzeuge/such-werkzeug.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-auslieferungspruefer/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-bookledgerpro/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-jasons-tresor/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-ki-schulung/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kim-bell/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kim-hub-company/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kimboard/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-kimseek/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-mein-tresor/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-mixarium/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-mycel-karte/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-perfect-skin-beauty/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-privat-brain/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-pwa-toolpoint/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-rezeptbuch/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-tomys-hub/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/markt-workfloh/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 </urlset>

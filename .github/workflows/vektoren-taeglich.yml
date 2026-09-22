@@ -215,6 +215,28 @@ jobs:
       - name: Statische Listen neu setzen
         run: node tools/statische-listen.mjs
 
+      # Die Detailseiten unter /apps/ lesen dieselbe Liste und dieselbe
+      # Messreihe. Ohne diesen Schritt drifteten sie: die Karte trüge die
+      # Messwerte von heute Nacht, die Detailseite die vom letzten Lauf von
+      # Hand — und eine neu freigegebene App bekäme NIE eine Seite.
+      #
+      # NICHT continue-on-error, aus demselben Grund wie oben.
+      - name: Detailseiten bauen
+        run: node tools/detailseiten.mjs
+
+      # Der Inhalt der Werkzeug-Seiten steht in FP_TOOL und wird in die Seite
+      # gebacken. Ohne diesen Schritt stünde dort wieder nur Navigation und
+      # Fußzeile, sobald jemand FP_TOOL ändert — und das fiele erst auf, wenn
+      # eine Suchmaschine die Seite für leer hält.
+      - name: Werkzeug-Seiten backen
+        run: node tools/werkzeug-seiten.mjs
+
+      # ⚠ ZULETZT, und das ist keine Geschmacksfrage: die Sitemap LIEST die
+      # gebauten Seiten (Canonical, robots). Stünde sie vor den zwei Schritten
+      # darüber, lüde sie den Stand von gestern ein.
+      - name: Sitemap bauen
+        run: node tools/sitemap-bauen.mjs
+
       - name: Ergebnis committen
         run: |
           set -euo pipefail
@@ -230,9 +252,12 @@ jobs:
           # sie hier liefe der Bau jede Nacht ins Leere — die Änderung entstünde
           # auf dem Rechner der Aktion und wäre mit ihm wieder weg, und der
           # Wächter fiele beim nächsten Lauf über die Abweichung.
+          # ⚠ apps/, werkzeuge/ und sitemap.xml stehen seit 2026-09-22 dabei.
+          # Ein Lauf, dessen Arbeit weggeworfen wird, ist teurer als einer, der
+          # gar nicht läuft: er sieht aus, als hätte er gewirkt.
           git add assets/config/listings-vec.json assets/config/listings.js assets/config/spore-stand.json \
               forschung/messreihe.json forschung/JOURNAL.md forschung/tabelle.html \
-              markt.html werkzeuge.html
+              markt.html werkzeuge.html apps werkzeuge sitemap.xml
           if git diff --cached --quiet; then
             echo "Keine Änderung."
             exit 0
