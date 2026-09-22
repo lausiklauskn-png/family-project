@@ -3,6 +3,13 @@
  * Seiten-Logik; Klaus' Browser-Sichttest bleibt unersetzbar. */
 import http from "node:http"; import fs from "node:fs"; import path from "node:path"; import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+/* Die Arbeitskopie der Wache — dieselbe Datei, die markt.html liest. Sie wird
+ * hier als DATEN gelesen, nicht als Regel: der Waechter unten entscheidet
+ * nicht, WER verborgen wird, er verlangt nur fuer jeden Verborgenen einen
+ * hingeschriebenen Grund. */
+let WACHE_HAND = {};
+try { WACHE_HAND = JSON.parse(fs.readFileSync(path.join(ROOT, "assets/config/wache-hand.json"), "utf8")); }
+catch { WACHE_HAND = {}; }
 const pw = await import(process.env.PW_CORE || "playwright-core");
 const chromium = pw.chromium || (pw.default && pw.default.chromium);
 const MIME = { ".html":"text/html",".js":"text/javascript",".mjs":"text/javascript",".css":"text/css",".json":"application/json",".svg":"image/svg+xml",".png":"image/png" };
@@ -91,12 +98,52 @@ console.log("\nDetail-Checks");
 // Seit 2026-08-05 stehen die Listen ZUSAETZLICH statisch im HTML (tools/
 // statische-listen.mjs). `render()` setzt innerHTML und ERSETZT sie damit —
 // das ist gewollt. Die Gefahr ist das Gegenteil: anhaengen statt ersetzen,
-// dann stuende jeder Eintrag zweimal da. Genau dagegen zaehlen diese zwei
-// Pruefungen. Der HTML-Waechter (smoke_statische_listen.mjs) kann das nicht
-// sehen — er laesst bewusst kein JavaScript laufen.
+// dann stuende jeder Eintrag zweimal da. Genau dagegen messen die vier
+// Pruefungen hier. Der HTML-Waechter (smoke_statische_listen.mjs) kann das
+// nicht sehen — er laesst bewusst kein JavaScript laufen.
+//
+// ⚠ BIS ZUM 2026-09-22 WAR ES EINE ZAHL: `Karten === liste.length`. Seit der
+// Wartung (2026-09-18) zeigt die Seite mit ABSICHT weniger Karten, als die
+// Liste Eintraege hat — der Waechter war damit ROT, ohne dass eine Zusicherung
+// gefallen waere, und zwar vier Tage lang. Gegenprobe:
+// tests/gegenprobe_markt_liste.sh (die es vorher gar nicht gab).
 { const { page } = await load("/markt.html");
-  ok(await page.evaluate(()=>document.querySelectorAll("#mkListings .listing").length===(window.FP_LISTINGS||[]).length && (window.FP_LISTINGS||[]).length>=10),
-    "markt: jeder Eintrag steht genau einmal (statisch ersetzt, nicht ergaenzt)");
+  const gez = await page.evaluate(()=>{
+    const k = [...document.querySelectorAll('#mkListings .listing a[href^="apps/"]')]
+      .map(a=>a.getAttribute("href").replace(/^apps\//,"").replace(/\/$/,""));
+    return { kennungen:k, karten:document.querySelectorAll("#mkListings .listing").length,
+             roh:(window.FP_LISTINGS||[]).map(e=>e.anchorId) };
+  });
+  const doppelt = gez.kennungen.filter((k,i)=>gez.kennungen.indexOf(k)!==i);
+  ok(doppelt.length===0,
+    "markt: jeder Eintrag steht genau einmal (statisch ersetzt, nicht ergaenzt)"
+    + (doppelt.length ? " — doppelt: " + doppelt.join(", ") : ""));
+  ok(gez.karten>=10 && gez.karten===gez.kennungen.length,
+    `markt: … und es wurde ueberhaupt etwas gemessen — ${gez.karten} Karten`);
+  const geister = gez.kennungen.filter(k=>!gez.roh.includes(k));
+  ok(geister.length===0,
+    "markt: keine Karte ohne Eintrag" + (geister.length ? " — " + geister.join(", ") : ""));
+  /* ⚠ DIE DIFFERENZ WIRD AUSGERECHNET, NICHT WEGGELASSEN. Seit der Wartung
+   * (2026-09-18) zeigt die Seite mit ABSICHT weniger Karten als die Liste
+   * Eintraege hat — `Karten === liste.length` war deshalb ROT, ohne dass eine
+   * Zusicherung gefallen waere, und zwar seit dem Tag, an dem Klaus Perfect
+   * Skin Fashion geschaltet hat. Wortgleich derselbe Fehler wie in
+   * PWA-Toolpoint am selben Tag: *eine Zahl in einer Pruefung ist kein
+   * Vertrag.*
+   *
+   * Nachgebaut wird der Riegel NICHT — `inWartung()` in markt.html ist die
+   * eine Quelle, eine zweite Fassung liefe auseinander. Verlangt wird nur die
+   * eine Richtung: wer FEHLT, braucht einen Grund in `wache-hand.json`. Ein
+   * Eintrag, der aus einem anderen Grund verschwindet, faellt damit auf —
+   * und zwar mit Namen. */
+  const fehlt = gez.roh.filter(k=>k && !gez.kennungen.includes(k));
+  const ohneGrund = fehlt.filter(k=>{
+    const w = WACHE_HAND[k] || null;
+    return !(w && (w.wartung===true || w.ampel==="rot"));
+  });
+  ok(ohneGrund.length===0,
+    `markt: wer fehlt, hat einen Grund in wache-hand.json — ${fehlt.length} fehlen`
+    + (ohneGrund.length ? ", OHNE Grund: " + ohneGrund.join(", ") : ""));
   ok(await page.evaluate(()=>{
     const hrefs=[...document.querySelectorAll('#mkListings a.ext')].map(a=>a.getAttribute("href"));
     return hrefs.length===new Set(hrefs).size;
