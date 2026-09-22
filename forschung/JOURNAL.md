@@ -21,6 +21,18 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-09-19 · family-projekt.de (Start) (Computer)
+
+<https://family-projekt.de/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 77 → 100** (↑ 23, am 2026-09-22 noch 99)
+
+> Gesehen am 2026-09-19, **bestätigt durch die Messung vom 2026-09-22**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Verursacher von Layout Shifts
+- Beanstandung neu: leistung: Reduziere nicht verwendetes JavaScript
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-09-18 · Alis Moderaum
 
 <https://lausiklauskn-png.github.io/Alis-Moderaum/> · Quelle der Zahlen: Google PageSpeed Insights
