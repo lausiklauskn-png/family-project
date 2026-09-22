@@ -110,6 +110,22 @@ export function rang(pfad) {
    sie den GRUND zurück, nicht nur ja/nein. */
 export function pruefeSeite(pfad, html) {
   const soll = adresseAusPfad(pfad);
+
+  /* ⚠ ERST: IST DAS ÜBERHAUPT EINE SEITE?
+   *
+   * `google9616ba6b6bbe62ad.html` ist die Bestätigungsdatei der Search Console —
+   * 54 Bytes Klartext mit `.html` am Namen, kein `<html>`, kein `<head>`, kein
+   * Titel. Ohne diese Frage meldete der Lauf sie als „kein-canonical", also als
+   * MANGEL AN EINER SEITE — und das ist eine falsche Anklage: es ist keine.
+   *
+   * Eine Ausnahme NACH NAMEN wäre wieder etwas zu Pflegendes, und sie machte
+   * denselben Fehler wie ein vergessener Eintrag, nur dauerhaft. Gefragt wird
+   * deshalb der INHALT: was kein `<html` und kein `<head` trägt, ist keine Seite.
+   * Das deckt jede weitere Bestätigungsdatei von selbst mit. */
+  if (!/<html[\s>]/i.test(html) && !/<head[\s>]/i.test(html)) {
+    return { pfad, drin: false, grund: "keine-seite", soll };
+  }
+
   const robots = robotsAus(html);
   if (/\bnoindex\b/i.test(robots)) return { pfad, drin: false, grund: "noindex", soll };
   const can = canonicalAus(html);
