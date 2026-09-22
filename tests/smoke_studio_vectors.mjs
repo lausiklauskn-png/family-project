@@ -38,6 +38,7 @@ import http from "node:http"; import fs from "node:fs"; import path from "node:p
 import { fileURLToPath } from "node:url";
 import { execFileSync, spawn } from "node:child_process";
 import os from "node:os";
+import { stubInSeite } from "./lib/vec-stub.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pw = await import(process.env.PW_CORE || "playwright-core");
@@ -80,32 +81,12 @@ const VEC_PFAD = "**/assets/config/listings-vec.json*";
  * überschreibt window.SbkimEmbedding, ein addInitScript wäre wirkungslos und
  * der Test hinge am echten 30-MB-Modell. */
 async function stubSetzen(page) {
-  await page.evaluate(({ dim, model }) => {
-    window.__embedCount = 0;
-    const vecFor = (t) => {
-      const v = new Float32Array(dim);
-      const winkel = ((String(t).length % 40) / 40) * Math.PI * 0.5;
-      v[0] = Math.cos(winkel); v[1] = Math.sin(winkel);
-      return v;
-    };
-    window.__vecFor = vecFor;
-    window.SbkimEmbedding = {
-      _meta: { model, dim },
-      // init() meldet Fortschritt wie das echte Modul 03 (emitProgress:
-      // {status, file, progress 0-100}). Ohne diese Meldungen liesse sich der
-      // Ladebalken des Studios nicht pruefen.
-      init: async () => {
-        for (const p of [25, 60, 90]) {
-          window.dispatchEvent(new CustomEvent("sbkim:embedding-progress", {
-            detail: { status: "progress", file: "model.onnx", progress: p },
-          }));
-          await new Promise((r) => setTimeout(r, 20));
-        }
-      },
-      embedQuery: async (t) => vecFor("q:" + t),
-      embedPassageBatch: async (texts) => { window.__embedCount += texts.length; return texts.map(vecFor); },
-    };
-  }, { dim: DIM, model: MODEL });
+  /* ⚠ EINE FASSUNG FÜR BEIDE PROBEN — tests/lib/vec-stub.mjs. Hier stand bis
+   * zum 2026-09-22 eine wortgleiche Kopie des Stubs aus
+   * smoke_markt_vecpack.mjs, samt desselben Fehlers. Die Begründung zu jeder
+   * Zeile steht dort. `mitFortschritt` ist der einzige Unterschied: das
+   * Studio prüft den Ladebalken und braucht dafür die Meldungen von init(). */
+  await page.evaluate(stubInSeite, { dim: DIM, model: MODEL, mitFortschritt: true });
 }
 
 /* Schreibt jede angezeigte Balken-Breite mit.

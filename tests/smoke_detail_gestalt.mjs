@@ -191,6 +191,84 @@ ok(/\.mk-ms-w\.is-gut\{color:var\(--ms-gut\)/.test(css),
   }
 }
 
+/* ── 2b · „Prüf es selbst" (Klaus 2026-09-22) ───────────────────────────────
+ *
+ * Der Knopf führt hier über die DOMAIN-GRENZE: dieses Depot hat keinen eigenen
+ * Auslieferungsprüfer, er liegt auf pwa-toolpoint.de. Daraus folgen drei
+ * Zusicherungen, die es in der Vorlage (PWA Toolpoint, relativer Link) gar
+ * nicht geben kann.
+ *
+ * ⚠ GEMESSEN WIRD ÜBER ALLE SEITEN, nicht an einer. Ein Wächter auf eine
+ * genannte Seite wäre blind, sobald das Werkzeug den Abschnitt nur noch bei
+ * manchen baut — und genau das ist die Bedingung hier (rot heißt kein Link). */
+{
+  const { PRUEFER } = await import("../tools/detailseiten.mjs");
+  const alle = readdirSync(join(WURZEL, "apps"), { withFileTypes: true })
+    .filter((x) => x.isDirectory()).map((x) => x.name);
+
+  const mitKnopf = [], ohneKnopf = [];
+  for (const n of alle) {
+    const h = lies(`apps/${n}/index.html`);
+    (h.includes(">Prüf es selbst<") ? mitKnopf : ohneKnopf).push(n);
+  }
+  ok(mitKnopf.length > 0, "mindestens eine Seite trägt „Prüf es selbst\"",
+    `${mitKnopf.length} von ${alle.length}`);
+
+  /* ⚠ WER IHN NICHT HAT, BRAUCHT EINEN GRUND — und der einzige ist die rote
+   * Ampel: `markteintraege` leert dann `url`, und ohne Adresse gibt es nichts
+   * vorzubelegen. Ein Wächter „alle haben ihn" wäre an dem Tag rot, an dem
+   * Klaus einen Eintrag sperrt, ohne dass eine Zusicherung gefallen wäre. */
+  const ohneGrund = ohneKnopf.filter((n) => !/Der Link ist zurzeit ausgesetzt/
+    .test(lies(`apps/${n}/index.html`)));
+  ok(ohneGrund.length === 0,
+    "wer keinen Prüf-Knopf hat, hat eine ausgesetzte Adresse",
+    ohneGrund.join(", ") || `${ohneKnopf.length} ohne, alle ausgesetzt`);
+
+  for (const n of mitKnopf) {
+    const h = lies(`apps/${n}/index.html`);
+    const m = /<a class="btn ghost ext" href="([^"]+)"([^>]*)>/.exec(
+      h.split(">Prüf es selbst<")[1] || "");
+    if (!m) { ok(false, `${n}: der Prüf-Knopf ist ein <a href>`); continue; }
+
+    /* 1 · Die Adresse steht EINMAL im Werkzeug, nicht im Text verstreut. */
+    ok(m[1].startsWith(PRUEFER + "?adresse="),
+      `${n}: der Knopf zeigt auf den Prüfer aus der Konstante`, m[1].slice(0, 70));
+
+    /* 2 · VORBELEGT, NICHT ABGERUFEN — die Adresse der App steht im Parameter,
+     *     und zwar dieselbe, auf die „Zur Seite" zeigt. */
+    const ziel = decodeURIComponent(m[1].split("?adresse=")[1] || "");
+    const zurSeite = /<a class="btn ghost ext" href="([^"]+)" target="_blank"/.exec(h);
+    ok(!!zurSeite && ziel === zurSeite[1],
+      `${n}: vorbelegt ist genau die Adresse, die auch „Zur Seite" nennt`, ziel);
+
+    /* 3 · Ein Wechsel der Domain wird GESAGT, nicht versteckt. */
+    ok(/pwa-toolpoint\.de<\/b>,?\s*du verl[aä]sst dabei also diese Seite/.test(h),
+      `${n}: es steht dabei, dass man diese Seite verlässt`);
+
+    /* 4 · Fremder Tab, kein Fenster-Zugriff. `nofollow ugc` wäre hier FALSCH:
+     *     das ist Klaus' eigenes Werkzeug, nicht der fremde Eintrag. */
+    ok(/target="_blank"/.test(m[2]) && /rel="noopener"/.test(m[2]),
+      `${n}: neuer Tab, rel=noopener`, m[2].trim());
+
+    /* 5 · Die Grenze des Werkzeugs steht daneben. Ohne sie wäre der Abschnitt
+     *     ein Versprechen, das der Prüfer nicht halten kann: er liest den
+     *     Quelltext, nicht den laufenden Verkehr. */
+    ok(/nicht den laufenden Verkehr/.test(h),
+      `${n}: die Grenze des Prüfers steht dabei`);
+  }
+
+  /* ⚠ UND DIE KONSTANTE DARF NICHT VOM MARKTPLATZ WEGDRIFTEN. Der Prüfer steht
+   * als eigener Eintrag in listings.js; zeigten die beiden auf verschiedene
+   * Adressen, führte der Knopf woandershin als die Karte, und niemand sähe es. */
+  const w = {};
+  new Function("window", lies("assets/config/listings.js"))(w);
+  const eintrag = (w.FP_LISTINGS || []).find((x) => x.anchorId === "markt-auslieferungspruefer");
+  ok(!!eintrag, "der Auslieferungsprüfer steht als Eintrag im Marktplatz");
+  if (eintrag) ok(eintrag.url === PRUEFER,
+    "… und der Knopf zeigt auf dieselbe Adresse wie seine Karte",
+    `${eintrag.url} ⟷ ${PRUEFER}`);
+}
+
 /* ── 3 · Und jetzt das, was ein Leser wirklich sieht ───────────────────────*/
 const TYP = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript",
   ".json": "application/json", ".xml": "application/xml", ".png": "image/png",

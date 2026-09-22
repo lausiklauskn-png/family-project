@@ -95,6 +95,25 @@ window.FP_LISTINGS = [
     "own": true
   },
   {
+    "label": "Muttis Rezeptbuch",
+    "anchorId": "eigen-muttis-rezeptbuch",
+    "text": "Das erste Rezeptbuch, mit dem alles anfing: Rezepte sammeln, ordnen, suchen und kochen. Zutaten, Mengen, Einkaufsliste und Wochenplan. Schlichter gebaut als das spätere Mein Rezeptbuch und gerade deshalb schnell zu begreifen. Läuft offline auf Handy und Tablet, ganz ohne Konto. Essen, Backen, Gerichte, Speisen, Kochbuch.",
+    "text_en": "The first recipe book, the one it all started with: collect, sort, search and cook recipes. Ingredients, amounts, shopping list and weekly plan. Built more plainly than the later My Recipe Book, and quicker to grasp for exactly that reason. Runs offline on phone and tablet, with no account at all. Food, baking, dishes, meals, cookbook.",
+    "vorstellung": [
+      "Für alle, die gern kochen und backen",
+      "Eigene Rezepte sammeln, ordnen und wiederfinden",
+      "Zutaten, Mengen und Schritte mit Foto",
+      "Einkaufsliste und Wochenplan entstehen aus den eigenen Rezepten",
+      "Läuft offline auf Handy und Tablet, ohne Konto"
+    ],
+    "besonders": "Hier wird zuerst gebaut. Was sich in diesem Buch bewährt, wandert danach in Mein Rezeptbuch. Die beiden sind Schwestern, und dieses ist die ältere.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/",
+    "img": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/icons/icon-book-512.png",
+    "category": "Küche",
+    "own": true
+  },
+  {
     "label": "Mein Mixarium",
     "anchorId": "markt-mixarium",
     "text": "Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol. Bar zuhause, trinken, Rezept, Mixgetränke. Offline nutzbar, kein Konto nötig.",
@@ -231,6 +250,25 @@ window.FP_LISTINGS = [
     "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/",
     "img": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/assets/logo-512.png",
     "category": "Mode & Design",
+    "own": true
+  },
+  {
+    "label": "Sage-Protokol",
+    "anchorId": "eigen-sage",
+    "text": "Der offene Bauplan hinter den anderen Apps hier: das SBKIM-Protokoll, mit dem Programme einander ohne Server finden und sich gegenseitig Fragen beantworten. Dazu die Werkzeugkiste zum Nachbauen: Suche nach Bedeutung, Spracheingabe, Texterkennung, Verschlüsselung, Siegel. Alles offen zum Lesen und Kopieren. Semantische Suche, Peer-to-Peer, offline, Mycel, SBKIM.",
+    "text_en": "The open blueprint behind the other apps here: the SBKIM protocol, which lets programs find each other without a server and answer each other's questions. Plus the toolbox for rebuilding it: search by meaning, speech input, text recognition, encryption, seals. All of it open to read and copy. Semantic search, peer-to-peer, offline, mycelium, SBKIM.",
+    "vorstellung": [
+      "Für alle, die wissen wollen, wie die Apps hier zusammenhängen",
+      "SBKIM heißt Semantisches Bidirektionales KI-Matching: zwei Programme finden einander daran, dass sie dasselbe meinen",
+      "Kein Server dazwischen, kein Verzeichnis, bei dem man sich anmeldet",
+      "Die Bauteile liegen offen da und dürfen kopiert werden",
+      "Glossar und Doku erklären jeden Begriff, den die anderen Apps benutzen"
+    ],
+    "besonders": "Hier entstehen die Bauteile, die in fast jeder App dieses Marktplatzes stecken. Wer wissen will, warum Kim-Bell, Kimseek, die Mycel-Karte und die Pinnwand überhaupt miteinander reden können, findet die Antwort an dieser Stelle.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Sage-Protokol/",
+    "img": "https://lausiklauskn-png.github.io/Sage-Protokol/assets/icon-512.png",
+    "category": "Werkzeug",
     "own": true
   },
   {
@@ -405,10 +443,10 @@ window.FP_LISTINGS = [
       "Für Firmen, die ihre Mitarbeiter nach Art. 4 EU AI Act schulen müssen",
       "Zehn Abschnitte von Datenschutz bis Hochrisiko-Anwendungen",
       "Wissenstest mit 15 Fragen, Auswertung im Browser",
-      "Bescheinigung zum Ausdrucken, dazu ein Lösungsschlüssel",
-      "Eine einzige Datei, läuft offline"
+      "Bescheinigung zum Ausdrucken, dazu ein Lösungsschlüssel für die Schulungsleitung",
+      "Artikel 4 verlangt kein amtliches Zertifikat: die Vorlage ist für die eigene Schulung gedacht"
     ],
-    "besonders": "Der Wissenstest wertet selbst aus und druckt die Bescheinigung. Sie ist eine Vorlage für die eigene Schulung, kein amtliches Zertifikat.",
+    "besonders": "Eine einzige Datei bringt alles mit: Schulung, Test und Auswertung laufen offline im Browser. Kein Ergebnis verlässt das Gerät, die Seite ruft nichts von außen ab.",
     "by": "@klaus",
     "url": "https://family-projekt.de/werkzeuge/ki-schulung.html",
     "img": "https://family-projekt.de/assets/appicons/ki-schulung.png",

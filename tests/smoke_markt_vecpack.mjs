@@ -31,6 +31,7 @@
  */
 import http from "node:http"; import fs from "node:fs"; import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { stubInSeite, abstandInSeite, ABSTAND_GRENZE } from "./lib/vec-stub.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const pw = await import(process.env.PW_CORE || "playwright-core");
@@ -69,28 +70,11 @@ async function open(paketBauen) {
   await page.goto(base + "/markt.html", { waitUntil: "load" });
   await page.waitForTimeout(800);
 
-  await page.evaluate(({ dim, model }) => {
-    window.__embedCount = 0;
-    /* Deterministisch aus dem Text, aber mit KLAREN Abständen: der Vektor liegt
-     * auf einem Kreis, dessen Winkel aus der Textlänge kommt. Dadurch ist die
-     * Reihenfolge eindeutig. Zufallsnahe Vektoren wären hier untauglich — in
-     * 384 Dimensionen liegen sie alle dicht beieinander, da kippen Ränge schon
-     * durch Rundung und der Test würde Rauschen messen. Wie genau die
-     * Quantisierung wirklich ist, misst smoke_vec_codec.mjs an ECHTEN Vektoren. */
-    const vecFor = (t) => {
-      const v = new Float32Array(dim);
-      const winkel = ((String(t).length % 40) / 40) * Math.PI * 0.5;
-      v[0] = Math.cos(winkel); v[1] = Math.sin(winkel);
-      return v;
-    };
-    window.__vecFor = vecFor;
-    window.SbkimEmbedding = {
-      _meta: { model, dim },
-      init: async () => {},
-      embedQuery: async (t) => vecFor("q:" + t),
-      embedPassageBatch: async (texts) => { window.__embedCount += texts.length; return texts.map(vecFor); },
-    };
-  }, { dim: DIM, model: MODEL });
+  /* ⚠ DER STUB STEHT AN EINER STELLE — tests/lib/vec-stub.mjs. Bis zum
+   * 2026-09-22 stand er hier UND in smoke_studio_vectors.mjs, wortgleich und
+   * mit demselben Fehler; ich habe den einen repariert, und der volle Lauf
+   * meldete den anderen. Die Begründung zu jeder Zeile steht dort. */
+  await page.evaluate(stubInSeite, { dim: DIM, model: MODEL });
 
   // Paket erst JETZT bauen — Codec der Seite und __vecFor stehen bereit.
   const paket = paketBauen ? await paketBauen(page) : null;
@@ -169,6 +153,17 @@ let anzahl = 0, referenz = null, ersteAnchor = null;
   anzahl = await page.evaluate(() =>
     document.querySelectorAll("#mkListings .listing img").length);
   ok(anzahl >= 10, `(e) Selbst-Riegel: der Marktplatz zeichnet überhaupt Karten (${anzahl})`);
+
+  /* ⚠ SELBST-RIEGEL AUF DEN ABSTAND — der Wächter, der am 2026-09-22 gefehlt
+   * hat. Liegen zwei Punktzahlen enger beieinander als die Quantisierung grob
+   * ist, misst „Reihenfolge identisch" nicht mehr die Zusicherung, sondern das
+   * Rundungsverhalten von int8; die Probe wäre dann rot oder grün aus dem
+   * falschen Grund. Gefragt wird die ECHTE Funktion der Seite, nicht ein
+   * Nachbau — ein zweiter Stub liefe auseinander. */
+  const abst = await page.evaluate(abstandInSeite);
+  ok(abst.min > ABSTAND_GRENZE,
+    `(e) Selbst-Riegel: die Punktzahlen liegen WEITER auseinander als int8 grob ist (> ${ABSTAND_GRENZE.toFixed(4)})`,
+    `engstes Paar ${abst.min.toFixed(5)} — ${abst.paar}`);
   ersteAnchor = await ersteId(page);
   const r = await suche(page);
   referenz = r.reihenfolge;

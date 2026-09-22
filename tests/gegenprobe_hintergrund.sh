@@ -106,6 +106,16 @@ probe "der Schein bleibt nach dem Loslassen wieder stehen" assets/mycel-bg.js \
 probe "der Schein klebt wieder am Zeiger" assets/mycel-bg.js \
   "s/u.uMouse.value.lerp(zielMaus, scheinFaktor(dt, SCHEIN_FOLGT));/u.uMouse.value.copy(zielMaus);/"
 
+# 10b · DER ZUHÖRER setzt die Lage mit, nicht die Schleife (2026-09-22).
+#      Fall 10 trifft die SCHLEIFE (`copy` statt `lerp`); dieser hier trifft
+#      den pointermove-Zuhörer. Zwei verschiedene Wege zum selben Schaden —
+#      „der Schein klebt am Zeiger" —, und bis zum 2026-09-22 gab es nur für
+#      den einen einen Fall. Der Wächter, der ihn fängt, misst in EINER
+#      JavaScript-Aufgabe: dort kann kein Bild dazwischenlaufen, die gezeigte
+#      Lage MUSS also stehenbleiben.
+probe "der Zuhoerer setzt die Lage direkt mit" assets/mycel-bg.js \
+  "s/^    zielSchein = 1;$/    zielSchein = 1; mat.uniforms.uMouse.value.copy(zielMaus);/"
+
 # 11 · Er springt aus, statt zu verglimmen.
 probe "er springt aus, statt zu verglimmen" assets/mycel-bg.js \
   "s/^  const SCHEIN_AUSLAUF = 0.42;.*$/  const SCHEIN_AUSLAUF = 0.02;/"

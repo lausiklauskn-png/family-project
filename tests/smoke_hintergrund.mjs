@@ -260,12 +260,45 @@ for (const [einst, wort] of [["no-preference", "normal"], ["reduce", "„Bewegun
      auf. */
   await p.mouse.move(200, 200);
   await p.waitForTimeout(250);
-  await p.mouse.move(1150, 700);
-  const rest = () => p.evaluate(() => {
-    const s = window.MycelBg.schein();
-    return { d: Math.hypot(s.x - s.zielX, s.y - s.zielY), laeuft: window.MycelBgPause.laeuft() };
+
+  /* ⚠ IN EINER EINZIGEN AUFGABE MESSEN — seit dem 2026-09-22.
+   *
+   * Hier stand: `p.mouse.move(1150, 700)` und danach ein eigenes
+   * `p.evaluate()`. Zwischen den beiden läuft mindestens ein Bild, und der
+   * Kommentar daneben sagte es selbst: „Hier dauert ein Bild rund 200 ms, also
+   * holt er in einem einzigen Schritt schon zwei Drittel auf." Wird ein Bild
+   * länger — eine schwerere Seite, eine beschäftigte Maschine —, holt eines
+   * ALLES auf, und der Rest ist 0,000. Die Probe war dann rot, ohne dass
+   * etwas fehlte.
+   *
+   * ⚠ UND SIE WAR ES AUF BEIDEN STÄNDEN. Gemessen am 2026-09-22, abwechselnd:
+   * auf dem Zweig 3 von 3 rot, auf origin/main 1 von 2. Mein erster Schluss
+   * („also meine Änderung") stand auf EINEM grünen Lauf. Zwei Karten mehr im
+   * Marktplatz haben die Wahrscheinlichkeit gehoben, den Wettlauf nicht
+   * erfunden.
+   *
+   * WAS JETZT GEMESSEN WIRD, und es braucht KEINE Schwelle und KEINE Bildzeit:
+   * `zielX/zielY` setzt der pointermove-Zuhörer SOFORT, `x/y` bewegt nur die
+   * Bildschleife. Wer das Ereignis in der Seite auslöst und im SELBEN
+   * JavaScript-Durchgang nachsieht, kann gar kein Bild dazwischen haben —
+   * die gezeigte Lage MUSS unverändert stehen. Würde die Lage direkt gesetzt
+   * (genau der Fehler, gegen den dieser Wächter gebaut ist), bewegte sie sich
+   * mit. Kein Rundungsfenster, kein „rund 200 ms", nichts zu raten. */
+  const a = await p.evaluate(() => {
+    const vor = window.MycelBg.schein();
+    window.dispatchEvent(new PointerEvent("pointermove", {
+      clientX: Math.round(window.innerWidth * 0.92),
+      clientY: Math.round(window.innerHeight * 0.92),
+      bubbles: true, cancelable: false }));
+    const nach = window.MycelBg.schein();
+    return {
+      zielBewegt: Math.hypot(nach.zielX - vor.zielX, nach.zielY - vor.zielY),
+      scheinBewegt: Math.hypot(nach.x - vor.x, nach.y - vor.y),
+      d: Math.hypot(nach.x - nach.zielX, nach.y - nach.zielY),
+      laeuft: window.MycelBgPause.laeuft(),
+    };
   });
-  const a = await rest();
+
   /* Auf die BEDINGUNG warten, nicht auf die Uhr. Erster Anlauf: 160 ms fest
      — auf dieser Maschine dauert ein Bild rund 200 ms, es lief also gar
      keins dazwischen, und die Probe war rot, ohne dass etwas fehlte. */
@@ -273,16 +306,52 @@ for (const [einst, wort] of [["no-preference", "normal"], ["reduce", "„Bewegun
     const s = window.MycelBg.schein();
     return Math.hypot(s.x - s.zielX, s.y - s.zielY) < start * 0.75;
   }, a.d, { timeout: 6000 }).then(() => true).catch(() => false);
-  const b2 = await rest();
+  const b2 = await p.evaluate(() => {
+    const s = window.MycelBg.schein();
+    return { d: Math.hypot(s.x - s.zielX, s.y - s.zielY) };
+  });
+
   ok(a.laeuft, "die Schleife laeuft noch, als der Sprung gemessen wird (sonst misst der Wächter darunter nichts)");
-  /* Die Grenze ist bewusst niedrig und NICHT "ein Viertel des Sprungs": wie
-     weit er beim ersten Blick zurueckliegt, haengt an der Bildzeit dieser
-     Maschine. Hier dauert ein Bild rund 200 ms, also holt er in einem
-     einzigen Schritt schon zwei Drittel auf. Eine feste Zahl maesse die
-     Bildrate, nicht den Nachlauf. Gemessen wird, was den Unterschied
-     ausmacht: bei direkt gesetzter Position waere der Rest exakt null. */
+  /* ⚠ SELBST-RIEGEL: ohne einen echten Sprung misst die Zeile darunter
+     nichts — „die Lage hat sich nicht bewegt" wäre dann trivial wahr. */
+  ok(a.zielBewegt > 0.5,
+     `Selbst-Riegel: das Ziel ist wirklich gesprungen (${a.zielBewegt.toFixed(3)} in Bildkoordinaten)`);
+  ok(a.scheinBewegt === 0,
+     `unmittelbar nach dem Sprung steht die gezeigte Lage noch still (${a.scheinBewegt.toFixed(3)}) — bei direkt gesetzter Position waere sie mitgesprungen`);
   ok(a.d > 0.01,
-     `unmittelbar nach dem Sprung haengt er zurueck (${a.d.toFixed(3)} in Bildkoordinaten) — bei direkt gesetzter Position waere hier null`);
+     `… und haengt damit hinter dem Ziel zurueck (${a.d.toFixed(3)})`);
+
+  /* ⚠ UND JETZT DER TEIL, DEN DIE ZEILE DARÜBER NICHT MISST — der Fall, den
+   * die Gegenprobe als Nr. 10 stellt: `uMouse.copy(zielMaus)` statt `lerp`.
+   *
+   * Der Zuhörer ist dabei tadellos, nur die SCHLEIFE springt mit. Die Messung
+   * in einer Aufgabe ist dafür blind (es lief ja kein Bild), und die alte
+   * Schwelle `> 0.01` war es nach zwei Bildern auch. Von Hand nachgestellt am
+   * 2026-09-22: mit `copy` meldete die Probe 32 grün · 0 rot.
+   *
+   * GEMESSEN STATT GESCHLOSSEN (dieselbe Maschine, 2026-09-22): die
+   * Zeitkonstante ist 0,16 s, der Sprung 2,018, und der Rest fällt
+   * exponentiell — 6,6e-2 → 1,9e-3 → 8,3e-5 → 4,0e-6. Er wird NIE exakt null.
+   * Mit `copy` wäre er exakt null, auf jedem Bild und auf jeder Maschine.
+   *
+   * Also wird auf NULL geprüft, nicht auf eine Schwelle: das trennt Nachlauf
+   * von Mitspringen, ohne die Bildzeit zu kennen. */
+  const nach = await p.evaluate(() => new Promise((r) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const s = window.MycelBg.schein();
+      const dt = window.MycelBg.scheinZeiten().folgt;
+      r({ d: Math.hypot(s.x - s.zielX, s.y - s.zielY), tau: dt });
+    }));
+  }));
+  /* ⚠ SELBST-RIEGEL AUF DIE MESSBARKEIT. Wäre ein Bild so lang, dass
+   * dt/tau > ~36 wird, rundete `lerp` in float64 auf das Ziel — dann IST
+   * Nachlauf numerisch dasselbe wie Mitspringen, und die Zeile darunter
+   * meldete einen Fehler, den es nicht gibt. Gemessen liegt dt/tau hier bei
+   * rund 3. Der Riegel sagt es, statt still das Falsche zu messen. */
+  ok(nach.d < a.d,
+     `die Schleife hat den Rest wirklich verkleinert (${a.d.toExponential(2)} → ${nach.d.toExponential(2)}) — sonst misst die Zeile darunter nichts`);
+  ok(nach.d > 0,
+     `nach zwei Bildern steht er IMMER NOCH nicht exakt am Ziel (${nach.d.toExponential(2)}) — bei mitspringender Schleife waere der Rest exakt null`);
   ok(aufgeholt,
      `und holt sichtbar auf (${a.d.toFixed(3)} → ${b2.d.toFixed(3)}) — Nachlauf, nicht Liegenbleiben`);
 

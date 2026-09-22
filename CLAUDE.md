@@ -673,6 +673,286 @@ weil die gestellte Lage ihre eigene Vorbedingung mitmisst) · voller Lauf
 
 ⚠ **Cache-Bump v128 → v129, dann v129 → v130.**
 
+## 🔎 ZWEI NEUE KARTEN — und die Kennung, die 27 Messpunkte gerettet hat (Klaus 2026-09-22)
+
+Klaus: *„Und von Multisrezept.sage-Protokoll wieder anlegen."* Hier stand bis
+dahin: *„ZWEI NAMEN AUS DEM AUFTRAG STEHEN NICHT IM MARKTPLATZ: Muttis
+Rezeptbuch und Sage-Protokol haben hier keine Karte. Es wird kein Eintrag
+erfunden."* Der Satz war richtig, **solange niemand ihn angelegt hatte**.
+
+### ⚠ DIE KENNUNG IST DIE IDENTITÄT DER MESSREIHE, nicht ein Namensschema
+
+Alle 18 Bestands-Einträge heißen `markt-…`. Die beiden Neuen heißen
+**`eigen-sage`** und **`eigen-muttis-rezeptbuch`** — mit Absicht, und der
+Grund steht in **zwei** Dateien, die dasselbe sagen:
+
+| | |
+|---|---|
+| `forschung/messziele.json`, `_felder.id` | *„Bleibt stabil, auch wenn sich der Name ändert — sonst reißt der Verlauf ab."* |
+| `assets/config/listings.js` | `anchorId` ist die Kennung, die stabil bleibt, wenn sich der Titel ändert |
+
+**Beide Adressen wurden längst gemessen**, nur unter der Forschungs-Kennung:
+`eigen-sage` trug **13** Handy-Punkte seit dem 06.08., `eigen-muttis-rezeptbuch`
+**14**. Ein `markt-`-Präfix hätte zwei frische, leere Reihen begonnen.
+
+⚠ **DER PRÄZEDENZFALL ZEIGT, WAS DAS KOSTET — er ist nachgerechnet, nicht
+vermutet.** `eigen-toolpoint-pruefer` ist am 13.09. in den Marktplatz gezogen
+und hat dabei das Präfix gewechselt:
+
+| | Punkte | Zeitraum |
+|---|---|---|
+| `eigen-toolpoint-pruefer` (alt) | 3 | 22.08. bis **08.09.**, steht seitdem still |
+| `markt-auslieferungspruefer` (neu) | **2** | ab **19.09.** |
+
+Seine Detailseite zeigt heute **zwei** Zeilen Verlauf statt fünf. Genau die
+dünne Seite, gegen die der ganze SEO-Plan gebaut ist — verursacht nicht von
+einer fehlenden Messung, sondern von einem umbenannten Schlüssel.
+
+⚠ **UND DAS DOPPELTE MESSEN IST DER PREIS, DER DAFÜR ZU ZAHLEN WAR.** Ein
+Marktplatz-Eintrag wird vom nächtlichen Markt-Lauf gemessen, ein
+Forschungs-Ziel vom `--messen`-Lauf. Dieselbe Adresse stünde zweimal je Nacht
+in der Messung, und die Reihe bekäme **zwei Punkte für denselben Tag aus zwei
+Wegen**. Beide Ziele stehen deshalb auf `aktiv: false`, mit dem Grund
+danebengeschrieben — und weil `bekannteKennungen()` auch die **abgeschalteten**
+Ziele mitliest, findet der Fremdmarkt-Weg sie ebenfalls nicht ein zweites Mal.
+
+⚠ **GEMESSEN, NICHT GEHOFFT:** nach dem Bau trägt `apps/eigen-sage/` **14**
+Tabellenzeilen (13 Punkte plus Kopf), `apps/eigen-muttis-rezeptbuch/` **15**.
+
+### ⚠ Und alle 18 Bestands-Texte kommen ohne Gedankenstrich aus
+
+Klaus' Regel vom 22.09. (*„keine Trennzeichen oder Bindestriche"*, Wort-Binde­
+striche bleiben) hat **keinen Wächter**, und trotzdem hielten sich alle
+achtzehn daran. Mein erster Muttis-Text nicht. Gezählt statt geglaubt: `1`
+Treffer, meiner. Nachgezogen.
+
+## 🔍 DER PRÜF-ES-SELBST-KNOPF FÜHRT HIER ÜBER EINE DOMAIN-GRENZE (Klaus 2026-09-22)
+
+Klaus: *„den Prüfer-Selbst-Knopf kannst du mit einfügen … macht genau wie
+PWA-Toolpoint."* Übernommen aus `PWA-Toolpoint/tools/detailseiten.mjs`.
+
+⚠ **KLAUS' VERMUTUNG DANEBEN STIMMTE NICHT, und das gehört hingeschrieben
+statt stillschweigend richtiggestellt.** Er sagte: *„Damit werden sie auf die
+Lighthouse-Seite verlinkt, glaube ich."* Er hat selbst „glaube ich" gesagt —
+und der Knopf tut etwas anderes: er öffnet den **Auslieferungsprüfer** mit der
+Adresse der App im Feld. Lighthouse kommt darin nicht vor.
+
+⚠ **UND ER IST NICHT DERSELBE KNOPF WIE DRÜBEN.** PWA Toolpoint hat den
+Prüfer bei sich liegen und verlinkt relativ; **dieses Depot hat ihn nicht**
+(gemessen: keine Datei `auslieferungspruefer.html`, der Marktplatz-Eintrag
+zeigt auf `pwa-toolpoint.de`). Daraus folgen drei Zusicherungen, die es in der
+Vorlage gar nicht geben kann:
+
+| | |
+|---|---|
+| **der Wechsel wird gesagt** | *„Der Prüfer liegt auf pwa-toolpoint.de, du verlässt dabei also diese Seite."* Einen Domain-Wechsel hinter einem Knopf zu verstecken verbietet der Ton dieses Depots |
+| **`noopener`, nicht `nofollow ugc`** | `relFuer(e.eigen)` beantwortet die Frage nach dem **Anbieter des Eintrags** und ist hier die falsche Quelle — der Prüfer ist Klaus' eigenes Werkzeug |
+| **die Adresse steht EINMAL** | als `PRUEFER` im Werkzeug, und ein Wächter hält sie gegen die Karte `markt-auslieferungspruefer`. Driften die beiden, führte der Knopf woandershin als der Eintrag, und niemand sähe es |
+
+Unverändert übernommen: **vorbelegt, nicht abgerufen** (`?adresse=`, gedrückt
+wird von Hand — ein Abruf beim Laden wäre eine Eigenanfrage ins offene Netz)
+und die **benannte Grenze** (er liest den Quelltext, nicht den laufenden
+Verkehr).
+
+⚠ **ROT HEISST AUCH HIER KEIN KNOPF**, und der Wächter misst genau das:
+*wer keinen hat, hat eine ausgesetzte Adresse.* Ein Wächter „alle 19 haben
+ihn" wäre an dem Tag rot, an dem Klaus einen Eintrag sperrt — ohne dass eine
+Zusicherung gefallen wäre. Dieselbe Falle wie am 2026-09-18, als eine Zahl in
+einer Prüfung die Veröffentlichung stillgelegt hat.
+
+## 🎯 DER VEKTOR-STUB MASS RAUSCHEN, NICHT RÄNGE — drei Schichten (2026-09-22)
+
+**Der teuerste Befund dieses Durchgangs, und gefunden hat ihn keine
+Überlegung, sondern zwei neue Einträge.** `smoke_markt_vecpack` wurde rot:
+„Reihenfolge identisch zur Live-Berechnung", und **ein** Eintrag stand anders.
+
+Im Stub der Probe stand seit jeher:
+
+```js
+const winkel = ((String(t).length % 40) / 40) * Math.PI * 0.5;
+```
+
+mit dem Satz daneben: *„Dadurch ist die Reihenfolge eindeutig."* **Der Satz
+war falsch, und zwar dreifach.**
+
+| | was wirklich geschah |
+|---|---|
+| **1 · nur 40 Vektoren** | `% 40` lässt vierzig verschiedene zu. Gemessen an den 20 Einträgen: **16 belegte Eimer, drei Kollisionen** — Mein Rezeptbuch ⟷ Jasons Tresor (beide 246 Zeichen) · Tomys Hub ⟷ PWA Toolpoint ⟷ Kim Hub Company · Mein Mixarium ⟷ Kimseek |
+| **2 · der Kosinus faltet** | `cos(q−a) = cos(q+a)`. Zwei Einträge symmetrisch um den Anfrage-Winkel tragen dieselbe Zahl auf **zwölf Nachkommastellen** — gemessen: Muttis Rezeptbuch (Eimer 2) ⟷ Private Brain (Eimer 14), beide `0.972369920398` |
+| **3 · meine erste Reparatur machte es schlimmer** | ein Streuwert über 1.000.003 Eimer nahm die Gleichstände weg und setzte **beliebig dichte** Winkel an ihre Stelle. Der Gleichstands-Riegel wurde grün, die Reihenfolge blieb falsch |
+
+⚠ **DIE ZUSICHERUNG MASS ETWAS ANDERES, ALS IHR NAME SAGT.** Bei einem
+Gleichstand entscheidet die **Stabilität der Sortierung**, und die ist zwischen
+dem Live-Weg (ein Stapel) und dem Paket-Weg (teils aus dem Paket, teils live)
+nicht dieselbe. **Siebzehn Einträge lang war sie grün, weil kein Gleichstand
+ins Gewicht fiel** — grün aus dem falschen Grund, und niemand konnte es sehen.
+
+⚠ **UND SCHICHT 3 IST DIE LEHRREICHSTE:** der alte Kommentar sprach von
+*„KLAREN Abständen"* und hatte damit vollkommen recht. Seine **Rechnung**
+hielt es nur nicht ein. Meine erste Reparatur hat die richtige Absicht des
+Kommentars gelesen und trotzdem gegen sie gebaut — weil ich *„eindeutig"*
+repariert habe und *„klar getrennt"* dabei verloren ging. **Das Paket ist
+int8-quantisiert** (Schrittweite rund 1/127 ≈ 0,008); wo zwei Zahlen enger
+beieinanderliegen, kippt der Rang am Runden.
+
+### Was jetzt gilt — und warum es von selbst trägt
+
+- **Die Anfrage ist die Achse** (`v = e0`). Damit **ist** die Punktzahl `v[0]`,
+  und der Kosinus kann nicht mehr falten.
+- **Der Platz kommt aus dem RANG** des Textes unter allen Marktplatz-Texten:
+  kollisionsfrei durch Bauart, nicht durch Glück. Kein Streuwert, kein Modulo,
+  keine Wahrscheinlichkeit.
+- **Gleichmäßig über 1,0 bis 0,2** — bei 20 Einträgen rund **0,038** je
+  Schritt, das **Fünffache** der Quantisierungs-Schrittweite.
+- ⚠ **Und der Selbst-Riegel MISST den Abstand, statt ihn zu behaupten:**
+  `min > 2/127`. Wächst die Liste, schrumpft der Abstand — dann meldet der
+  Riegel es, **bevor** die Ränge wieder kippen. Genau der Wächter, der
+  siebzehn Einträge lang gefehlt hat.
+
+⚠ **DIE GRENZE `2/127` IST EINE WAHL, KEINE MESSUNG**, und sie steht mit ihrer
+Rechnung im Code. Wie genau die Quantisierung wirklich ist, misst
+`smoke_vec_codec.mjs` an **echten** Vektoren; hier geht es nur darum, dass die
+Probe Ränge misst und nicht Rauschen.
+
+⚠ **UND DER GEGENPROBE-FALL IST DER BELEG, dass die Reparatur eine ist:**
+`VEC: der alte Stub mit % 40 und gefaltetem Kosinus kommt zurueck` dreht ihn
+wortgleich zurück, und der Abstands-Riegel fällt.
+
+### ⚠ ZUM SECHSTEN MAL: das deutsche Anführungszeichen beendet den String
+
+`echo "═══ PRUEFKNOPF: „Pruef es selbst" …"` in der Gegenprobe —
+`syntax error near unexpected token '('`. Die Falle steht in dieser Datei
+**fünfmal**, eine Überschrift weiter oben sogar unter genau diesem Namen, und
+sie ist mir beim Schreiben des Abschnitts über sie selbst passiert.
+`bash -n` meldet sie in Sekunden.
+
+## 🌀 ICH HABE EINEN WETTLAUF REPARIERT UND DABEI EINEN WÄCHTER BLIND GEMACHT (2026-09-22)
+
+`smoke_hintergrund` wurde rot: *„unmittelbar nach dem Sprung haengt er
+zurueck (0.000) — bei direkt gesetzter Position waere hier null."*
+
+### ⚠ Mein erster Schluss stand auf EINEM Lauf, und er war falsch
+
+Ich habe die Probe auf `origin/main` gefahren, **30 grün · 0 rot** gesehen und
+geschrieben: *„also meine Änderung."* Abwechselnd gemessen sieht es anders aus:
+
+| | rot |
+|---|---|
+| mein Zweig | 3 von 3 |
+| **`origin/main`** | **1 von 2** |
+
+**Der Wettlauf war auf beiden Ständen.** Zwei Karten mehr im Marktplatz haben
+seine Wahrscheinlichkeit gehoben, ihn nicht erfunden. *Ein Lauf ist keine
+Messung* — die Regel steht netzweit, und ich habe sie an einem einzigen grünen
+Lauf gebrochen.
+
+### Die Ursache stand im Kommentar der Probe, eine Zeile über der roten Zeile
+
+*„Hier dauert ein Bild rund 200 ms, also holt er in einem einzigen Schritt
+schon zwei Drittel auf."* Gemessen wurde nach `p.mouse.move(…)` in einem
+**zweiten** Aufruf — dazwischen läuft mindestens ein Bild. Wird eines länger
+(schwerere Seite, beschäftigte Maschine), holt es **alles** auf.
+
+**Gemessen statt geschlossen**, dieselbe Maschine: Zeitkonstante **0,16 s**,
+Sprung **2,018**, und der Rest fällt exponentiell.
+
+| nach | Bildzeit | Rest |
+|---|---|---|
+| ohne Bild | — | **2,018** |
+| 1 Bild | 0,8 ms | 6,6e-2 |
+| 2 Bilder | 564 ms | 1,9e-3 |
+| 3 Bilder | 504 ms | 8,3e-5 |
+| 4 Bilder | 486 ms | 4,0e-6 |
+
+Die Schwelle war `> 0.01`. Ab dem zweiten Bild ist sie gerissen — **ohne dass
+etwas fehlte**.
+
+### ⚠ UND MEINE ERSTE REPARATUR HAT DEN WÄCHTER BLIND GEMACHT
+
+Ich habe den Sprung in die Seite verlegt und in **einer** JavaScript-Aufgabe
+gemessen: dann kann kein Bild dazwischenlaufen, die gezeigte Lage muss
+stehenbleiben. Deterministisch, ohne Schwelle — und **für den Fehler blind,
+gegen den der Wächter gebaut ist.**
+
+Gegenprobe-Fall 10 sabotiert die **Schleife** (`uMouse.copy(zielMaus)` statt
+`lerp`). Der Zuhörer ist dabei tadellos; in einer Aufgabe ohne Bild sieht man
+gar nichts. **Von Hand nachgestellt: mit `copy` meldete die Probe 32 grün ·
+0 rot.**
+
+> **Gefunden hat es nicht das Nachdenken, sondern das Nachstellen.** Ich hatte
+> mir schon zurechtgelegt, warum die neue Fassung stärker sei.
+
+### Was jetzt gilt — und warum es ohne Schwelle auskommt
+
+**Zwei Wege zu demselben Schaden, zwei Wächter:**
+
+| | wird gemessen |
+|---|---|
+| **der Zuhörer** setzt die Lage mit | in **einer** Aufgabe: `scheinBewegt === 0`. Kein Bild dazwischen, kein Rundungsfenster |
+| **die Schleife** springt mit | nach zwei Bildern: `d > 0`, **strikt**, keine Schwelle |
+
+⚠ **DIE NULL IST DER GANZE TRICK.** Mit `lerp` fällt der Rest exponentiell und
+wird **nie exakt null** (gemessen bis 4,0e-6). Mit `copy` ist er **exakt null**,
+auf jedem Bild und auf jeder Maschine. Eine Schwelle misst die Bildrate, die
+Null misst die Zusicherung.
+
+⚠ **UND DER SELBST-RIEGEL DANEBEN:** *„die Schleife hat den Rest wirklich
+verkleinert"*. Ohne ihn wäre `d > 0` auch dann grün, wenn die Schleife gar
+nicht mehr liefe.
+
+⚠ **BENANNTE GRENZE:** wäre ein Bild so lang, dass `dt/tau > ~36` wird, rundete
+`lerp` in float64 auf das Ziel, und Nachlauf wäre numerisch dasselbe wie
+Mitspringen. Gemessen liegt `dt/tau` hier bei rund **3**.
+
+**Beide Richtungen nachgestellt**, jede mit ihrem Namen in der roten Zeile:
+Schleife mitspringend → 33/1 · Zuhörer setzt direkt → 29/5 · unverändert →
+**34 grün · 0 rot**. Der neue Fall **10b** steht in
+`tests/gegenprobe_hintergrund.sh`; bis dahin gab es für den Zuhörer-Weg
+**keinen**.
+
+## ⚠ `Pr.f` TRIFFT `Prüf` NICHT — der Punkt ist ein BYTE (2026-09-22)
+
+Die Gegenprobe meldete zwei meiner neuen Fälle als **„rot aus falschem
+Grund"**. Von Hand nachgestellt: der Wächter feuerte tadellos, mit seinem
+eigenen Namen in der roten Zeile. Falsch war **mein grep-Muster**.
+
+```
+LANG=   LC_ALL=            ← leer, also C-Locale
+grep '✗.*der Pr.f-Knopf ist ein <a href>'   → 0 Treffer
+grep '✗.*Knopf ist ein <a href>'            → 1 Treffer
+```
+
+**`.` trifft im C-Locale ein BYTE, und `ü` sind zwei** (`\xc3\xbc`). `Pr.f`
+kann `Prüf` deshalb nie treffen.
+
+⚠ **DAS IST DIE DRITTE SPIELART DERSELBEN FALLE**, und die ersten zwei stehen
+eine Überschrift weiter oben: am 2026-09-22 trafen `traegt` und `laesst`
+daneben, weil die rote Zeile „trägt" und „lässt" trug. Damals war die Abhilfe
+*„schreib den Umlaut"* — ich habe stattdessen versucht, ihn mit `.` zu
+**umgehen**, und bin in eine andere Tür derselben Falle gelaufen.
+
+**Was jetzt gilt: im Muster steht kein Umlaut.** Nicht der echte (der geht,
+solange die Datei UTF-8 ist), nicht `.` als Ersatz — sondern ein Stück der
+Zusicherung **ohne** Umlaut, das trotzdem eindeutig ist (`Knopf ist ein
+<a href>`, `fers steht dabei`).
+
+### ⚠ Und ein Fall war ein toter Anker, den ich selbst gebaut hatte
+
+Mein mehrzeiliger Anker trug **wörtliche `\n`** statt Zeilenumbrüchen — die
+Falle steht netzweit seit dem 2026-08-24 („`\n` ist ein wörtliches
+Backslash-N"). Der Fall ist seitdem kein Anker-Problem mehr, sondern eine
+**benannte Grenze**: heute steht kein Eintrag auf ROT, es gibt also gar keine
+Seite ohne Adresse, und eine Sabotage daran änderte nichts Messbares. *Ein
+Fall, der nichts messen kann, sähe wie Deckung aus.* Der Wächter bleibt und
+trägt an dem Tag, an dem Klaus einen Eintrag sperrt.
+
+### ⚠ Und ein Fall war blind, weil die Sabotage ZU stark war
+
+`SCHRITT = 0.0` macht alle Vektoren gleich — und über lauter gleichen Zahlen
+sortiert auch der Studio-Weg stabil, also blieb er grün. `0.002` bricht die
+Reihenfolge wirklich. *Eine Sabotage muss treffen, was der Wächter misst;
+„gar nichts mehr" ist kein Treffer.*
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere
