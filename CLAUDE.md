@@ -826,6 +826,90 @@ wortgleich zurück, und der Abstands-Riegel fällt.
 sie ist mir beim Schreiben des Abschnitts über sie selbst passiert.
 `bash -n` meldet sie in Sekunden.
 
+## 🌀 ICH HABE EINEN WETTLAUF REPARIERT UND DABEI EINEN WÄCHTER BLIND GEMACHT (2026-09-22)
+
+`smoke_hintergrund` wurde rot: *„unmittelbar nach dem Sprung haengt er
+zurueck (0.000) — bei direkt gesetzter Position waere hier null."*
+
+### ⚠ Mein erster Schluss stand auf EINEM Lauf, und er war falsch
+
+Ich habe die Probe auf `origin/main` gefahren, **30 grün · 0 rot** gesehen und
+geschrieben: *„also meine Änderung."* Abwechselnd gemessen sieht es anders aus:
+
+| | rot |
+|---|---|
+| mein Zweig | 3 von 3 |
+| **`origin/main`** | **1 von 2** |
+
+**Der Wettlauf war auf beiden Ständen.** Zwei Karten mehr im Marktplatz haben
+seine Wahrscheinlichkeit gehoben, ihn nicht erfunden. *Ein Lauf ist keine
+Messung* — die Regel steht netzweit, und ich habe sie an einem einzigen grünen
+Lauf gebrochen.
+
+### Die Ursache stand im Kommentar der Probe, eine Zeile über der roten Zeile
+
+*„Hier dauert ein Bild rund 200 ms, also holt er in einem einzigen Schritt
+schon zwei Drittel auf."* Gemessen wurde nach `p.mouse.move(…)` in einem
+**zweiten** Aufruf — dazwischen läuft mindestens ein Bild. Wird eines länger
+(schwerere Seite, beschäftigte Maschine), holt es **alles** auf.
+
+**Gemessen statt geschlossen**, dieselbe Maschine: Zeitkonstante **0,16 s**,
+Sprung **2,018**, und der Rest fällt exponentiell.
+
+| nach | Bildzeit | Rest |
+|---|---|---|
+| ohne Bild | — | **2,018** |
+| 1 Bild | 0,8 ms | 6,6e-2 |
+| 2 Bilder | 564 ms | 1,9e-3 |
+| 3 Bilder | 504 ms | 8,3e-5 |
+| 4 Bilder | 486 ms | 4,0e-6 |
+
+Die Schwelle war `> 0.01`. Ab dem zweiten Bild ist sie gerissen — **ohne dass
+etwas fehlte**.
+
+### ⚠ UND MEINE ERSTE REPARATUR HAT DEN WÄCHTER BLIND GEMACHT
+
+Ich habe den Sprung in die Seite verlegt und in **einer** JavaScript-Aufgabe
+gemessen: dann kann kein Bild dazwischenlaufen, die gezeigte Lage muss
+stehenbleiben. Deterministisch, ohne Schwelle — und **für den Fehler blind,
+gegen den der Wächter gebaut ist.**
+
+Gegenprobe-Fall 10 sabotiert die **Schleife** (`uMouse.copy(zielMaus)` statt
+`lerp`). Der Zuhörer ist dabei tadellos; in einer Aufgabe ohne Bild sieht man
+gar nichts. **Von Hand nachgestellt: mit `copy` meldete die Probe 32 grün ·
+0 rot.**
+
+> **Gefunden hat es nicht das Nachdenken, sondern das Nachstellen.** Ich hatte
+> mir schon zurechtgelegt, warum die neue Fassung stärker sei.
+
+### Was jetzt gilt — und warum es ohne Schwelle auskommt
+
+**Zwei Wege zu demselben Schaden, zwei Wächter:**
+
+| | wird gemessen |
+|---|---|
+| **der Zuhörer** setzt die Lage mit | in **einer** Aufgabe: `scheinBewegt === 0`. Kein Bild dazwischen, kein Rundungsfenster |
+| **die Schleife** springt mit | nach zwei Bildern: `d > 0`, **strikt**, keine Schwelle |
+
+⚠ **DIE NULL IST DER GANZE TRICK.** Mit `lerp` fällt der Rest exponentiell und
+wird **nie exakt null** (gemessen bis 4,0e-6). Mit `copy` ist er **exakt null**,
+auf jedem Bild und auf jeder Maschine. Eine Schwelle misst die Bildrate, die
+Null misst die Zusicherung.
+
+⚠ **UND DER SELBST-RIEGEL DANEBEN:** *„die Schleife hat den Rest wirklich
+verkleinert"*. Ohne ihn wäre `d > 0` auch dann grün, wenn die Schleife gar
+nicht mehr liefe.
+
+⚠ **BENANNTE GRENZE:** wäre ein Bild so lang, dass `dt/tau > ~36` wird, rundete
+`lerp` in float64 auf das Ziel, und Nachlauf wäre numerisch dasselbe wie
+Mitspringen. Gemessen liegt `dt/tau` hier bei rund **3**.
+
+**Beide Richtungen nachgestellt**, jede mit ihrem Namen in der roten Zeile:
+Schleife mitspringend → 33/1 · Zuhörer setzt direkt → 29/5 · unverändert →
+**34 grün · 0 rot**. Der neue Fall **10b** steht in
+`tests/gegenprobe_hintergrund.sh`; bis dahin gab es für den Zuhörer-Weg
+**keinen**.
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere
