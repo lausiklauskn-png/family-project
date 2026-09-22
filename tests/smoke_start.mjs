@@ -45,12 +45,48 @@ await page.goto(base + "/index.html", { waitUntil: "load" });
 await page.waitForTimeout(1500); // three.js + Module + init
 
 // Filter: Embedding-CDN/Netz-Warnungen sind erwartbar offline und kein Fehler.
+//
+// ⚠ DER PROXY-WORTLAUT STAND HIER NICHT, UND IN smoke_all.mjs SEIT DEM
+// 2026-08-08 SCHON. Der Behälter lässt keine WebSocket-Verbindung nach
+// draußen; „Establishing a tunnel via proxy server failed" ist eine Aussage
+// über die Leitung, nicht über die Seite. Dieselbe Probe, dieselbe Umgebung,
+// zwei verschiedene Filter — und diese hier war deshalb dauerhaft rot.
+// Bewusst ENG gefasst, nur der Proxy-Wortlaut: ein wirklich totes Relais soll
+// weiterhin auffallen.
 const realErrors = errors.filter((e) =>
-  !/transformers|jsdelivr|cdn|net::ERR|Failed to load resource.*(cdn|jsdelivr)/i.test(e));
+  !/transformers|jsdelivr|cdn|net::ERR|Failed to load resource.*(cdn|jsdelivr)|tunnel via proxy server failed/i.test(e));
 
 ok(realErrors.length === 0, "keine kritischen Konsolen-Fehler" + (realErrors.length ? " — " + JSON.stringify(realErrors.slice(0, 5)) : ""));
 ok(await page.evaluate(() => !!document.querySelector("#bg")), "three.js-Canvas #bg vorhanden");
-ok(await page.evaluate(() => !!(window.MycelBg && typeof window.MycelBg.setTheme === "function")), "MycelBg.setTheme bereit (three.js initialisiert)");
+
+/* ⚠ TAFEL-EVOLUTIONS-KLAUSEL, AUSDRÜCKLICH BENANNT. Hier stand „MycelBg.setTheme
+ * bereit (three.js initialisiert)" — also: der Hintergrund IST an. Das war
+ * richtig, bis der Hintergrund am 2026-08-08 daran gehängt wurde, OB EIN
+ * GRAFIKCHIP DA IST. Dieser Lauf fährt ein headless Chromium mit SwiftShader,
+ * also genau den Fall, in dem three.js mit Absicht gar nicht mehr geholt wird.
+ * smoke_all.mjs hat die Zusicherung damals nachgezogen, diese Probe nicht —
+ * seitdem war sie rot, ohne dass eine Zusicherung gefallen wäre.
+ *
+ * Gefragt wird jetzt dasselbe wie dort: verhält er sich zur Grafiklage passend?
+ * Beide Antworten sind gültig, eine dritte gibt es nicht — und ein stiller
+ * Fehler (three.js geladen, aber kein MycelBg TROTZ Chip) fällt weiterhin auf. */
+const bg = await page.evaluate(() => ({
+  da: !!(window.MycelBg && typeof window.MycelBg.setTheme === "function"),
+  ohneChip: (function () {
+    try {
+      var c = document.createElement("canvas");
+      var gl = c.getContext("webgl2") || c.getContext("webgl");
+      if (!gl) return true;
+      var d = gl.getExtension("WEBGL_debug_renderer_info");
+      var n = d ? String(gl.getParameter(d.UNMASKED_RENDERER_WEBGL) || "") : "";
+      return /swiftshader|llvmpipe|software|mesa offscreen|microsoft basic/i.test(n);
+    } catch (_e) { return true; }
+  })(),
+}));
+ok(bg.ohneChip ? !bg.da : bg.da,
+  bg.ohneChip
+    ? "three.js ohne Grafikchip zu Recht ausgelassen (MycelBg fehlt)"
+    : "MycelBg.setTheme bereit (three.js initialisiert)");
 ok(await page.evaluate(() => typeof window.FP === "object" && typeof window.FP.init === "function"), "FP (app.js) geladen");
 ok(await page.evaluate(() => !!window.SbkimStorage && !!window.SbkimWidget && !!window.SbkimMembrane && !!window.SbkimSiegel), "SBKIM-Module geladen (01/15/16/17)");
 ok(await page.evaluate(() => !!document.getElementById("fp-dock") && !!document.querySelector(".fp-sw")), "andockbares Status-Widget in der Dock-Zone");

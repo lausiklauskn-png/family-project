@@ -79,9 +79,29 @@ const srv = createServer((q, a) => {
 await new Promise((r) => srv.listen(0, r));
 const port = srv.address().port;
 
+/* ⚠ DIESE PROBE LAS `PW_CHROME`, IHRE 21 NACHBARN LESEN `PW_CHROMIUM` — und
+ * sie hatte keinen Rückfall. Ohne gesetzte Variable suchte Playwright seine
+ * eigene Vorgabe (die „headless shell"), die in diesem Behälter nicht liegt:
+ * der Lauf starb mit einem Stacktrace, und die rote Zeile trug den Namen eines
+ * Startfehlers statt den einer Zusicherung. Alles dahinter mass nichts.
+ *
+ * *Ein Name, der fast der Name des Nachbarn ist* — dieselbe Familie wie die
+ * Anker, die den Anfang eines anderen treffen. Beide Namen gelten jetzt, der
+ * gemeinsame Pfad ist der Rückfall. */
 const start = { args: ["--no-sandbox"] };
-if (process.env.PW_CHROME) start.executablePath = process.env.PW_CHROME;
-const br = await chromium.launch(start);
+start.executablePath = process.env.PW_CHROMIUM || process.env.PW_CHROME
+  || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
+let br;
+try {
+  br = await chromium.launch(start);
+} catch (e) {
+  /* ⊘ nicht lauffähig ist NICHT grün — aber auch kein Befund über den Code.
+   * Gemeldet statt geworfen, damit die Schlusszeile überhaupt erscheint. */
+  console.log("  ⊘ NICHT LAUFFÄHIG: kein Browser unter " + start.executablePath);
+  console.log("     " + String(e.message || e).split("\n")[0]);
+  console.log(`\nErgebnis: ${pass} gruen, ${fail} rot, 1 nicht lauffaehig`);
+  process.exit(fail ? 1 : 0);
+}
 const pg = await br.newPage();
 await pg.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: "load" });
 
