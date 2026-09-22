@@ -649,9 +649,59 @@ h2{font-size:1.55rem;margin:0 0 6px}
 
 /* align-self bewusst NICHT flex-start: sonst haengt der Oeffnen-Knopf oben,
    waehrend der Melde-Knopf unten sitzt (Befund 2026-07-31). Beide unten buendig. */
-.listing .ext{font-family:var(--mono);font-size:.82rem}
+
+/* ── DIE KNÖPFE EINER KARTE SIND EINE FAMILIE (Klaus 2026-09-22) ────────────
+ *
+ * Klaus mit Bild: „Die Button in Family Project Einzelheiten und zur Seite so
+ * fett sein. Bei Einzelheiten steht der Pfeil unten unter dem Wort … Macht
+ * bitte einheitlich die Höhe. Maximal so hoch wie Bewertung nachlesen."
+ *
+ * GEMESSEN am 2026-09-22, über fünf Breiten, nicht geschätzt:
+ *
+ *      Breite   „Bewertung nachlesen"   „Einzelheiten →"   „→ Zur Seite"
+ *      380 px         44 px, 1 Zeile      65 px, 2 Zeilen   60 px, 2 Zeilen
+ *      412 px         44 px               65 px             60 px
+ *      900 px         44 px               65 px             60 px
+ *     1280 px         44 px               65 px             60 px
+ *      560 px         44 px               46 px, 1 Zeile    44 px, 1 Zeile
+ *
+ * VIER VON FÜNF BREITEN BRACHEN UM — nur die eine Zwischenbreite, bei der die
+ * Karte einspaltig steht, sah richtig aus. Der Pfeil rutschte unter das Wort,
+ * und der Knopf war 21 px höher als sein Nachbar.
+ *
+ * ⚠ DREI KNÖPFE, DIE GLEICH AUSSEHEN SOLLEN, BRAUCHEN EINE REGEL, NICHT DREI.
+ * Vorher stand die Schrift an zwei Stellen (`.listing .ext` und
+ * `.listing .mk-ms-btn`), und „Einzelheiten" stand an gar keiner — es erbte
+ * `.btn` mit .96rem und 13px/22px Polster und war damit als einziges anders.
+ * Genau das misst `smoke_stufe5_messung` seit dem 2026-08-01 (C2d/C2e:
+ * gleiche Schrift, gleiches Polster, gleiche Rundung) — nur eben an zwei von
+ * drei Knöpfen.
+ *
+ * ⚠ `white-space:nowrap` IST DER EIGENTLICHE RIEGEL. Ein Knopftext, der
+ * umbricht, ist nicht nur höher — er verschiebt auch seinen Nachbarn und die
+ * ganze Kartenreihe. Eine kleinere Schrift allein hätte den Umbruch nur bis
+ * zur nächsten schmalen Karte verschoben.
+ *
+ * ⚠ UND DAS POLSTER MUSSTE MIT. Gemessen: bei 1280 px ist eine Karte im
+ * dreispaltigen Raster nur 329 px breit, innen 295 px. Mit dem alten Polster
+ * (2×22 px je Knopf) passen zwei Beschriftungen ohne Umbruch dort nicht mehr
+ * hinein — `nowrap` allein ergäbe einen Knopf, der aus der Karte ragt.
+ *
+ * ⚠ UND `flex-wrap` IST DIE EHRLICHE ANTWORT AUF DIE GANZ SCHMALE KARTE.
+ * Bei 276 px Kartenbreite reicht es auch mit kleinem Polster nicht für drei
+ * Knöpfe in einer Reihe. Dann rutscht der Melde-Knopf in eine zweite Zeile —
+ * jeder Knopf bleibt einzeilig und gleich hoch. Die Alternative wäre eine
+ * Schrift unter 10 px, und die kann niemand lesen. */
+.listing .ext,
+.listing .mk-ms-btn,
+.listing .listing-foot .btn:not(.mk-report){
+  font-family:var(--mono);font-size:.78rem;font-weight:600;
+  padding:10px 12px;border-radius:10px;
+  justify-content:center;   /* Klaus: „steht auch nicht in der Mitte vom Button" */
+  white-space:nowrap}       /* der Text bricht NIE um — siehe oben */
 /* Fußzeile der Marktplatz-Karte: Öffnen links, Melde-Knopf rechtsbündig mit Abstand. */
-.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px}
+.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.listing-foot .mk-report{margin-left:auto}
 /* Aktions-Block (Stufe 5): „Bewertung nachlesen" + Fußzeile kleben GEMEINSAM
    am Boden der Karte. Befund von Klaus 2026-08-02: allein die Fußzeile klebte,
    der Knopf hing im Rumpf und wurde von allem darüber mitgeschoben — bei einer
@@ -673,25 +723,51 @@ h2{font-size:1.55rem;margin:0 0 6px}
      2. clip-path schneidet den ÄUSSEREN box-shadow weg → das Schweben
         kommt aus filter: drop-shadow(), das der echten Form folgt.
         Die inneren Schliff-Kanten (inset) bleiben unberührt.
+
    Höhe 44 px = exakt die Höhe des Öffnen-Knopfes daneben (gemessen, nicht
    geschätzt). Vorher 56 px, das war 12 px höher und zog den Blick auf sich —
-   die Meldung ist eine Ergänzung, kein Hauptweg (Klaus 2026-07-31). */
+   die Meldung ist eine Ergänzung, kein Hauptweg (Klaus 2026-07-31).
+
+   ⚠ UND DIE HÖHE 44 IST SEIT DEM 2026-09-22 EINE ANDERE ZUSICHERUNG ALS
+   VORHER — benannt, nicht stillschweigend umgedeutet. Sie hiess „so hoch wie
+   der Nachbar". Der Nachbar ist seit demselben Tag 37 px hoch (die drei
+   Karten-Knöpfe sind eine Familie geworden, siehe oben), und Klaus hat dazu
+   gesagt: „Genauso den Meldebutton auch nicht so eine bombenfunktionösen,
+   riesigen Button machen."
+
+   ⚠ DIE HÖHE KANN TROTZDEM NICHT UNTER 44 — und das hat eine Probe gesagt,
+   nicht das Nachdenken. `smoke_markt_melden` misst seit jeher eine
+   Mindest-Trefffläche von 44×44 px; mein erster Anlauf setzte 52×37 und wurde
+   prompt rot. Ein Knopf, den ein Finger nicht sicher trifft, ist kein
+   kleinerer Knopf, sondern ein schlechterer. Kleiner geworden ist er deshalb
+   in der BREITE: 68 → 52 px, also ein Viertel schmaler, dazu ein leichterer
+   Schatten und eine kleinere Schrift. Das Dreieck wird dadurch spitzer statt
+   wuchtiger.
+
+   ⚠ UND DER PFAD IST NEU GERECHNET, NICHT GESCHÄTZT — der Kommentar oben
+   verlangt es. Ecken A(26,0) B(52,44) C(0,44), je 7 px entlang BEIDER Kanten
+   eingerückt (7 = 9 × 52/68, also derselbe Anteil wie vorher):
+     |AB| = √(26² + 44²) = 51.11 → Einheitsvektor (0.5087, 0.8609) × 7 = (3.56, 6.03)
+     B→C Einheitsvektor (−1, 0) × 7 = (−7, 0)
+     C→A Einheitsvektor (0.5087, −0.8609) × 7 = (3.56, −6.03)
+   Wer die Größe wieder ändert, rechnet ihn wieder — eine gequetschte
+   Bezier-Kurve sieht aus wie ein Zeichenfehler, nicht wie eine Absicht. */
 .mk-report{
-  width:68px;height:44px;flex:0 0 auto;
-  padding:12px 7px 5px;border-radius:0;border-color:transparent;
+  width:52px;height:44px;flex:0 0 auto;
+  padding:13px 5px 5px;border-radius:0;border-color:transparent;
   flex-direction:column;justify-content:flex-end;gap:1px;
-  font-size:.5rem;font-weight:700;line-height:1;text-align:center;
+  font-size:.46rem;font-weight:700;line-height:1;text-align:center;
   color:var(--muted);
-  clip-path:path("M 39.5 7.12 L 62.5 36.88 Q 68 44 59 44 L 9 44 Q 0 44 5.5 36.88 L 28.5 7.12 Q 34 0 39.5 7.12 Z");
-  filter:drop-shadow(0 6px 11px rgba(0,0,0,.44));
+  clip-path:path("M 29.56 6.03 L 48.44 37.97 Q 52 44 45 44 L 7 44 Q 0 44 3.56 37.97 L 22.44 6.03 Q 26 0 29.56 6.03 Z");
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.4));
   box-shadow:
     inset 0 2px 1px rgba(255,255,255,.42),
     inset 0 -5px 9px rgba(0,0,0,.5),
     inset 0 0 0 1px rgba(255,255,255,.09)}
-.mk-report .ic{font-size:.78rem;line-height:1}
+.mk-report .ic{font-size:.70rem;line-height:1}
 .mk-report:hover,.mk-report:focus-visible{
   color:var(--gold);
-  filter:drop-shadow(0 10px 18px rgba(0,0,0,.5)) drop-shadow(0 0 9px color-mix(in srgb,var(--gold) 60%,transparent))}
+  filter:drop-shadow(0 8px 14px rgba(0,0,0,.46)) drop-shadow(0 0 8px color-mix(in srgb,var(--gold) 60%,transparent))}
 /* Ohne clip-path-Unterstützung bleibt ein normaler eckiger Knopf (fail-soft). */
 @supports not (clip-path: path("M 0 0 L 1 1 Z")){
   .mk-report{clip-path:none;border-radius:12px;padding:8px 9px 7px;height:auto;filter:none;
