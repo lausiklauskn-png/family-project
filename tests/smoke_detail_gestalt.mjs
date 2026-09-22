@@ -17,7 +17,9 @@
  * `.glass`-Kasten nicht. Ein Wächter auf die Vorlage allein hätte den Befund
  * nie gemacht; gemessen wird deshalb im Browser, was ein Leser SIEHT. */
 import { createServer } from "node:http";
-import { readFileSync, existsSync, statSync, readdirSync } from "node:fs";
+import { readFileSync, existsSync, statSync, readdirSync, mkdtempSync, cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { execFileSync } from "node:child_process";
 import { join, extname, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { messStufe } from "../tools/statische-listen.mjs";
@@ -95,17 +97,58 @@ ok(/\.mk-ms-w\.is-gut\{color:var\(--ms-gut\)/.test(css),
     (/<ul class="det-punkte">/.test(abschnitt) ? mit : ohne).push(d.name);
   }
   ok(mit.length > 0, "mindestens eine Seite zeigt Stichpunkte", mit.join(", ") || "keine");
-  ok(ohne.length > 0,
-    "… und mindestens eine faellt auf den alten Text zurueck — sonst ist der Rueckfall nicht messbar",
-    `${ohne.length} Stueck`);
 
-  /* Der Rückfall zeigt wirklich `text`, nicht eine leere Zeile. */
-  if (ohne.length) {
-    const h = lies(`apps/${ohne[0]}/index.html`);
-    const abschnitt = (h.split("Was die App macht")[1] || "").split("</section>")[0];
-    const roher = /<p>([^<]{40,})<\/p>/.exec(abschnitt);
-    ok(!!roher, `der Rueckfall traegt einen Absatz (${ohne[0]})`,
-      roher ? `${roher[1].length} Zeichen` : "keiner");
+  /* ⚠ DER RÜCKFALL WIRD GESTELLT, NICHT VORGEFUNDEN — seit dem 2026-09-22.
+   *
+   * Hier stand: „… und mindestens eine faellt auf den alten Text zurueck".
+   * Das war richtig, solange erst EIN Eintrag die neuen Felder trug. Klaus hat
+   * den Ton freigegeben, seitdem tragen ihn ALLE — und der Riegel meldete
+   * folgerichtig „0 Stueck". Er hat damit genau das getan, wofür er gebaut
+   * wurde: gesagt, dass der Rückfall am Bestand nicht mehr messbar ist, statt
+   * still grün zu bleiben.
+   *
+   * Die Abhilfe ist nicht, ihn zu schwächen, sondern das Messen zu verlegen:
+   * das ECHTE Werkzeug läuft in einer Wegwerf-Kopie über einen Eintrag, dem
+   * `vorstellung` und `besonders` genommen wurden. Damit ist der Rückfall
+   * unabhängig davon messbar, wie viele Einträge die Felder gerade tragen —
+   * und er bleibt es, wenn morgen ein fremder Eintrag ohne sie dazukommt.
+   * Tafel-Evolutions-Klausel: ersetzt, nicht stillschweigend getauscht. */
+  {
+    const weg = mkdtempSync(join(tmpdir(), "fp-rueckfall-"));
+    try {
+      for (const d of ["assets", "tools", "forschung"]) {
+        cpSync(join(WURZEL, d), join(weg, d), { recursive: true });
+      }
+      /* ⚠ `sw.js` GEHÖRT DAZU — das Werkzeug liest daraus die Cache-Fassung
+       * für die `?v=`-Angaben. Ohne sie stirbt es mit ENOENT, und die rote
+       * Zeile trüge den Namen eines Lesefehlers statt den einer Zusicherung. */
+      cpSync(join(WURZEL, "sw.js"), join(weg, "sw.js"));
+      mkdirSync(join(weg, "apps"), { recursive: true });
+      /* EIN Eintrag verliert die neuen Felder. Genommen wird der erste, der
+       * sie trägt — nicht ein fest hingeschriebener Name, der morgen falsch
+       * ist. */
+      const ziel = mit[0];
+      const kennung = ziel;
+      let l = readFileSync(join(weg, "assets/config/listings.js"), "utf8");
+      const block = new RegExp(
+        '("anchorId":\\s*"' + kennung + '".*?)\\n\\s*"vorstellung":[\\s\\S]*?\\n(\\s*)"by":', "s");
+      const vorher = l;
+      l = l.replace(block, '$1\n$2"by":');
+      writeFileSync(join(weg, "assets/config/listings.js"), l);
+      ok(l !== vorher, `die gestellte Lage ist wirklich hergestellt (${kennung} ohne vorstellung)`);
+
+      execFileSync(process.execPath, [join(weg, "tools/detailseiten.mjs")],
+        { cwd: weg, stdio: "pipe" });
+      const h = readFileSync(join(weg, "apps", kennung, "index.html"), "utf8");
+      const abschnitt = (h.split("Was die App macht")[1] || "").split("</section>")[0];
+      ok(!/<ul class="det-punkte">/.test(abschnitt),
+        "ohne vorstellung stehen KEINE Stichpunkte da");
+      const roher = /<p>([^<]{40,})<\/p>/.exec(abschnitt);
+      ok(!!roher, "… sondern der alte Text als Absatz",
+        roher ? `${roher[1].length} Zeichen` : "keiner");
+    } finally {
+      rmSync(weg, { recursive: true, force: true });
+    }
   }
 
   /* Die hervorgehobene Funktion steht da, wo sie gesetzt ist — und nur dort. */
