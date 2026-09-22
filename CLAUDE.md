@@ -408,6 +408,102 @@ niemand lesen.
 
 ⚠ **Cache-Bump v126 → v127**, an **78** Stellen, `ASSET_V` mitgezogen.
 
+## 🎨 DIE DETAILSEITE HATTE KEIN POLSTER UND KEINE FARBE (Klaus 2026-09-22)
+
+Klaus nach dem Sichttest: *„Der Link dahin führt zum Container, wo die Schrift
+linksbündig im Container auf Null ist. Das ist viel zu nah am Rand."* Und:
+*„die Messung, das sind die Werte nicht farbig gestaltet, so wie bei der
+ersten Seite. Also unter 85 gelb oder wie auch immer und die anderen grün."*
+
+**Gemessen, nicht geschätzt:** die Überschrift stand **1 px** vom Kastenrand,
+und alle vier Messwerte trugen dieselbe graue Farbe — gut und schwach sahen
+gleich aus.
+
+| | vorher | nachher |
+|---|---|---|
+| Inhalt vom Kastenrand | **1 px** | **23 px** (17 px am Handy) |
+| Messwerte | grau, alle gleich | **gelb / grün je Stufe**, mit Symbol |
+| Verlaufs-Zahlen | grau | **gefärbt**, nur die Ziffer |
+
+### ⚠ Die Ursache stand NICHT in der Vorlage
+
+`assets/style.css` trägt `section{padding:32px 0}` — oben und unten 32,
+seitlich **null**. Auf der Startseite ist das richtig: dort stecken die
+Abschnitte in `.wrap` und holen ihre seitliche Luft von dort. Die Detailseite
+legt sie aber in `.glass`-Kästen, und **ein Kasten mit Rand braucht eigenes
+Polster**. Ein Wächter auf die Vorlage allein hätte den Befund nie gemacht;
+gemessen wird deshalb im Browser, was ein Leser **sieht**.
+
+### Die Mess-Stufen sind Lighthouses eigene, und sie stehen an zwei Stellen
+
+`messStufe()` (Node, `tools/statische-listen.mjs`) und `msStufe()` (Browser,
+`markt.html`) — ab **90** gut, ab **50** mittel. Klaus' „85 oder wie auch
+immer" ist eine ungefähre Angabe; genommen wird die Zahl, die im ganzen
+Marktplatz gilt.
+
+⚠ **BENANNTE DOPPELUNG.** Den Browser-Weg auf eine geteilte Datei umzubauen
+kostete einen weiteren Netz-Abruf auf genau der Seite, an der die Ladezeit
+gemessen wird. Bewacht wird deshalb die **Zusicherung statt der Zeile**: die
+Probe rechnet beide Fassungen Stufe für Stufe gegeneinander und fällt um,
+sobald eine sich bewegt.
+
+### ⚠ `Number(null)` IST 0, NICHT NaN — zum vierten Mal in diesem Netz
+
+Der erste Aufruf von `messStufe(null)` gab **„schwach"** zurück: eine rote
+Pille für eine Messung, die es gar nicht gibt. „Nichts" wird jetzt
+**ausdrücklich abgewiesen, bevor `Number` es deutet**. Dieselbe Familie wie
+`a ?? b` bei `null`, `${X:-vorgabe}` bei leerem X und `toggle(n, undefined)`.
+Beide Richtungen bewacht: `0` ist eine echte Messung, `null` ist keine.
+
+### ⚠ Und ich habe die Farben ABGESCHRIEBEN statt geteilt
+
+Mein erster Anlauf kopierte die sechs Hex-Werte aus `assets/style.css` in die
+Vorlage — und **zwei davon falsch** (`#e8c15a` statt `#e8c14a`, `#ef8377`
+statt `#ff7a6b`). Das ist die Drift selbst, an ihrem Entstehungstag. Sie
+stehen jetzt **einmal** als Variablen (`--ms-gut` · `--ms-mittel` ·
+`--ms-schwach`), und beide Seiten lesen sie.
+
+### ⚠ ZUM FÜNFTEN MAL: das deutsche Anführungszeichen beendet den String
+
+`"… „Wort""` → `SyntaxError`. Die Falle steht in PWA Toolpoints Verfassung
+**dreimal**, und sie ist mir hier trotzdem zweimal passiert. *Eine Regel, an
+die man sich erinnern muss, ist keine.*
+
+**`tests/smoke_syntax.mjs`** fährt seitdem `node --check` über **jede** `.js`
+und `.mjs` des Depots — gefunden, nicht gepflegt. Gemessen: **88 Dateien**.
+Und der Schaden ist nie nur die rote Zeile: eine Datei, die sich nicht laden
+lässt, ist **nicht lauffähig**, die rote Zeile trägt den Namen des
+Ladefehlers, und alle Wächter dahinter messen nichts.
+
+### ⚠ Drei Gegenprobe-Fälle trafen daneben — zwei davon am Umlaut
+
+`grep '✗.*traegt jede Zahl'` findet „trägt jede Zahl" **nicht**. Zweimal
+dasselbe (`traegt`, `laesst`). Der dritte war ein **zu schwacher Wächter**:
+`--ms-gut` steht in `style.css` zweimal (Grundwert und Thema), also fand der
+Regex nach dem Umbenennen die zweite Stelle noch und blieb grün — gefallen ist
+ein Farb-Wächter daneben. Sabotiert wird jetzt die Stelle, an der die
+Zusicherung wirklich hängt.
+
+### Geprüft
+
+```bash
+node tests/smoke_detail_gestalt.mjs        # echter Browser, drei Themen
+node tests/smoke_syntax.mjs                # node --check über 88 Dateien
+bash tests/gegenprobe_detail_gestalt.sh    # sabotiert in einer SICHERUNG
+```
+
+Zuletzt gemessen (2026-09-22): **26 grün · 89 grün · 0 ROT** · Gegenprobe
+**7 schlagen an · 0 blind · 0 aus falschem Grund · 0 tote Anker**. Davor:
+**4 · 0 · 3 · 0** — die drei danebengegangenen Fälle oben.
+
+⚠ **NOCH NICHT GEBAUT:** Klaus' vierter Befund — *„Die Textgestaltung ist eher
+SEO-mäßig. Also nicht umschrieben … ein bisschen schöner gestalteter Text"* und
+*„in die Beschreibung sollte eventuell noch rein, für wen diese App etwas
+ist"*. Das ist ein **Inhalts**-Auftrag über 17 Einträge und braucht sein Wort,
+kein geratenes Wort. Der Weg dorthin steht im Abschlussbrief.
+
+⚠ **Cache-Bump v127 → v128.**
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

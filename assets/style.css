@@ -559,15 +559,19 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .mk-ms-w{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;
   border:1px solid currentColor;font-size:.78rem;white-space:nowrap}
 .mk-ms-w b{font-variant-numeric:tabular-nums}
-.mk-ms-w.is-gut{color:#1e7a4b;background:rgba(30,122,75,.10)}
-.mk-ms-w.is-mittel{color:#b8860b;background:rgba(218,165,32,.10)}
-.mk-ms-w.is-schwach{color:#c0392b;background:rgba(192,57,43,.10)}
-:root[data-theme="dark"] .mk-ms-w.is-gut,
-:root[data-theme="neon"] .mk-ms-w.is-gut{color:#6fd39b}
-:root[data-theme="dark"] .mk-ms-w.is-mittel,
-:root[data-theme="neon"] .mk-ms-w.is-mittel{color:#e8c14a}
-:root[data-theme="dark"] .mk-ms-w.is-schwach,
-:root[data-theme="neon"] .mk-ms-w.is-schwach{color:#ff7a6b}
+/* ⚠ DIE DREI MESS-FARBEN STEHEN SEIT DEM 2026-09-22 ALS VARIABLEN DA, weil
+   sie an einer ZWEITEN Stelle gebraucht werden: die Verlaufs-Tabelle der
+   Detailseiten färbt dieselben Stufen, nur als Ziffer statt als Pille.
+   Mein erster Anlauf hat die sechs Hex-Werte in die Vorlage ABGESCHRIEBEN —
+   und dabei zwei davon falsch (`#e8c15a` statt `#e8c14a`, `#ef8377` statt
+   `#ff7a6b`). Das ist die Drift selbst, an ihrem Entstehungstag.
+   Kontrast gilt pro Thema; wer eine Farbe ändert, rechnet alle drei nach. */
+:root{--ms-gut:#1e7a4b;--ms-mittel:#b8860b;--ms-schwach:#c0392b}
+:root[data-theme="dark"],:root[data-theme="neon"]{
+  --ms-gut:#6fd39b;--ms-mittel:#e8c14a;--ms-schwach:#ff7a6b}
+.mk-ms-w.is-gut{color:var(--ms-gut);background:rgba(30,122,75,.10)}
+.mk-ms-w.is-mittel{color:var(--ms-mittel);background:rgba(218,165,32,.10)}
+.mk-ms-w.is-schwach{color:var(--ms-schwach);background:rgba(192,57,43,.10)}
 .listing .mk-ms-sum{color:var(--text)}
 .listing .mk-ms-sum small{opacity:.7}
 .listing .mk-ms-alt{color:#b8860b}
