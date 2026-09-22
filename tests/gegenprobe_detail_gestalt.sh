@@ -10,7 +10,8 @@
 cd "$(dirname "$0")/.." || exit 1
 
 DATEIEN=(tools/vorlagen/detail.html tools/detailseiten.mjs tools/statische-listen.mjs
-         assets/style.css markt.html assets/config/listings.js)
+         assets/style.css markt.html assets/config/listings.js
+         tests/smoke_markt_vecpack.mjs)
 SICH="/tmp/gp_dg.$$"; mkdir -p "$SICH"
 for d in "${DATEIEN[@]}"; do mkdir -p "$SICH/$(dirname "$d")"; cp "$d" "$SICH/$d"; done
 for a in apps/*/index.html; do mkdir -p "$SICH/$(dirname "$a")"; cp "$a" "$SICH/$a"; done
@@ -125,6 +126,78 @@ fall 'der Werbetext ueberschreibt den Such-Korpus' tools/statische-listen.mjs \
   '        text: String(x.text || ""),' \
   '        text: String(x.vorstellung || x.text || ""),' \
   'zeigt genau ihn, nicht den Werbetext' tests/smoke_detail_gestalt.mjs neubau
+
+echo; echo "═══ PRUEFKNOPF: Pruef es selbst — Klaus 2026-09-22 ═══"
+
+# PRUEF-1 · aus dem Link wird ein Knopf ohne Ziel. Der stillste Schaden: er
+#           steht da und fuehrt nirgendwohin.
+fall 'PRUEF: aus dem Link wird ein <button>' tools/detailseiten.mjs \
+  "      <p><a class=\"btn ghost ext\" href=\"\${PRUEFER}?adresse=" \
+  "      <p><button class=\"btn ghost ext\" data-x=\"\${PRUEFER}?adresse=" \
+  'der Pr.f-Knopf ist ein <a href>' tests/smoke_detail_gestalt.mjs neubau
+
+# PRUEF-2 · vorbelegt wird eine ANDERE Adresse als die, auf die „Zur Seite"
+#           zeigt. Der Nutzer prueft dann etwas anderes, als er ansieht — und
+#           der Bericht sieht trotzdem echt aus.
+fall 'PRUEF: vorbelegt wird eine fremde Adresse' tools/detailseiten.mjs \
+  '?adresse=${esc(encodeURIComponent(e.url))}' \
+  '?adresse=${esc(encodeURIComponent("https://example.org/"))}' \
+  'vorbelegt ist genau die Adresse' tests/smoke_detail_gestalt.mjs neubau
+
+# PRUEF-3 · der Domain-Wechsel wird verschwiegen. Genau das verbietet der Ton
+#           dieses Depots: ein Knopf, der einen woandershin traegt, sagt es.
+fall 'PRUEF: der Domain-Wechsel wird verschwiegen' tools/detailseiten.mjs \
+  " du verlässt dabei also diese Seite.</p>');" \
+  "</p>');" \
+  'es steht dabei, dass man diese Seite verl' tests/smoke_detail_gestalt.mjs neubau
+
+# PRUEF-4 · der fremde Tab bekommt Zugriff aufs Fenster.
+fall 'PRUEF: rel=noopener faellt weg' tools/detailseiten.mjs \
+  " target=\"_blank\" rel=\"noopener\">Diese App prüfen</a></p>');" \
+  " target=\"_blank\">Diese App prüfen</a></p>');" \
+  'neuer Tab, rel=noopener' tests/smoke_detail_gestalt.mjs neubau
+
+# PRUEF-5 · die GRENZE faellt weg. Dann verspricht der Abschnitt etwas, das
+#           das Werkzeug nicht halten kann — es liest den Quelltext, nicht den
+#           laufenden Verkehr.
+fall 'PRUEF: die Grenze des Pruefers faellt weg' tools/detailseiten.mjs \
+  'nicht den laufenden Verkehr:' \
+  'auch den laufenden Verkehr:' \
+  'die Grenze des Pr.fers steht dabei' tests/smoke_detail_gestalt.mjs neubau
+
+# PRUEF-6 · die Konstante driftet vom Marktplatz-Eintrag weg. Dann fuehrt der
+#           Knopf woandershin als die Karte, und niemand saehe es.
+fall 'PRUEF: die Pruefer-Adresse driftet vom Marktplatz weg' tools/detailseiten.mjs \
+  'export const PRUEFER = "https://pwa-toolpoint.de/auslieferungspruefer.html";' \
+  'export const PRUEFER = "https://pwa-toolpoint.de/pruefer.html";' \
+  'dieselbe Adresse wie seine Karte' tests/smoke_detail_gestalt.mjs neubau
+
+# PRUEF-7 · der Abschnitt kommt AUCH ohne Adresse. Bei roter Ampel hat
+#           `markteintraege` die url geleert; ein Knopf davor belegte dann
+#           nichts vor und fuehrte in ein leeres Feld.
+fall 'PRUEF: der Knopf kommt auch ohne Adresse' tools/detailseiten.mjs \
+  "   * vorzubelegen. */\n  if (e.url) {\n    T.push('    <section class=\"glass\">');\n      T.push('      <h2>Prüf es selbst</h2>');" \
+  "   * vorzubelegen. */\n  if (true) {\n    T.push('    <section class=\"glass\">');\n      T.push('      <h2>Prüf es selbst</h2>');" \
+  'vorbelegt ist genau die Adresse' tests/smoke_detail_gestalt.mjs neubau
+
+echo; echo "═══ VEKTOR-STUB: misst er Raenge oder Rauschen? (2026-09-22) ═══"
+
+# VEC-1 · DER ALTE STUB, wortgleich zurueckgedreht. Er hat siebzehn Eintraege
+#         lang gruen gemeldet und bei neunzehn die Raenge kippen lassen — nicht
+#         weil der Code kaputt war, sondern weil zwei Zahlen gleich waren.
+#         DIESER FALL IST DER BELEG, dass die Reparatur eine ist.
+fall 'VEC: der alte Stub mit % 40 und gefaltetem Kosinus kommt zurueck' tests/smoke_markt_vecpack.mjs \
+  '      const c = s.startsWith("q:") ? 1' \
+  '      const w40 = ((s.length % 40) / 40) * Math.PI * 0.5; v[0] = Math.cos(w40); v[1] = Math.sin(w40); return v; const c = s.startsWith("q:") ? 1' \
+  'liegen WEITER auseinander' tests/smoke_markt_vecpack.mjs
+
+# VEC-2 · die Abstaende werden eng, ohne gleich zu sein. Dann ist der
+#         Gleichstands-Gedanke erfuellt und die Raenge kippen trotzdem am
+#         Runden — genau der Fehler meines ERSTEN Reparatur-Versuchs.
+fall 'VEC: die Abstaende schrumpfen unter die Quantisierung' tests/smoke_markt_vecpack.mjs \
+  'const SCHRITT = 0.8 / (N + 1);' \
+  'const SCHRITT = 0.001 / (N + 1);' \
+  'liegen WEITER auseinander' tests/smoke_markt_vecpack.mjs
 
 echo; echo "═══ SYNTAX: jede JS-Datei laedt ═══"
 # 7 · genau der Fehler, der mir an EINEM Tag fuenfmal passiert ist.

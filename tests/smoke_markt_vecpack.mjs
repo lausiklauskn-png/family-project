@@ -71,16 +71,67 @@ async function open(paketBauen) {
 
   await page.evaluate(({ dim, model }) => {
     window.__embedCount = 0;
-    /* Deterministisch aus dem Text, aber mit KLAREN Abständen: der Vektor liegt
-     * auf einem Kreis, dessen Winkel aus der Textlänge kommt. Dadurch ist die
-     * Reihenfolge eindeutig. Zufallsnahe Vektoren wären hier untauglich — in
-     * 384 Dimensionen liegen sie alle dicht beieinander, da kippen Ränge schon
-     * durch Rundung und der Test würde Rauschen messen. Wie genau die
-     * Quantisierung wirklich ist, misst smoke_vec_codec.mjs an ECHTEN Vektoren. */
+    /* Deterministisch, mit KLAREN Abständen — und der Satz ist seit dem
+     * 2026-09-22 auch gemessen statt behauptet.
+     *
+     * ⚠ HIER STAND `((String(t).length % 40) / 40) * Math.PI * 0.5` mit dem
+     * Satz „Dadurch ist die Reihenfolge eindeutig." Der war falsch, und der
+     * Fehler hatte DREI Schichten. Gefunden hat sie keine Überlegung, sondern
+     * zwei neue Einträge im Marktplatz:
+     *
+     *   1 · `% 40` lässt nur VIERZIG verschiedene Vektoren zu. Gemessen an den
+     *       20 Einträgen: 16 belegte Eimer, DREI Kollisionen (Mein Rezeptbuch
+     *       ⟷ Jasons Tresor, beide 246 Zeichen · Tomys Hub ⟷ PWA Toolpoint ⟷
+     *       Kim Hub Company · Mein Mixarium ⟷ Kimseek).
+     *   2 · Und selbst OHNE Kollision faltet der Kosinus: cos(q−a) = cos(q+a).
+     *       Zwei Einträge symmetrisch um den Anfrage-Winkel tragen dieselbe
+     *       Zahl auf zwölf Nachkommastellen — gemessen: Muttis Rezeptbuch
+     *       (Eimer 2) ⟷ Private Brain (Eimer 14), beide 0.972369920398.
+     *   3 · UND DER ERSTE REPARATUR-VERSUCH MACHTE ES SCHLIMMER. Ein Streuwert
+     *       über 1.000.003 Eimer nahm die Gleichstände weg — und setzte
+     *       BELIEBIG DICHTE Winkel an ihre Stelle. Das Paket ist int8-
+     *       quantisiert (Schrittweite rund 1/127 ≈ 0,008); wo zwei Zahlen
+     *       enger beieinanderliegen, kippt der Rang durch das Runden. Der
+     *       Gleichstands-Riegel war grün, die Reihenfolge trotzdem anders.
+     *       Genau davor warnt der alte Kommentar mit „KLAREN Abständen" —
+     *       er hatte recht, nur hielt seine Rechnung es nicht ein.
+     *
+     * DIE ZUSICHERUNG „Reihenfolge identisch zur Live-Berechnung" MASS DAMIT
+     * ETWAS ANDERES, ALS IHR NAME SAGT: bei einem Gleichstand entscheidet die
+     * Stabilität der Sortierung, und die ist zwischen dem Live-Weg (ein
+     * Stapel) und dem Paket-Weg (teils aus dem Paket, teils live) nicht
+     * dieselbe. Siebzehn Einträge lang war sie grün, weil kein Gleichstand ins
+     * Gewicht fiel.
+     *
+     * WAS JETZT GILT — und warum es von selbst trägt:
+     *   · Die Anfrage ist die Achse selbst (v = e0). Damit IST die Punktzahl
+     *     v[0], und der Kosinus kann nicht mehr falten.
+     *   · Jeder Eintrag bekommt seinen Platz aus dem RANG seines Textes unter
+     *     allen Marktplatz-Texten. Kollisionsfrei durch Bauart, nicht durch
+     *     Glück — kein Streuwert, kein Modulo, keine Wahrscheinlichkeit.
+     *   · Die Plätze liegen GLEICHMÄSSIG über 1,0 bis 0,2. Bei 20 Einträgen
+     *     sind das rund 0,038 je Schritt, also das Fünffache der
+     *     Quantisierungs-Schrittweite.
+     *   · Und der Selbst-Riegel weiter unten MISST diesen Abstand, statt ihn
+     *     zu behaupten. Wächst die Liste, schrumpft er — der Riegel meldet
+     *     das, bevor die Ränge wieder kippen.
+     *
+     * Wie genau die Quantisierung wirklich ist, misst smoke_vec_codec.mjs an
+     * ECHTEN Vektoren; hier geht es nur darum, dass der Test Ränge misst und
+     * nicht Rauschen. */
+    const texte = [...new Set((window.FP_LISTINGS || [])
+      .filter((x) => x && x.anchorId).map((x) => String(x.text || x.label)))].sort();
+    const rang = new Map(texte.map((t, i) => [t, i]));
+    const N = Math.max(rang.size, 1);
+    const SCHRITT = 0.8 / (N + 1);
+    window.__vecSchritt = SCHRITT;
     const vecFor = (t) => {
+      const s = String(t);
       const v = new Float32Array(dim);
-      const winkel = ((String(t).length % 40) / 40) * Math.PI * 0.5;
-      v[0] = Math.cos(winkel); v[1] = Math.sin(winkel);
+      /* Die Anfrage IST die Achse — dann ist die Punktzahl genau v[0]. */
+      const c = s.startsWith("q:") ? 1
+        : 1 - ((rang.has(s) ? rang.get(s) : N) + 1) * SCHRITT;
+      v[0] = c; v[1] = Math.sqrt(Math.max(0, 1 - c * c));
       return v;
     };
     window.__vecFor = vecFor;
@@ -169,6 +220,34 @@ let anzahl = 0, referenz = null, ersteAnchor = null;
   anzahl = await page.evaluate(() =>
     document.querySelectorAll("#mkListings .listing img").length);
   ok(anzahl >= 10, `(e) Selbst-Riegel: der Marktplatz zeichnet überhaupt Karten (${anzahl})`);
+
+  /* ⚠ SELBST-RIEGEL AUF DEN ABSTAND — der Wächter, der am 2026-09-22 gefehlt
+   * hat. Liegen zwei Punktzahlen enger beieinander als die Quantisierung grob
+   * ist, misst „Reihenfolge identisch" nicht mehr die Zusicherung, sondern das
+   * Rundungsverhalten von int8; die Probe wäre dann rot oder grün aus dem
+   * falschen Grund. Gefragt wird die ECHTE Funktion der Seite, nicht ein
+   * Nachbau — ein zweiter Stub liefe auseinander. */
+  const abst = await page.evaluate(() => {
+    const punkte = [];
+    for (const x of (window.FP_LISTINGS || [])) {
+      if (!x || !x.anchorId) continue;
+      punkte.push({ l: x.label, s: window.__vecFor(String(x.text || x.label))[0] });
+    }
+    punkte.sort((p, q) => q.s - p.s);
+    let min = Infinity, paar = "";
+    for (let i = 1; i < punkte.length; i++) {
+      const dd = punkte[i - 1].s - punkte[i].s;
+      if (dd < min) { min = dd; paar = `${punkte[i - 1].l} ⟷ ${punkte[i].l}`; }
+    }
+    return { min, paar, n: punkte.length };
+  });
+  /* 1/127 ist die Schrittweite von int8-sym. Der Faktor 2 ist der Abstand,
+   * den ein Rang braucht, um das Runden sicher zu überleben — er ist eine
+   * Wahl, keine Messung, und steht deshalb hier mit seiner Rechnung. */
+  const GRENZE = 2 / 127;
+  ok(abst.min > GRENZE,
+    `(e) Selbst-Riegel: die Punktzahlen liegen WEITER auseinander als int8 grob ist (> ${GRENZE.toFixed(4)})`,
+    `engstes Paar ${abst.min.toFixed(5)} — ${abst.paar}`);
   ersteAnchor = await ersteId(page);
   const r = await suche(page);
   referenz = r.reihenfolge;

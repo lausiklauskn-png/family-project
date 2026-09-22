@@ -73,6 +73,14 @@ import {
 
 const WURZEL = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const BASIS = "https://family-projekt.de";
+
+/* Der Auslieferungsprüfer liegt NICHT in diesem Depot, sondern auf
+ * pwa-toolpoint.de (gemessen 2026-09-22: hier gibt es keine Datei
+ * `auslieferungspruefer.html`). Die Adresse steht deshalb EINMAL hier statt
+ * in den Texten verstreut — und ein Wächter hält sie gegen den
+ * Marktplatz-Eintrag `markt-auslieferungspruefer`, damit die beiden nicht
+ * auseinanderlaufen. */
+export const PRUEFER = "https://pwa-toolpoint.de/auslieferungspruefer.html";
 const lies = (p) => readFileSync(join(WURZEL, p), "utf8");
 
 /* ---- Fassung aus sw.js, damit ?v= überall dieselbe Zahl trägt ------------- */
@@ -325,6 +333,58 @@ export function inhalt(e, punkte, alle) {
     for (const m of mangel) T.push(`        <li>${esc(m)}</li>`);
     T.push("      </ul>");
     T.push("    </section>");
+  }
+
+  /* ── 5b · Prüf es selbst (Klaus 2026-09-22) ───────────────────────────────
+   *
+   * Klaus: „den Prüfer-Selbst-Knopf kannst du mit einfügen … macht genau wie
+   * PWA-Toolpoint." Übernommen aus PWA-Toolpoint/tools/detailseiten.mjs.
+   *
+   * WOFÜR ER DA IST: der ganze Marktplatz steht und fällt damit, dass man die
+   * Zahlen nachprüfen kann, OHNE uns vertrauen zu müssen. Auf einer App-Seite
+   * ist das die naheliegendste Stelle dafür — hier steht die App, um die es
+   * geht.
+   *
+   * ⚠ HIER FÜHRT ER AUF EINE ANDERE DOMAIN, und das ist der Unterschied zur
+   * Vorlage. PWA Toolpoint hat den Prüfer bei sich liegen und verlinkt
+   * relativ (`../../auslieferungspruefer.html`); dieses Depot hat ihn NICHT
+   * (gemessen 2026-09-22: keine Datei `auslieferungspruefer.html`, der
+   * Marktplatz-Eintrag zeigt auf `pwa-toolpoint.de`). Der Link ist deshalb
+   * absolut, öffnet einen neuen Tab, und es STEHT DABEI, dass man die Seite
+   * verlässt. Einen Wechsel der Domain stillschweigend hinter einem Knopf zu
+   * verstecken wäre genau das, was der Ton hier verbietet.
+   *
+   * ⚠ KEIN `nofollow ugc`, sondern `noopener`. Das ist kein fremder Eintrag,
+   * sondern Klaus' eigenes Werkzeug — `relFuer(e.eigen)` beantwortet die
+   * Frage nach dem ANBIETER DES EINTRAGS und ist hier die falsche Quelle.
+   *
+   * ⚠ DIE ADRESSE WIRD VORBELEGT, NICHT ABGERUFEN. `?adresse=` trägt sie ins
+   * Feld; gedrückt wird von Hand. Ein Abruf beim Laden wäre eine Eigenanfrage
+   * ins offene Netz.
+   *
+   * ⚠ UND DIE GRENZE GEHÖRT DANEBEN. Der Prüfer liest den AUSGELIEFERTEN
+   * QUELLTEXT: was eine Seite von fremden Rechnern holt, wohin sie verlinkt,
+   * was sie mitliefert. Er sieht NICHT den laufenden Verkehr — was eine Seite
+   * tut, NACHDEM sie geladen ist, beobachtet er nicht. Das wegzulassen wäre
+   * ein Versprechen, das das Werkzeug nicht halten kann.
+   *
+   * ⚠ ROT HEISST AUCH HIER KEIN LINK: `markteintraege` hat `url` bei roter
+   * Ampel geleert, und ohne Adresse gibt es nichts vorzubelegen. */
+  if (e.url) {
+    T.push('    <section class="glass">');
+    T.push('      <h2>Prüf es selbst</h2>');
+    T.push('      <p>Wir sagen dir, was gemessen wurde. Du musst uns das nicht glauben:' +
+           ' der Auslieferungsprüfer liest den ausgelieferten Quelltext dieser App und zeigt' +
+           ' dir, was sie von fremden Rechnern holt, wohin sie verlinkt und was sie' +
+           ' mitliefert — Zähldienste, fremde Schriftarten, vergessene Zugangsdaten.</p>');
+    T.push('      <p class="klein">Er liest den Quelltext, nicht den laufenden Verkehr:' +
+           ' was eine Seite tut, <em>nachdem</em> sie geladen ist, sieht er nicht.' +
+           ' Die Prüfung läuft in deinem Browser — es wird nichts hochgeladen und nichts' +
+           ' gespeichert. Der Prüfer liegt auf <b translate="no">pwa-toolpoint.de</b>,' +
+           ' du verlässt dabei also diese Seite.</p>');
+    T.push(`      <p><a class="btn ghost ext" href="${PRUEFER}?adresse=${esc(encodeURIComponent(e.url))}"` +
+           ' target="_blank" rel="noopener">Diese App prüfen</a></p>');
+    T.push('    </section>');
   }
 
   /* 6 · Wo die Zahlen herkommen */

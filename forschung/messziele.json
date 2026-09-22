@@ -35,7 +35,8 @@
       "name": "Sage-Protokol",
       "url": "https://lausiklauskn-png.github.io/Sage-Protokol/",
       "repo": "Sage-Protokol",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-22 selbst im Marktplatz und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-toolpoint-pruefer. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id), ein neues markt-Präfix hätte den Verlauf von 13 Handy-Punkten seit 2026-08-06 abreißen lassen — genau das ist bei eigen-toolpoint-pruefer passiert. Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-sage-suchtool",
@@ -98,7 +99,8 @@
       "name": "Muttis Rezeptbuch",
       "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/",
       "repo": "Muttis-Rezeptbuch",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-22 selbst im Marktplatz und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-toolpoint-pruefer. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id), ein neues markt-Präfix hätte den Verlauf von 14 Handy-Punkten seit 2026-08-06 abreißen lassen — genau das ist bei eigen-toolpoint-pruefer passiert. Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-workfloh-page",
