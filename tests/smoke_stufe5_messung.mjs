@@ -940,8 +940,23 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
 
     // (b) GAR KEIN Bericht -> der Marktplatz sieht aus wie immer. Ein Wächter,
     // der die Seite verändert, wenn er selbst ausfällt, wäre schlimmer als keiner.
+    //
+    // ⚠ TAFEL-EVOLUTIONS-KLAUSEL, AUSDRÜCKLICH BENANNT. Hier wurde nur
+    // `spore-stand.json` gesperrt, und die Zusicherung hiess „ohne Bericht gar
+    // kein Band". Das war richtig, solange der nächtliche Bericht die EINZIGE
+    // Quelle des Bandes war. `messung-hand.json` ist die zweite — sie gibt es,
+    // damit eine Seite SOFORT öffentlich gestellt werden kann, ohne einen Tag
+    // auf den Lauf zu warten, und sie trägt gemessen am 2026-09-22 SECHS
+    // Einträge. Das Band stand also zu Recht da, und der Wächter war rot,
+    // ohne dass eine Zusicherung gefallen wäre.
+    //
+    // *Zwei Quellen für dieselbe Frage, und nur eine wurde gefragt* — dieselbe
+    // Falle, die am 2026-09-18 den Wartungs-Riegel in markt.html gebrochen hat.
+    // Gesperrt werden jetzt BEIDE; die Zusicherung heisst entsprechend „ohne
+    // JEDE Quelle".
     const p3 = await browser.newPage();
     await p3.route("**/assets/config/spore-stand.json*", (r) => r.fulfill({ status: 404, body: "no" }));
+    await p3.route("**/assets/config/messung-hand.json*", (r) => r.fulfill({ status: 404, body: "no" }));
     await p3.goto(base + "/markt.html", { waitUntil: "load" });
     await p3.waitForSelector(".listing", { timeout: 20000 });
     const z3 = await p3.evaluate(() => ({
@@ -949,7 +964,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       mess: document.querySelectorAll(".mk-mess").length,
       links: document.querySelectorAll(".listing a.ext").length
     }));
-    ok(z3.karten > 0 && z3.mess === 0, "C6d ohne Bericht gar kein Band (" + z3.karten + " Karten)");
+    ok(z3.karten > 0 && z3.mess === 0, "C6d ohne JEDE Quelle gar kein Band (" + z3.karten + " Karten)");
     ok(z3.links === z3.karten, "C6e und alle Links funktionieren wie bisher");
     await p3.close();
   }

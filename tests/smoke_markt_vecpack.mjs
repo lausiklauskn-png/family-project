@@ -157,14 +157,29 @@ let anzahl = 0, referenz = null, ersteAnchor = null;
 // (e) ohne Paket = heutiger Weg. Liefert zugleich die Referenz-Reihenfolge.
 {
   const { page, errors, schliessen } = await open(null);
-  anzahl = await page.evaluate(() => (window.FP_LISTINGS || []).filter((x) => x && x.img).length);
+  /* ⚠ GEZÄHLT WIRD, WAS DIE SEITE WIRKLICH ZEICHNET — nicht, was in der Liste
+   * steht. Vorher: `FP_LISTINGS.filter(x => x.img).length`. Seit der Wartung
+   * (2026-09-18) zeigt der Marktplatz mit ABSICHT weniger Karten, als die
+   * Liste Einträge hat; der Maßstab zählte 18, eingebettet wurden 17, und
+   * beide Fälle waren ROT, ohne dass eine Zusicherung gefallen wäre.
+   * Gemessen an dem Tag, an dem es auffiel: die Seite sagt selbst „17 / 17".
+   *
+   * Der Wartungs-Riegel wird dabei NICHT nachgebaut — eine zweite Fassung
+   * derselben Regel liefe auseinander. Gezählt wird das Ergebnis im DOM. */
+  anzahl = await page.evaluate(() =>
+    document.querySelectorAll("#mkListings .listing img").length);
+  ok(anzahl >= 10, `(e) Selbst-Riegel: der Marktplatz zeichnet überhaupt Karten (${anzahl})`);
   ersteAnchor = await ersteId(page);
   const r = await suche(page);
   referenz = r.reihenfolge;
   ok(r.embedded === anzahl, `(e) Datei fehlt → alle ${anzahl} live eingebettet (${r.embedded})`);
   // Fremd-Origin-Abrufe (Vorschaubilder der Anbieter) scheitern in dieser
   // Umgebung am Proxy — kein Fehler der Seite. Nur eigene Fehler zählen.
-  const eigene = errors.filter((e) => !/ERR_TUNNEL|ERR_NAME|net::ERR|Failed to load resource/i.test(e));
+  /* ⚠ Der Proxy-Wortlaut gehört dazu, und er stand hier nicht: der Behälter
+   * lässt keine WebSocket-Verbindung zum Relais nach draußen. Dieselbe Zeile
+   * steht in smoke_all.mjs seit dem 2026-08-08. Eng gefasst — nur der
+   * Proxy-Wortlaut, ein wirklich totes Relais fällt weiterhin auf. */
+  const eigene = errors.filter((e) => !/ERR_TUNNEL|ERR_NAME|net::ERR|Failed to load resource|tunnel via proxy server failed/i.test(e));
   ok(eigene.length === 0, "(e) keine eigenen Konsolen-Fehler" + (eigene.length ? ": " + eigene[0] : ""));
   await schliessen();
 }
