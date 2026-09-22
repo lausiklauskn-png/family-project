@@ -5,8 +5,20 @@
 # MUSS — und die rote Zeile muss den Namen IHRER Zusicherung tragen.
 #
 # ⚠ SIE SABOTIERT DEN ECHTEN BAUM und legt ihn aus einer SICHERUNG unter /tmp
-# zurueck — NICHT per `git checkout --`. Die Sicherung ueberlebt auch einen
-# Abbruch (trap).
+# zurueck — NICHT per `git checkout --`. Die Sicherung ueberlebt einen Abbruch
+# mit STRG-C oder TERM (trap).
+#
+# ⚠ ABER NICHT EINEN NEUSTART DES BEHAELTERS. Am 2026-09-22 ist genau das
+# passiert: der Behaelter startete mitten im C6D-Fall neu, die trap kam nie
+# dran, und `tests/smoke_stufe5_messung.mjs` lag danach SABOTIERT im
+# Arbeitsbaum. Ein `git add -A` haette sie mitgenommen — wortgleich der
+# Schaden vom 2026-09-14, als eine Sabotage in `assets/karte.js` in einen
+# Commit ging.
+#
+# Der einzige Schutz, der auch das traegt, ist die Reihenfolge: VOR dem Lauf
+# festschreiben. Dann steht eine liegengebliebene Sabotage in `git status`
+# und ist mit einem `git checkout --` zurueckzuholen, OHNE eigene Arbeit
+# mitzunehmen. Genau so ist sie an dem Tag gefunden worden.
 #
 #   bash tests/gegenprobe_dauerrote.sh
 #   NUR_FALL="VECPACK:" bash tests/gegenprobe_dauerrote.sh
