@@ -91,6 +91,14 @@ window.FP_LISTINGS = [
     "anchorId": "markt-mixarium",
     "text": "Getränke-Labor für Cocktails, Mocktails, Smoothies, Limonaden, Tees und Sirupe. Rezepte für Drinks sammeln, mischen und entdecken, mit und ohne Alkohol. Bar zuhause, trinken, Rezept, Mixgetränke. Offline nutzbar, kein Konto nötig.",
     "text_en": "Drinks lab for cocktails, mocktails, smoothies, lemonades, teas and syrups. Collect, mix and discover drink recipes, with and without alcohol. Home bar, drinking, recipe, mixed drinks. Works offline, no account needed.",
+    "vorstellung": [
+      "Für alle, die gern selbst mixen",
+      "Cocktails, Mocktails, Smoothies und Limonaden sammeln und ordnen",
+      "Eigene Rezepte mit Foto, Zutaten und Schritten",
+      "Klassiker aus einer großen öffentlichen Cocktail-Datenbank, in sieben Sprachen",
+      "Läuft offline auf Handy und Tablet, ohne Konto"
+    ],
+    "besonders": "Das KI-Labor erfindet Rezepte nach deinem Geschmack. Du bewertest, das Gute bleibt im Buch.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
     "appUrl": "https://lausiklauskn-png.github.io/Mein-Mixarium/",

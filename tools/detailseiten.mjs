@@ -207,10 +207,49 @@ export function inhalt(e, punkte, alle) {
   T.push('      </div>');
   T.push('    </section>');
 
-  /* 2 · Was die App macht — der VOLLE Text */
+  /* ── 2 · Was die App macht ────────────────────────────────────────────────
+   *
+   * Klaus 2026-09-22, nach dem Sichttest: „Die Textgestaltung ist eher
+   * SEO-mäßig. Also nicht umschrieben … ein bisschen schöner gestalteter
+   * Text." Und: „Der Text soll sehr kurz sein. Nur wenige Sätze. Er soll
+   * einfach nur neugierig machen … auf die Landingpage zu klicken." Und
+   * zuletzt: „vielleicht stichwortartig machen. Das lässt sich viel leichter
+   * lesen als lange Sätze."
+   *
+   * ⚠ `e.text` BLEIBT UNBERÜHRT, und das ist der Kern dieser Lösung. Er ist
+   * der SUCH-KORPUS: aus ihm werden die Bedeutungs-Vektoren gerechnet, und er
+   * trägt die Stichwörter, an denen der Marktplatz gefunden wird. Wer ihn
+   * durch Werbetext ersetzt, ändert unbemerkt, WAS gefunden wird.
+   * Die Karte im Marktplatz zeigt ihn weiter — dort ist er richtig, dort
+   * klemmt er ohnehin auf drei Zeilen. Die Detailseite bekommt daneben ein
+   * eigenes Feld. Zwei Orte, zwei Aufgaben, eine Quelle je Aufgabe.
+   *
+   * ⚠ FAIL-SOFT IN DREI STUFEN, ausnahmslos: eine Liste wird zu Stichpunkten,
+   * ein einzelner String zu einem Absatz, und fehlt beides, steht wieder
+   * `e.text` da. Kein Eintrag steht je leer — das ist die Fremdnutzer-Brille
+   * aus den eigenen Bauregeln, hier an einer neuen Tür.
+   *
+   * ⚠ KEINE GEDANKENSTRICHE ALS SATZ-TRENNER (Klaus: „keine Trennzeichen oder
+   * Bindestriche"). Wort-Bindestriche bleiben — „KI-Labor" ohne wäre kein
+   * Deutsch mehr; das ist eine benannte Abweichung, keine Nachlässigkeit. */
+  const vor = e.vorstellung;
+  const stich = Array.isArray(vor) ? vor.filter((x) => String(x || "").trim()) : [];
   T.push('    <section class="glass">');
   T.push('      <h2>Was die App macht</h2>');
-  T.push(`      <p>${esc(e.text)}</p>`);
+  if (stich.length) {
+    T.push('      <ul class="det-punkte">');
+    for (const x of stich) T.push(`        <li>${esc(x)}</li>`);
+    T.push('      </ul>');
+  } else {
+    T.push(`      <p>${esc(typeof vor === "string" && vor.trim() ? vor : e.text)}</p>`);
+  }
+  /* Die eine hervorgehobene Funktion (Klaus 2026-09-22): „Eine besondere
+   * Funktion soll hervorgehoben werden, wie zum Beispiel KI-Rezepterkennung
+   * oder KI-Bilderstellung oder Import, Export und Dateien tauschen."
+   * Genau EINE — zwei Hervorhebungen heben nichts mehr hervor. */
+  if (String(e.besonders || "").trim()) {
+    T.push(`      <p class="det-besonders"><b>Besonders:</b> ${esc(e.besonders)}</p>`);
+  }
   T.push('    </section>');
 
   /* 3 · Zuletzt gemessen */
@@ -392,7 +431,8 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   for (const e of ziel) {
     const punkte = punkteVon(reihen, e.anchorId);
     const url = adresseVon(e.anchorId);
-    const besch = metaBeschreibung(e.text);
+    const besch = metaBeschreibung(Array.isArray(e.vorstellung) ? e.vorstellung.join(". ") + "."
+    : (typeof e.vorstellung === "string" && e.vorstellung.trim() ? e.vorstellung : e.text));
     if (besch.length < 120) kurz.push(`${e.anchorId} (${besch.length} Zeichen)`);
     const html = seite({
       titel: `${e.label} — Family Projekt`,

@@ -17,7 +17,7 @@
   <meta property="og:url" content="https://family-projekt.de/apps/markt-rezeptbuch/" />
   <meta property="og:image" content="https://family-projekt.de/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="stylesheet" href="../../assets/style.css?v=128" />
+  <link rel="stylesheet" href="../../assets/style.css?v=129" />
   <style>
   /* ── Die Mess-Tabelle ────────────────────────────────────────────────────
    * `grep -c table assets/style.css` → 0: dieses Stylesheet hat KEINE
@@ -68,6 +68,18 @@
   .mess-tabelle .st-schwach { color:var(--ms-schwach); }
   .det-hinweis { border-left:3px solid var(--line,#283139); padding:.6em 0 .6em 12px;
     color:var(--muted,#b6c2cc); }
+  /* Stichpunkte statt Fliesstext (Klaus 2026-09-22): „vielleicht
+   * stichwortartig machen. Das laesst sich viel leichter lesen als lange
+   * Saetze." Kein Aufzaehlungszeichen des Browsers, sondern ein eigener
+   * Punkt in der Akzentfarbe — sonst steht er je Thema anders da. */
+  .det-punkte { list-style:none; padding:0; margin:.2em 0 0; }
+  .det-punkte li { position:relative; padding:5px 0 5px 20px; line-height:1.5; }
+  .det-punkte li::before { content:"\2022"; position:absolute; left:4px; top:5px;
+    color:var(--accent,#7ee0c0); font-weight:700; }
+  /* Die EINE hervorgehobene Funktion. Ein Kasten waere zu laut fuer einen
+   * Satz; ein Strich links reicht und traegt die Akzentfarbe. */
+  .det-besonders { margin:14px 0 0; padding:10px 0 10px 12px;
+    border-left:3px solid var(--accent,#7ee0c0); }
   .det-liste { list-style:none; padding:0; }
   .det-liste li { padding:6px 0; border-bottom:1px solid var(--line,#283139); }
   .det-liste li:last-child { border-bottom:0; }
