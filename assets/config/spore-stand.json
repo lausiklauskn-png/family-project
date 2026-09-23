@@ -1,6 +1,6 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-09-22T07:56:20.893Z",
+  "geprueft": "2026-09-23T07:56:58.819Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
@@ -30,7 +30,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-09-21",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -52,6 +52,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
       }
     },
@@ -83,6 +84,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-22",
         "quelle": "google",
         "werkzeug": "13.5.0",
@@ -101,7 +103,6 @@
             "t": "Erzwungener dynamischer Umbruch"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Tresor/"
       }
     },
@@ -133,6 +134,7 @@
         "bedienbarkeit": 97,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-22",
         "quelle": "google",
         "werkzeug": "13.5.0",
@@ -155,7 +157,6 @@
             "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Jasons-Tresor/"
       }
     },
@@ -187,6 +188,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-22",
         "quelle": "google",
         "werkzeug": "13.5.0",
@@ -209,13 +211,13 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Tomys-Hub/",
         "schaufenster": {
           "leistung": 100,
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
+          "stand": "gemessen",
           "gemessen": "2026-09-22",
           "quelle": "google",
           "werkzeug": "13.5.0",
@@ -233,7 +235,6 @@
               "t": "Netzwerkabhängigkeitsbaum"
             }
           ],
-          "stand": "gemessen",
           "url": "https://lausiklauskn-png.github.io/Tomys-Hub/showcase/"
         }
       }
@@ -267,6 +268,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-22",
         "quelle": "google",
         "werkzeug": "13.5.0",
@@ -289,7 +291,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
       }
     },
@@ -390,6 +391,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-22",
         "quelle": "google",
         "werkzeug": "13.5.0",
@@ -412,7 +414,6 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kimboard/"
       }
     },
@@ -483,11 +484,11 @@
           }
         ],
         "frisch": {
-          "leistung": 84,
+          "leistung": 97,
           "bedienbarkeit": 91,
           "gute_praxis": 96,
           "auffindbarkeit": 100,
-          "gemessen": "2026-09-22",
+          "gemessen": "2026-09-23",
           "quelle": "google",
           "werkzeug": "13.5.0",
           "hinweise": [
@@ -502,7 +503,7 @@
             },
             {
               "k": "leistung",
-              "t": "Bildübermittlung verbessern"
+              "t": "Erzwungener dynamischer Umbruch"
             },
             {
               "k": "bedienbarkeit",
@@ -523,7 +524,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-09-22"
         },
@@ -562,7 +563,7 @@
         "bedienbarkeit": 96,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-09-20",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -589,6 +590,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://lausiklauskn-png.github.io/Mein-WorkFloh/"
       }
     },
@@ -607,14 +609,14 @@
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "cd9214a2",
-        "grundlage": "200d5a7176ace2bd",
+        "grundlage": "a57fbb24541bc1bf",
         "fgrundlage": "e49bf89e183c97bb",
         "fingerabdruck": "e49bf89e183c97bb",
         "fremde": [
           "family-projekt.de",
           "lausiklauskn-png.github.io"
         ],
-        "pruefsumme": "200d5a7176ace2bd",
+        "pruefsumme": "a57fbb24541bc1bf",
         "status": 200,
         "seit": "2026-09-18",
         "url": "https://pwa-toolpoint.de/"
@@ -624,7 +626,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-09-19",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -647,40 +649,7 @@
             "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
           }
         ],
-        "frisch": {
-          "leistung": 82,
-          "bedienbarkeit": 100,
-          "gute_praxis": 100,
-          "auffindbarkeit": 100,
-          "gemessen": "2026-09-22",
-          "quelle": "google",
-          "werkzeug": "13.5.0",
-          "hinweise": [
-            {
-              "k": "leistung",
-              "t": "JavaScript komprimieren",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Reduziere nicht verwendete CSS",
-              "ms": 150
-            },
-            {
-              "k": "leistung",
-              "t": "Effiziente Verweildauer im Cache verwenden"
-            },
-            {
-              "k": "bedienbarkeit",
-              "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
-            }
-          ]
-        },
-        "zurueckgehalten": {
-          "zahl": 1,
-          "noetig": 3,
-          "seit": "2026-09-22"
-        },
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://pwa-toolpoint.de/"
       }
     },
@@ -694,7 +663,7 @@
       "neuerText": "Der Auslieferungsprüfer prüft, was eine Internetseite wirklich ins Netz gibt, statt was sie zu geben vorgibt. Er findet fremde Adressen, von denen eine Seite ungefragt nachlädt, versehentlich mitgelieferte Server-Dateien, offene Zugangsdaten und Schlüssel, und Personenbezug, der dort nicht hingehört: Kontonummern werden nachgerechnet, Telefonnummern brauchen eine Ländervorwahl, und wo sich ein echtes Etikett nicht von einem vergessenen Platzhalter unterscheiden lässt, meldet er nichts. Er läuft in zwei Fassungen — eine im Browser, eine als Textleser ohne Browser — und der Unterschied zwischen beiden ist selbst ein Befund: was der Browser lädt und der Textleser nicht sieht, ist ein Versteck. Ein Link, den ein Mensch anklickt, ist kein Abruf und steht deshalb nicht in der Fundliste.",
       "wache": {
         "ampel": "gruen",
-        "grund": "nur_inhalt",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
@@ -712,7 +681,7 @@
         "bedienbarkeit": 94,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-09-21",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -741,6 +710,7 @@
             "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
           }
         ],
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://pwa-toolpoint.de/auslieferungspruefer.html"
       }
     },
@@ -804,7 +774,7 @@
           "bedienbarkeit": 100,
           "gute_praxis": 96,
           "auffindbarkeit": 100,
-          "gemessen": "2026-09-22",
+          "gemessen": "2026-09-23",
           "quelle": "google",
           "werkzeug": "13.5.0",
           "hinweise": [
@@ -833,7 +803,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-09-22"
         },
@@ -917,6 +887,105 @@
         }
       }
     },
+    "eigen-muttis-rezeptbuch": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "ankuendigung": "ohne_spore",
+        "grundlage": "ebbcc316e0072a10",
+        "fgrundlage": "cc483804be31b217",
+        "fingerabdruck": "cc483804be31b217",
+        "kennzeichen": [
+          "atob",
+          "document-write"
+        ],
+        "pruefsumme": "ebbcc316e0072a10",
+        "status": 200,
+        "seit": "2026-09-23",
+        "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/"
+      },
+      "messung": {
+        "leistung": 93,
+        "bedienbarkeit": 95,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "stand": "gemessen",
+        "gemessen": "2026-09-20",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+          },
+          {
+            "k": "leistung",
+            "t": "Erzwungener dynamischer Umbruch"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript"
+          }
+        ],
+        "frisch": {
+          "leistung": 92,
+          "bedienbarkeit": 95,
+          "gute_praxis": 96,
+          "auffindbarkeit": 100,
+          "gemessen": "2026-09-23",
+          "quelle": "google",
+          "werkzeug": "13.5.0",
+          "hinweise": [
+            {
+              "k": "leistung",
+              "t": "Reduziere nicht verwendetes JavaScript",
+              "ms": 750
+            },
+            {
+              "k": "leistung",
+              "t": "Erzwungener dynamischer Umbruch"
+            },
+            {
+              "k": "leistung",
+              "t": "Netzwerkabhängigkeitsbaum"
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+            },
+            {
+              "k": "gute_praxis",
+              "t": "Es wurden Browserfehler in der Konsole protokolliert"
+            },
+            {
+              "k": "gute_praxis",
+              "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+            }
+          ]
+        },
+        "zurueckgehalten": {
+          "zahl": 1,
+          "noetig": 3,
+          "seit": "2026-09-23"
+        },
+        "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/"
+      }
+    },
     "markt-mixarium": {
       "lage": "ohne_spore",
       "wache": {
@@ -938,6 +1007,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-09-22",
         "quelle": "google",
         "werkzeug": "13.5.0",
@@ -965,7 +1035,6 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
         "schaufenster": {
           "leistung": 100,
@@ -990,34 +1059,6 @@
               "t": "Netzwerkabhängigkeitsbaum"
             }
           ],
-          "frisch": {
-            "leistung": 99,
-            "bedienbarkeit": 100,
-            "gute_praxis": 100,
-            "auffindbarkeit": 100,
-            "gemessen": "2026-09-22",
-            "quelle": "google",
-            "werkzeug": "13.5.0",
-            "hinweise": [
-              {
-                "k": "leistung",
-                "t": "Effiziente Verweildauer im Cache verwenden"
-              },
-              {
-                "k": "leistung",
-                "t": "Erzwungener dynamischer Umbruch"
-              },
-              {
-                "k": "leistung",
-                "t": "Bildübermittlung verbessern"
-              }
-            ]
-          },
-          "zurueckgehalten": {
-            "zahl": 1,
-            "noetig": 3,
-            "seit": "2026-09-22"
-          },
           "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
         }
       }
@@ -1132,7 +1173,98 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "frisch": {
+          "leistung": 92,
+          "bedienbarkeit": 94,
+          "gute_praxis": 96,
+          "auffindbarkeit": 100,
+          "gemessen": "2026-09-23",
+          "quelle": "google",
+          "werkzeug": "13.5.0",
+          "hinweise": [
+            {
+              "k": "leistung",
+              "t": "JavaScript komprimieren",
+              "ms": 450
+            },
+            {
+              "k": "leistung",
+              "t": "Effiziente Verweildauer im Cache verwenden"
+            },
+            {
+              "k": "leistung",
+              "t": "Erzwungener dynamischer Umbruch"
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Überschriftenelemente sind nicht in einer fortlaufenden absteigenden Reihenfolge angeordnet"
+            },
+            {
+              "k": "bedienbarkeit",
+              "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+            },
+            {
+              "k": "gute_praxis",
+              "t": "Es wurden Browserfehler in der Konsole protokolliert"
+            }
+          ]
+        },
+        "zurueckgehalten": {
+          "zahl": 1,
+          "noetig": 3,
+          "seit": "2026-09-23"
+        },
         "url": "https://lausiklauskn-png.github.io/Perfect-Skin-Fashion/"
+      }
+    },
+    "eigen-sage": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "erste_pruefung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "ankuendigung": "ohne_spore",
+        "grundlage": "909e920ccfb6dc52",
+        "fgrundlage": "d03a998f4df78896",
+        "fingerabdruck": "d03a998f4df78896",
+        "pruefsumme": "909e920ccfb6dc52",
+        "status": 200,
+        "seit": "2026-09-23",
+        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/"
+      },
+      "messung": {
+        "leistung": 80,
+        "bedienbarkeit": 100,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "stand": "gemessen",
+        "gemessen": "2026-09-22",
+        "quelle": "google",
+        "werkzeug": "13.5.0",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/"
       }
     },
     "markt-mycel-karte": {
@@ -1193,10 +1325,10 @@
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
-        "grundlage": "ccb00ba8aeea400b",
+        "grundlage": "6a7f671316e11414",
         "fgrundlage": "d03a998f4df78896",
         "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "ccb00ba8aeea400b",
+        "pruefsumme": "6a7f671316e11414",
         "status": 200,
         "seit": "2026-09-18",
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
@@ -1206,7 +1338,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
+        "stand": "veraltet",
         "gemessen": "2026-09-21",
         "quelle": "google",
         "werkzeug": "13.4.1",
@@ -1226,90 +1358,19 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
+        "grund": "PageSpeed antwortete HTTP 500",
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
-      }
-    },
-    "eigen-muttis-rezeptbuch": {
-      "lage": "ohne_spore",
-      "messung": {
-        "stand": "gemessen",
-        "leistung": 93,
-        "bedienbarkeit": 95,
-        "gute_praxis": 96,
-        "auffindbarkeit": 100,
-        "gemessen": "2026-09-20",
-        "quelle": "google",
-        "werkzeug": "13.4.1",
-        "hinweise": [
-          {
-            "k": "bedienbarkeit",
-            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
-          },
-          {
-            "k": "gute_praxis",
-            "t": "Es wurden Browserfehler in der Konsole protokolliert"
-          },
-          {
-            "k": "gute_praxis",
-            "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
-          },
-          {
-            "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
-          },
-          {
-            "k": "leistung",
-            "t": "Netzwerkabhängigkeitsbaum"
-          },
-          {
-            "k": "leistung",
-            "t": "Reduziere nicht verwendetes JavaScript"
-          }
-        ],
-        "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/"
-      }
-    },
-    "eigen-sage": {
-      "lage": "ohne_spore",
-      "messung": {
-        "stand": "gemessen",
-        "leistung": 80,
-        "bedienbarkeit": 100,
-        "gute_praxis": 100,
-        "auffindbarkeit": 100,
-        "gemessen": "2026-09-22",
-        "quelle": "google",
-        "werkzeug": "13.5.0",
-        "hinweise": [
-          {
-            "k": "bedienbarkeit",
-            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
-          },
-          {
-            "k": "leistung",
-            "t": "Effiziente Verweildauer im Cache verwenden"
-          },
-          {
-            "k": "leistung",
-            "t": "JavaScript komprimieren"
-          },
-          {
-            "k": "leistung",
-            "t": "Reduziere nicht verwendetes JavaScript"
-          }
-        ],
-        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/"
       }
     }
   },
   "wacheZaehler": {
-    "gruen": 18,
+    "gruen": 20,
     "gelb": 0,
     "rot": 0
   },
   "messungZaehler": {
-    "gemessen": 17,
-    "veraltet": 1,
+    "gemessen": 14,
+    "veraltet": 6,
     "nicht_gemessen": 0
   }
 }
