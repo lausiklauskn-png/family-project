@@ -21,6 +21,16 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-09-21 · family-projekt.de (Marktplatz) (Computer)
+
+<https://family-projekt.de/markt.html> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 69 → 94** (↑ 25, am 2026-09-25 noch 92)
+
+> Gesehen am 2026-09-21, **bestätigt durch die Messung vom 2026-09-25**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-09-19 · family-projekt.de (Start) (Computer)
 
 <https://family-projekt.de/> · Quelle der Zahlen: Google PageSpeed Insights
