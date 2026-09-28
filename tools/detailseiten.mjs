@@ -80,7 +80,7 @@ const BASIS = "https://family-projekt.de";
  * in den Texten verstreut — und ein Wächter hält sie gegen den
  * Marktplatz-Eintrag `markt-auslieferungspruefer`, damit die beiden nicht
  * auseinanderlaufen. */
-export const PRUEFER = "https://pwa-toolpoint.de/auslieferungspruefer.html";
+export const PRUEFER = "https://lausiklauskn-png.github.io/Auslieferung-Pruefer/auslieferungspruefer.html";
 const lies = (p) => readFileSync(join(WURZEL, p), "utf8");
 
 /* ---- Fassung aus sw.js, damit ?v= überall dieselbe Zahl trägt ------------- */
