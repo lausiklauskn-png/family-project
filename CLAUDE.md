@@ -1073,6 +1073,17 @@ Knopf: die Knöpfe einer Karte sind eine Familie. Beide Fassungen der Karte
 Mixarium und Tomys Hub. Die Karte bleibt bei „Einzelheiten · Zur Seite".
 `markteintraege()` reicht dafür `appUrl` und `video` durch (Positivliste!).
 
+⚠ **Der Video-Hinweis führt auch nach `apps/` — drei Wächter mussten das lernen**,
+und zwei davon hat erst die Gegenprobe gezeigt: `smoke_all` (Geister-Karte: zuerst
+auf die Fußzeile eingeengt und damit blind, jetzt jeder apps-Link außer `.mk-video`),
+`smoke_sitemap` (der Laufzeit-Knopf: das Muster traf die Video-Zeile, jetzt samt
+`mk_details`) und ein toter Anker in zwei Gegenproben, weil `mk_video` mitten in der
+gesuchten Zeile stand. Die alten Gegenproben liefen je in einer **eigenen** Kopie —
+in einer gemeinsamen hinterließ `gegenprobe_statische_listen.sh` Reste, und
+`gegenprobe_wartung.sh` brach danach „schon rot" ab. Diese Gegenprobe meldet auch auf
+`origin/main` drei „erwartet gruen/rot"-Zeilen (Fall C und Endstand) bei rc=0 —
+eingereiht, nicht nebenbei repariert.
+
 ⚠ **`smoke_all` zählte jeden Link nach `apps/` als Karte** — der Video-Hinweis
 machte daraus eine „Karte ohne Eintrag". Gezählt wird jetzt der Knopf in der
 Fußzeile. **`smoke_fremdmarkt` ist in einem Behälter ohne Lighthouse rot**,
