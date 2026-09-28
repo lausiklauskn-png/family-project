@@ -473,6 +473,203 @@ window.FP_LISTINGS = [
     "own": true,
     "sporeUrl": "https://lausiklauskn-png.github.io/kim-hub-company/sbkim/spore.json"
   },
+  // ── Angeglichen an PWA Toolpoint (Klaus 2026-09-28): jede App von dort steht
+  //    auch hier. Kennungen = die vorhandenen Forschungs-Ziele (eigen-…), damit
+  //    ihre Messreihe weiterläuft. Alis Moderaum steht auf Wartung (wache-hand).
+  {
+    "label": "Workfloh PDF",
+    "anchorId": "eigen-workflow-pdf",
+    "text": "Formulare als PDF ausfüllen, ohne Drucker und ohne Konto: PDF oder Foto einlesen, Felder erkennen lassen oder selbst setzen, ausfüllen und als festes oder ausfüllbares PDF ausgeben. Dazu Scannen mit der Kamera samt Blatt-Erkennung, PDF übersetzen (Deutsch, Englisch, Russisch) mit Bildern und Aufbau des Originals, Suche nach Wort und Bedeutung in allen Dokumenten, Ordner, Teilen und Spracheingabe. Mit Erklärvideo. Formular ausfüllen, Behördenformular, Antrag, PDF bearbeiten, Dokument scannen, übersetzen, Unterschrift. Läuft offline im Browser, nichts wird hochgeladen.",
+    "text_en": "Fill in PDF forms without a printer and without an account: load a PDF or a photo, let the app find the fields or place them yourself, fill them in and export a fixed or fillable PDF. Plus scanning with the camera including page detection, translating PDFs (German, English, Russian) with the pictures and layout of the original, search by word and by meaning across all documents, folders, sharing and voice input. With an explainer video. Fill in a form, official form, application, edit a PDF, scan a document, translate, signature. Runs offline in the browser, nothing is uploaded.",
+    "vorstellung": [
+      "Für alle, die Formulare ausfüllen müssen und keinen Drucker haben",
+      "PDF oder Foto einlesen, die Felder findet die App selbst",
+      "Mit der Kamera scannen, das Blatt wird gerade gezogen",
+      "PDF übersetzen, Bilder und Aufbau des Originals bleiben",
+      "Suche nach Wort und nach Bedeutung in allen Dokumenten",
+      "Läuft offline im Browser, nichts wird hochgeladen"
+    ],
+    "besonders": "Ein Behördenformular auf Russisch oder Englisch lässt sich übersetzen, auf Deutsch ausfüllen und die Einträge zurück ins Original tragen. Ein Erklärvideo zeigt den ganzen Weg.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Workfloh-PDF-Page/",
+    "appUrl": "https://lausiklauskn-png.github.io/Workflow-PDF/",
+    "video": {
+      "quer": "https://lausiklauskn-png.github.io/Workfloh-PDF-Page/assets/workfloh-pdf-quer.mp4",
+      "hoch": "https://lausiklauskn-png.github.io/Workfloh-PDF-Page/assets/workfloh-pdf-hochvoll.mp4",
+      "poster": "https://lausiklauskn-png.github.io/Workfloh-PDF-Page/assets/poster-de.jpg",
+      "dauer": "3:39"
+    },
+    "img": "https://lausiklauskn-png.github.io/Workflow-PDF/icons/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
+  {
+    "label": "SBKIM-Demo",
+    "anchorId": "eigen-sbkim-demo",
+    "text": "Zwei Apps fragen sich gegenseitig nach Bedeutung: eine sagt in eigenen Worten, was sie sucht, die andere prüft selbst, ob sie dazu etwas hat, und antwortet aus ihrem eigenen Bestand — oder sagt ehrlich, dass sie nichts hat. Zwei Geräte finden sich über einen QR-Code und reden direkt miteinander. Der erste lauffähige Stand des Protokolls vom März 2026, absichtlich so stehen geblieben. Zum Ausprobieren mit eigenem KI-Schlüssel. Bidirektionales Matching, semantische Suche, Peer-to-Peer, WebRTC, SBKIM.",
+    "text_en": "Two apps ask each other about meaning: one says in its own words what it is looking for, the other checks for itself whether it has anything on that and answers from its own holdings — or says honestly that it has nothing. Two devices find each other through a QR code and talk directly. The first working state of the protocol from March 2026, deliberately left as it was. To try out with your own AI key. Bidirectional matching, semantic search, peer-to-peer, WebRTC, SBKIM.",
+    "vorstellung": [
+      "Für alle, die sehen wollen, wie das Netz hier angefangen hat",
+      "Zwei Apps fragen einander in eigenen Worten nach Bedeutung",
+      "Die gefragte App prüft selbst und sagt ehrlich, wenn sie nichts hat",
+      "Zwei Geräte finden sich über einen QR-Code",
+      "Zum Ausprobieren mit eigenem KI-Schlüssel"
+    ],
+    "besonders": "Der erste lauffähige Stand des Protokolls vom März 2026, absichtlich so stehen geblieben. Was die anderen Apps heute können, hat hier angefangen.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Sage-Protokol/sbkim-demo/",
+    "img": "https://lausiklauskn-png.github.io/Sage-Protokol/sbkim-demo/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
+  {
+    "label": "SB·KIMTool·Point",
+    "anchorId": "eigen-kimtool-point",
+    "text": "Die Werkzeugkiste zum Mitnehmen: die Bausteine aus dem Sage-Protokol einzeln erklärt, jeder mit Nutzen, Verwendung und Einbau. Für alle, die so etwas selbst bauen wollen, statt es zu mieten. Zeigt auch, was der Kasten kann und was nicht. Offen, ohne Anmeldung, zum Kopieren. Baukasten, Module, Vorlage, Entwickler.",
+    "text_en": "The toolbox to take with you: the building blocks from the Sage protocol explained one by one, each with its use, how to work with it and how to fit it in. For everyone who wants to build something like this themselves instead of renting it. It also shows what the box can do and what it cannot. Open, no sign-up, made to be copied. Construction kit, modules, template, developers.",
+    "vorstellung": [
+      "Für alle, die so etwas selbst bauen wollen, statt es zu mieten",
+      "Die Bausteine aus dem Sage-Protokol einzeln erklärt",
+      "Zu jedem Baustein Nutzen, Verwendung und Einbau",
+      "Sagt auch, was der Kasten nicht kann",
+      "Offen, ohne Anmeldung, zum Kopieren"
+    ],
+    "besonders": "Jedes Werkzeug trägt dieselben fünf Angaben: was es ist, wozu es taugt, wie man es benutzt, wie man es einbaut und wann es anspringt.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",
+    "img": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/assets/img/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
+  {
+    "label": "Sage-Protokol · Such-Werkzeug",
+    "anchorId": "eigen-sage-suchtool",
+    "text": "Sucht nach dem, was gemeint ist, statt nach dem Wort: wer „was hilft gegen Wespen\" eintippt, findet auch den Eintrag, in dem nur „Insektenstiche\" steht. Mit Spracheingabe, drei getrennt wählbaren Bereichen (eigene Sachen, verbundene Knoten, Internet) und einer Merkliste. Läuft ohne Server im Browser; ein eigener KI-Schlüssel bleibt auf dem Gerät. Suche, Bedeutung, Semantik.",
+    "text_en": "It searches for what you mean instead of for the word: type “what helps against wasps” and you also find the entry that only says “insect stings”. With speech input, three separately selectable areas (your own things, connected nodes, the internet) and a shortlist. Runs without a server in the browser; your own AI key stays on the device. Search, meaning, semantics.",
+    "vorstellung": [
+      "Für alle, die nach dem suchen wollen, was sie meinen",
+      "Findet auch Einträge, in denen das gesuchte Wort gar nicht steht",
+      "Spracheingabe und eine Merkliste",
+      "Drei Bereiche einzeln wählbar: eigene Sachen, verbundene Apps, Internet",
+      "Läuft ohne Server im Browser"
+    ],
+    "besonders": "Wer „was hilft gegen Wespen\" eintippt, findet auch den Zettel, auf dem nur „Insektenstiche\" steht. Ein eigener KI-Schlüssel bleibt auf dem Gerät.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
+    "img": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
+  {
+    "label": "Sage-Protokol · Pinnwand",
+    "anchorId": "eigen-sage-pinnwand",
+    "text": "Ein schwarzes Brett über Geräte hinweg, ohne dass jemand einen Server dafür betreibt: Frage anheften, Antworten einsammeln, nach Bedeutung sortiert statt nach Eingangszeit. Als Transportweg dient ein geborgtes fremdes Brett; sortiert wird im eigenen Browser. Notizen, Fragen, Antworten, Zettel, Austausch.",
+    "text_en": "A notice board across devices, without anybody running a server for it: pin a question, collect answers, sorted by meaning instead of by arrival time. A borrowed foreign board serves as the transport; the sorting happens in your own browser. Notes, questions, answers, slips, exchange.",
+    "vorstellung": [
+      "Für alle, die eine Frage an mehrere Geräte heften wollen",
+      "Frage anheften, Antworten einsammeln",
+      "Sortiert nach Bedeutung statt nach Eingangszeit",
+      "Kein eigener Server, sortiert wird im eigenen Browser"
+    ],
+    "besonders": "Als Transportweg dient ein geborgtes fremdes Brett. Das Brett sieht nur Zettel, verstanden werden sie erst auf dem eigenen Gerät.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
+    "img": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
+  {
+    "label": "Muster Werbetechnik",
+    "anchorId": "eigen-workfloh-page",
+    "text": "Vorlage für die Website einer Werbetechnik-Firma: Leistungen, Arbeitsproben, Anfahrt und Kontakt-Formular. Bewusst neutral gehalten und mit eigenem Namen, eigenen Farben und eigenen Bildern zur fertigen Firmenseite ausbaubar. Installierbar und offline-fähig wie eine App. Werbetechnik, Firmenseite, Beschriftung, Folierung, Digitaldruck, Schilder.",
+    "text_en": "Template for the website of a sign-making company: services, examples of work, how to find them and a contact form. Deliberately kept neutral, and ready to be built out into a finished company site with its own name, its own colours and its own pictures. Installable and offline-capable like an app. Sign making, company site, lettering, vehicle wrapping, digital printing, signs.",
+    "vorstellung": [
+      "Für Werbetechnik-Firmen, die eine eigene Webseite wollen",
+      "Leistungen, Arbeitsproben, Anfahrt und Kontakt-Formular",
+      "Bewusst neutral, mit eigenem Namen und eigenen Farben ausbaubar",
+      "Installierbar und offline-fähig wie eine App"
+    ],
+    "besonders": "Alle Namen, Texte und Kontaktdaten sind Platzhalter. Wer sie ersetzt, hat seine fertige Firmenseite, ohne monatlich an einen Baukasten zu zahlen.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Mein-Workfloh-Page/",
+    "img": "https://lausiklauskn-png.github.io/Mein-Workfloh-Page/icon-512.png",
+    "category": "Druck & Design",
+    "own": true
+  },
+  {
+    "label": "Company Brain",
+    "anchorId": "eigen-company-brain",
+    "text": "Probeversion, der Kern läuft: findet eigene Dateien nach Bedeutung statt nach Dateinamen. Verträge, Rechnungen, Notizen, Bilder. Liest jede Datei einmal, merkt sich den Sinn und rührt die Originale nicht an, nichts wird kopiert, verschoben oder gelöscht. Offline im Browser, ohne Konto und ohne Cloud. Ablage, Archiv, Dokumente, Wissen, Suche fürs Büro.",
+    "text_en": "A trial version with a working core: it finds your own files by meaning instead of by file name. Contracts, invoices, notes, pictures. It reads every file once, remembers the sense of it and leaves the originals alone — nothing is copied, moved or deleted. Offline in the browser, with no account and no cloud. Filing, archive, documents, knowledge, search for the office.",
+    "vorstellung": [
+      "Für Büros, in denen die Ablage über den Kopf wächst",
+      "Findet eigene Dateien nach Bedeutung statt nach Dateinamen",
+      "Verträge, Rechnungen, Notizen und Bilder",
+      "Liest nur, schlägt vor, bewegt nichts",
+      "Offline im Browser, ohne Konto und ohne Cloud"
+    ],
+    "besonders": "Die Originale bleiben unberührt: nichts wird kopiert, verschoben oder gelöscht. Die App merkt sich nur den Sinn jeder Datei. Noch eine Probeversion, der Kern läuft.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Company-Brain/",
+    "img": "https://lausiklauskn-png.github.io/Company-Brain/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
+  {
+    "label": "Küchenzettel",
+    "anchorId": "eigen-kuechenzettel",
+    "text": "Rezepte als schnelle Notizen: aufschreiben, wiederfinden, kochen. Für alle, denen ein volles Rezeptbuch zu viel ist und der Zettel am Kühlschrank zu wenig. Läuft offline auf dem Handy, ohne Konto. Notizen, Küche, Kochen, Einkauf, Zettel.",
+    "text_en": "Recipes as quick notes: write them down, find them again, cook. For everyone who finds a full recipe book too much and the slip on the fridge too little. Runs offline on the phone, with no account. Notes, kitchen, cooking, shopping, slips.",
+    "vorstellung": [
+      "Für alle, denen ein volles Rezeptbuch zu viel ist",
+      "Rezepte als schnelle Notizen",
+      "Aufschreiben, wiederfinden, kochen",
+      "Läuft offline auf dem Handy, ohne Konto"
+    ],
+    "besonders": "Der Zettel vom Kühlschrank, nur dass er nicht verloren geht.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Kuechenzettel/",
+    "img": "https://lausiklauskn-png.github.io/Kuechenzettel/icons/icon-512.png",
+    "category": "Küche",
+    "own": true
+  },
+  {
+    "label": "Alis Moderaum",
+    "anchorId": "eigen-alis-moderaum",
+    "text": "Entwurf einer Damenboutique im Netz: Sortiment, Warenkorb, Kasse und Gebrauchsanleitung, alles offline im Browser. Gedacht als Vorlage für kleine Läden, die einen eigenen Auftritt wollen, ohne monatlich an einen Baukasten zu zahlen. Namen und Texte lassen sich direkt auf der Seite ändern. Mode, Boutique, Shop, Laden, Onlineshop.",
+    "text_en": "A draft of a women's boutique on the web: range, basket, checkout and instructions, all offline in the browser. Meant as a template for small shops that want a presence of their own without paying a site builder every month. Names and texts can be changed directly on the page. Fashion, boutique, shop, store, online shop.",
+    "vorstellung": [
+      "Für kleine Läden, die einen eigenen Auftritt im Netz wollen",
+      "Sortiment, Warenkorb, Kasse und Gebrauchsanleitung",
+      "Namen und Texte lassen sich direkt auf der Seite ändern",
+      "Läuft offline im Browser"
+    ],
+    "besonders": "Ein Entwurf ohne monatliche Gebühr an einen Baukasten. Zusammen mit der Warenwirtschaft daneben gehen freigegebene Artikel vom Lager direkt in den Shop.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/",
+    "img": "https://lausiklauskn-png.github.io/Alis-Moderaum/assets/icon-512.png",
+    "category": "Mode & Design",
+    "own": true
+  },
+  {
+    "label": "Alis Moderaum · Warenwirtschaft",
+    "anchorId": "eigen-alis-warenwirtschaft",
+    "text": "Entwurf einer Lagerverwaltung für einen kleinen Laden: Wareneingang und Warenausgang buchen, Artikelstammdaten pflegen, Bewegungs-Journal, Nachbestell-Liste, verschlüsselter Sicherungs-Tresor. Freigegebene Artikel gehen von hier in den Shop. Läuft offline im Browser, die Daten bleiben auf dem Gerät. Lager, Bestand, Inventur, Warenwirtschaft.",
+    "text_en": "A draft of stock management for a small shop: book goods in and out, maintain article master data, movement journal, reorder list, encrypted backup vault. Released articles go from here into the shop. Runs offline in the browser, the data stays on the device. Stock, inventory, stocktaking, goods management.",
+    "vorstellung": [
+      "Für kleine Läden mit eigenem Lager",
+      "Wareneingang und Warenausgang buchen",
+      "Artikelstammdaten, Bewegungs-Journal und Nachbestell-Liste",
+      "Verschlüsselter Sicherungs-Tresor",
+      "Die Daten bleiben auf dem Gerät"
+    ],
+    "besonders": "Freigegebene Artikel gehen von hier in den Shop von Alis Moderaum. Ein Entwurf, der zeigt, wie Lager und Laden ohne Server zusammenarbeiten.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/warehouse.html",
+    "img": "https://lausiklauskn-png.github.io/Alis-Moderaum/assets/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];

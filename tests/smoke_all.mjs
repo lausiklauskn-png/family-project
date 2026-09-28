@@ -109,7 +109,10 @@ console.log("\nDetail-Checks");
 // tests/gegenprobe_markt_liste.sh (die es vorher gar nicht gab).
 { const { page } = await load("/markt.html");
   const gez = await page.evaluate(()=>{
-    const k = [...document.querySelectorAll('#mkListings .listing a[href^="apps/"]')]
+    /* Gezählt wird der Knopf „Einzelheiten" in der Fußzeile, nicht jeder
+       Link nach apps/ — seit 2026-09-28 führt auch der Video-Hinweis dorthin
+       (apps/<id>/#video), und der ist keine zweite Karte. */
+    const k = [...document.querySelectorAll('#mkListings .listing .listing-foot a[href^="apps/"]')]
       .map(a=>a.getAttribute("href").replace(/^apps\//,"").replace(/\/$/,""));
     return { kennungen:k, karten:document.querySelectorAll("#mkListings .listing").length,
              roh:(window.FP_LISTINGS||[]).map(e=>e.anchorId) };

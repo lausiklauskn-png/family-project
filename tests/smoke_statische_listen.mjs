@@ -88,8 +88,14 @@ console.log("\nmarkt.html");
    * ihre eigene Zusicherung, und der Innen-Link wird ueberhaupt erst gemessen. */
   const alleLinks = links(b);
   const gefunden = alleLinks.filter((l) => /^https?:/i.test(l.href));
-  const innen = alleLinks.filter((l) => l.href.startsWith("apps/"));
-  const sonstige = alleLinks.filter((l) => !gefunden.includes(l) && !innen.includes(l));
+  /* Seit 2026-09-28 fuehrt der Video-Hinweis auf `apps/<id>/#video` — eine
+   * eigene Sorte, sonst zaehlte er als zweiter Detailseiten-Link. */
+  const videoL = alleLinks.filter((l) => /^apps\/[^/]+\/#video$/.test(l.href));
+  const innen = alleLinks.filter((l) => l.href.startsWith("apps/") && !videoL.includes(l));
+  const sonstige = alleLinks.filter((l) => !gefunden.includes(l) && !innen.includes(l) && !videoL.includes(l));
+  const sollVideo = markt.filter((e) => e.video && e.anchorId).map((e) => `apps/${e.anchorId}/#video`);
+  ok(videoL.length === sollVideo.length && videoL.every((l) => sollVideo.includes(l.href)),
+    `jeder Video-Hinweis gehoert zu einem Eintrag mit Video (${videoL.length} von ${sollVideo.length})`);
   const sollLinks = markt.filter((e) => e.url);
 
   // 1 · Zahl gegen Zahl — je Sorte.

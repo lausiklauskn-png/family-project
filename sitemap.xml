@@ -92,12 +92,52 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/eigen-company-brain/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-kimtool-point/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-kuechenzettel/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/apps/eigen-muttis-rezeptbuch/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/eigen-sage-pinnwand/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-sage-suchtool/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/apps/eigen-sage/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-sbkim-demo/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-workfloh-page/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-workflow-pdf/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

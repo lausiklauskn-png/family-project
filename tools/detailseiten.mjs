@@ -207,7 +207,15 @@ export function inhalt(e, punkte, alle) {
    * hat die url bei roter Ampel schon geleert. */
   if (e.url) {
     T.push(`        <p><a class="btn ghost ext" href="${esc(e.url)}" target="_blank"` +
-           ` rel="${relFuer(e.eigen)}">Zur Seite</a></p>`);
+           ` rel="${relFuer(e.eigen)}">Zur Seite</a>` +
+           /* Steht eine Vorschau-Seite davor, führt ein zweiter Knopf direkt
+            * zur App (Klaus 2026-09-28: „die Leute sollen auch wirklich da
+            * ankommen, wo sie hinwollen"). Rot: `markteintraege` hat appUrl
+            * schon geleert. */
+           (e.appUrl && e.appUrl !== e.url
+             ? ` <a class="btn ghost ext zur-app" href="${esc(e.appUrl)}" target="_blank"` +
+               ` rel="${relFuer(e.eigen)}">Zur App</a>`
+             : '') + '</p>');
   } else {
     T.push('        <p class="det-hinweis">Der Link ist zurzeit ausgesetzt. Der Eintrag' +
            ' bleibt sichtbar; der Grund steht im Marktplatz an der Karte.</p>');
@@ -259,6 +267,34 @@ export function inhalt(e, punkte, alle) {
     T.push(`      <p class="det-besonders"><b>Besonders:</b> ${esc(e.besonders)}</p>`);
   }
   T.push('    </section>');
+
+  /* ── 2b · Erklärvideo (Klaus 2026-09-28: „Detailseite + Hinweis an Karte")
+   *
+   * ⚠ DAS VIDEO WIRD NICHT KOPIERT. Es liegt auf der Webseite der App und
+   * wird von dort eingebettet; `preload="none"` heißt, beim Laden kommt nur
+   * das Vorschaubild, das Video erst beim Tippen auf ▶. In den Vorrat des
+   * Service-Workers kommt es nie (fremde Adresse).
+   *
+   * ⚠ OHNE SKRIPT: hochkant oder quer entscheidet der Browser über
+   * `<source media>`. Dieselbe Bauart wie in PWA Toolpoint. */
+  const vid = e.video;
+  if (vid && vid.quer) {
+    T.push('    <section class="glass det-video" id="video">');
+    T.push('      <h2>Erklärvideo' + (vid.dauer ? ` <span class="det-hinweis">${esc(vid.dauer)} min</span>` : '') + '</h2>');
+    T.push('      <p class="det-hinweis">Das Video zeigt die App bei der Arbeit. Es lädt erst, wenn du auf ▶' +
+           ' tippst, und kommt von der Webseite der App. Auf dem Handy hochkant läuft die Hochformat-Fassung.</p>');
+    T.push('      <video controls preload="none" playsinline width="1280" height="720"' +
+           ' style="width:100%;height:auto;max-height:78vh;border-radius:12px;background:#000;display:block"' +
+           (vid.poster ? ` poster="${esc(vid.poster)}"` : '') + '>');
+    if (vid.hoch) T.push(`        <source src="${esc(vid.hoch)}" type="video/mp4" media="(orientation: portrait)">`);
+    T.push(`        <source src="${esc(vid.quer)}" type="video/mp4">`);
+    T.push('      </video>');
+    if (e.url) {
+      T.push(`      <p class="det-hinweis"><a href="${esc(e.url)}" target="_blank" rel="noopener">` +
+             'Auf Englisch und Russisch: auf der Webseite der App →</a></p>');
+    }
+    T.push('    </section>');
+  }
 
   /* 3 · Zuletzt gemessen */
   T.push('    <section class="glass">');

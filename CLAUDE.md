@@ -1037,6 +1037,61 @@ Namen ihrer Zusicherung. **Kein Cache-Bump nötig:** `markt.html` holt den
 Bericht zur Laufzeit (`fetch` mit `no-store`), die statische Liste trägt kein
 Messband. Gemessen: `class="mw` kommt in `markt.html` **null** Mal vor.
 
+## 🎬 ANGEGLICHEN AN PWA TOOLPOINT, MIT ERKLÄRVIDEO UND WEG ZUR APP (Klaus 2026-09-28)
+
+Auftrag aus `Workfloh-PDF-Page/docs/BRIEF_marktplaetze.md`: *„jede App aus PWA
+Toolpoint soll auch auf family-projekt.de zu sehen sein"*, Workfloh PDF samt
+Erklärvideo, jeder Markt in seinem eigenen Design. Klaus' Wahl: Alis
+**„Mitnehmen, auch auf Wartung"**, Video **„Detailseite + Hinweis an Karte"**.
+
+**Zehn Einträge dazu:** SBKIM-Demo · SB·KIMTool·Point · Such-Werkzeug ·
+Pinnwand · Muster Werbetechnik · Company Brain · Küchenzettel · Alis Moderaum ·
+Alis Warenwirtschaft · Workfloh PDF. Nicht dazu: family-projekt.de (das ist
+dieser Markt) und die KI-Schulung von drüben (hier steht die eigene Fassung).
+
+⚠ **DIE KENNUNGEN SIND DIE DER FORSCHUNGS-ZIELE (`eigen-…`)**, nicht `markt-…`:
+sie sind die Identität der Messreihe. Die neun Ziele in
+`forschung/messziele.json` stehen deshalb auf `aktiv: false`, mit Grund —
+sonst liefe dieselbe Adresse zweimal je Nacht durch die Messung.
+`tools/messung-nachziehen.mjs` hat sieben Karten sofort aus der Reihe gefüllt.
+Workfloh PDF hatte keine Reihe und heißt in beiden Märkten `eigen-workflow-pdf`.
+
+⚠ **ALIS STEHT AUF WARTUNG, und zwar an ZWEI Stellen:** `wache-hand.json`
+(wirkt im Browser sofort) **und** vorab im Bericht `spore-stand.json` mit
+`grund: "in_wartung"` — genau das, was der nächtliche Wächter für einen neuen
+Eintrag in Wartung schreibt. Ohne die zweite stünden die zwei Karten bis zur
+Nacht im gebauten HTML und hätten eine Detailseite.
+
+**Das Video** steht auf der Detailseite (`#video`, `preload="none"`, hochkant
+über `<source media>`, Adressen auf der Webseite der App — nie kopiert, nie im
+Vorrat). Die Karte trägt nur eine Textzeile **„🎬 Erklärvideo"**, keinen vierten
+Knopf: die Knöpfe einer Karte sind eine Familie. Beide Fassungen der Karte
+(`marktHtml()` und `card()` in markt.html) tragen sie.
+
+**Zur App:** steht eine Vorschau-Seite davor (`appUrl` ≠ `url`), trägt die
+**Detailseite** einen zweiten Knopf „Zur App" — auch für Mein Rezeptbuch, Mein
+Mixarium und Tomys Hub. Die Karte bleibt bei „Einzelheiten · Zur Seite".
+`markteintraege()` reicht dafür `appUrl` und `video` durch (Positivliste!).
+
+⚠ **`smoke_all` zählte jeden Link nach `apps/` als Karte** — der Video-Hinweis
+machte daraus eine „Karte ohne Eintrag". Gezählt wird jetzt der Knopf in der
+Fußzeile. **`smoke_fremdmarkt` ist in einem Behälter ohne Lighthouse rot**,
+auch auf `origin/main` (nachgestellt mit Nachbar-Klon): ohne Lighthouse fehlt
+die Zeile „Deckel 0", die der Wächter liest. Eingereiht, nicht nebenbei gebaut.
+
+⚠ **BENANNTE GRENZE: der Messdeckel.** Der Marktplatz wächst von 21 auf 30
+Einträge, der nächtliche Lauf misst höchstens zehn — jede Karte kommt seltener
+dran. Dafür misst der Forschungs-Lauf neun Ziele weniger.
+
+### Geprüft
+
+```bash
+node tests/smoke_angleichen.mjs         # ohne Browser, echte Daten, gebaute Seiten
+bash tests/gegenprobe_angleichen.sh     # Wegwerf-Kopie, prüft den Namen der roten Zeile
+```
+
+⚠ **Cache-Bump v132 → v133**, `ASSET_V` mitgezogen.
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

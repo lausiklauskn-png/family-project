@@ -1423,6 +1423,288 @@
         ],
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
       }
+    },
+    "eigen-alis-moderaum": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "in_wartung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "wartung": true,
+        "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/"
+      }
+    },
+    "eigen-alis-warenwirtschaft": {
+      "lage": "ohne_spore",
+      "wache": {
+        "ampel": "gruen",
+        "grund": "in_wartung",
+        "fehlschlaege": 0,
+        "safebrowsing": "nicht_geprueft",
+        "wartung": true,
+        "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/warehouse.html"
+      }
+    },
+    "eigen-sbkim-demo": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 100,
+        "bedienbarkeit": 94,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-26",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Dokument hat keine Hauptmarkierung."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Links sind durch Farbe erkennbar."
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/sbkim-demo/"
+      }
+    },
+    "eigen-kimtool-point": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 80,
+        "bedienbarkeit": 100,
+        "gute_praxis": 96,
+        "auffindbarkeit": 90,
+        "gemessen": "2026-09-27",
+        "quelle": "google",
+        "werkzeug": "13.5.0",
+        "hinweise": [
+          {
+            "k": "auffindbarkeit",
+            "t": "Dokument enthält keine Meta-Beschreibung"
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/"
+      }
+    },
+    "eigen-sage-suchtool": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 100,
+        "bedienbarkeit": 93,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-28",
+        "quelle": "google",
+        "werkzeug": "13.5.0",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Elemente verwenden unzulässige ARIA-Attribute"
+          },
+          {
+            "k": "leistung",
+            "t": "Bildübermittlung verbessern"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/"
+      }
+    },
+    "eigen-sage-pinnwand": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 100,
+        "bedienbarkeit": 100,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-28",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          },
+          {
+            "k": "leistung",
+            "t": "Bildübermittlung verbessern"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/"
+      }
+    },
+    "eigen-workfloh-page": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 99,
+        "bedienbarkeit": 96,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-28",
+        "quelle": "google",
+        "werkzeug": "13.5.0",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "Erzwungener dynamischer Umbruch"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Mein-Workfloh-Page/"
+      }
+    },
+    "eigen-company-brain": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 99,
+        "bedienbarkeit": 94,
+        "gute_praxis": 96,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-28",
+        "quelle": "google",
+        "werkzeug": "13.5.0",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Dokument hat keine Hauptmarkierung."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Es wurden Browserfehler in der Konsole protokolliert"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Company-Brain/"
+      }
+    },
+    "eigen-kuechenzettel": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 100,
+        "bedienbarkeit": 84,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-09-27",
+        "quelle": "google",
+        "werkzeug": "13.4.1",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Das Kontrastverhältnis von Hintergrund- und Vordergrundfarben ist nicht ausreichend."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Dokument hat keine Hauptmarkierung."
+          },
+          {
+            "k": "bedienbarkeit",
+            "t": "Überschriftenelemente sind nicht in einer fortlaufenden absteigenden Reihenfolge angeordnet"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Kuechenzettel/"
+      }
     }
   },
   "wacheZaehler": {

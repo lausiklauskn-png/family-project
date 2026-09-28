@@ -43,56 +43,64 @@
       "name": "Sage · Such-Tool",
       "url": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/",
       "repo": "Sage-Protokol",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-sage-pinnwand",
       "name": "Sage · Pinnwand",
       "url": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/",
       "repo": "Sage-Protokol",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-sbkim-demo",
       "name": "SBKIM-Demo",
       "url": "https://lausiklauskn-png.github.io/Sage-Protokol/sbkim-demo/",
       "repo": "Sage-Protokol",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-kimtool-point",
       "name": "SB-KIMTool-Point",
       "url": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/",
       "repo": "SB-KIMTool-Point",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-alis-moderaum",
       "name": "Alis Moderaum",
       "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/",
       "repo": "Alis-Moderaum",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-alis-warenwirtschaft",
       "name": "Alis Moderaum · Warenwirtschaft",
       "url": "https://lausiklauskn-png.github.io/Alis-Moderaum/warehouse.html",
       "repo": "Alis-Moderaum",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-company-brain",
       "name": "Company Brain",
       "url": "https://lausiklauskn-png.github.io/Company-Brain/",
       "repo": "Company-Brain",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-kuechenzettel",
       "name": "Küchenzettel",
       "url": "https://lausiklauskn-png.github.io/Kuechenzettel/",
       "repo": "Kuechenzettel",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-muttis-rezeptbuch",
@@ -107,7 +115,8 @@
       "name": "WorkFloh (Schaufenster)",
       "url": "https://lausiklauskn-png.github.io/Mein-Workfloh-Page/",
       "repo": "Mein-Workfloh-Page",
-      "aktiv": true
+      "aktiv": false,
+      "grund": "steht seit 2026-09-28 selbst im Marktplatz (angeglichen an PWA Toolpoint, Klaus' Auftrag) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-new-psb",
