@@ -18,14 +18,30 @@
 # /\breferrer\b/ trifft "noreferrer" nicht, zwei Pruefungen waren wirkungslos.
 cd "$(dirname "$0")/.." || exit 1
 
+# ⚠ BIS ZUM 2026-09-28 GAB DIESE DATEI KEINEN RUECKGABEWERT: sie meldete
+# „✗ … erwartet rot" und endete trotzdem mit 0. Seitdem zaehlt jede ✗-Zeile.
+FEHL=0
 lauf() {  # lauf "<name>" "<erwartung: rot|gruen>"
   if node tests/smoke_statische_listen.mjs > /tmp/gp.txt 2>&1; then E=gruen; else E=rot; fi
   if [ "$E" = "$2" ]; then echo "  ✓ $1 → $E (erwartet)"; else
-    echo "  ✗ $1 → $E, erwartet $2"; grep '✗' /tmp/gp.txt | head -3; fi
+    FEHL=$((FEHL+1)); echo "  ✗ $1 → $E, erwartet $2"; grep '✗' /tmp/gp.txt | head -3; fi
+}
+# Eine Sabotage, die nichts aendert, misst nichts — und sieht aus wie ein
+# blinder Waechter. `sabotiere <datei> <sed-ausdruck>` meldet einen toten Anker.
+sabotiere() {
+  local vor; vor=$(md5sum < "$1")
+  sed -i "$2" "$1"
+  if [ "$(md5sum < "$1")" = "$vor" ]; then FEHL=$((FEHL+1)); echo "  ✗ TOTER ANKER in $1 — die Sabotage hat nichts geaendert"; return 1; fi
 }
 SICH="/tmp/gp_stat.$$"; mkdir -p "$SICH"
+# ⚠ assets/config/spore-stand.json FEHLTE HIER BIS ZUM 2026-09-28. Fall C setzt
+# darin Kimboard auf rot, und ohne Sicherung blieb das liegen: jeder
+# „Endstand"-Lauf danach war rot (27 statt 26 Aussen-Links), und im ECHTEN Baum
+# stand hinterher eine erfundene Sperre. Wer einen Fall schreibt, der eine
+# Datei anfasst, traegt sie hier ein.
 DATEIEN=(markt.html werkzeuge.html sitemap.xml tools/statische-listen.mjs
-         assets/config/listings.js assets/config/werkzeuge.js assets/config/wache-hand.json)
+         assets/config/listings.js assets/config/werkzeuge.js assets/config/wache-hand.json
+         assets/config/spore-stand.json)
 for d in "${DATEIEN[@]}"; do mkdir -p "$SICH/$(dirname "$d")"; cp "$d" "$SICH/$d" 2>/dev/null; done
 aufraeumen() { for d in "${DATEIEN[@]}"; do cp "$SICH/$d" "$d" 2>/dev/null; done; rm -rf "$SICH"; }
 trap aufraeumen INT TERM EXIT
@@ -75,7 +91,7 @@ node tools/statische-listen.mjs > /dev/null
 echo -n "     erzeugtes rel: "; grep -o 'href="https://example.org/fremd/"[^>]*' markt.html | grep -o 'rel="[^"]*"'
 lauf "fremder Eintrag korrekt gebaut" gruen
 echo "     falsche Reparatur — jemand macht daraus einen normalen Link:"
-sed -i 's|href="https://example.org/fremd/" target="_blank" rel="nofollow ugc noopener noreferrer"|href="https://example.org/fremd/" target="_blank" rel="noopener"|' markt.html
+sabotiere markt.html 's|href="https://example.org/fremd/" target="_blank" rel="nofollow ugc noopener noreferrer"|href="https://example.org/fremd/" target="_blank" rel="noopener"|'
 lauf "fremd, aber ohne nofollow" rot
 heile
 
@@ -93,8 +109,11 @@ echo -n "     Kimboard-Link nach Neubau: "; grep -c 'href="https://lausiklauskn-
 echo -n "     Kimboard-Karte trotzdem sichtbar: "; grep -c '>Kimboard<' markt.html
 lauf "rot gebaut: Eintrag sichtbar, Link weg" gruen
 echo "     falsche Reparatur — Link von Hand wieder rein:"
-sed -i 's|<div class="listing-actions"><div class="listing-foot"></div></div></div></div>|<div class="listing-actions"><div class="listing-foot"><a class="btn ghost ext" href="https://lausiklauskn-png.github.io/Kimboard/" target="_blank" rel="noopener">Zur Seite</a></div></div></div></div>|' markt.html
-lauf "Link auf Eis-Eintrag wieder eingebaut" rot
+# ⚠ Der Anker hiess bis zum 2026-09-28 `<div class="listing-foot"></div>` — seit
+# die Karte „Einzelheiten" traegt, gibt es den leeren Fuss nicht mehr. Die
+# Sabotage aenderte nichts, und der Fall meldete sich als „gruen, erwartet rot".
+sabotiere markt.html 's|<a class="btn ghost" href="apps/markt-kimboard/">Einzelheiten</a></div>|<a class="btn ghost" href="apps/markt-kimboard/">Einzelheiten</a><a class="btn ghost ext" href="https://lausiklauskn-png.github.io/Kimboard/" target="_blank" rel="noopener">Zur Seite</a></div>|' \
+  && lauf "Link auf Eis-Eintrag wieder eingebaut" rot
 heile
 
 echo; echo "D · Angehängt statt ersetzt (Prüfung 6)"
@@ -120,7 +139,7 @@ lauf "fremder Host würde als eigen behandelt" rot
 heile
 
 echo; echo "F · Sitemap zeigt auf eine Datei, die es nicht gibt (Prüfung 7)"
-sed -i 's|<loc>https://family-projekt.de/referenzen.html</loc>|<loc>https://family-projekt.de/gibtsnicht.html</loc>|' sitemap.xml
+sabotiere sitemap.xml 's|<loc>https://family-projekt.de/referenzen.html</loc>|<loc>https://family-projekt.de/gibtsnicht.html</loc>|'
 lauf "tote Adresse in der Sitemap" rot
 heile
 
@@ -136,7 +155,7 @@ heile
 
 echo; echo "═══ Endstand: Wächter muss wieder grün sein ═══"
 lauf "unveränderter Stand" gruen
-git status --short
+git status --short 2>/dev/null
 
 echo; echo "H · Eigener Eintrag bekommt noreferrer (der Fall, der am 2026-08-05 durchrutschte)"
 python3 - <<'EOF'
@@ -158,7 +177,7 @@ echo; echo "I · Der Kartentext wird wieder gekürzt (Prüfung 2b, Befund 2026-0
 # ungeschriebene Arbeit hatte; an dem Tag hat genau diese Zeile eine
 # Änderung am Karten-Bauer gelöscht, und danach sah es aus, als hätte der
 # Bau nie stattgefunden.
-sed -i 's|text: String(x.text \|\| ""),|text: String(x.text \|\| "").slice(0, 160),|' tools/statische-listen.mjs
+sabotiere tools/statische-listen.mjs 's|text: String(x.text \|\| ""),|text: String(x.text \|\| "").slice(0, 160),|'
 node tools/statische-listen.mjs > /dev/null
 lauf "Kartentext wieder auf 160 gekürzt" rot
 heile   # legt auch tools/statische-listen.mjs zurueck
@@ -181,7 +200,10 @@ echo; echo "K · Der Browser-Weg kürzt wieder (Prüfung 2b, dritte Stelle)"
 # Zwei Fassungen desselben Textes laufen auseinander: kürzte nur markt.html,
 # sähe ein Besucher etwas anderes als ein Crawler — und die beiden Wächter
 # darüber blieben beide grün, weil das STATISCHE HTML in Ordnung ist.
-sed -i "s|esc(kartenText(x))|esc(kartenText(x).slice(0, 160))|" markt.html
+sabotiere markt.html "s|esc(kartenText(x))|esc(kartenText(x).slice(0, 160))|"
 lauf "markt.html kürzt im Browser wieder" rot
 heile
 lauf "Endstand wieder grün" gruen
+
+echo; if [ "$FEHL" -eq 0 ]; then echo "═══ alle Faelle wie erwartet ═══"; exit 0; fi
+echo "═══ $FEHL Zeile(n) NICHT wie erwartet ═══"; exit 1

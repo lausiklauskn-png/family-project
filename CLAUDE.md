@@ -1084,6 +1084,21 @@ in einer gemeinsamen hinterließ `gegenprobe_statische_listen.sh` Reste, und
 `origin/main` drei „erwartet gruen/rot"-Zeilen (Fall C und Endstand) bei rc=0 —
 eingereiht, nicht nebenbei repariert.
 
+✅ **REPARIERT AM 2026-09-28 — und es waren ZWEI Ursachen, die eine dritte versteckten.**
+Nachgestellt in einer Kopie: (1) Fall C setzt Kimboard in `assets/config/spore-stand.json`
+auf rot, und diese Datei stand **nicht** in der Sicherung — sie blieb liegen, jeder
+„Endstand" danach war rot (27 statt 26 Außen-Links), und im echten Baum stand hinterher
+eine erfundene Sperre. Das sind die „Reste", an denen `gegenprobe_wartung.sh` danach
+„schon rot" abbrach (`smoke_wartung` liest `spore-stand.json`; der Zusammenhang ist
+gefolgert, der Rest selbst gemessen). (2) Der `sed`-Anker von C
+(`<div class="listing-foot"></div>`) war **tot**, seit die Karte „Einzelheiten" trägt —
+die Sabotage änderte nichts, und das sah aus wie ein blinder Wächter. (3) Die Datei gab
+**keinen Rückgabewert**. Seitdem: `spore-stand.json` in der Sicherung · jede `sed`-Sabotage
+über `sabotiere`, das einen toten Anker als rote Zeile meldet · jede ✗-Zeile zählt, Ende
+mit 1. Gemessen: 18 Zeilen wie erwartet, rc=0, Kopie danach byte-gleich; von Hand
+gegengeprüft — alter Anker → „TOTER ANKER", rc=1 · `spore-stand.json` aus der Sicherung
+genommen → vier rote Endstand-Zeilen, rc=1.
+
 ⚠ **`smoke_all` zählte jeden Link nach `apps/` als Karte** — der Video-Hinweis
 machte daraus eine „Karte ohne Eintrag". Gezählt wird jetzt der Knopf in der
 Fußzeile. **`smoke_fremdmarkt` ist in einem Behälter ohne Lighthouse rot**,
