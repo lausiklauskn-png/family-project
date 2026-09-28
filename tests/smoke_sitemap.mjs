@@ -130,7 +130,11 @@ for (const a of appsAdressen) {
  * verschwände er in dem Augenblick, in dem jemand sucht, und die gebackene
  * Fassung sähe anders aus als die gezeichnete. Genau dieser Unterschied ist
  * von einer Probe auf das gebaute HTML allein NICHT zu sehen. */
-ok(/href="apps\/' \+ esc\(x\.anchorId\)/.test(marktRoh) || /apps\/' \+ esc\(x\.anchorId\)/.test(marktRoh),
+/* ⚠ Gemessen wird der KNOPF, nicht irgendein Link auf apps/. Seit dem
+ * 2026-09-28 baut card() auch den Video-Hinweis (`apps/<id>/#video`); ein
+ * Muster auf `apps/' + esc(x.anchorId)` allein blieb gruen, als der Knopf
+ * fehlte (von gegenprobe_sitemap.sh Fall 17 entlarvt). */
+ok(/apps\/' \+ esc\(x\.anchorId\) \+ '\/">' \+ esc\(FP\.t\("mk_details"\)\)/.test(marktRoh),
    "… und der Laufzeit-Zeichner in markt.html baut denselben Knopf");
 ok(/mk_details:/.test(marktRoh) && (marktRoh.match(/mk_details:/g) || []).length >= 2,
    "… und er ist in BEIDEN Sprachen beschriftet",

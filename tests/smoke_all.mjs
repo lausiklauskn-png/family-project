@@ -109,7 +109,13 @@ console.log("\nDetail-Checks");
 // tests/gegenprobe_markt_liste.sh (die es vorher gar nicht gab).
 { const { page } = await load("/markt.html");
   const gez = await page.evaluate(()=>{
+    /* Gezählt wird jeder Link nach apps/ AUSSER dem Video-Hinweis — seit
+       2026-09-28 führt auch er dorthin (apps/<id>/#video), und er ist keine
+       zweite Karte. ⚠ Nicht auf die Fußzeile einengen: dann sähe der
+       Wächter eine Geister-Karte nicht, deren Link woanders steht
+       (gegenprobe_markt_liste.sh Fall 2, gemessen am 2026-09-28). */
     const k = [...document.querySelectorAll('#mkListings .listing a[href^="apps/"]')]
+      .filter(a=>!a.closest(".mk-video"))
       .map(a=>a.getAttribute("href").replace(/^apps\//,"").replace(/\/$/,""));
     return { kennungen:k, karten:document.querySelectorAll("#mkListings .listing").length,
              roh:(window.FP_LISTINGS||[]).map(e=>e.anchorId) };

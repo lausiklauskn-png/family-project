@@ -179,6 +179,15 @@ export const relFuer = (eigen) => (eigen ? "noopener" : "nofollow ugc noopener n
 
 /* ---- Marktplatz ----------------------------------------------------------- */
 
+/* Ein Video nur mit https-Adressen; alles andere fällt weg, statt halb dazustehen. */
+export function videoVon(x) {
+  const v = x && x.video;
+  if (!v || typeof v !== "object") return null;
+  const quer = safeUrl(v.quer);
+  if (!quer) return null;
+  return { quer, hoch: safeUrl(v.hoch), poster: safeUrl(v.poster), dauer: String(v.dauer || "") };
+}
+
 export function markteintraege(listings, wache) {
   /* Dieselbe Vorauswahl wie `neuAufbauen()` in markt.html: ohne gültiges Bild
    * kein Eintrag. Was die Seite nicht zeigt, darf auch nicht im HTML stehen. */
@@ -246,7 +255,16 @@ export function markteintraege(listings, wache) {
         vorstellung: Array.isArray(x.vorstellung)
           ? x.vorstellung.map((z) => String(z || ""))
           : String(x.vorstellung || ""),
-        besonders: String(x.besonders || "")
+        besonders: String(x.besonders || ""),
+        /* ── Weg zur App und Erklärvideo (Klaus 2026-09-28) ─────────────────
+         * `appUrl`: steht eine Vorschau-Seite davor, führt die Detailseite
+         * zusätzlich zur App („die Landingpage ist nur eine Vorschau").
+         * `video`: { quer, hoch, poster, dauer } — Adressen auf der Webseite
+         * der App, NIE kopiert. Die Karte trägt nur den Hinweis, das Video
+         * steht auf der Detailseite. Beide stehen HIER, weil diese Liste
+         * beschneidet (siehe `vorstellung` darüber). Rot: kein Weg zur App. */
+        appUrl: aufEis ? "" : safeUrl(x.appUrl),
+        video: videoVon(x)
       };
     });
 }
@@ -289,6 +307,11 @@ export function marktHtml(eintraege) {
         `<h3 translate="no">${esc(e.label)}</h3>` +
         (e.by ? `<p class="by" translate="no">${esc(e.by)}</p>` : "") +
         `<p>${esc(e.text)}</p>` +
+        /* Das Erklärvideo steht auf der Detailseite; die Karte trägt nur den
+         * Weg dorthin, als Textzeile statt als vierter Knopf — die Knöpfe
+         * einer Karte sind eine Familie (Klaus 2026-09-22). Wortgleich in
+         * markt.html `card()`. */
+        (e.video && e.anchorId ? `<p class="mk-video"><a href="apps/${esc(e.anchorId)}/#video">🎬 Erklärvideo</a></p>` : "") +
         '<div class="listing-actions"><div class="listing-foot">' + einzeln + link + "</div></div>" +
       "</div>" +
       "</div>";

@@ -40,5 +40,13 @@
   "markt-perfect-skin-fashion": {
     "wartung": true,
     "wartungSeit": "2026-09-18"
+  },
+  "eigen-alis-moderaum": {
+    "wartung": true,
+    "wartungSeit": "2026-09-28"
+  },
+  "eigen-alis-warenwirtschaft": {
+    "wartung": true,
+    "wartungSeit": "2026-09-28"
   }
 }
