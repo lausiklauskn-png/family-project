@@ -70,6 +70,28 @@
 
   <h1 data-i18n="sh_h1">So funktioniert das Mycel, und so bist du geschützt.</h1>
 
+  <!-- NUTZEN-OBEN-ANFANG · Klaus 2026-09-29: „gleich oben als erstes: was ist es und was nützt es mir" — Wortlaut wie Sage-Protokol/sicherheit.html; hier je Stelle ein data-i18n-Schlüssel (DE/EN) -->
+  <style>
+    .nz-oben { border: 2px solid rgba(201,169,97,.6); background: rgba(201,169,97,.1); border-radius: 12px; padding: 1rem 1.2rem; margin: 1em 0 1.6em; }
+    .nz-oben h2 { margin: 0 0 .5em; font-size: 1.15rem; }
+    .nz-oben p { margin: .45em 0; }
+    .nz-oben ul { margin: .5em 0; padding-left: 1.2em; }
+    .nz-oben li { margin: .3em 0; }
+  </style>
+  <div class="nz-oben" id="kurz">
+    <h2 data-i18n="nz_o_h">Was ist das — und was nützt es dir?</h2>
+    <p><strong data-i18n="nz_o_was_h">Was:</strong> <span data-i18n="nz_o_was_t">Deine Apps und Geräte verbinden sich zu einem kleinen Netz und beantworten Fragen gemeinsam — ohne Konzern-Server dazwischen.</span></p>
+    <p><strong data-i18n="nz_o_bringt">Was es dir bringt:</strong></p>
+    <ul>
+      <li><strong data-i18n="nz_o_b1_h">Weniger Suchen:</strong> <span data-i18n="nz_o_b1_t">du fragst einmal, und es antwortet, wer es weiß. Du musst nicht wissen, welches Programm oder welcher Kollege es hat.</span></li>
+      <li><strong data-i18n="nz_o_b2_h">Weniger Abtippen und Hin-und-her-Schicken:</strong> <span data-i18n="nz_o_b2_t">keine fünf Fassungen derselben Datei in fünf Postfächern.</span></li>
+      <li><strong data-i18n="nz_o_b3_h">Deine Daten bleiben bei dir:</strong> <span data-i18n="nz_o_b3_t">es wandern Frage und Antwort, nicht deine Dateien.</span></li>
+      <li><strong data-i18n="nz_o_b4_h">Ein Netz nur für dich:</strong> <span data-i18n="nz_o_b4_t">für Firma, Verein oder Familie lässt es sich so abschirmen, dass niemand von außen hineinkommt.</span></li>
+    </ul>
+    <p><a href="#nutzen" data-i18n="nz_o_mehr">Ausführlich: Beispiele, Belege und wie man ein eigenes Netz baut ↓</a></p>
+  </div>
+  <!-- NUTZEN-OBEN-ENDE -->
+
   <div class="section">
     <p class="lede"><strong data-i18n="sh_was_h">Was ist das überhaupt?</strong>
     <span data-i18n="sh_was_t">SBKIM ist ein Weg, wie Anwendungen im Browser einander finden. Nicht über eine zentrale Liste, sondern über Bedeutung. Eine Seite, die Rezepte kennt, und eine, die Weine kennt, erkennen sich, weil ihre Themen nah beieinanderliegen. Kein Server in der Mitte, keine Anmeldung, kein Konzern dazwischen.</span></p>
@@ -77,6 +99,113 @@
     <p><strong data-i18n="sh_knoten_h">Was ist ein Knoten?</strong>
     <span data-i18n="sh_knoten_t">Ein Knoten ist eine Browser-Anwendung (eine Internetseite, ein Web-Werkzeug oder eine installierbare App), die die SBKIM-Bausteine trägt. Er hat eine eigene, unterschriebene Identität (eine öffentliche Visitenkarte) und einen geheimen Schlüssel, der den Browser nie verlässt. Den Schlüssel kannst du als verschlüsselte Sicherung (mit Passwort) wegspeichern und auf einem anderen Gerät zurückspielen.</span></p>
   </div>
+
+  <!-- NUTZEN-ANFANG · Klaus 2026-09-29: „Was nützt mir das?" — Wortlaut wie Sage-Protokol/sicherheit.html; hier je Stelle ein data-i18n-Schlüssel (DE/EN) -->
+  <style>
+    .nz-netz { margin: 1.6em 0 2.2em; }
+    .nz-netz .nz-kurz { font-size: 1.05rem; }
+    .nz-netz .nz-karte { border: 1px solid rgba(127,140,150,.35); border-radius: 10px; padding: .8rem 1rem; margin: .7em 0; background: rgba(127,140,150,.06); }
+    .nz-netz .nz-karte h4 { margin: 0 0 .3em; font-size: 1rem; }
+    .nz-netz .nz-karte p { margin: .3em 0; }
+    .nz-netz .nz-heute { font-size: .92rem; opacity: .85; }
+    .nz-netz figure { margin: 1.2em 0; }
+    .nz-netz svg { width: 100%; max-width: 460px; height: auto; display: block; margin: 0 auto; color: inherit; }
+    .nz-netz figcaption { font-size: .92rem; opacity: .85; margin-top: .4em; }
+    .nz-netz .nz-stand { font-weight: 700; white-space: nowrap; }
+    .nz-netz .nz-quelle { font-size: .9rem; opacity: .85; }
+    .nz-netz .nz-achtung { border: 1px solid rgba(201,169,97,.55); background: rgba(201,169,97,.1); border-radius: 8px; padding: .9rem 1.1rem; margin-top: 1em; }
+    .nz-netz .nz-achtung p { margin: .4em 0; }
+  </style>
+  <div class="section nz-netz" id="nutzen">
+    <h2 data-i18n="nz_h">Was nützt mir das?</h2>
+
+    <h3 data-i18n="nz_mail_h">„Ich kann doch auch meinem Kollegen eine Mail schicken."</h3>
+    <p data-i18n="nz_mail_t">Kannst du, und für vieles ist das richtig. Der Unterschied liegt an vier Stellen:</p>
+    <ul>
+      <li><strong data-i18n="nz_m1_h">Du musst nicht wissen, wer es hat.</strong> <span data-i18n="nz_m1_t">Eine Mail geht an einen Menschen, den du schon kennst. Eine Frage im Mycel geht an alle deine Knoten auf einmal, und es antwortet, wer zum Thema passt — nach Bedeutung, nicht nach dem genauen Wort.</span></li>
+      <li><strong data-i18n="nz_m2_h">Die Daten bleiben, wo sie sind.</strong> <span data-i18n="nz_m2_t">Es wandern eine Frage und eine Antwort, keine Kopie der ganzen Datei. Es entstehen keine fünf Fassungen desselben Dokuments in fünf Postfächern, von denen keiner weiß, welche die richtige ist.</span></li>
+      <li><strong data-i18n="nz_m3_h">Es wird nichts abgetippt.</strong> <span data-i18n="nz_m3_t">Was eine App schon weiß, muss niemand aus einer Mail in die nächste App übertragen.</span></li>
+      <li><strong data-i18n="nz_m4_h">Kein Anbieter dazwischen.</strong> <span data-i18n="nz_m4_t">Es gibt kein Konto und keinen Dienst, der abgeschaltet oder teurer werden kann. Jede Antwort ist unterschrieben — man sieht, welcher Knoten sie gegeben hat, und eine gefälschte fällt an der Unterschrift durch.</span></li>
+    </ul>
+
+    <h3 data-i18n="nz_beleg_h">Was dazu belegt ist</h3>
+    <p class="nz-quelle" data-i18n="nz_beleg_t">Für SBKIM selbst ist noch nicht gemessen, wie viel Zeit es spart. Belegt ist bisher, dass zwei Knoten einander ohne Server in der Mitte finden und Fragen beantworten. Was es an Nutzen bringen kann, zeigen Messungen zu den Problemen, die es angeht:</p>
+    <ul class="nz-quelle">
+      <li><strong data-i18n="nz_q1_h">Hin- und Herspringen zwischen Programmen kostet Zeit.</strong> <span data-i18n="nz_q1_t">In einer Studie mit 137 Beschäftigten in drei Großunternehmen wechselten sie rund 1.200-mal am Tag zwischen Programmen und brauchten knapp vier Stunden pro Woche, um sich danach wieder zurechtzufinden</span> <span data-i18n="nz_q1_q">(Harvard Business Review, 2022,</span> <a href="https://hbr.org/2022/08/how-much-time-and-energy-do-we-waste-toggling-between-applications" target="_blank" rel="noopener noreferrer" data-i18n="nz_q1_a">Artikel</a>).</li>
+      <li><strong data-i18n="nz_q2_h">Abtippen macht Fehler, auch mit Nachsehen.</strong> <span data-i18n="nz_q2_t">In einem Versuch mit 195 Teilnehmenden war Abtippen mit anschließendem Sichtvergleich nicht deutlich genauer als einfaches Abtippen</span> <span data-i18n="nz_q2_q">(Barchard &amp; Pace 2011,</span> <a href="https://www.sciencedirect.com/science/article/abs/pii/S0747563211000707" target="_blank" rel="noopener noreferrer" data-i18n="nz_q2_a">Studie</a>). <span data-i18n="nz_q2_n">Was nicht abgetippt werden muss, kann dabei auch nicht falsch werden.</span></li>
+      <li><strong data-i18n="nz_q3_h">Daten zuerst auf dem eigenen Gerät.</strong> <span data-i18n="nz_q3_t">Forschende der Universität Cambridge und von Ink &amp; Switch beschreiben, was das bringt: schnell, ohne Netz nutzbar, und die Daten bleiben erhalten, auch wenn ein Anbieter aufhört</span> (<a href="https://www.inkandswitch.com/essay/local-first/" target="_blank" rel="noopener noreferrer" data-i18n="nz_q3_a">„Local-first software", 2019</a>). <span data-i18n="nz_q3_n">SBKIM-Knoten sind so gebaut.</span></li>
+    </ul>
+
+    <h3 data-i18n="nz_bsp_h">Beispiele</h3>
+    <div class="nz-karte">
+      <h4 data-i18n="nz_b1_h">In einer Firma</h4>
+      <p data-i18n="nz_b1_t">Das Werkstatt-Tablet mit den Aufträgen, der Büro-Rechner mit der Buchhaltung, der Laptop im Außendienst mit den Angeboten und der Lager-Rechner mit dem Material. Jemand fragt: „Haben wir schon einmal einen Transporter beschriftet — und mit welcher Folie?" Die Auftrags-App meldet die Aufträge, die Buchhaltung die Rechnungen, das Lager die Folie. Niemand muss herumfragen, wer das noch weiß.</p>
+    </div>
+    <div class="nz-karte">
+      <h4 data-i18n="nz_b2_h">Auf mehreren eigenen Geräten</h4>
+      <p data-i18n="nz_b2_t">Dein Rezeptbuch auf dem Tablet, die Getränke-Sammlung auf dem Handy. Du fragst „Was passt zu Lachs?" — das Rezeptbuch antwortet mit dem Gericht, die Getränke-Sammlung mit dem Getränk dazu.</p>
+    </div>
+    <div class="nz-karte">
+      <h4 data-i18n="nz_b3_h">Im Verein oder beim Hobby</h4>
+      <p data-i18n="nz_b3_t">Jedes Mitglied hat seine eigene Sammlung — Bauanleitungen, Ersatzteile, Termine. Eine gemeinsame Pinnwand auf der eigenen Poststelle des Vereins sammelt Fragen, und wer etwas weiß, antwortet. Nichts davon liegt bei einem fremden Anbieter.</p>
+    </div>
+    <p class="nz-heute"><strong data-i18n="nz_stand_h">Ehrlich zum Stand:</strong> <span data-i18n="nz_stand_t">Heute tauschen die Knoten Fragen und Antworten als Text aus. Dass die Programme ganze Aufträge oder Rechnungen selbstständig untereinander abgleichen, ist nicht gebaut — die Beispiele zeigen, wofür das Netz gedacht ist.</span></p>
+
+    <h2 id="eigenes-netz" data-i18n="nz_eigen_h">Ein eigenes, abgeschirmtes Netz bauen</h2>
+    <p><span data-i18n="nz_eigen_t1">Das Mycel braucht keinen Konzern und keinen zentralen Server. Du kannst dir deshalb ein</span> <strong data-i18n="nz_eigen_t2">eigenes</strong> <span data-i18n="nz_eigen_t3">Netz bauen, in das nur deine eigenen Knoten hineinkommen. So sieht das aus:</span></p>
+    <figure>
+      <svg viewBox="0 0 400 480" role="img" aria-labelledby="nz-bild-titel nz-bild-text">
+        <title id="nz-bild-titel" data-i18n="nz_svg_titel">Ein eigenes, abgeschirmtes Mycel</title>
+        <desc id="nz-bild-text" data-i18n="nz_svg_desc">Vier Knoten einer Firma — Werkstatt, Büro, Außendienst, Lager — sind mit
+        der eigenen Poststelle in der Mitte verbunden. Die Poststelle hat eine Gästeliste. Ein fremder
+        Knoten außerhalb kommt nicht hinein, weil sein Schlüssel nicht auf der Gästeliste steht.</desc>
+        <rect x="6" y="6" width="388" height="376" rx="18" fill="rgba(54,190,170,.07)" stroke="#2fb3a2" stroke-width="2" stroke-dasharray="8 6"/>
+        <text x="22" y="34" font-size="16" font-weight="700" fill="currentColor" data-i18n="nz_svg_rahmen">Deine Firma · Verein · Familie</text>
+        <text x="22" y="54" font-size="14" fill="currentColor" opacity=".8" data-i18n="nz_svg_nur">abgeschirmt: nur eure Knoten</text>
+        <g stroke="#2fb3a2" stroke-width="3">
+          <line x1="148" y1="146" x2="163" y2="168"/><line x1="252" y1="146" x2="237" y2="168"/>
+          <line x1="148" y1="296" x2="163" y2="276"/><line x1="252" y1="296" x2="237" y2="276"/>
+        </g>
+        <circle cx="200" cy="222" r="66" fill="rgba(54,190,170,.2)" stroke="#2fb3a2" stroke-width="3"/>
+        <text x="200" y="206" font-size="16" font-weight="700" text-anchor="middle" fill="currentColor" data-i18n="nz_svg_eigene">Eigene</text>
+        <text x="200" y="226" font-size="16" font-weight="700" text-anchor="middle" fill="currentColor" data-i18n="nz_svg_post">Poststelle</text>
+        <text x="200" y="248" font-size="13" text-anchor="middle" fill="currentColor" data-i18n="nz_svg_gaeste">🔒 Gästeliste</text>
+        <g font-size="15" text-anchor="middle" fill="currentColor">
+          <rect x="20" y="88" width="128" height="58" rx="10" fill="rgba(127,140,150,.18)" stroke="currentColor" stroke-opacity=".5"/>
+          <text x="84" y="112" font-weight="700" data-i18n="nz_svg_werk">Werkstatt</text><text x="84" y="132" data-i18n="nz_svg_auftr">Aufträge</text>
+          <rect x="252" y="88" width="128" height="58" rx="10" fill="rgba(127,140,150,.18)" stroke="currentColor" stroke-opacity=".5"/>
+          <text x="316" y="112" font-weight="700" data-i18n="nz_svg_buero">Büro</text><text x="316" y="132" data-i18n="nz_svg_buch">Buchhaltung</text>
+          <rect x="20" y="296" width="128" height="58" rx="10" fill="rgba(127,140,150,.18)" stroke="currentColor" stroke-opacity=".5"/>
+          <text x="84" y="320" font-weight="700" data-i18n="nz_svg_aussen">Außendienst</text><text x="84" y="340" data-i18n="nz_svg_angeb">Angebote</text>
+          <rect x="252" y="296" width="128" height="58" rx="10" fill="rgba(127,140,150,.18)" stroke="currentColor" stroke-opacity=".5"/>
+          <text x="316" y="320" font-weight="700" data-i18n="nz_svg_lager">Lager</text><text x="316" y="340" data-i18n="nz_svg_mat">Material</text>
+        </g>
+        <line x1="200" y1="416" x2="200" y2="288" stroke="#c85050" stroke-width="3" stroke-dasharray="6 5"/>
+        <circle cx="200" cy="382" r="15" fill="#c85050"/>
+        <path d="M193 375 L207 389 M207 375 L193 389" stroke="#fff" stroke-width="3"/>
+        <rect x="120" y="416" width="160" height="56" rx="10" fill="rgba(200,80,80,.14)" stroke="#c85050" stroke-width="2"/>
+        <text x="200" y="440" font-size="15" font-weight="700" text-anchor="middle" fill="currentColor" data-i18n="nz_svg_fremd">Fremder Knoten</text>
+        <text x="200" y="460" font-size="13" text-anchor="middle" fill="currentColor" data-i18n="nz_svg_nicht">nicht auf der Gästeliste</text>
+      </svg>
+      <figcaption data-i18n="nz_svg_cap">Alle eure Knoten sprechen nur mit eurer eigenen Poststelle. Wer nicht auf der
+      Gästeliste steht, kommt nicht hinein.</figcaption>
+    </figure>
+
+    <h3 data-i18n="nz_baust_h">Die Bausteine</h3>
+    <ol>
+      <li><strong data-i18n="nz_k1_h">Die Knoten</strong> <span data-i18n="nz_k1_t">— deine Apps mit den SBKIM-Bausteinen. Jede bekommt beim ersten Start ihre eigene Identität.</span> <span class="nz-stand" data-i18n="nz_k1_s">✅ vorhanden</span></li>
+      <li><strong data-i18n="nz_k2_h">Eine eigene Poststelle (Relais)</strong> <span data-i18n="nz_k2_t">— ein kleines Server-Programm, zum Beispiel auf einem Rechner in der Firma oder einem gemieteten Server. Über sie laufen Fragen und Antworten.</span> <span class="nz-stand" data-i18n="nz_k2_s">✅ läuft so schon</span> <span data-i18n="nz_k2_n">(das Netz dieser Apps hat eine eigene); für ein neues Netz muss sie eingerichtet werden.</span></li>
+      <li><strong data-i18n="nz_k3_h">Die Gästeliste an der Poststelle</strong> <span data-i18n="nz_k3_t">— nur die Schlüssel eurer Knoten dürfen dort schreiben. Damit ist das Netz geschlossen.</span> <span class="nz-stand" data-i18n="nz_k3_s">⚠ vorbereitet</span><span data-i18n="nz_k3_n">, heute noch nirgends eingeschaltet.</span></li>
+      <li><strong data-i18n="nz_k4_h">Jeder Knoten spricht nur mit der eigenen Poststelle</strong> <span data-i18n="nz_k4_t">— die Adresse wird beim Einrichten in der Konfiguration der App gesetzt.</span> <span class="nz-stand" data-i18n="nz_k4_s">✅ einstellbar</span></li>
+      <li><strong data-i18n="nz_k5_h">Die Membran</strong> <span data-i18n="nz_k5_t">— sie nimmt nur Nachrichten von erlaubten Absendern an.</span> <span class="nz-stand" data-i18n="nz_k5_s">✅ in jedem Knoten</span></li>
+      <li><strong data-i18n="nz_k6_h">Das Siegel</strong> <span data-i18n="nz_k6_t">— es zeigt an jedem Knoten, ob alle Bausteine da sind.</span> <span class="nz-stand" data-i18n="nz_k6_s">✅ vorhanden</span></li>
+    </ol>
+    <div class="nz-achtung">
+      <p><strong data-i18n="nz_a1_h">Wichtig zu wissen:</strong> <span data-i18n="nz_a1_t">Was über eine Poststelle läuft, kann ihr Betreiber lesen — die Fragen sind heute nicht Ende-zu-Ende verschlüsselt. Bei einer eigenen Poststelle seid der Betreiber ihr selbst. Vertrauliches gehört deshalb nicht über fremde Poststellen.</span></p>
+      <p><strong data-i18n="nz_a2_h">Und:</strong> <span data-i18n="nz_a2_t">Die Poststelle einzurichten ist heute noch Handarbeit auf einem Server, kein Knopf in der App. Ein eigener, abgetrennter Raum auf einer geteilten öffentlichen Poststelle ist noch nicht einstellbar — abgeschirmt wird über eine eigene.</span></p>
+    </div>
+  </div>
+  <!-- NUTZEN-ENDE -->
 
   <div class="section">
     <h2 data-i18n="sh_schritt_h">Wie läuft das Schritt für Schritt?</h2>
@@ -158,7 +287,7 @@
     </dl>
   </div>
 
-<script src="assets/notranslate.js?v=133"></script>
+<script src="assets/notranslate.js?v=134"></script>
 <script>
 /* Diese Seite traegt ihre Uebersetzung SELBST.
  *
@@ -222,7 +351,102 @@
     sh_g_empfang: "a node does not call out by itself, it only answers.",
     sh_g_apoptose: "the orderly self-teardown: a node can delete itself in a controlled and complete way.",
     sh_g_handshake: "the handshake of two nodes when they swap calling cards.",
-    sh_g_self: "\u201cself-inscribing\u201d: no authority issues the seal, the node checks itself and lays it open."
+    sh_g_self: "\u201cself-inscribing\u201d: no authority issues the seal, the node checks itself and lays it open.",
+    nz_o_h: "What is this \u2014 and what does it do for you?",
+    nz_o_was_h: "What:",
+    nz_o_was_t: "Your apps and devices connect into a small network and answer questions together \u2014 with no corporate server in between.",
+    nz_o_bringt: "What you get from it:",
+    nz_o_b1_h: "Less searching:",
+    nz_o_b1_t: "you ask once, and whoever knows answers. You do not need to know which program or which colleague has it.",
+    nz_o_b2_h: "Less retyping and sending back and forth:",
+    nz_o_b2_t: "no five versions of the same file in five inboxes.",
+    nz_o_b3_h: "Your data stays with you:",
+    nz_o_b3_t: "the question and the answer travel, not your files.",
+    nz_o_b4_h: "A network just for you:",
+    nz_o_b4_t: "for a company, club or family it can be shielded so that nobody from outside gets in.",
+    nz_o_mehr: "In detail: examples, evidence and how to build your own network \u2193",
+    nz_h: "What is it good for?",
+    nz_mail_h: "\u201cBut I can just send my colleague an email.\u201d",
+    nz_mail_t: "You can, and for many things that is right. The difference lies in four places:",
+    nz_m1_h: "You do not need to know who has it.",
+    nz_m1_t: "An email goes to a person you already know. A question in the mycelium goes to all your nodes at once, and whoever fits the subject answers \u2014 by meaning, not by the exact word.",
+    nz_m2_h: "The data stays where it is.",
+    nz_m2_t: "A question and an answer travel, not a copy of the whole file. You do not end up with five versions of the same document in five inboxes, with nobody knowing which one is right.",
+    nz_m3_h: "Nothing gets retyped.",
+    nz_m3_t: "What one app already knows, nobody has to copy from an email into the next app.",
+    nz_m4_h: "No provider in between.",
+    nz_m4_t: "There is no account and no service that can be switched off or become more expensive. Every answer is signed \u2014 you can see which node gave it, and a forged one fails on its signature.",
+    nz_beleg_h: "What the evidence says",
+    nz_beleg_t: "For SBKIM itself it has not yet been measured how much time it saves. What has been shown so far is that two nodes find each other without a server in the middle and answer questions. What it can bring is shown by measurements of the problems it addresses:",
+    nz_q1_h: "Jumping back and forth between programs costs time.",
+    nz_q1_t: "In a study of 137 employees at three large companies, they switched between programs about 1,200 times a day and needed almost four hours a week to find their way back afterwards",
+    nz_q1_q: "(Harvard Business Review, 2022,",
+    nz_q1_a: "article",
+    nz_q2_h: "Retyping causes errors, even when checked.",
+    nz_q2_t: "In an experiment with 195 participants, retyping followed by a visual check was not clearly more accurate than plain retyping",
+    nz_q2_q: "(Barchard & Pace 2011,",
+    nz_q2_a: "study",
+    nz_q2_n: "What does not need to be retyped cannot go wrong either.",
+    nz_q3_h: "Data first on your own device.",
+    nz_q3_t: "Researchers at the University of Cambridge and Ink & Switch describe what that brings: fast, usable without a connection, and the data survives even if a provider shuts down",
+    nz_q3_a: "\u201cLocal-first software\u201d, 2019",
+    nz_q3_n: "SBKIM nodes are built this way.",
+    nz_bsp_h: "Examples",
+    nz_b1_h: "In a company",
+    nz_b1_t: "The workshop tablet with the orders, the office computer with the accounts, the field laptop with the quotes and the warehouse computer with the materials. Someone asks: \u201cHave we ever lettered a van before \u2014 and with which film?\u201d The order app reports the orders, the accounts the invoices, the warehouse the film. Nobody has to ask around who still remembers.",
+    nz_b2_h: "On several of your own devices",
+    nz_b2_t: "Your recipe book on the tablet, your drinks collection on the phone. You ask \u201cWhat goes with salmon?\u201d \u2014 the recipe book answers with the dish, the drinks collection with the drink to go with it.",
+    nz_b3_h: "In a club or for a hobby",
+    nz_b3_t: "Every member has their own collection \u2014 building instructions, spare parts, dates. A shared pinboard on the club\u2019s own post office collects questions, and whoever knows something answers. None of it sits with an outside provider.",
+    nz_stand_h: "Honestly, where things stand:",
+    nz_stand_t: "Today the nodes exchange questions and answers as text. Programs reconciling whole orders or invoices with each other on their own is not built \u2014 the examples show what the network is meant for.",
+    nz_eigen_h: "Building your own shielded network",
+    nz_eigen_t1: "The mycelium needs no corporation and no central server. So you can build yourself",
+    nz_eigen_t2: "your own",
+    nz_eigen_t3: "network that only your own nodes can get into. This is what it looks like:",
+    nz_svg_titel: "Your own shielded mycelium",
+    nz_svg_rahmen: "Your company \u00b7 club \u00b7 family",
+    nz_svg_nur: "shielded: only your nodes",
+    nz_svg_eigene: "Your own",
+    nz_svg_post: "post office",
+    nz_svg_gaeste: "\ud83d\udd12 guest list",
+    nz_svg_werk: "Workshop",
+    nz_svg_auftr: "Orders",
+    nz_svg_buero: "Office",
+    nz_svg_buch: "Accounts",
+    nz_svg_aussen: "Field service",
+    nz_svg_angeb: "Quotes",
+    nz_svg_lager: "Warehouse",
+    nz_svg_mat: "Materials",
+    nz_svg_fremd: "Outside node",
+    nz_svg_nicht: "not on the guest list",
+    nz_svg_desc: "Four nodes of a company \u2014 workshop, office, field service, warehouse \u2014 are connected to their own post office in the middle. The post office has a guest list. An outside node cannot get in, because its key is not on the guest list.",
+    nz_svg_cap: "All your nodes talk only to your own post office. Whoever is not on the guest list does not get in.",
+    nz_baust_h: "The building blocks",
+    nz_k1_h: "The nodes",
+    nz_k1_t: "\u2014 your apps with the SBKIM building blocks. Each one gets its own identity the first time it starts.",
+    nz_k1_s: "\u2705 available",
+    nz_k2_h: "Your own post office (relay)",
+    nz_k2_t: "\u2014 a small server program, for example on a computer in the company or on a rented server. Questions and answers run through it.",
+    nz_k2_s: "\u2705 already runs like this",
+    nz_k2_n: "(the network of these apps has its own); for a new network it has to be set up.",
+    nz_k3_h: "The guest list at the post office",
+    nz_k3_t: "\u2014 only the keys of your nodes may write there. That closes the network.",
+    nz_k3_s: "\u26a0 prepared",
+    nz_k3_n: ", not switched on anywhere yet.",
+    nz_k4_h: "Every node talks only to its own post office",
+    nz_k4_t: "\u2014 the address is set in the app\u2019s configuration during setup.",
+    nz_k4_s: "\u2705 configurable",
+    nz_k5_h: "The membrane",
+    nz_k5_t: "\u2014 it only accepts messages from allowed senders.",
+    nz_k5_s: "\u2705 in every node",
+    nz_k6_h: "The seal",
+    nz_k6_t: "\u2014 it shows on every node whether all building blocks are present.",
+    nz_k6_s: "\u2705 available",
+    nz_a1_h: "Important to know:",
+    nz_a1_t: "Whoever runs a post office can read what passes through it \u2014 the questions are not end-to-end encrypted today. With your own post office, you are the operator. So confidential things do not belong on other people\u2019s post offices.",
+    nz_a2_h: "And:",
+    nz_a2_t: "Setting up the post office is still manual work on a server today, not a button in the app. A separate room of your own on a shared public post office cannot be set up yet \u2014 shielding works through your own."
   };
 
   // Der deutsche Text steht in der SEITE, nicht in einem zweiten Woerterbuch.
