@@ -202,6 +202,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/markt-perfect-skin-fashion/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/apps/markt-privat-brain/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
