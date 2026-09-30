@@ -132,6 +132,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/eigen-sende-pruefer/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/apps/eigen-workfloh-page/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>

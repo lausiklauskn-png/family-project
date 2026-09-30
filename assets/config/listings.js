@@ -430,6 +430,25 @@ window.FP_LISTINGS = [
     "own": true,
     "sporeUrl": "https://pwa-toolpoint.de/sbkim/pruefer-spore.json"
   },
+  {
+    "label": "Sende-Prüfer",
+    "anchorId": "eigen-sende-pruefer",
+    "text": "Sende-Prüfer: prüft einen Text, bevor er an eine KI geht. Zugangsschlüssel, Mailadressen, Telefonnummern, IBANs, Beträge, Rechnungsnummern und selbst eingetragene Namen werden durch Platzhalter ersetzt, die Antwort der KI kommt wieder im Klartext zurück. Postfach für eingefügte Mails, Aufgaben zum Antippen, Prüfung von Anhängen auf versteckte Daten und Anweisungen an eine KI. Senden mit eigenem Schlüssel an Claude, ChatGPT, Gemini, OpenRouter oder Mistral, oder kopieren fürs eigene KI-Abo. Zugleich eigener SBKIM-Knoten. KI, Datenschutz, Pseudonymisierung, Mail beantworten, Kundendaten, DSGVO. Die Prüfung läuft im Browser.",
+    "text_en": "Send Checker: checks a text before it goes to an AI. Access keys, e-mail addresses, phone numbers, IBANs, amounts, invoice numbers and names you enter yourself are replaced by placeholders, and the AI's answer comes back in plain text. An inbox for pasted mails, tasks to tap, checks of attachments for hidden data and instructions aimed at an AI. Send with your own key to Claude, ChatGPT, Gemini, OpenRouter or Mistral, or copy it for your own AI subscription. Also an SBKIM node in its own right. AI, privacy, pseudonymisation, answering mail, customer data, GDPR. The checking runs in the browser.",
+    "vorstellung": [
+      "Für alle, die eine Mail mit KI beantworten wollen, ohne Kundendaten preiszugeben",
+      "Ersetzt Namen, Adressen, Nummern und Beträge durch Platzhalter",
+      "Die Antwort kommt mit den echten Angaben zurück",
+      "Prüft Anhänge auf versteckte Daten und Anweisungen an eine KI",
+      "Senden mit eigenem Schlüssel oder kopieren fürs eigene KI-Abo"
+    ],
+    "besonders": "Vor dem Senden zeigt die Ansicht „Was die KI sieht“ genau den Text, der hinausgeht. Der Schlüssel liegt verschlüsselt im eigenen Tresor.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Sende-Pruefer/",
+    "img": "https://lausiklauskn-png.github.io/Sende-Pruefer/icons/icon-512.png",
+    "category": "Sicherheit",
+    "own": true
+  },
   /* Klaus 2026-09-17: „gleich hinter dem Auslieferungsprüfer". Hier ist die
      Reihenfolge Handarbeit, also steht die Schulung wörtlich dahinter. Kein
      Knoten, deshalb keine sporeUrl. Kein Preis, kein Versprechen von
