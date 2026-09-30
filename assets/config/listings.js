@@ -425,7 +425,7 @@ window.FP_LISTINGS = [
     "besonders": "Er ist in die App-Seiten von PWA Toolpoint eingebaut. Ein Klick auf „Prüf es selbst\" öffnet ihn mit der Adresse der App, die gerade davorsteht.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Auslieferung-Pruefer/auslieferungspruefer.html",
-    "img": "https://pwa-toolpoint.de/assets/pruefer-karte.png",
+    "img": "https://lausiklauskn-png.github.io/Auslieferung-Pruefer/icons/icon-512.png",
     "category": "Sicherheit",
     "own": true,
     "sporeUrl": "https://pwa-toolpoint.de/sbkim/pruefer-spore.json"
