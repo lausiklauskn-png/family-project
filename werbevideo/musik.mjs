@@ -1,9 +1,9 @@
-// Musik für das Family-Projekt-Werbevideo — 60 s, 128 BPM, 32 Takte, a-Moll (Am–F–C–G).
+// Musik für das Family-Projekt-Werbevideo — 67,5 s, 128 BPM, 36 Takte, a-Moll (Am–F–C–G).
 // Rein synthetisch, deterministisch (fester Zufalls-Startwert), keine fremden Klänge.
 // Aufruf: node musik.mjs  → assets/music.wav (48 kHz, Stereo, 16 Bit)
 import fs from "node:fs";
 
-const SR = 48000, DUR = 60, N = SR * DUR;
+const SR = 48000, DUR = 67.5, N = SR * DUR;
 const BPM = 128, BEAT = 60 / BPM, BAR = BEAT * 4, STEP = BEAT / 4;
 
 const bus = () => [new Float32Array(N), new Float32Array(N)];
@@ -188,8 +188,11 @@ function bassBar(t0, c, cut = 850, g = 0.32) { for (const s of [2, 6, 10, 14]) b
 function arpBar(t0, c, g = 0.08, bright = 0.55) { for (let s = 0; s < 16; s++) pluck(t0 + s * STEP, arpTon(CH[c], ARP[s % 8]), g * (s % 4 === 0 ? 1.15 : 0.9), (s % 2 ? 0.35 : -0.35), bright); }
 function hookBar(t0, c, g = 0.05, okt = 0) { for (const [s, l, m] of HOOK[c]) lead(t0 + s * STEP, l * STEP * 0.92, m + okt, g); }
 
-for (let bar = 0; bar < 32; bar++) {
-  const t0 = bar * BAR, c = bar % 4, sec = Math.floor(bar / 4), inner = bar % 4;
+for (let bar = 0; bar < 36; bar++) {
+  // Takte 16–23 sind die Emblem-Schau (doppelt so lang wie früher); danach rückt alles um 4 Takte.
+  const t0 = bar * BAR, c = bar % 4;
+  const sec = bar < 16 ? Math.floor(bar / 4) : bar < 24 ? 4 : Math.floor((bar - 4) / 4);
+  const inner = bar < 16 ? bar % 4 : bar < 24 ? bar - 16 : (bar - 4) % 4;
   switch (sec) {
     case 0: { // Intro: Lichtpunkt, Fluid, Logo
       pad(t0, BAR, CH[c], 0.035 + 0.01 * inner, (tt) => 500 + (inner * BAR + tt) * 260, inner === 0 ? 1.4 : 0.5, 0.9, 0.5);
@@ -209,10 +212,17 @@ for (let bar = 0; bar < 32; bar++) {
       hookBar(t0, c, 0.055); if (sec === 6) hookBar(t0, c, 0.03, 12);
       arpBar(t0, c, 0.045, 0.7);
       break; }
-    case 4: { // Emblem-Schau: Stich auf jeden Takt
-      groove(t0, { sech: true }); bassBar(t0, c, 1000);
-      supersaw(t0, 0.28, CH[c].map((m) => m + 12), 0.03, 7000, 0.003, 0.25, FX, 0.45);
-      impact(t0, 0.32, 1.6); pad(t0, BAR, CH[c], 0.02, 1500); arpBar(t0, c, 0.06, 0.6);
+    case 4: { // Emblem-Schau: ein Takt mit Stich (Zeichen setzt sich), ein Takt zum Atmen (Sporen fliegen)
+      if (inner % 2 === 0) {
+        groove(t0, { sech: true }); bassBar(t0, c, 1000);
+        supersaw(t0, 0.28, CH[c].map((m) => m + 12), 0.03, 7000, 0.003, 0.25, FX, 0.45);
+        impact(t0, 0.32, 1.6); pad(t0, BAR, CH[c], 0.025, 1600); arpBar(t0, c, 0.06, 0.6);
+      } else {
+        kick(t0, 0.7);
+        for (let s = 2; s < 16; s += 4) hat(t0 + s * STEP, false, 0.04, s % 8 ? 0.4 : -0.4);
+        bass(t0, BAR * 0.95, BASS[c], 0.2, 500);
+        pad(t0, BAR, CH[c], 0.05, 2400, 0.25, 0.9, 0.6); arpBar(t0, c, 0.035, 0.45);
+      }
       break; }
     case 5: { // Nachprüfbar: ruhiger, Zahlen zählen hoch
       if (inner < 3) {
@@ -245,18 +255,26 @@ riser(20.625, 22.5, 0.32); rueckwaerts(21.56, 22.5, 0.3); wirbel(20.625, 22.5, 0
 impact(22.5, 1.0);                                                                        // Drop 1
 whoosh(26.25, 0.9, 0.16, -1);
 whoosh(30, 0.8, 0.18, 1);
-for (const t of [31.875, 33.75, 35.625]) whoosh(t, 0.6, 0.14, t === 33.75 ? -1 : 1);
-whoosh(37.5, 1.2, 0.2, -1); impact(37.5, 0.4, 2.5);
-for (let k = 0; k < 8; k++) bell(38.2 + k * BEAT * 0.5, 84 + [0, 3, 7, 12][k % 4], 0.035, k % 2 ? 0.5 : -0.5, 0.9, 0.4); // Zahlen ticken
-riser(43.125, 45, 0.32); rueckwaerts(44.06, 45, 0.3); wirbel(43.125, 45, 0.06, 0.42);
-impact(45, 1.0);                                                                          // Drop 2
-whoosh(48.75, 0.9, 0.16, 1);
-whoosh(52.5, 1.2, 0.22, -1); impact(52.5, 0.45, 2.0);
-riser(54.375, 56.25, 0.2); rueckwaerts(54.375, 56.25, 0.32); wirbel(55.3, 56.25, 0.03, 0.22);
-impact(56.25, 1.0, 3.6);                                                                  // Logo setzt sich zusammen
-supersaw(56.25, 2.4, [48, 55, 60, 62, 64, 67, 72], 0.02, 3800, 0.02, 1.2, FX, 0.6);     // C(add9) — Schlussakkord
-drone(56.25, 59.9, [[36, 0], [43, -0.2], [48, 0.2]], 0.07, 0.05);
-bell(56.25, 84, 0.06, -0.4, 3.4, 0.8); bell(56.4, 88, 0.05, 0.4, 3.4, 0.8); bell(57.2, 91, 0.04, 0, 2.6, 0.8);
+// Emblem-Schau: je Gruppe setzt sich das Zeichen auf dem Takt, hält, und zerfällt nach 5 Schlägen in Sporen
+const PENTA = [81, 84, 86, 88, 91, 93];
+for (let g = 0; g < 4; g++) {
+  const T = 30 + g * 3.75, B = T + BEAT * 5;
+  if (g) whoosh(T, 0.6, 0.12, g % 2 ? -1 : 1);
+  for (let k = 0; k < 6; k++) bell(B + k * 0.06, PENTA[(k * 2 + g) % 6], 0.04 - k * 0.004, (k % 2 ? 1 : -1) * (0.2 + k * 0.1), 1.6, 0.7);
+  whoosh(B + 0.3, 0.9, 0.1, g % 2 ? 1 : -1);
+  if (g < 3) rueckwaerts(B + 0.6, T + 3.75, 0.12);
+}
+whoosh(45, 1.2, 0.2, -1); impact(45, 0.4, 2.5);
+for (let k = 0; k < 8; k++) bell(45.7 + k * BEAT * 0.5, 84 + [0, 3, 7, 12][k % 4], 0.035, k % 2 ? 0.5 : -0.5, 0.9, 0.4); // Zahlen ticken
+riser(50.625, 52.5, 0.32); rueckwaerts(51.56, 52.5, 0.3); wirbel(50.625, 52.5, 0.06, 0.42);
+impact(52.5, 1.0);                                                                        // Drop 2
+whoosh(56.25, 0.9, 0.16, 1);
+whoosh(60, 1.2, 0.22, -1); impact(60, 0.45, 2.0);
+riser(61.875, 63.75, 0.2); rueckwaerts(61.875, 63.75, 0.32); wirbel(62.8, 63.75, 0.03, 0.22);
+impact(63.75, 1.0, 3.6);                                                                  // Logo setzt sich zusammen
+supersaw(63.75, 2.4, [48, 55, 60, 62, 64, 67, 72], 0.02, 3800, 0.02, 1.2, FX, 0.6);     // C(add9) — Schlussakkord
+drone(63.75, 67.4, [[36, 0], [43, -0.2], [48, 0.2]], 0.07, 0.05);
+bell(63.75, 84, 0.06, -0.4, 3.4, 0.8); bell(63.9, 88, 0.05, 0.4, 3.4, 0.8); bell(64.7, 91, 0.04, 0, 2.6, 0.8);
 
 // ── Seitenketten-Pumpen, Delay, Hall, Summe ─────────────────
 const duck = new Float32Array(N).fill(1);
@@ -297,11 +315,11 @@ for (let i = 0; i < N; i++) {
   const yl = hpA * (hpL + l - xL), yr = hpA * (hpR + r - xR); xL = l; xR = r; hpL = yl; hpR = yr;
   mix[0][i] = yl; mix[1][i] = yr;
 }
-// weiche Begrenzung + Normalisierung + Ausblenden auf Stille bei 60 s
+// weiche Begrenzung + Normalisierung + Ausblenden auf Stille bei 67,5 s
 let peak = 0; for (let i = 0; i < N; i++) peak = Math.max(peak, Math.abs(mix[0][i]), Math.abs(mix[1][i]));
 const pre = 1.35 / peak; let peak2 = 0;
 for (let i = 0; i < N; i++) for (const c of mix) { c[i] = Math.tanh(c[i] * pre); peak2 = Math.max(peak2, Math.abs(c[i])); }
-const norm = 0.93 / peak2, fadeA = si(58.4);
+const norm = 0.93 / peak2, fadeA = si(65.9);
 const buf = Buffer.alloc(44 + N * 4);
 buf.write("RIFF", 0); buf.writeUInt32LE(36 + N * 4, 4); buf.write("WAVE", 8); buf.write("fmt ", 12); buf.writeUInt32LE(16, 16); buf.writeUInt16LE(1, 20); buf.writeUInt16LE(2, 22);
 buf.writeUInt32LE(SR, 24); buf.writeUInt32LE(SR * 4, 28); buf.writeUInt16LE(4, 32); buf.writeUInt16LE(16, 34); buf.write("data", 36); buf.writeUInt32LE(N * 4, 40);
