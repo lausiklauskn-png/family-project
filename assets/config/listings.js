@@ -690,6 +690,29 @@ window.FP_LISTINGS = [
     "category": "Büro",
     "own": true
   },
+  /* Klaus 2026-10-02: die Download-Seite für große Videos als eigene App.
+     Kein Knoten, deshalb keine sporeUrl. Keine Messwerte erfunden — die
+     Karte bekommt ihre Zahlen erst aus dem nächtlichen Lauf. */
+  {
+    "label": "Family-Projekt.de · Videos",
+    "anchorId": "eigen-fp-videos",
+    "text": "Family-Projekt.de · Videos: große Videos von family-projekt.de herunterladen, auch als installierbare App. Das Video kommt in Teilen zu je 14 MB, jeder Teil wird mit SHA-256 geprüft, am Ende wird eine Datei gespeichert. Nach einem Abbruch holt „Weiter laden“ nur, was noch fehlt. Vier Lade-Wege mit demselben Ergebnis: schlicht, mit Hintergrundbildern, mit Werbeschau samt Musik oder mit Vorschaufilm. Jede Karte nennt Länge, Bild und Größe, gemessen statt geschätzt. Ohne Konto, ohne Zähler, ausgeliefert über GitHub Pages. Video herunterladen, großer Download, Prüfsumme, Werbevideo, Download fortsetzen.",
+    "text_en": "Family-Projekt.de · Videos: download large videos from family-projekt.de, also as an installable app. The video comes in parts of 14 MB each, every part is checked with SHA-256, and at the end one file is saved. After an interruption, “Continue loading” fetches only what is still missing. Four ways to load with the same result: plain, with background pictures, with a promo show and music, or with a preview film. Every card states length, picture size and file size, measured rather than estimated. No account, no counter, delivered via GitHub Pages. Download a video, large download, checksum, promo video, resume a download.",
+    "vorstellung": [
+      "Für alle, die ein großes Video von family-projekt.de in voller Qualität haben wollen",
+      "Das Video kommt in Teilen zu je 14 MB, jeder Teil wird geprüft",
+      "Am Ende liegt eine einzige Datei auf dem Gerät",
+      "Vier Lade-Wege: schlicht, mit Bildern, mit Werbeschau oder mit Vorschaufilm",
+      "Länge, Bild und Größe stehen gemessen auf jeder Karte",
+      "Ohne Konto, ohne Zähler, auch als App installierbar"
+    ],
+    "besonders": "Ein abgebrochener Download geht weiter, ohne dass schon geprüfte Teile neu geholt werden.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/",
+    "img": "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/icons/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];

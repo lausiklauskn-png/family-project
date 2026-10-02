@@ -15,7 +15,7 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v138";
+var CACHE_VERSION = "family-projekt-v139";
 
 /* ⚠ NUR EIGENE VORRAETE AUFRAEUMEN — `caches` gehoert dem URSPRUNG, nicht dem
  * Pfad. Auf lausiklauskn-png.github.io liegen rund zwanzig Apps; ein Filter,
@@ -40,7 +40,7 @@ var VORRAT_PRAEFIX = "family-projekt-";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "138";
+var ASSET_V = "139";
 // Absichtlich NICHT mehr im Vorrat (Messung 2026-08-02):
 //
 // 1. "og-image.png" (386 KiB). Das ist das Vorschaubild für geteilte Links.
@@ -60,7 +60,7 @@ var ASSET_V = "138";
 var CORE = [
   "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=138", "assets/app.js?v=138", "assets/notranslate.js?v=138", "assets/status-widget.js?v=138",
+  "assets/style.css?v=139", "assets/app.js?v=139", "assets/notranslate.js?v=139", "assets/status-widget.js?v=139",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
   "manifest.json", "icon-192.png", "icon-512.png",
   // Die KI-Schulung (2026-09-17): der Rahmen und die byte-gleiche Kopie der
