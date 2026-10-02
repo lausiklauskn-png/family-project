@@ -71,8 +71,8 @@ body{font-family:Geist,system-ui,sans-serif;color:#eef2f8;-webkit-font-smoothing
 /* Szene E */
 .grpLabel{position:absolute;left:0;right:0;top:150px;text-align:center;font-size:72px;font-weight:800;letter-spacing:-.02em;background:radial-gradient(closest-side,rgba(11,13,20,.85),rgba(11,13,20,0))}
 .emb{position:absolute}
-.emb .shard{position:absolute;inset:0;border-radius:22%;overflow:hidden}
-.emb .shard img,.emb .shard svg{width:100%;height:100%;display:block}
+.emb .ico{position:absolute;inset:0;border-radius:22%;overflow:hidden;opacity:0}
+.emb .ico img,.emb .ico svg{width:100%;height:100%;display:block}
 .emb .glow{position:absolute;inset:-22%;border-radius:50%;background:radial-gradient(circle,rgba(124,156,255,.45),rgba(110,231,211,0) 65%);mix-blend-mode:screen}
 .emb .lbl{position:absolute;left:-80px;right:-80px;text-align:center;font-size:30px;font-weight:600;color:#eef2f8;background:radial-gradient(closest-side,rgba(11,13,20,.9),rgba(11,13,20,0))}
 /* Szene F */
@@ -107,8 +107,8 @@ body{font-family:Geist,system-ui,sans-serif;color:#eef2f8;-webkit-font-smoothing
 </style>
 </head>
 <body>
-<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="60">
-<audio id="music" src="assets/music.wav" data-start="0" data-duration="60" data-track-index="2" data-volume="1"></audio>
+<div id="root" data-composition-id="main" data-start="0" data-width="1920" data-height="1080" data-duration="67.5">
+<audio id="music" src="assets/music.wav" data-start="0" data-duration="67.5" data-track-index="2" data-volume="1"></audio>
 <div id="cam">
   <!-- Hintergruende -->
   <div id="bgA" class="clip" data-start="0" data-duration="8.2" data-track-index="0" style="z-index:1">
@@ -123,12 +123,12 @@ body{font-family:Geist,system-ui,sans-serif;color:#eef2f8;-webkit-font-smoothing
   <div id="bgB" class="clip" data-start="7.2" data-duration="8.6" data-track-index="0" style="z-index:2"><div class="full in"><img class="bgimg" id="wirbel" src="assets/bg/wirbel.jpg" alt=""><div class="dim" style="opacity:.8"></div></div></div>
   <div id="bgC" class="clip" data-start="14.6" data-duration="8.2" data-track-index="0" style="z-index:3"><div class="full in"><img class="bgimg" id="tisch" src="assets/bg/tisch-weich.jpg" alt=""><div class="dim" style="background:rgba(11,13,20,.62)"></div></div></div>
   <div id="bgD" class="clip" data-start="22.3" data-duration="8.2" data-track-index="0" style="z-index:4"><div class="full in"><img class="bgimg" id="erde" src="assets/bg/kosmos-erde.jpg" alt=""><div class="dim" style="background:rgba(11,13,20,.55)"></div></div></div>
-  <div id="bgE" class="clip" data-start="29.8" data-duration="8.1" data-track-index="0" style="z-index:5"><div class="full in">
+  <div id="bgE" class="clip" data-start="29.8" data-duration="15.6" data-track-index="0" style="z-index:5"><div class="full in">
     <img class="bgimg e0" src="assets/bg/netz.jpg" alt=""><img class="bgimg e1" src="assets/bg/pilze.jpg" alt="" style="opacity:0"><img class="bgimg e2" src="assets/bg/buch.jpg" alt="" style="opacity:0"><img class="bgimg e3" src="assets/bg/tisch.jpg" alt="" style="opacity:0;filter:blur(6px);transform:scale(1.05)"><div class="dim" style="background:rgba(11,13,20,.6)"></div></div></div>
-  <div id="bgF" class="clip" data-start="37.2" data-duration="8.1" data-track-index="0" style="z-index:6"><div class="full in"><div id="gridbg"></div></div></div>
-  <div id="bgG" class="clip" data-start="45" data-duration="8" data-track-index="0" style="z-index:7"><div class="full in">
+  <div id="bgF" class="clip" data-start="44.7" data-duration="8.1" data-track-index="0" style="z-index:6"><div class="full in"><div id="gridbg"></div></div></div>
+  <div id="bgG" class="clip" data-start="52.5" data-duration="8" data-track-index="0" style="z-index:7"><div class="full in">
     <img class="bgimg g0" src="assets/bg/wald.jpg" alt=""><img class="bgimg g1" src="assets/bg/mycel-gold.jpg" alt="" style="opacity:0"><img class="bgimg g2" src="assets/bg/netz.jpg" alt="" style="opacity:0"><div class="dim" style="background:rgba(11,13,20,.45)"></div></div></div>
-  <div id="bgH" class="clip" data-start="52.3" data-duration="7.7" data-track-index="0" style="z-index:8"><div class="full in"><img id="kos2" src="assets/bg/kosmos2.jpg" alt="" style="position:absolute;left:0;top:0;width:2701px;height:1080px"><div class="dim" style="background:rgba(11,13,20,.5)"></div></div></div>
+  <div id="bgH" class="clip" data-start="59.8" data-duration="7.7" data-track-index="0" style="z-index:8"><div class="full in"><img id="kos2" src="assets/bg/kosmos2.jpg" alt="" style="position:absolute;left:0;top:0;width:2701px;height:1080px"><div class="dim" style="background:rgba(11,13,20,.5)"></div></div></div>
 
   <div id="fluidWrap"><canvas id="fluid" width="1920" height="1080"></canvas></div>
 
@@ -175,9 +175,9 @@ body{font-family:Geist,system-ui,sans-serif;color:#eef2f8;-webkit-font-smoothing
     </div></div>
   </div>
 
-  <div id="cE" class="clip" data-start="30" data-duration="7.6" data-track-index="3" style="z-index:30"></div>
+  <div id="cE" class="clip" data-start="29.9" data-duration="15.1" data-track-index="3" style="z-index:30"></div>
 
-  <div id="cF" class="clip" data-start="37.4" data-duration="7.8" data-track-index="3" style="z-index:30">
+  <div id="cF" class="clip" data-start="44.9" data-duration="7.8" data-track-index="3" style="z-index:30">
     <div class="kicker" style="top:96px">03 · Nachprüfbar</div>
     <div id="fHead" style="position:absolute;left:140px;top:142px;font-size:72px;font-weight:800;letter-spacing:-.02em">Jede Zahl mit Datum.</div>
     <div id="rows"></div>
@@ -185,7 +185,7 @@ body{font-family:Geist,system-ui,sans-serif;color:#eef2f8;-webkit-font-smoothing
     <div id="fFoot" class="cap" style="left:0;right:0;top:960px;text-align:center">Lighthouse 13.5.0 · Handy · Leistung · Quelle: family-projekt.de</div>
   </div>
 
-  <div id="cG" class="clip" data-start="45" data-duration="7.7" data-track-index="3" style="z-index:30">
+  <div id="cG" class="clip" data-start="52.5" data-duration="7.7" data-track-index="3" style="z-index:30">
     <div class="slam" id="w1" style="top:250px">Finden.</div>
     <div class="slam" id="w2" style="top:450px;color:#6ee7d3">Entdecken.</div>
     <div class="slam" id="w3" style="top:650px;color:#a78bfa">Anbieten.</div>
@@ -195,7 +195,7 @@ body{font-family:Geist,system-ui,sans-serif;color:#eef2f8;-webkit-font-smoothing
     <div class="claim" id="k3" style="top:540px;color:#6ee7d3">Offline nutzbar.</div>
   </div>
 
-  <div id="cH" class="clip" data-start="52.4" data-duration="7.6" data-track-index="3" style="z-index:30">
+  <div id="cH" class="clip" data-start="59.9" data-duration="7.6" data-track-index="3" style="z-index:30">
     <div id="hTiles" class="full"></div>
     <div id="logoH" style="position:absolute;left:870px;top:250px;width:180px;height:180px"></div>
     <div id="titleH" class="bigtitle" style="top:458px;font-size:96px"></div>
@@ -228,23 +228,99 @@ const mat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, metalness: 1, roug
 const mc = new MarchingCubes(48, mat, false, false, 60000); sc.add(mc);
 const comp = new EffectComposer(r); comp.addPass(new RenderPass(sc, cam)); comp.addPass(new UnrealBloomPass(new THREE.Vector2(1920, 1080), 0.6, 0.5, 0.75)); comp.addPass(new OutputPass());
 const cl = (v) => Math.max(0, Math.min(1, v));
-let cleared = false;
-function renderAt(t) {
-  const inD = t >= 22.3 && t <= 30.4, inH = t >= 52.4 && t <= 56.6;
-  if (!inD && !inH) { if (!cleared) { r.clear(); cleared = true; } return; }
-  cleared = false; mc.reset();
-  let s, spread;
-  if (inH) { const k = cl((t - 52.6) / 2.8), sh = cl((t - 55.6) / 0.6); s = (0.3 + 0.7 * k) * (1 - 0.97 * sh); spread = 0.24 - 0.1 * k; }
-  else { s = cl((t - 22.4) / 0.7) * (1 - 0.6 * cl((t - 29.2) / 1.0)); spread = 0.22; }
-  for (let i = 0; i < 9; i++) {
-    const a = t * (0.55 + i * 0.07) + i * 2.1;
-    mc.addBall(0.5 + spread * Math.sin(a), 0.5 + spread * 0.8 * Math.cos(a * 1.3 + i), 0.5 + spread * 0.6 * Math.sin(a * 0.7 + i * 1.7), 0.5, 12);
+/* Szene E: Sporen. Zielpunkte werden aus den Zeichen in #cE abgetastet (Farbe + Lage). */
+const N = 1500, PX = 2 * 6 * Math.tan(17.5 * Math.PI / 180) / 1080;
+const ET = [30, 33.75, 37.5, 41.25], DIS = 2.34375, E_ON = 29.5, E_OFF = 44.9;
+let sd = 7341; const rr = () => { sd = sd + 0x6D2B79F5 | 0; let x = Math.imul(sd ^ sd >>> 15, 1 | sd); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
+const sph = () => { let x, y, z; do { x = rr() * 2 - 1; y = rr() * 2 - 1; z = rr() * 2 - 1; } while (x * x + y * y + z * z > 1); return [x, y, z]; };
+const sMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.16, metalness: 0.05, clearcoat: 1, clearcoatRoughness: 0.1, iridescence: 0.8, iridescenceIOR: 1.4, iridescenceThicknessRange: [200, 700], envMapIntensity: 1.4 });
+sMat.onBeforeCompile = (sh) => { sh.fragmentShader = sh.fragmentShader.replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\n\ttotalEmissiveRadiance += diffuseColor.rgb * 0.6;'); };
+const spor = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 2), sMat, N);
+spor.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(N * 3), 3); spor.frustumCulled = false; spor.visible = false; sc.add(spor);
+const TG = [], CO = [], CL = [];               // je Gruppe: Ziel, Farbe, Wolke
+const BL = new Float32Array(N * 3), PH = new Float32Array(N * 3), RS = new Float32Array(N), DL = new Float32Array(N);
+for (let i = 0; i < N; i++) { const [x, y, z] = sph(); BL.set([x * 0.6, y * 0.6, z * 0.6], i * 3); PH.set([rr() * 6.3, rr() * 6.3, rr() * 6.3], i * 3); RS[i] = 0.75 + rr() * 0.55; DL[i] = rr(); }
+const loadImg = (src) => new Promise((ok) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
+async function sample() {
+  const S = 96, c = document.createElement('canvas'); c.width = c.height = S; const x2 = c.getContext('2d', { willReadFrequently: true });
+  for (let g = 0; g < 4; g++) {
+    const embs = Array.from(document.querySelectorAll('#eg' + g + ' .emb')), pts = [];
+    for (const em of embs) {
+      const L = parseFloat(em.style.left), T = parseFloat(em.style.top), W = parseFloat(em.style.width);
+      const el = em.querySelector('.ico svg, .ico img'); let src = null, url = null;
+      if (el && el.tagName.toLowerCase() === 'svg') { url = URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(el)], { type: 'image/svg+xml' })); src = url; } else if (el) src = el.src;
+      const im = src ? await loadImg(src) : null; if (url) URL.revokeObjectURL(url);
+      x2.clearRect(0, 0, S, S); x2.save(); x2.beginPath(); x2.roundRect(0, 0, S, S, S * 0.22); x2.clip();
+      if (im) x2.drawImage(im, 0, 0, S, S); else { x2.fillStyle = '#7c9cff'; x2.fillRect(0, 0, S, S); }
+      x2.restore(); const d = x2.getImageData(0, 0, S, S).data, list = [];
+      for (let py = 0; py < S; py++) for (let px = 0; px < S; px++) { const o = (py * S + px) * 4; if (d[o + 3] > 140) list.push([px, py, d[o], d[o + 1], d[o + 2]]); }
+      for (let k = list.length - 1; k > 0; k--) { const m = Math.floor(rr() * (k + 1)); [list[k], list[m]] = [list[m], list[k]]; }
+      pts.push({ L, T, W, list });
+    }
+    const tg = new Float32Array(N * 3), co = new Float32Array(N * 3), cw = new Float32Array(N * 3), col = new THREE.Color();
+    for (let i = 0; i < N; i++) {
+      const e = pts[i % pts.length], q = e.list[Math.floor(i / pts.length) % Math.max(1, e.list.length)] || [48, 48, 124, 156, 255];
+      const sx = e.L + (q[0] + rr()) / S * e.W, sy = e.T + (q[1] + rr()) / S * e.W;
+      const x = (sx - 960) * PX, y = (540 - sy) * PX; tg.set([x, y, (rr() - 0.5) * 0.06], i * 3);
+      col.setRGB(q[2] / 255 * 0.85 + 0.1, q[3] / 255 * 0.85 + 0.1, q[4] / 255 * 0.85 + 0.1, THREE.SRGBColorSpace); co.set([col.r, col.g, col.b], i * 3);
+      const [a, b, z] = sph(); cw.set([x * 1.7 + a * 1.4, y * 1.5 + b * 1.1 + 0.15, z * 1.6], i * 3);
+    }
+    TG.push(tg); CO.push(co); CL.push(cw);
   }
-  mc.update(); mc.scale.setScalar(Math.max(0.001, 1.8 * s)); mc.rotation.y = t * 0.35; mc.rotation.x = Math.sin(t * 0.3) * 0.3;
+}
+const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), V = new THREE.Vector3(), SV = new THREE.Vector3(), C3 = new THREE.Color();
+const eio = (k) => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, eo = (k) => 1 - Math.pow(1 - k, 3);
+const BLC = [0.75, 0.85, 1.0];
+function spores(t, sBlob) {
+  let g = 0; for (let k = 1; k < 4; k++) if (t >= ET[k] - 0.35) g = k;
+  const C0 = g ? ET[g] - 0.35 : E_ON, C1 = ET[g] + 0.75, D = ET[g] + DIS, last = g === 3;
+  const fade = last ? 1 - cl((t - (D + 0.45)) / 0.7) : 1;
+  const tg = TG[g], co = CO[g], cw = CL[g], pw = g ? CL[g - 1] : null, pc = g ? CO[g - 1] : null;
+  const wob = (i, a) => [a * Math.sin(t * 0.9 + PH[i * 3]), a * Math.sin(t * 0.8 + PH[i * 3 + 1]), a * Math.sin(t * 0.7 + PH[i * 3 + 2])];
+  for (let i = 0; i < N; i++) {
+    const o = i * 3; let x, y, z, sc = 1, cr, cg, cb;
+    if (t < C1) {
+      const k = eio(cl((t - C0 - DL[i] * 0.3) / (C1 - C0 - 0.3)));
+      let fx, fy, fz;
+      if (g) { const w = wob(i, 0.14); fx = pw[o] + w[0]; fy = pw[o + 1] + w[1]; fz = pw[o + 2] + w[2]; cr = pc[o]; cg = pc[o + 1]; cb = pc[o + 2]; }
+      else { const r = 0.4 + 0.6 * sBlob, a = t * 0.35; fx = (BL[o] * Math.cos(a) + BL[o + 2] * Math.sin(a)) * r; fy = BL[o + 1] * r; fz = (BL[o + 2] * Math.cos(a) - BL[o] * Math.sin(a)) * r; [cr, cg, cb] = BLC; sc = cl((t - E_ON) / 0.45 - DL[i] * 0.4); }
+      const sw = Math.sin(Math.PI * k) * 0.35;
+      x = fx + (tg[o] - fx) * k + sw * Math.sin(PH[o]); y = fy + (tg[o + 1] - fy) * k + sw * Math.cos(PH[o + 1]); z = fz + (tg[o + 2] - fz) * k + sw * Math.sin(PH[o + 2]);
+      cr += (co[o] - cr) * k; cg += (co[o + 1] - cg) * k; cb += (co[o + 2] - cb) * k; sc *= 1.3 - 0.3 * k;
+    } else if (t < D) {
+      const w = wob(i, 0.01); x = tg[o] + w[0]; y = tg[o + 1] + w[1]; z = tg[o + 2] + w[2]; cr = co[o]; cg = co[o + 1]; cb = co[o + 2];
+    } else {
+      const k = eo(cl((t - D - DL[i] * 0.25) / 0.85)), w = wob(i, 0.14 * k);
+      x = tg[o] + (cw[o] + w[0] - tg[o]) * k; y = tg[o + 1] + (cw[o + 1] + w[1] - tg[o + 1]) * k; z = tg[o + 2] + (cw[o + 2] + w[2] - tg[o + 2]) * k;
+      cr = co[o]; cg = co[o + 1]; cb = co[o + 2]; sc = 1 + 0.3 * k;
+    }
+    const rad = Math.max(0.0001, PX * 4.6 * RS[i] * sc * fade);
+    M4.compose(V.set(x, y, z), Q, SV.set(rad, rad, rad)); spor.setMatrixAt(i, M4); spor.setColorAt(i, C3.setRGB(cr, cg, cb));
+  }
+  spor.instanceMatrix.needsUpdate = true; spor.instanceColor.needsUpdate = true;
+}
+let cleared = false, ready = false;
+function renderAt(t) {
+  if (!ready) return;
+  const inD = t >= 22.3 && t <= 30.4, inH = t >= 59.9 && t <= 64.1, inE = TG.length === 4 && t >= E_ON && t <= E_OFF;
+  if (!inD && !inH && !inE) { if (!cleared) { r.clear(); cleared = true; } return; }
+  cleared = false; mc.reset();
+  let s = 0, spread = 0.22;
+  if (inH) { const k = cl((t - 60.1) / 2.8), sh = cl((t - 63.1) / 0.6); s = (0.3 + 0.7 * k) * (1 - 0.97 * sh); spread = 0.24 - 0.1 * k; }
+  else if (inD) { s = cl((t - 22.4) / 0.7) * (1 - 0.35 * cl((t - 29.0) / 0.5)) * (1 - cl((t - 29.55) / 0.6)); }
+  mc.visible = s > 0.002;
+  if (mc.visible) {
+    for (let i = 0; i < 9; i++) {
+      const a = t * (0.55 + i * 0.07) + i * 2.1;
+      mc.addBall(0.5 + spread * Math.sin(a), 0.5 + spread * 0.8 * Math.cos(a * 1.3 + i), 0.5 + spread * 0.6 * Math.sin(a * 0.7 + i * 1.7), 0.5, 12);
+    }
+    mc.update(); mc.scale.setScalar(Math.max(0.001, 1.8 * s)); mc.rotation.y = t * 0.35; mc.rotation.x = Math.sin(t * 0.3) * 0.3;
+  }
+  spor.visible = inE; if (inE) spores(t, s);
   comp.render();
 }
 window.addEventListener('hf-seek', (e) => renderAt(e.detail.time));
-window.__hf.buildReady['fluid'] = Promise.resolve().then(() => renderAt(window.__hfThreeTime || 0));
+window.__hf.buildReady['fluid'] = (async () => { try { if (document.fonts) await document.fonts.ready; await sample(); } catch (err) { console.warn('Sporen', err); } ready = true; renderAt(window.__hfThreeTime || 0); })();
 </script>
 
 <script>
@@ -287,10 +363,9 @@ const ring=$('#ring');
 APPS.forEach(([k],i)=>{const phi=i*360/APPS.length;const s=document.createElement('div');s.className='slot';s.style.transform=`rotateY(${phi}deg) translateZ(calc(var(--R) * 1px))`;s.innerHTML=`<div class="face" style="transform:rotateY(${-phi}deg)"><div class="bill"><div class="tile">${ic(k)}</div></div></div>`;ring.appendChild(s)});
 for(let i=0;i<40;i++){const b=document.createElement('div');b.className='bub';const z=14+rnd()*46;b.style.width=b.style.height=z+'px';b.style.marginLeft=b.style.marginTop=(-z/2)+'px';b.dataset.x=((rnd()-.5)*1700).toFixed(0);b.dataset.y=((rnd()-.5)*900).toFixed(0);$('#bubs').appendChild(b)}
 /* Szene E */
-const SH=['polygon(0 0,58% 0,46% 52%,0 44%)','polygon(58% 0,100% 0,100% 56%,46% 52%)','polygon(0 44%,46% 52%,40% 100%,0 100%)','polygon(46% 52%,100% 56%,100% 100%,40% 100%)'];
 const GROUPS=[['Tresore',[['mtresor','Mein Tresor'],['jtresor','Jasons Tresor']],300],['Netzwerk',[['sage','Sage-Protokol'],['mycel','Mycel-Karte'],['sbkim','SBKIM-Demo'],['kimbell','Kim-Bell']],240],['Betrieb',[['workfloh','Mein WorkFloh'],['werbetechnik','Muster Werbetechnik'],['brain','Company Brain'],['bookledger','BookLedgerPro']],240],['Küche & Lernen',[['kuechen','Küchenzettel'],['ki','KI-Schulung']],300]];
 GROUPS.forEach(([lab,items,sz],g)=>{const w=document.createElement('div');w.className='full eg';w.id='eg'+g;w.style.opacity=g?0:1;let h=`<div class="grpLabel">${lab}</div>`;const gap=sz+120,x0=960-(items.length-1)*gap/2;
- items.forEach(([k,n],j)=>{h+=`<div class="emb" id="em${g}_${j}" style="left:${x0+j*gap-sz/2}px;top:${540-sz/2+20}px;width:${sz}px;height:${sz}px"><div class="glow"></div>${SH.map(c=>`<div class="shard" style="clip-path:${c}">${ic(k)}</div>`).join('')}<div class="lbl" style="top:${sz+26}px">${n}</div></div>`});w.innerHTML=h;$('#cE').appendChild(w)});
+ items.forEach(([k,n],j)=>{h+=`<div class="emb" id="em${g}_${j}" style="left:${x0+j*gap-sz/2}px;top:${540-sz/2+20}px;width:${sz}px;height:${sz}px"><div class="glow"></div><div class="ico">${ic(k)}</div><div class="lbl" style="top:${sz+26}px">${n}</div></div>`});w.innerHTML=h;$('#cE').appendChild(w)});
 /* Szene F */
 const ROWS=[['tomy','Tomys Hub','27.09.2026'],['mycel','Mycel-Karte','29.09.2026'],['sbkim','SBKIM-Demo','29.09.2026'],['kuechen','Küchenzettel','30.09.2026'],['ki','KI-Schulung','01.10.2026'],['kimbell','Kim-Bell','02.10.2026'],['kimseek','Kimseek','02.10.2026']];
 const strip=a=>`<div class="dg"><div class="st">${a.map(d=>`<span>${d}</span>`).join('')}</div></div>`;
@@ -308,7 +383,7 @@ const leak=(t,d)=>{tl.fromTo('#leak',{opacity:0,x:-160},{opacity:.9,x:0,duration
 const fadeIn=(sel,t,d=.6)=>tl.fromTo(sel,{opacity:0},{opacity:1,duration:d,ease:'sine.inOut',immediateRender:false},t);
 const fadeOut=(sel,t,d=.6)=>tl.to(sel,{opacity:0,duration:d,ease:'sine.inOut'},t);
 // Grain
-tl.fromTo('#grain',{backgroundPosition:'0px 0px'},{backgroundPosition:'512px 9216px',duration:60,ease:'steps(1440)'},0);
+tl.fromTo('#grain',{backgroundPosition:'0px 0px'},{backgroundPosition:'576px 10368px',duration:67.5,ease:'steps(1620)'},0);
 
 /* A: Sonne, Mycel-Nebel, Erde */
 tl.fromTo('#kosImg',{'--r':0},{'--r':2600,duration:1.75,ease:'power2.in'},.25);
@@ -373,7 +448,6 @@ fadeOut('#bgC .in',21.9,.6);
 fadeIn('#bgD .in',22.3,.3); tl.fromTo('#erde',{scale:1.25},{scale:1.05,duration:8,ease:'power1.out'},22.3);
 fxFlash(22.5,1,.8); fxStreak(22.5,560,1.4); shake(22.5,22);
 tl.fromTo('#fluidWrap',{opacity:0},{opacity:.9,duration:.5,ease:'power2.out',immediateRender:false},22.4);
-tl.to('#fluidWrap',{opacity:0,duration:.8,ease:'power2.in'},29.4);
 tl.fromTo('#shock',{scale:.2,opacity:1},{scale:6,opacity:0,duration:1.0,ease:'power2.out',immediateRender:false},22.5);
 $$('#bubs .bub').forEach((b,i)=>{tl.fromTo(b,{x:0,y:0,scale:0,opacity:1},{x:+b.dataset.x,y:+b.dataset.y,scale:1,duration:1.1+rnd()*.6,ease:'expo.out',immediateRender:false},22.5+i*.006);tl.to(b,{y:'-=180',opacity:0,duration:2.2,ease:'sine.in'},24.0+rnd()*1.2)});
 tl.fromTo('#ring',{'--R':0},{'--R':700,duration:1.05,ease:'expo.out'},22.55);
@@ -388,30 +462,6 @@ tl.to('#ringText',{opacity:0,scale:.8,duration:.5,ease:'power2.in'},28.6);
 tl.to('#ring',{'--R':2600,duration:1.0,ease:'power3.in'},29.0);
 tl.to('#ring .tile',{opacity:0,duration:.4,ease:'power1.in'},29.55);
 leak(29.6,.8); fadeOut('#bgD .in',29.8,.6);
-
-/* E: Embleme setzen sich zusammen und zerspringen */
-fadeIn('#bgE .in',29.8,.5);
-const ET=[30.0,31.875,33.75,35.625];
-ET.forEach((t,g)=>{
-  if(g){tl.to(`#bgE .e${g}`,{opacity:1,duration:.5,ease:'sine.inOut'},t-.2);tl.set(`#eg${g}`,{opacity:1},t)}
-  tl.fromTo(`#eg${g} .grpLabel`,{y:-40,opacity:0,scaleX:1.3},{y:0,opacity:1,scaleX:1,duration:.5,ease:'power3.out',immediateRender:false},t+.05);
-  $$(`#eg${g} .emb`).forEach((em,j)=>{const id='#'+em.id,tt=t+j*.08;
-    $$(id+' .shard').forEach((s,k)=>{const sx=k%2?1:-1,sy=k<2?-1:1;tl.fromTo(s,{x:sx*(160+rnd()*80),y:sy*(140+rnd()*80),rotation:sx*sy*40,opacity:0},{x:0,y:0,rotation:0,opacity:1,duration:.5,ease:'power4.out',immediateRender:false},tt);
-      tl.to(s,{x:sx*(300+rnd()*200),y:sy*(240+rnd()*160),rotation:-sx*sy*60,opacity:0,duration:.4,ease:'power3.in'},t+1.5+j*.03)});
-    tl.fromTo(id+' .glow',{scale:.3,opacity:0},{scale:1,opacity:1,duration:.6,ease:'power2.out',immediateRender:false},tt+.1);tl.to(id+' .glow',{opacity:0,duration:.3},t+1.5);
-    tl.fromTo(id+' .lbl',{y:20,opacity:0},{y:0,opacity:1,duration:.4,ease:'power2.out',immediateRender:false},tt+.3);tl.to(id+' .lbl',{opacity:0,duration:.25},t+1.5);
-    if(document.querySelector(id+' .draw'))tl.fromTo(id+' .draw',{strokeDashoffset:1},{strokeDashoffset:0,duration:.8,stagger:.06,ease:'power2.out',immediateRender:false},tt+.25);
-    if(document.querySelector(id+' .spin'))tl.fromTo(id+' .spin',{rotation:-120},{rotation:0,svgOrigin:'100 100',duration:1.2,ease:'power3.out',immediateRender:false},tt+.2);
-    if(document.querySelector(id+' .pls'))tl.fromTo(id+' .pls',{opacity:.25},{opacity:1,duration:.18,stagger:.05,ease:'none',yoyo:true,repeat:3,immediateRender:false},tt+.3);
-    if(document.querySelector(id+' .hop'))tl.fromTo(id+' .hop',{y:0},{y:-16,duration:.2,ease:'power2.out',yoyo:true,repeat:3,immediateRender:false},tt+.5);
-    if(document.querySelector(id+' .bolt'))tl.fromTo(id+' .bolt',{x:0},{x:(i,el)=>el.getAttribute('x')<100?10:-10,duration:.25,yoyo:true,repeat:1,ease:'power2.inOut',immediateRender:false},tt+.9);
-    if(document.querySelector(id+' .rise'))tl.fromTo(id+' .rise',{y:10,opacity:0},{y:-18,opacity:1,duration:1.1,ease:'sine.out',immediateRender:false},tt+.3);
-  });
-  tl.to(`#eg${g} .grpLabel`,{opacity:0,y:-30,duration:.3,ease:'power2.in'},t+1.5);
-  shake(t,8);
-});
-fxFlash(30.0,.6,.4); fxStreak(33.75,540,.8);
-leak(36.9,1.0); fadeOut('#bgE .in',37.3,.5);
 
 /* F: Nachpruefbar */
 fadeIn('#bgF .in',37.2,.5);
@@ -460,7 +510,32 @@ tl.fromTo('#pillsH .pill',{y:30,opacity:0},{y:0,opacity:1,duration:.45,stagger:.
 tl.fromTo('#capH',{opacity:0},{opacity:1,duration:.5},57.9);
 fxStreak(58.5,700,1);
 tl.fromTo('#black',{opacity:0},{opacity:1,duration:.8,ease:'power1.in',immediateRender:false},59.2);
-tl.set({},{},60);
+tl.shiftChildren(7.5,true,37.0);
+/* E: Embleme formen sich aus Sporen und zerfallen wieder (Sporen: three.js-Modul) */
+fadeIn('#bgE .in',29.8,.5);
+const ET=[30,33.75,37.5,41.25],DIS=2.34375;
+ET.forEach((t,g)=>{const d=t+DIS;
+  if(g){tl.to(`#bgE .e${g}`,{opacity:1,duration:.6,ease:'sine.inOut'},t-.4);tl.set(`#eg${g}`,{opacity:1},t-.4)}
+  tl.fromTo(`#eg${g} .grpLabel`,{y:-40,opacity:0,scaleX:1.3},{y:0,opacity:1,scaleX:1,duration:.5,ease:'power3.out',immediateRender:false},t+.25);
+  $$(`#eg${g} .emb`).forEach((em,j)=>{const id='#'+em.id,tt=t+.5+j*.06;
+    tl.fromTo(id+' .ico',{opacity:0,scale:.96},{opacity:1,scale:1,duration:.3,ease:'sine.inOut',immediateRender:false},tt);
+    tl.to(id+' .ico',{opacity:0,scale:1.04,duration:.22,ease:'sine.in'},d+j*.03);
+    tl.fromTo(id+' .glow',{scale:.3,opacity:0},{scale:1,opacity:1,duration:.6,ease:'power2.out',immediateRender:false},tt);tl.to(id+' .glow',{opacity:0,duration:.3},d);
+    tl.fromTo(id+' .lbl',{y:20,opacity:0},{y:0,opacity:1,duration:.4,ease:'power2.out',immediateRender:false},tt+.2);tl.to(id+' .lbl',{opacity:0,duration:.25},d);
+    if(document.querySelector(id+' .draw'))tl.fromTo(id+' .draw',{strokeDashoffset:1},{strokeDashoffset:0,duration:.8,stagger:.06,ease:'power2.out',immediateRender:false},tt+.1);
+    if(document.querySelector(id+' .spin'))tl.fromTo(id+' .spin',{rotation:-120},{rotation:0,svgOrigin:'100 100',duration:1.2,ease:'power3.out',immediateRender:false},tt+.05);
+    if(document.querySelector(id+' .pls'))tl.fromTo(id+' .pls',{opacity:.25},{opacity:1,duration:.18,stagger:.05,ease:'none',yoyo:true,repeat:3,immediateRender:false},tt+.2);
+    if(document.querySelector(id+' .hop'))tl.fromTo(id+' .hop',{y:0},{y:-16,duration:.2,ease:'power2.out',yoyo:true,repeat:3,immediateRender:false},tt+.4);
+    if(document.querySelector(id+' .bolt'))tl.fromTo(id+' .bolt',{x:0},{x:(i,el)=>el.getAttribute('x')<100?10:-10,duration:.25,yoyo:true,repeat:1,ease:'power2.inOut',immediateRender:false},tt+.8);
+    if(document.querySelector(id+' .rise'))tl.fromTo(id+' .rise',{y:10,opacity:0},{y:-18,opacity:1,duration:1.1,ease:'sine.out',immediateRender:false},tt+.2);
+  });
+  tl.to(`#eg${g} .grpLabel`,{opacity:0,y:-30,duration:.3,ease:'power2.in'},d);
+  shake(t+.55,6);
+});
+fxFlash(30.0,.6,.4); fxStreak(37.5,540,.8);
+leak(44.3,1.0); fadeOut('#bgE .in',44.8,.5);
+
+tl.set({},{},67.5);
 window.__timelines["main"]=tl;
 })();
 </script>
