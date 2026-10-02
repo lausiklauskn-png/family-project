@@ -1,7 +1,7 @@
-# Werbevideo Family Projekt (60 s)
+# Werbevideo Family Projekt (67,5 s)
 
 Ein Werbevideo über die Apps auf family-projekt.de, gebaut mit HyperFrames
-(HTML + GSAP + three.js), 1920 × 1080, 60 Sekunden, 128 BPM.
+(HTML + GSAP + three.js), 1920 × 1080, 67,5 Sekunden, 128 BPM.
 
 ## Neu bauen
 
@@ -19,10 +19,10 @@ npx --yes hyperframes@0.8.111 render . --quality delivery -o family-projekt-werb
 | 7,5–15 s | Sende-Prüfer und Auslieferungsprüfer (Bildschirmfotos mit erfundenen Angaben) |
 | 15–22,5 s | Mein Mixarium und Mein Rezeptbuch (Bildschirmaufnahmen der Apps) |
 | 22,5–30 s | 25 Apps auf einem 3D-Ring, Flüssigmetall (three.js) |
-| 30–37,5 s | eigene Zeichen: Tresore, Netzwerk, Betrieb, Küche & Lernen — zerplatzen und setzen sich neu zusammen |
-| 37,5–45 s | sieben Apps mit Leistung 100 |
-| 45–52,5 s | Finden · Entdecken · Anbieten · Kostenlos · Ohne Konto · Offline nutzbar |
-| 52,5–60 s | Logo, family-projekt.de |
+| 30–45 s | eigene Zeichen: Tresore, Netzwerk, Betrieb, Küche & Lernen — entstehen aus dem Flüssigmetall als Sporen (three.js), lösen sich nach einer kurzen Pause auf und setzen sich zur nächsten Gruppe zusammen |
+| 45–52,5 s | sieben Apps mit Leistung 100 |
+| 52,5–60 s | Finden · Entdecken · Anbieten · Kostenlos · Ohne Konto · Offline nutzbar |
+| 60–67,5 s | Logo, family-projekt.de |
 
 ## Woher die Zahlen kommen
 
