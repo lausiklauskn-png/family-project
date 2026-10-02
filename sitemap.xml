@@ -97,6 +97,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/eigen-fp-videos/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/apps/eigen-kimtool-point/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
