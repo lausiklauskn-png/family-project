@@ -36,8 +36,9 @@ fi
 lauf() {  # lauf "<name>" "<erwartung: rot|gruen>"
   if node "$T" > /tmp/gp2.txt 2>&1; then E=gruen; else E=rot; fi
   if [ "$E" = "$2" ]; then echo "  ✓ $1 → $E (erwartet)"; else
-    echo "  ✗ $1 → $E, erwartet $2"; grep '✗' /tmp/gp2.txt | head -3; fi
+    echo "  ✗ $1 → $E, erwartet $2"; grep '✗' /tmp/gp2.txt | head -3; FEHL=$((FEHL+1)); fi
 }
+FEHL=0
 heile() { git checkout -- "$T" "$S" "$M" "$V" 2>/dev/null; }
 
 echo "═══ GEGENPROBEN Fall 9 ═══"
@@ -65,8 +66,15 @@ heile
 echo; echo "C · falsche Reparatur 2: Waehler wieder ungefiltert UND Erwartung 7"
 echo "     — sieht heute gruen aus, haengt aber an einer voellig fremden Datei:"
 sed -i 's|^const SPZ = "\[data-role=sporen\] .fpst-sporezeile";|const SPZ = ".fpst-sporezeile";|' "$T"
-sed -i 's/ok(z.length === 3, "drei Zeilen im Bericht/ok(z.length === 7, "drei Zeilen im Bericht/' "$T"
-lauf "ungefiltert + 7, heutiger Stand" gruen
+# Die Zahl wird GEMESSEN, nicht hingeschrieben: der Mess-Block waechst mit den
+# Daten (2026-08-06: 7, 2026-10-05: 9). Mit fester 7 war dieser Fall rot, ohne
+# dass etwas kaputt war -- genau die Schwaeche, die er zeigen soll.
+node "$T" > /tmp/gp2.txt 2>&1
+N=$(grep -o 'drei Zeilen im Bericht ([0-9]*)' /tmp/gp2.txt | head -1 | grep -o '[0-9]*')
+if [ -z "$N" ]; then echo "  ✗ ungefilterte Zahl nicht messbar"; FEHL=$((FEHL+1)); N=0; fi
+echo "     (ungefiltert stehen heute $N Zeilen da)"
+sed -i "s/ok(z.length === 3, \"drei Zeilen im Bericht/ok(z.length === $N, \"drei Zeilen im Bericht/" "$T"
+lauf "ungefiltert + $N, heutiger Stand" gruen
 echo "     … und jetzt traegt jemand EINE Messung von Hand nach:"
 python3 - <<'EOF'
 import json, collections
@@ -79,7 +87,7 @@ d['markt-kimseek']={"leistung":88,"bedienbarkeit":95,"gute_praxis":96,
                     "auffindbarkeit":92,"gemessen":"2026-08-06"}
 json.dump(d, open(p,'w'), indent=2, ensure_ascii=False)
 EOF
-lauf "ungefiltert + 7, eine Messung mehr" rot
+lauf "ungefiltert + $N, eine Messung mehr" rot
 echo "     ↑ genau darum ist 7 keine Reparatur: die Zahl gehoert dem Mess-Block."
 heile
 
@@ -139,8 +147,10 @@ EOF
 PW_CORE=/gibt/es/nicht lauf "kein Paket, kein Riegel" rot
 heile
 echo "   und mit Riegel: ⊘ statt rot"
-if PW_CORE=/gibt/es/nicht node "$T" 2>&1 | grep -q "1 nicht lauffähig"; then echo "  ✓ meldet nicht lauffähig"; else echo "  ✗ meldet NICHT nicht lauffähig"; fi
+if PW_CORE=/gibt/es/nicht node "$T" 2>&1 | grep -q "1 nicht lauffähig"; then echo "  ✓ meldet nicht lauffähig"; else echo "  ✗ meldet NICHT nicht lauffähig"; FEHL=$((FEHL+1)); fi
 
 echo; echo "═══ Endstand ═══"
 lauf "wieder unveraenderter Stand" gruen
 git status --short
+echo; echo "$FEHL Abweichung(en)"
+[ "$FEHL" -eq 0 ]
