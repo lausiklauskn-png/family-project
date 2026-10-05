@@ -41,6 +41,18 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let pass = 0, fail = 0;
 const ok = (c, m) => { if (c) { pass++; console.log("  ✓", m); } else { fail++; console.log("  ✗", m); } };
 
+/* ── Ohne playwright-core ist die Probe NICHT LAUFFÄHIG, nicht rot ─────────
+ * Das Werkzeug rechnet die Vektoren im Browser. Fehlt das Paket, starb jeder
+ * Lauf mit ERR_MODULE_NOT_FOUND, und acht Zeilen wurden rot, obwohl am Code
+ * nichts falsch war (gemessen 2026-10-05). Dieselbe Regel wie in
+ * smoke_wortkarte: ⊘ ist kein Grün, aber auch kein Befund über den Code. */
+try { await import(process.env.PW_CORE || "playwright-core"); }
+catch {
+  console.log("  ⊘ NICHT LAUFFÄHIG: playwright-core fehlt — ungeprüft, nicht grün");
+  console.log("\nErgebnis: 0 bestanden, 0 durchgefallen, 1 nicht lauffähig");
+  process.exit(0);
+}
+
 const MODELL = "Xenova/multilingual-e5-small";
 const DIM = 384;
 

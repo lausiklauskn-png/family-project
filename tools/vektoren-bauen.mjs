@@ -199,7 +199,15 @@ async function imBrowserRechnen(texte) {
     await page.goto(base + "/__bau.html", { waitUntil: "load" });
     // Auf das Ergebnis warten, nicht auf die Uhr: das Modell sind ~30 MB, und
     // wie lange die durch die Leitung gehen, weiß niemand vorher.
-    return await page.evaluate(async (t) => {
+    // Die Frist steht HIER, nicht als drittes Argument von evaluate: ältere
+    // playwright-core (1.56) werfen bei drei Argumenten „Too many arguments",
+    // neuere nehmen sie an. Gemessen 2026-10-05 — der Nightly lief mit dem
+    // neuen Paket, die Probe smoke_stufe2_sporen mit dem alten und war rot.
+    let uhr;
+    const frist = new Promise((_, nein) => {
+      uhr = setTimeout(() => nein(new Error("Einbettung: Frist von 15 min abgelaufen")), 15 * 60 * 1000);
+    });
+    const rechnung = page.evaluate(async (t) => {
       await window.SbkimEmbedding.init();
       const meta = window.SbkimEmbedding._meta || {};
       const vecs = [];
@@ -208,7 +216,9 @@ async function imBrowserRechnen(texte) {
         for (const v of teil) vecs.push(Array.from(v));
       }
       return { model: meta.model, dim: meta.dim, quant: (window.FPVecCodec._meta || {}).quant, vecs };
-    }, texte, { timeout: 15 * 60 * 1000 });
+    }, texte);
+    try { return await Promise.race([rechnung, frist]); }
+    finally { clearTimeout(uhr); }
   } finally {
     await browser.close();
     server.close();

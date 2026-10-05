@@ -215,7 +215,11 @@ console.log("\n── Der echte Lauf ──");
   const lauf = spawnSync("node", ["tools/forschung.mjs", "--messen"],
     { cwd: WURZEL, encoding: "utf8", timeout: 120000, env: { ...process.env, FORSCHUNG_MAX: "0" } });
   const aus = String(lauf.stdout || "") + String(lauf.stderr || "");
-  const m = aus.match(/Deckel 0: (\d+) Ziel/);
+  /* ⚠ Hier stand `/Deckel 0: (\d+) Ziel/`. Die Deckel-Zeile kommt erst NACH
+     der Frage nach Lighthouse — ohne Werkzeug war die Probe rot, ohne dass
+     etwas falsch war (2026-10-05). Gelesen wird jetzt die Zeile, die der Lauf
+     immer schreibt. */
+  const m = aus.match(/Mess-Liste: (\d+) Ziel/);
 
   /* ⚠ HIER STAND ZUERST `/PWA Toolpoint/` — und das traf ein MESS-ZIEL, das
      zufällig so heißt („Auslieferungsprüfer (PWA Toolpoint)"). Der Wächter war

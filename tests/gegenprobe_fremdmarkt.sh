@@ -143,6 +143,10 @@ probe 'die fremden Maerkte werden gar nicht erst gefragt' \
       '    const { fremdeZiele, bekannteKennungen } = await import("./lib/fremdmarkt.mjs");' \
       '    return [];
     const { fremdeZiele, bekannteKennungen } = await import("./lib/fremdmarkt.mjs");'
+probe 'die Ziel-Zahl verschweigt die gefundenen Ziele (Messung 2026-10-05)' \
+      tools/forschung.mjs \
+      'console.log(`Mess-Liste: ${an.length} Ziel(e) aktiv' \
+      'console.log(`Mess-Liste: ${eigene.filter((z) => z.aktiv !== false).length} Ziel(e) aktiv'
 
 aufraeumen
 trap - INT TERM EXIT

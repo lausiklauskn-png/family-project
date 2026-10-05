@@ -577,6 +577,13 @@ async function messen() {
   const reihe = lesen(REIHE, { fassung: 1, reihen: {} });
   reihe.reihen = reihe.reihen || {};
 
+  /* Die Zahl der Ziele steht VOR der Werkzeug-Frage. Vorher stand sie nur in
+   * der „Deckel"-Zeile, und die kommt ohne Lighthouse und PSI-Schlüssel nie:
+   * dann ließ sich nicht sehen, ob die gefundenen Ziele überhaupt in der Liste
+   * ankommen — smoke_fremdmarkt war in jedem Behälter ohne Lighthouse rot
+   * (gemessen 2026-10-05). */
+  console.log(`Mess-Liste: ${an.length} Ziel(e) aktiv, ${aus.length} abgeschaltet.`);
+
   if (!werkzeugDa({})) {
     console.log("Lighthouse ist nicht verfügbar und kein PSI-Schlüssel gesetzt — es wird nicht gemessen.");
     if (!process.env.PSI_API_KEY) return;
