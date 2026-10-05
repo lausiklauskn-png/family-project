@@ -18,13 +18,14 @@ cd "$(dirname "$0")/.." || exit 1
 T=tests/smoke_stufe2_sporen.mjs
 S=assets/studio-markt.js
 M=assets/config/messung-hand.json
+V=tools/vektoren-bauen.mjs
 
 # SPERRE, aus Schaden klug (2026-08-06): heile() ist ein `git checkout --`.
 # Beim ersten Lauf lag der zu pruefende Fix noch UNCOMMITTED im Baum -- die
 # erste heile() hat ihn mitgeloescht, und alle Proben danach liefen gegen den
 # alten Stand und meldeten Unsinn. Ein Werkzeug, das eine Datei zuruecksetzt,
 # darf nur laufen, wenn diese Datei sauber ist.
-DRECK=$(git status --porcelain -- "$T" "$S" "$M")
+DRECK=$(git status --porcelain -- "$T" "$S" "$M" "$V")
 if [ -n "$DRECK" ]; then
   echo "ABBRUCH: nicht eingecheckte Aenderungen an Dateien, die diese Gegenprobe"
   echo "zuruecksetzt. Erst committen, sonst wird die Arbeit geloescht:"
@@ -37,7 +38,7 @@ lauf() {  # lauf "<name>" "<erwartung: rot|gruen>"
   if [ "$E" = "$2" ]; then echo "  ✓ $1 → $E (erwartet)"; else
     echo "  ✗ $1 → $E, erwartet $2"; grep '✗' /tmp/gp2.txt | head -3; fi
 }
-heile() { git checkout -- "$T" "$S" "$M" 2>/dev/null; }
+heile() { git checkout -- "$T" "$S" "$M" "$V" 2>/dev/null; }
 
 echo "═══ GEGENPROBEN Fall 9 ═══"
 
@@ -113,6 +114,32 @@ open(p,'w').write(s.replace(alt, neu, 1))
 EOF
 lauf "innerHTML statt textContent" rot
 heile
+
+echo; echo "G · evaluate wieder mit drittem Argument (Messung 2026-10-05)"
+echo "     (playwright-core 1.56 wirft dann \"Too many arguments\" — der Lauf stirbt."
+echo "      ⚠ Mit neueren Paketen bleibt dieser Fall gruen: benannte Grenze, nicht blind)"
+python3 - <<'EOF'
+p='tools/vektoren-bauen.mjs'; s=open(p).read()
+alt='    }, texte);\n    try { return await Promise.race([rechnung, frist]); }'
+neu='    }, texte, { timeout: 15 * 60 * 1000 });\n    try { return await Promise.race([rechnung, frist]); }'
+assert s.count(alt) == 1, "Ankertext nicht eindeutig gefunden"
+open(p,'w').write(s.replace(alt, neu, 1))
+EOF
+lauf "drei Argumente an page.evaluate" rot
+heile
+
+echo; echo "H · ohne playwright-core: der Riegel fehlt, die Probe wirft statt ⊘"
+python3 - <<'EOF'
+p='tests/smoke_stufe2_sporen.mjs'; s=open(p).read()
+alt='  process.exit(0);\n}\n\nconst MODELL'
+neu='}\n\nconst MODELL'
+assert s.count(alt) == 1, "Ankertext nicht eindeutig gefunden"
+open(p,'w').write(s.replace(alt, neu, 1))
+EOF
+PW_CORE=/gibt/es/nicht lauf "kein Paket, kein Riegel" rot
+heile
+echo "   und mit Riegel: ⊘ statt rot"
+if PW_CORE=/gibt/es/nicht node "$T" 2>&1 | grep -q "1 nicht lauffähig"; then echo "  ✓ meldet nicht lauffähig"; else echo "  ✗ meldet NICHT nicht lauffähig"; fi
 
 echo; echo "═══ Endstand ═══"
 lauf "wieder unveraenderter Stand" gruen
