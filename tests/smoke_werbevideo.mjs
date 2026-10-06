@@ -31,7 +31,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";
 const PIN = {
   "assets/abspielen-kern.js": "8cfd9c05816c7c5519fe5799a644944c9346c36f578ec3176f720f8c3eed702d",
-  "assets/abspielen-rahmen.js": "bfc69ca9289eec392c3b52bd56ab4ea70220a6aa34c417b564d5e75483e9460e"
+  "assets/abspielen-rahmen.js": "3e5c3b7c2460658166d715d62ec513428e9aafa9179ca5ebcde2bc01aa5a905a"
 };
 let gruen = 0, rot = 0, stumm = 0;
 const ok = (c, m, mehr) => { if (c) { gruen++; console.log("  ✓", m); } else { rot++; console.log("  ✗ ROT:", m + (mehr !== undefined ? "  → " + mehr : "")); } };
@@ -381,8 +381,11 @@ try {
     const ruhe = await q.evaluate(() => {
       const pad = document.getElementById("tagesbildPad");
       return { knoepfe: [...pad.querySelectorAll(".vr-leiste button")].filter((x) => x.offsetParent).map((x) => x.className.replace(/^vr-| .*$/g, "")),
-        text: pad.innerText };
+        text: pad.innerText,
+        leisteGrund: (() => { const cs = getComputedStyle(pad.querySelector(".vr-leiste")); return cs.backgroundColor + " | " + cs.boxShadow; })() };
     });
+    /* Klaus 2026-10-06: kein Streifen von ▶ bis ⛶ — die Leiste selbst ist unsichtbar */
+    ok(ruhe.leisteGrund === "rgba(0, 0, 0, 0) | none", `${groesse}: die Leiste selbst ist unsichtbar, kein Streifen zwischen den Knöpfen`, ruhe.leisteGrund);
     ok(ruhe.knoepfe.join(" ") === "spielen voll", `${groesse}: in Ruhe stehen nur ▶ und ⛶ in der Leiste`, ruhe.knoepfe.join(" "));
     ok(!/werbevideo/i.test(ruhe.text), `${groesse}: das Wort „Werbevideo“ steht nicht im sichtbaren Text`, JSON.stringify(ruhe.text));
     await q.evaluate(() => document.querySelector("#tagesbildPad .vr-spielen").click());
