@@ -1,0 +1,70 @@
+{
+  "_hinweis": "Was der Server spiegelt. Ordnername = erster Pfadteil unter videos.family-projekt.de. Nur oeffentliche Adressen, die die Apps heute schon benutzen. Eine Datei, die hier fehlt, wird nicht gespiegelt; eine, die an der Quelle fehlt, wird gemeldet, nie still uebersprungen. Geloescht wird auf dem Server NIE.",
+  "fassung": 1,
+  "ordner": [
+    {
+      "name": "family-project",
+      "basis": "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/",
+      "teile": "videos.json",
+      "dateien": [
+        { "von": "assets/ls/clip-mixarium.mp4" },
+        { "von": "assets/ls/clip-rezeptbuch.mp4" }
+      ]
+    },
+    {
+      "name": "workfloh-pdf",
+      "basis": "https://lausiklauskn-png.github.io/Workfloh-PDF-Page/",
+      "dateien": [
+        { "von": "assets/workfloh-pdf-quer.mp4" },
+        { "von": "assets/workfloh-pdf-quer-en.mp4" },
+        { "von": "assets/workfloh-pdf-quer-ru.mp4" },
+        { "von": "assets/workfloh-pdf-hochvoll.mp4" },
+        { "von": "assets/workfloh-pdf-hochvoll-en.mp4" },
+        { "von": "assets/workfloh-pdf-hochvoll-ru.mp4" },
+        { "von": "assets/poster-de.jpg" },
+        { "von": "assets/poster-en.jpg" },
+        { "von": "assets/poster-ru.jpg" },
+        { "von": "assets/poster-hochvoll-de.jpg" },
+        { "von": "assets/poster-hochvoll-en.jpg" },
+        { "von": "assets/poster-hochvoll-ru.jpg" },
+        { "von": "assets/kapitel-quer.json" },
+        { "von": "assets/kapitel-quer-en.json" },
+        { "von": "assets/kapitel-quer-ru.json" }
+      ]
+    },
+    {
+      "name": "mein-mixarium",
+      "basis": "https://lausiklauskn-png.github.io/",
+      "dateien": [
+        { "von": "Mein-Mixarium/mixarium_intro.mp4" },
+        { "von": "Mein-Mixarium/mixarium_intro.webm" },
+        { "von": "Mein-Mixarium-Page/assets/demo.mp4", "als": "seite-demo.mp4" },
+        { "von": "Mein-Mixarium-Page/assets/intro.mp4", "als": "seite-intro.mp4" }
+      ]
+    },
+    {
+      "name": "mein-rezeptbuch",
+      "basis": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
+      "dateien": [
+        { "von": "assets/demo.mp4" },
+        { "von": "assets/demo.webm" }
+      ]
+    },
+    {
+      "name": "tomys-hub",
+      "basis": "https://lausiklauskn-png.github.io/Tomys-Hub/",
+      "dateien": [
+        { "von": "showcase/assets/demo.webm" },
+        { "von": "showcase/assets/workfloh-demo.webm" }
+      ]
+    },
+    {
+      "name": "alis-moderaum",
+      "basis": "https://lausiklauskn-png.github.io/Alis-Moderaum/",
+      "dateien": [
+        { "von": "assets/img/demo-runway.mp4" },
+        { "von": "assets/products/vid-65434.mp4" }
+      ]
+    }
+  ]
+}

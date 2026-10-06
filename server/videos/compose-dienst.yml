@@ -1,0 +1,9 @@
+  videos:
+    image: caddy:2-alpine
+    container_name: videos
+    restart: unless-stopped
+    volumes:
+      - /srv/family-project/server/videos/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /srv/videos:/videos:ro
+    logging: { driver: "json-file", options: { max-size: "1m", max-file: "2" } }
+    expose: ["80"]

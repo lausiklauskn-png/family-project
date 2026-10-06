@@ -1322,6 +1322,35 @@ Gegenprobe kennt seitdem `NUR_ANKER`.
 
 ⚠ **Cache-Bump v141 → v142**, `ASSET_V` mitgezogen, alle `?v=` (95 Verweise).
 
+## 🎞 VIDEO-SPIEGEL auf videos.family-projekt.de (Klaus 2026-10-06)
+
+Klaus: *„jedes Werbevideo … in einen separaten Ordner … videos.family-projekt.de/workfloh-pdf/…"*
+Der Hetzner **Cloud**-Server holt die Videos alle 10 Minuten selbst von GitHub Pages
+(`server/videos/spiegeln.mjs`, Liste in `server/videos/quellen.json`, ein Ordner je App) und
+liefert sie über einen eigenen Caddy-Container `videos` aus. Einrichten: `server/videos/EINRICHTEN.md`.
+**Schritt 2 (Apps auf die neue Adresse umstellen, github.io als Rückfall) ist NICHT gebaut.**
+
+- Teile und Videos werden per SHA-256 geprüft, sonst per ETag/304; geschrieben wird über
+  tmp-Datei + Umbenennen. Ein Lauf hält eine Sperre (älter als 3 h wird übernommen).
+  **Gelöscht wird nie.** `.spiegel/` (Stand, Teile) wird nie ausgeliefert.
+- CORS nur für github.io, family-projekt.de, www, pwa-toolpoint.de — nie `*`. Kein `encode` im
+  äußeren Block (bricht Range-Anfragen).
+- `einrichten.sh`: Sicherungen vorher, Caddy erst nach `validate` neu laden, sonst Rückweg mit
+  `cat >` (nie `cp`), Cron ersetzt sich selbst (Marke `videos-spiegel`).
+- Der Cron zieht das Depot **nicht** nach: ein neuer Ordner braucht `git -C /srv/family-project pull`,
+  eine geänderte innere Caddyfile zusätzlich `docker restart videos`.
+
+```bash
+node tests/smoke_videos_spiegel.mjs       # gestellter Server statt github.io
+node tests/gegenprobe_videos_spiegel.mjs  # 16 Fälle, Wegwerf-Kopie; NUR_ANKER=1, NUR_FALL="…"
+```
+
+⚠ Ein Gegenprobe-Fall („unveränderte Teile werden nicht neu zusammengesetzt") war zuerst blind:
+der Teile-Vorrat behält die Teile ohnehin, und „unverändert" traf auch die 304-Zeile. Gemessen
+wird jetzt der Inode der Datei und die Meldung „unverändert (2 Teile)".
+⚠ **Nicht gemessen:** der echte Server, echte Downloads von github.io (aus dem Behälter gesperrt),
+Gesamtgröße, ob jede Adresse in `quellen.json` heute antwortet, das Tablet.
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

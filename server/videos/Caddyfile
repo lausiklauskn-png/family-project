@@ -1,0 +1,30 @@
+# Innerer Caddy des Containers „videos" — liefert /srv/videos (nur lesend) aus.
+# Keine Verzeichnisliste, nichts mit führendem Punkt (.spiegel, .spiegel.lock).
+# Freigabe für Browser NUR für die eigenen Adressen, nie „*".
+{
+	admin off
+	auto_https off
+}
+
+:80 {
+	root * /videos
+
+	@punkt path_regexp punkt /\.
+	respond @punkt 404
+
+	@erlaubt header_regexp herkunft Origin ^https://(lausiklauskn-png\.github\.io|family-projekt\.de|www\.family-projekt\.de|pwa-toolpoint\.de)$
+	header @erlaubt Access-Control-Allow-Origin "{http.request.header.Origin}"
+	header @erlaubt Vary Origin
+	header @erlaubt Access-Control-Expose-Headers "Content-Length, Content-Range, Accept-Ranges"
+
+	header {
+		X-Content-Type-Options nosniff
+		Cache-Control "public, max-age=3600"
+		-Server
+	}
+	header /*.json Cache-Control "no-cache"
+
+	file_server {
+		hide .*
+	}
+}
