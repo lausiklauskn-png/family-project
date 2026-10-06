@@ -247,10 +247,22 @@ try {
   ok(menue.q.length === 3 && menue.q.includes("720p*"), "drei Qualitäten zur Wahl, 720p ist gewählt", menue.q.join(" "));
   ok(menue.l.length === 3 && menue.l.every((h) => h.startsWith(BASIS + "index.html?laden=werbevideo-67s")),
     "drei Downloads, jeder auf die Video-Seite (dort geprüft und gespeichert)", menue.l.join(" "));
+  /* Gemessen wird die ERSTE Zeitmeldung nach dem Wechsel. Ein Warten auf
+     „currentTime ≥ alte Stelle" wäre auch dann grün, wenn das Video vorn
+     beginnt und in den 20 s einfach dorthin spielt — so war es blind
+     (Gegenprobe QUALITAET, 2026-10-06). */
+  await p.evaluate(() => {
+    const v = window.__rahmenSpieler[0].vid;
+    window.__ersteNachWechsel = null;
+    const f = () => { if (/480p/.test(v.getAttribute("src") || "") && !v.seeking && window.__ersteNachWechsel === null && v.readyState >= 1) { window.__ersteNachWechsel = v.currentTime; } };
+    v.addEventListener("timeupdate", f);
+  });
   const vorWechsel = (await zustand(p)).t;
   await p.click('#tagesbildPad .vr-fassung[data-fassung="werbevideo-67s-480p"]');
-  ok(await bis(p, (t) => { const s = window.__rahmenSpieler[0]; return /480p/.test(s.vid.getAttribute("src")) && !s.vid.paused && s.vid.currentTime >= t - 0.5; }, vorWechsel, 20000),
-    "Qualität wechseln: 480p, läuft weiter an derselben Stelle", JSON.stringify(await zustand(p)));
+  const wechselDa = await bis(p, () => window.__ersteNachWechsel !== null && !window.__rahmenSpieler[0].vid.paused, null, 20000);
+  const erste = await p.evaluate(() => window.__ersteNachWechsel);
+  ok(wechselDa && vorWechsel > 1 && erste >= vorWechsel - 1,
+    "Qualität wechseln: 480p, läuft weiter an derselben Stelle", `vorher ${vorWechsel.toFixed(1)} s · erste Meldung danach ${erste === null ? "keine" : erste.toFixed(1) + " s"}`);
   await p.click("#tagesbildPad .vr-zu");
 
   /* B6 · Vollbild und zurück: läuft weiter */
