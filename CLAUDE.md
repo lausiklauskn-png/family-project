@@ -1238,7 +1238,7 @@ Bildes — ein quadratisches Bild machte ihn 1016 × 1016 statt 1016 × 572.
 
 Gemessen (Rahmen mit hohem Bild ⟷ Video): 2000×1100 1016×571 ⟷ 1016×572 · 1280×600
 907×510 ⟷ 907×510 · 360×740 316×178 ⟷ 316×178. Das Standardbild (2,5:1) bleibt unverändert.
-`smoke_werbevideo` B12 · Gegenprobe `STARTBILD:`/`STARTBREITE:`. Cache v144.
+`smoke_werbevideo` B12 (105 grün) · Gegenprobe `STARTBILD:`/`STARTBREITE:` 2 schlagen an (STARTBREITE erst „aus falschem Grund“: das „×“ im Muster sind zwei Bytes). Cache v144.
 ⚠ Bei hohem Bild wird oben und unten beschnitten (`cover`) — ohne Ränder geht es nicht anders.
 ⚠ Am Tablet nicht gemessen.
 

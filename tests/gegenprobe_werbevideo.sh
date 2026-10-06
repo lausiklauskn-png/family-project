@@ -186,7 +186,7 @@ fall 'STARTBILD: ein hohes Bild macht den Rahmen wieder hoch' index.html \
 
 fall 'STARTBREITE: der Rahmen ist im flachen Fenster breiter als das Video' assets/style.css \
   'aspect-ratio:16/5;max-width:calc(85vh * 16 / 9);' 'aspect-ratio:16/5;' \
-  '1280.600: Rahmen .* als das Video'
+  '600: Rahmen .* als das Video'
 
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"
