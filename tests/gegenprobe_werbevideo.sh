@@ -11,6 +11,11 @@
 # zuerst ein Pin-Bruch („rot aus falschem Grund"). Der Pin hat Fall 1, ohne Schalter.
 #
 #   bash tests/gegenprobe_werbevideo.sh          NUR_FALL="STOPP" für einen Fall
+#   NUR_ANKER=1 bash tests/gegenprobe_werbevideo.sh   nur die Anker, fährt KEINE Probe
+#   und fasst den Baum nicht an. Ohne den Schalter lief am 2026-10-06 ein
+#   „NUR_ANKER"-Aufruf als voller Lauf im echten Baum (er kannte ihn nicht).
+#
+# ⚠ Der volle Lauf gehört in eine Wegwerf-Kopie, und vorher wird committet.
 cd "$(dirname "$0")/.." || exit 1
 export PW_CORE="${PW_CORE:-/opt/node-tools/node_modules/playwright-core/index.mjs}"
 
@@ -34,6 +39,14 @@ s=io.open('$datei',encoding='utf-8').read()
 sys.exit(0 if os.environ['ALT'] in s else 1)"; then
     echo "  ⊘ TOTER ANKER: $name"; tot=$((tot+1)); return 0
   fi
+  if [ -n "$NUR_ANKER" ]; then
+    local n; n=$(ALT="$alt" python3 -c "
+import io,os
+print(io.open('$datei',encoding='utf-8').read().count(os.environ['ALT']))")
+    if [ "$n" -ne 1 ]; then echo "  ⊘ ANKER TRIFFT ${n}x: $name"; tot=$((tot+1))
+    else echo "  · lebt: $name"; gruen=$((gruen+1)); fi
+    return 0
+  fi
   ALT="$alt" NEU="$neu" python3 -c "
 import io,os
 p='$datei'; s=io.open(p,encoding='utf-8').read()
@@ -54,9 +67,12 @@ io.open(p,'w',encoding='utf-8').write(s.replace(os.environ['ALT'],os.environ['NE
   return 0
 }
 
+if [ -n "$NUR_ANKER" ]; then trap - INT TERM EXIT; rm -rf "$SICH"
+else
 echo "═══ Ausgangslage ═══"
 if node tests/smoke_werbevideo.mjs > "$LAUF" 2>&1; then echo "  ✓ grün"
 else echo "  ✗ schon OHNE Eingriff rot — die Gegenprobe misst so nichts:"; grep '✗\|⊘' "$LAUF" | head -5; exit 1; fi
+fi
 
 echo; echo "═══ WERBEVIDEO im Rahmen der Startseite ═══"
 # Die Muster in den roten Zeilen tragen KEINEN Umlaut: im C-Locale trifft
@@ -140,6 +156,24 @@ fall 'ENDE: nach dem letzten Bild bleibt das Video stehen' assets/abspielen-rahm
 fall 'PUNKTE: beim Laden kreist nichts' assets/abspielen-rahmen.js \
   '  function punkte(eltern) {' '  function punkte(eltern) { return;' \
   'kreisen Punkte'
+
+# Die schlanke Leiste (Klaus 2026-10-06): sie tritt beim Spielen zurück, ein Tipp
+# holt sie, „720p" verschwindet, und der Name steht nicht sichtbar da.
+fall 'LEISE: die Leiste bleibt beim Spielen stehen' assets/abspielen-rahmen.js \
+  'if (leiseErlaubt()) rahmen.setAttribute("data-vr-leise", ""); }, LEISE_MS);' '}, LEISE_MS);' \
+  'beim Abspielen tritt die Leiste'
+
+fall 'TIPP: ein Tipp aufs Video holt die Leiste nicht zurueck' assets/abspielen-rahmen.js \
+  'if (rahmen.hasAttribute("data-vr-leise")) { wach(); return; }' 'if (rahmen.hasAttribute("data-vr-leise")) { return; }' \
+  'ein Tipp aufs Video holt die Leiste'
+
+fall 'QUAL: die Qualitaet bleibt stehen' assets/abspielen-rahmen.js \
+  'qualUhr = setTimeout(function () { qual.hidden = true; }, QUAL_MS);' 'qualUhr = null;' \
+  'verschwindet nach 2 s'
+
+fall 'TITEL: der Name des Videos steht wieder sichtbar in der Leiste' assets/abspielen-rahmen.js \
+  'titel.textContent = stelle > 0 ? T.weiterBei + mmss(stelle) : "";' 'titel.textContent = M.titel;' \
+  'steht nicht im sichtbaren Text'
 
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"
