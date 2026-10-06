@@ -68,9 +68,11 @@ fall 'WAHL: die Wahl im Menue setzt die Sprache nicht' assets/app.js \
   'b.addEventListener("click", function () { langZu(true); });' \
   'die Wahl setzt die Sprache'
 
-fall 'RELOAD: das Wort Aktualisieren steht wieder sichtbar im Knopf' index.html \
-  '<span class="rl-ic" aria-hidden="true">↻</span></span>' \
-  '<span class="rl-ic" aria-hidden="true">↻</span> Aktualisieren</span>' \
+# Die Beschriftung setzt app.js bei JEDEM Laden neu (setLabel) — eine Sabotage
+# an index.html kommt dort nie an und war deshalb blind. Sabotiert wird die Quelle.
+fall 'RELOAD: das Wort Aktualisieren steht wieder sichtbar im Knopf' assets/app.js \
+  "      pill.innerHTML = '<span class=\"rl-ic\" aria-hidden=\"true\">↻</span>';" \
+  "      pill.innerHTML = '<span class=\"rl-ic\" aria-hidden=\"true\">↻</span> Aktualisieren';" \
   'zeigt nur das Zeichen'
 
 fall 'SPRACHE: der Sprachknopf zeigt wieder das ganze Wort' assets/app.js \
