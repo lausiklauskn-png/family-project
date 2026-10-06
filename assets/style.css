@@ -109,6 +109,12 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
  * lesen es weiter, und `title` zeigt es der Maus. Ein Knopf ohne jede
  * Beschriftung waere fuer Blinde ein toter Knopf.                          */
 .pill.pill-eng{padding:6px 9px}
+/* Der Knopf für die Hintergrund-Bewegung sagt seinen Zustand als WORT (Klaus
+   2026-10-06: „oben der Button funktioniert nicht. Außerdem steht er auf
+   Pause."). ⏸/▶ sahen aus wie ein Video-Knopf. Feste Breite, damit
+   „Bewegt"/„Steht" nichts verschiebt. Blass, wenn es auf dem Gerät nicht geht. */
+#bgPauseWort{display:inline-block;min-width:6ch;text-align:left}
+.pill.pill-eng.bg-aus{opacity:.62}
 .nur-vorlesen{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
 

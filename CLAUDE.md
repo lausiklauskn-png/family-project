@@ -1118,6 +1118,96 @@ bash tests/gegenprobe_angleichen.sh     # Wegwerf-Kopie, prüft den Namen der ro
 
 ⚠ **Cache-Bump v132 → v133**, `ASSET_V` mitgezogen.
 
+## ▶ DAS WERBEVIDEO LÄUFT IM RAHMEN DER STARTSEITE (Klaus 2026-10-06)
+
+Klaus: *„Es soll in dem Container, wo Family Projekt mit Namen steht, mit der
+Sonne und der Erde. Und da soll auch die Bedienung drin sein. Das Video soll
+aber nicht automatisch starten, sondern erst auf Klick. Und es soll gestreamt
+werden. Herunterladen soll man auch angeboten bekommen. Verschiedene
+Qualitäten. Und es soll auch wieder gestoppt werden können."* · *„Und
+Vollbildmodus soll auch möglich sein."* · *„Kommt man zurück, läuft das Video
+dort weiter."*
+
+| | |
+|---|---|
+| `assets/abspielen-kern.js` | **byte-1:1 aus FP-Videos**, im Worker per `importScripts`: setzt `werbevideo/<kennung>.mp4` aus den geprüften Teilen auf github.io zusammen (Range → 206, nächster Teil vorgeholt, ≤ 3 Teile im Speicher, **nie** im Vorrat) |
+| `assets/abspielen-rahmen.js` | **byte-1:1 aus FP-Videos**: baut Leiste und Menü IN `#tagesbildPad` |
+| `sw.js` | `VIDEO_BASIS` + Route `^/werbevideo/<kennung>.mp4$` **vor** dem Ausstieg für fremde Ursprünge und vor jedem Vorrat |
+| `index.html` | die `data-video-*`-Marken am Rahmen — alles Seitenabhängige steht dort, nie im Spieler |
+
+**Beide Dateien werden in FP-Videos gepflegt.** Wer hier etwas ändert, bricht
+den SHA-Pin in `tests/smoke_werbevideo.mjs` — mit Absicht.
+
+Gestreamt wird zuerst **720p** (27 MB statt 198 MB für 67 s); 480p und 1080p
+sind im Menü wählbar, der Wechsel behält Stelle und Lauf. **Herunterladen**
+führt je Qualität auf die Video-Seite (`index.html?laden=<kennung>`): dort wird
+jeder Teil geprüft und eine Datei gespeichert. Die Größen im Menü werden erst
+beim Öffnen gefragt. **Vor dem ersten Tipp geht kein einziger Abruf an die
+Video-Seite** — das Bild bleibt LCP, die Leiste liegt `position:absolute` darüber.
+
+⚠ **Playwright sieht den Netzverkehr eines Service-Workers NICHT von selbst.**
+Der erste Lauf war 10 × rot: der Kern holte `videos.json` am gestellten
+github.io vorbei aus dem gesperrten Netz und antwortete 503. Die Probe setzt
+deshalb `PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS=1`. *Eine gestellte Seite,
+die der Worker nicht erreicht, misst den Proxy des Behälters.*
+
+⚠ **ZWEI WÄCHTER WAREN TRIVIAL GRÜN** und sind geschärft: „läuft an der
+gemerkten Stelle weiter" war bei gemerkter Stelle **0** wahr, und der Ladebalken
+galt als gezeigt, sobald irgendwo ein `%` stand — auch während nichts lief.
+
+⚠ **⏸ ALS SCHRIFTZEICHEN FEHLT MANCHEN SCHRIFTEN** — im Testbrowser stand ein
+leerer Knopf da (Bildschirmfoto, nicht Probe). Die Symbole sind seitdem SVG, und
+damit auch nie mit dem orangen Emoji-⏸ der Kopfleiste verwechselbar.
+
+```bash
+node tests/smoke_werbevideo.mjs            # A ohne Browser · B echter Browser, VP9-Stellvertreter
+bash tests/gegenprobe_werbevideo.sh        # 15 Fälle; Pin-Sabotagen mit eigenem Fall
+```
+
+⚠ **DER ERSTE GEGENPROBE-LAUF MELDETE 12 · 2 BLIND · 1 AUS FALSCHEM GRUND —
+alle drei in der PROBE, keiner im Spieler.** *Die Zahlen bleiben stehen, weil
+sie die Funde gemacht haben:*
+
+| Fall | warum er nichts (oder das Falsche) mass |
+|---|---|
+| **QUALITAET** (blind) | gewartet wurde, bis `currentTime ≥ alte Stelle` — ein Video, das **vorn** beginnt, spielt in 20 s einfach dorthin. Gemessen wird jetzt die **erste** Zeitmeldung nach dem Wechsel |
+| **MENUE** (blind) | gemessen bei 320/360 px — dort stehen die Größen nur im `title`, das Menü passte auch mit dem alten Rand. Der Fall war **380 px**. Jetzt 320 · 360 · 380 · 412 |
+| **FUENFFACH** (falscher Grund) | ohne Riegel öffnet der 5. Tipp das Bild-Fenster, dessen Hintergrund verdeckt den 6., `p.click` wartete 30 s und **warf**. Getippt wird jetzt per `element.click()`, und ein Stolpern der Probe ist eine rote Zeile mit Namen |
+
+Danach, in einer frischen Kopie: alle drei **schlagen an**, jeder mit seinem Namen.
+
+⚠ **BENANNTE GRENZEN:** nicht gemessen sind das echte H.264-MP4 am Tablet und am
+DeX, **ob github.io den Abruf von family-projekt.de aus zulässt** (CORS; aus dem
+Behälter gesperrt, 403), das Vollbild am iPhone (dort nur `webkitEnterFullscreen`
+am Video, ohne unsere Leiste) und ein Selbststart nach dem Zurückkommen — es geht
+an der gemerkten Stelle weiter, aber erst auf Tipp. Den Sichttest ersetzt keine Probe.
+
+⚠ **Kein Nav-Link „Werbevideo".** Der Plan sah einen vor; Klaus' Wunsch nennt den
+Rahmen auf der Startseite, und die Kopfleiste bricht am Handy schon jetzt in drei
+Zeilen um. Eingereiht als Frage an Klaus, nicht gebaut.
+
+## ≈ DER BEWEGUNGS-KNOPF SAGT, WAS IST (Klaus 2026-10-06)
+
+Klaus: *„oben der Button funktioniert nicht. Außerdem steht er auf Pause."*
+**Beides stimmte aus seiner Sicht, und eins davon war ein echter Fehler:**
+
+| | |
+|---|---|
+| **das Zeichen** | ⏸ hieß „läuft, Tippen hält an" — ein Video-Zeichen, und seit im Rahmen darunter ein Video spielt, verwechselbar. Jetzt **„≈ Bewegt" / „≈ Steht"**, als Wort, schon im HTML (kein Nachschieben), beide Wörter gleich breit (`min-width:6ch`) |
+| **die Selbst-Bremse** | `MycelBgPause.steht()` kannte sie nicht. Hielt die Bremse den Hintergrund an, zeigte der Knopf weiter „läuft", und ein Tipp schaltete auf „angehalten" — **sichtbar änderte sich nichts.** Jetzt zählt `gebremst` mit, die Bremse meldet sich (`fp:bg-zustand`), und ein Tipp danach versucht es **neu**, statt ein „angehalten" zu merken |
+| **ohne Grafikchip** | ein Tipp änderte nur den Vorlese-Text. Jetzt ist der Knopf **blass**, und ein Tipp zeigt den Grund **sichtbar** für 4 s („kein Grafikchip", „Gerät: wenig Bewegung", „zu langsam", „nicht geladen") |
+
+```bash
+node tests/smoke_bewegungsknopf.mjs        # drei Lagen: ohne Chip, mit Chip, gebremst; 320–412 px
+bash tests/gegenprobe_bewegungsknopf.sh    # 4 schlagen an · 0 blind · 0 aus falschem Grund · 0 tote Anker
+```
+
+⚠ **OFFEN, nur Klaus' Gerät kann es sagen:** ob sein DeX einen Grafikchip meldet
+und ob dort „weniger Bewegung" eingestellt ist. Sein Bild zeigt den Hintergrund
+still — der Knopf sagt es jetzt beim ersten Tipp selbst.
+
+⚠ **Cache-Bump v139 → v140**, `ASSET_V` mitgezogen, alle `?v=` (64 Verweise).
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

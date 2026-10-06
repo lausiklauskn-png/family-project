@@ -15,7 +15,18 @@
  * Seitenfluss statt zu schweben, weil `position:fixed` nie ankam. Wer CORE
  * anfasst, erhöht hier. tests/smoke_cache_version.mjs wacht darüber.
  */
-var CACHE_VERSION = "family-projekt-v139";
+/* Das Werbevideo im Rahmen der Startseite (Klaus 2026-10-06). Der Abspiel-Kern
+ * ist eine BYTE-1:1-Kopie aus FP-Videos (dort gepflegt, hier per SHA-256
+ * gepinnt: tests/smoke_werbevideo.mjs). Er setzt werbevideo/<kennung>.mp4 beim
+ * Abspielen aus den geprüften Teilen auf der Video-Seite zusammen — Range → 206
+ * bis ans Ende des Teils, nächster Teil vorgeholt, höchstens drei Teile im
+ * Arbeitsspeicher, NIE in der Cache Storage. Fehlt der Kern, bleibt alles
+ * andere am Worker heil (try), und das Video sagt im Rahmen, dass es hier nicht geht. */
+try { importScripts("assets/abspielen-kern.js?v=140"); } catch (_e) {}
+var VIDEO_BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";
+var VIDEO_WEG = /^\/werbevideo\/([a-z0-9][a-z0-9-]{1,59})\.mp4$/;
+
+var CACHE_VERSION = "family-projekt-v140";
 
 /* ⚠ NUR EIGENE VORRAETE AUFRAEUMEN — `caches` gehoert dem URSPRUNG, nicht dem
  * Pfad. Auf lausiklauskn-png.github.io liegen rund zwanzig Apps; ein Filter,
@@ -40,7 +51,7 @@ var VORRAT_PRAEFIX = "family-projekt-";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "139";
+var ASSET_V = "140";
 // Absichtlich NICHT mehr im Vorrat (Messung 2026-08-02):
 //
 // 1. "og-image.png" (386 KiB). Das ist das Vorschaubild für geteilte Links.
@@ -60,8 +71,11 @@ var ASSET_V = "139";
 var CORE = [
   "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=139", "assets/app.js?v=139", "assets/notranslate.js?v=139", "assets/status-widget.js?v=139",
+  "assets/style.css?v=140", "assets/app.js?v=140", "assets/notranslate.js?v=140", "assets/status-widget.js?v=140",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
+  // Das Werbevideo (2026-10-06): der Kern für den Worker und der Spieler im
+  // Startseiten-Rahmen. Beide klein; das Video selbst steht NIE im Vorrat.
+  "assets/abspielen-kern.js?v=140", "assets/abspielen-rahmen.js?v=140",
   "manifest.json", "icon-192.png", "icon-512.png",
   // Die KI-Schulung (2026-09-17): der Rahmen und die byte-gleiche Kopie der
   // Unterlage — eine Datei, die selbst nichts nachlädt und die ein Betrieb auch
@@ -100,6 +114,14 @@ self.addEventListener("fetch", function (e) {
   if (req.method !== "GET") return;
   var url;
   try { url = new URL(req.url); } catch (_e) { return; }
+  // Das Werbevideo VOR allem anderen: es darf weder in den Vorrat noch an den
+  // Seiten-Rückfall geraten (eine HTML-Seite unter einer .mp4-Adresse).
+  var vw = url.origin === self.location.origin && VIDEO_WEG.exec(url.pathname);
+  if (vw) {
+    if (self.FPAbspielKern) e.respondWith(self.FPAbspielKern.antwort(req, vw[1], VIDEO_BASIS));
+    else e.respondWith(new Response("Abspiel-Kern fehlt", { status: 503 }));
+    return;
+  }
   if (url.origin !== self.location.origin) return; // Fremd-Origins durchreichen
   // Embedding-Modell (/models/…) NICHT abfangen/cachen: transformers.js
   // pflegt seinen eigenen Modell-Cache, und ein SPA-Fallback (index.html für
