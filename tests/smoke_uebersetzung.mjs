@@ -218,7 +218,10 @@ console.log("\nSprachriegel — die Wahl in der App schlägt den Auto-Übersetze
     const ctx = await browser.newContext(); const page = await ctx.newPage();
     await page.goto(`${base}/markt.html`, { waitUntil: "load" });
     await page.waitForTimeout(1500);
+    /* Seit 2026-10-06 öffnet der Knopf eine Auswahl; die Wahl darin ist die
+     * ausdrückliche Wahl. */
     await page.click("#langBtn");
+    await page.click("#langMenu [data-lang=\"en\"]");
     await page.waitForTimeout(400);
     const nach = await page.evaluate(lies);
     ok(nach.translate === "no", "nach dem Klick: translate=no am Dokument", JSON.stringify(nach));
@@ -292,6 +295,8 @@ console.log("\nSprachriegel — die Wahl in der App schlägt den Auto-Übersetze
     await page.waitForTimeout(400);
     const kurz = await page.evaluate(() => localStorage.getItem("fp_lang_wahl"));
     ok(kurz === "1", "ein KURZER Druck nimmt die Wahl nicht zurück", String(kurz));
+    ok(await page.$("#langMenu") !== null, "…er öffnet nur die Auswahl");
+    await page.keyboard.press("Escape");
 
     const kn = await page.$("#langBtn"); const box = await kn.boundingBox();
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);

@@ -1226,6 +1226,51 @@ still — der Knopf sagt es jetzt beim ersten Tipp selbst.
 
 ⚠ **Cache-Bump v139 → v140**, `ASSET_V` mitgezogen, alle `?v=` (64 Verweise).
 
+## ▭ DIE KOPFLEISTE IST KOMPAKT — und das ersetzt den Abschnitt darüber zum Teil (Klaus 2026-10-06)
+
+Klaus mit drei Bildern vom Handy: *„Aktualisieren einfach das Wort raus. DE, EN
+kann man einfach nur die Sprache, die aktuell ist, machen. Und dann geht oben das
+auf und dann kann man wählen. … Steht kann man auch wegnehmen."*
+
+⚠ **TAFEL-EVOLUTION, AUSDRÜCKLICH BENANNT.** Der Abschnitt darüber sagte am selben
+Tag: der Bewegungs-Knopf zeigt **„≈ Bewegt" / „≈ Steht" als Wort**, und ein Tipp
+zeigt den Grund im Knopf. Ersetzt, nicht stillschweigend getauscht:
+
+| | vorher | jetzt |
+|---|---|---|
+| `#fpReload` | ↻ Aktualisieren | **↻** (Name nur zum Vorlesen) |
+| `#langBtn` | DE · EN als Umschalter | **die aktuelle Sprache**; ein Tipp öffnet eine Auswahl (Deutsch · English) |
+| `#bgPauseBtn` | ≈ + Wort | **nur das Zeichen**: Striche = bewegt, Dreieck = steht; der Name bleibt (`.nur-vorlesen`) |
+| Grund nach einem Tipp | Wort im Knopf | **Blase unter dem Knopf**, 4 s |
+
+- Die Auswahl und die Blase hängen an `body` mit `position:fixed` — sie verschieben
+  die Kopfleiste nicht (gemessen). Die Wahl setzt `fp_lang_wahl` wie vorher.
+- `@media (max-width:360px)` verdichtet die Reiter (`nav.top` gap 5 px, Reiter
+  7×8 px, .86rem). **Gemessen (Nav-Reihen, die Marke zählt nicht — so hat Klaus
+  gezählt):** `origin/main` 4 · 4 · 4, jetzt **3 · 3 · 3** bei 320 · 360 · 412 px.
+- ⚠ **`werkzeuge/geschenkbox.html` hat keinen `#bgPauseBtn`** — sie hat keinen
+  Mycel-Hintergrund. Die Proben finden die Seiten über `id="langBtn"` und fragen
+  den Bewegungs-Knopf nur, wo es ihn gibt.
+
+```bash
+node tests/smoke_kopfleiste.mjs           # 320 · 360 · 412 px, alle Seiten, Auswahl im Browser
+bash tests/gegenprobe_kopfleiste.sh       # 5 Fälle; NUR_ANKER=1 nur die Anker — IN EINER KOPIE fahren
+bash tests/gegenprobe_bewegungsknopf.sh   # GRUND/ZEICHEN nachgezogen, WORT neu
+```
+
+⚠ **Zwei Fälle der Bewegungsknopf-Gegenprobe zeigten ins Leere** (GRUND auf
+`w0.textContent`, ZEICHEN auf das alte Markup). Nachgezogen, nicht gestrichen; die
+Gegenprobe kennt seitdem `NUR_ANKER`.
+
+**Gemessen (2026-10-06, in einer Wegwerf-Kopie):** `smoke_kopfleiste` **208 grün · 0 rot** ·
+`gegenprobe_bewegungsknopf` **6 schlagen an · 0 blind · 0 aus falschem Grund · 0 tot** ·
+`gegenprobe_kopfleiste` erst **4 schlagen an · 1 blind** — RELOAD sabotierte
+`index.html`, aber `mountReloadButton` schreibt die Beschriftung bei jedem Laden neu
+(`setLabel`), die Sabotage kam nie an. Er sabotiert jetzt `assets/app.js` und schlägt an.
+*Die Zahl davor bleibt stehen, weil sie den Fund gemacht hat.*
+
+⚠ **Cache-Bump v141 → v142**, `ASSET_V` mitgezogen, alle `?v=` (95 Verweise).
+
 ## Dieses Repo trägt seine eigenen Rezepte
 
 Unter `.claude/skills/` liegen fünf Skills — Marktplatz-Karten, saubere

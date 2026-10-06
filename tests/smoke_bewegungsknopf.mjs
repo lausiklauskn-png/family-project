@@ -33,8 +33,15 @@ for (const dir of [ROOT, path.join(ROOT, "werkzeuge")]) for (const f of fs.readd
   if (/id="bgPauseBtn"/.test(t)) seiten.push([path.relative(ROOT, path.join(dir, f)), t]);
 }
 ok(seiten.length >= 8, `der Knopf steht auf ${seiten.length} Seiten`);
-const ohneWort = seiten.filter(([, t]) => !/<span id="bgPauseZeichen" aria-hidden="true">≈<\/span> <span id="bgPauseWort" aria-hidden="true">Bewegt<\/span>/.test(t));
-ok(ohneWort.length === 0, "überall steht das Wort schon im HTML (≈ Bewegt) — kein Nachschieben, kein Sprung", ohneWort.map(([n]) => n).join(","));
+/* ⚠ TAFEL-EVOLUTION (Klaus 2026-10-06): hier stand „überall steht das Wort
+ * schon im HTML (≈ Bewegt)". Klaus: „Steht kann man auch wegnehmen … einfach
+ * nur ein Symbol." Seitdem trägt der Knopf nur noch ein gezeichnetes Zeichen
+ * (zwei Striche = läuft, Dreieck = steht) und einen Vorlese-Namen. Die
+ * Zusicherung „kein Nachschieben, kein Sprung" bleibt: beides steht schon im HTML. */
+const ohneZeichen = seiten.filter(([, t]) => !/<span id="bgPauseZeichen" class="bg-zeichen" aria-hidden="true"><\/span><span id="bgPauseName" class="nur-vorlesen">/.test(t));
+ok(ohneZeichen.length === 0, "überall steht das Zeichen samt Vorlese-Namen schon im HTML — kein Nachschieben, kein Sprung", ohneZeichen.map(([n]) => n).join(","));
+const mitWort = seiten.filter(([, t]) => /id="bgPauseWort"/.test(t));
+ok(mitWort.length === 0, "kein sichtbares Wort mehr neben den Strichen (bgPauseWort ist weg)", mitWort.map(([n]) => n).join(","));
 const mitVideoZeichen = seiten.filter(([, t]) => /id="bgPauseBtn"[\s\S]{0,400}[⏸▶]/.test(t));
 ok(mitVideoZeichen.length === 0, "kein ⏸/▶ mehr im Knopf — nicht mit einem Video-Knopf verwechselbar", mitVideoZeichen.map(([n]) => n).join(","));
 
@@ -79,10 +86,16 @@ const LANGSAM = () => {
 };
 const knopf = (p) => p.evaluate(() => {
   const b = document.getElementById("bgPauseBtn");
-  return { wort: document.getElementById("bgPauseWort").textContent, zeichen: document.getElementById("bgPauseZeichen").textContent,
+  const z = document.getElementById("bgPauseZeichen"), h = document.getElementById("bgPauseHinweis");
+  const vor = getComputedStyle(z, "::before"), nach = getComputedStyle(z, "::after");
+  return { steht: b.classList.contains("bg-steht"), sicht: [...b.childNodes].filter((n) => !(n.id === "bgPauseName")).map((n) => n.textContent).join("").replace(/\s+/g, " ").trim(),
+    nameUnsichtbar: (() => { const n = document.getElementById("bgPauseName"); const r = n.getBoundingClientRect(); return r.width <= 1 && r.height <= 1; })(),
+    zeichen: (z.textContent || "") + "|" + vor.content + "|" + nach.display,
+    form: b.classList.contains("bg-steht") ? "dreieck" : (vor.display !== "none" && nach.display !== "none" ? "striche" : "keine"),
+    hinweis: h ? h.textContent : "", hinweisImBild: h ? (() => { const r = h.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth + 0.5; })() : null,
     blass: b.classList.contains("bg-aus"), gedrueckt: b.getAttribute("aria-pressed"), title: b.getAttribute("title") || "",
     breite: Math.round(b.getBoundingClientRect().width),
-    steht: window.MycelBgPause ? window.MycelBgPause.steht() : null, laeuft: window.MycelBgPause ? window.MycelBgPause.laeuft() : null,
+    mbSteht: window.MycelBgPause ? window.MycelBgPause.steht() : null, laeuft: window.MycelBgPause ? window.MycelBgPause.laeuft() : null,
     aus: window.MycelBgAus || "" };
 });
 async function seite(init, breite = 1280) {
@@ -95,50 +108,52 @@ async function seite(init, breite = 1280) {
 }
 
 try {
-  /* B1 · ohne Grafikchip: blass, „Steht", ein Tipp sagt den Grund SICHTBAR */
+  /* B1 · ohne Grafikchip: blass, Dreieck, ein Tipp sagt den Grund SICHTBAR (Blase) */
   {
     const { ctx, p } = await seite([]);
     await p.waitForFunction(() => !!window.MycelBgAus || !!window.MycelBgPause, null, { timeout: 15000 }).catch(() => {});
     let k = await knopf(p);
-    ok(k.aus === "grafikchip" && k.blass && k.wort === "Steht" && k.gedrueckt === "true",
-      "ohne Grafikchip: der Knopf ist blass und sagt „Steht“ statt „läuft“", JSON.stringify(k));
+    ok(k.aus === "grafikchip" && k.blass && k.steht && k.form === "dreieck" && k.gedrueckt === "true",
+      "ohne Grafikchip: der Knopf ist blass und zeigt das Dreieck (steht) statt der Striche", JSON.stringify(k));
+    ok(k.sicht === "" && k.nameUnsichtbar, "kein sichtbares Wort im Knopf, nur das Zeichen (der Name ist nur zum Vorlesen)", JSON.stringify(k));
     ok(/keinen Grafikchip/.test(k.title), "ohne Grafikchip: der title nennt den Grund", k.title);
     await p.click("#bgPauseBtn");
     k = await knopf(p);
-    ok(k.wort === "kein Grafikchip", "ohne Grafikchip: ein Tipp zeigt den Grund SICHTBAR im Knopf", k.wort);
+    ok(k.hinweis === "kein Grafikchip" && k.hinweisImBild, "ohne Grafikchip: ein Tipp zeigt den Grund SICHTBAR als Blase unter dem Knopf", JSON.stringify(k));
+    ok(k.sicht === "", "…und der Grund schiebt den Knopf nicht breiter (kein Wort IM Knopf)", k.sicht);
     await p.waitForTimeout(4400);
     k = await knopf(p);
-    ok(k.wort === "Steht", "nach ein paar Sekunden steht wieder „Steht“ da", k.wort);
+    ok(k.hinweis === "" && k.form === "dreieck", "nach vier Sekunden ist die Blase weg, das Dreieck bleibt", JSON.stringify(k));
     await ctx.close();
   }
 
-  /* B2 · mit Grafikchip: „Bewegt" ⇄ „Steht", Breite bleibt */
+  /* B2 · mit Grafikchip: Striche ⇄ Dreieck, Breite bleibt */
   {
     const { ctx, p } = await seite([NAMEN_VERSTECKEN]);
     const da = await p.waitForFunction(() => !!window.MycelBgPause && window.MycelBgPause.laeuft(), null, { timeout: 20000 }).then(() => true, () => false);
     if (!da) { stumm++; console.log("  ⊘ nicht lauffähig: der Hintergrund lief im Testbrowser nicht an"); }
     else {
       let k = await knopf(p);
-      ok(k.wort === "Bewegt" && !k.blass && k.gedrueckt === "false" && k.zeichen === "≈", "läuft er, sagt der Knopf „≈ Bewegt“", JSON.stringify(k));
+      ok(!k.steht && k.form === "striche" && !k.blass && k.gedrueckt === "false" && k.sicht === "", "läuft er, zeigt der Knopf zwei Striche und kein Wort", JSON.stringify(k));
       const b0 = k.breite;
       await p.click("#bgPauseBtn");
       k = await knopf(p);
-      ok(k.wort === "Steht" && k.steht && !k.laeuft && k.gedrueckt === "true", "ein Tipp: „Steht“, und die Schleife steht wirklich", JSON.stringify(k));
-      ok(k.breite === b0, "„Bewegt“ und „Steht“ sind gleich breit — die Kopfleiste springt nicht", `${b0} → ${k.breite}`);
+      ok(k.steht && k.form === "dreieck" && k.mbSteht && !k.laeuft && k.gedrueckt === "true", "ein Tipp: Dreieck, und die Schleife steht wirklich", JSON.stringify(k));
+      ok(k.breite === b0, "Striche und Dreieck sind gleich breit — die Kopfleiste springt nicht", `${b0} → ${k.breite}`);
       await p.click("#bgPauseBtn");
       k = await knopf(p);
-      ok(k.wort === "Bewegt" && k.laeuft, "noch ein Tipp: „Bewegt“, und sie läuft wieder", JSON.stringify(k));
+      ok(!k.steht && k.form === "striche" && k.laeuft, "noch ein Tipp: Striche, und sie läuft wieder", JSON.stringify(k));
     }
     await ctx.close();
   }
 
-  /* B3 · die Selbst-Bremse greift: der Knopf sagt „Steht", ein Tipp versucht es neu */
+  /* B3 · die Selbst-Bremse greift: der Knopf zeigt das Dreieck, ein Tipp versucht es neu */
   {
     const { ctx, p } = await seite([NAMEN_VERSTECKEN, LANGSAM]);
     const gebremst = await p.waitForFunction(() => !!window.MycelBgPause && window.MycelBgPause.grund() === "gebremst", null, { timeout: 25000 }).then(() => true, () => false);
     let k = await knopf(p);
-    ok(gebremst && k.steht === true && k.laeuft === false, "bei zu langsamen Bildern hält die Bremse an, und steht() sagt es", JSON.stringify(k));
-    ok(k.wort === "Steht" && k.blass && k.gedrueckt === "true", "nach der Bremse zeigt der Knopf „Steht“ — nicht mehr „läuft“", JSON.stringify(k));
+    ok(gebremst && k.mbSteht === true && k.laeuft === false, "bei zu langsamen Bildern hält die Bremse an, und steht() sagt es", JSON.stringify(k));
+    ok(k.steht && k.form === "dreieck" && k.blass && k.gedrueckt === "true", "nach der Bremse zeigt der Knopf das Dreieck — nicht mehr die Striche", JSON.stringify(k));
     await p.click("#bgPauseBtn");
     const neu = await p.evaluate(() => window.MycelBgPause.laeuft() || window.MycelBgPause.grund() === "gebremst");
     ok(neu, "ein Tipp nach der Bremse versucht es noch einmal (läuft, oder bremst erneut)");

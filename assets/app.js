@@ -65,6 +65,11 @@
     // hier eigens nachgezogen. Ohne das blieb im Englisch-Modus „Dunkel".
     try { applyTheme(ti); } catch (_e) {}
     try { mountMicLangPicker(); } catch (_e) {}
+    /* Die Sprach-Pille zeigt seit 2026-10-06 nur noch die AKTUELLE Sprache
+       (Klaus: „DE, EN kann man einfach nur die Sprache, die aktuell ist").
+       Gesetzt wird sie hier, weil hier die Sprache wechselt — eine zweite
+       Stelle liefe auseinander. */
+    try { var lbx = document.getElementById("langBtn"); if (lbx) lbx.textContent = lang === "en" ? "EN" : "DE"; } catch (_e) {}
     try { global.dispatchEvent(new CustomEvent("fp:lang", { detail: { lang: lang } })); } catch (_e) {}
   }
   function getLang() { return lang; }
@@ -894,8 +899,11 @@
     pill.tabIndex = 0;
     var setLabel = function () {
       var de = getLang() === "de";
-      var wort = de ? "Aktualisieren" : "Refresh";
-      pill.innerHTML = '<span class="rl-ic" aria-hidden="true">↻</span> ' + wort;
+      /* Seit 2026-10-06 nur das Zeichen (Klaus: „Aktualisieren einfach das
+         Wort raus"). Das ↻ ist aria-hidden — der Vorlese-Name ist damit frei
+         und trägt das Wort, das früher dastand. */
+      var wort = de ? "Aktualisieren" : "Reload";
+      pill.innerHTML = '<span class="rl-ic" aria-hidden="true">↻</span>';
       pill.title = de ? "Seite frisch laden, holt die neueste Version (Cache leeren)"
                       : "Reload fresh, get the latest version (clear cache)";
       // Sichtbares Wort zuerst — sonst meldet Lighthouse zu Recht, dass
@@ -966,10 +974,74 @@
     // und die schlaegt den Auto-Uebersetzer. Der Start-Aufruf von applyLang
     // weiter unten tut das NICHT — sonst waere jeder Besucher sofort gesperrt,
     // auch der, der nie etwas gewaehlt hat.
-    alsKnopf(lb, function () { waehleSprache(lang === "de" ? "en" : "de"); },
+    /* ── SPRACHWAHL ALS KLEINE AUSWAHL (Klaus 2026-10-06) ─────────────────
+     * „DE, EN kann man einfach nur die Sprache, die aktuell ist, machen. Und
+     * dann geht oben das auf und dann kann man wählen." Die Pille zeigt nur
+     * die aktuelle Sprache; ein Tipp öffnet Deutsch · English darunter.
+     *
+     * ⚠ DIE AUSWAHL HÄNGT AM <body>, NICHT IN DER PILLE: `.pill` trägt
+     * `overflow:hidden` (für den Glanz), eine Liste darin wäre abgeschnitten.
+     * `position:fixed` unter dem Rechteck der Pille — sie verschiebt nichts,
+     * die Kopfleiste springt nicht. Esc und ein Tipp daneben schließen. */
+    var langMenu = null;
+    var langZu = function (fokusZurueck) {
+      if (!langMenu) return;
+      langMenu.remove(); langMenu = null;
+      if (lb) lb.setAttribute("aria-expanded", "false");
+      document.removeEventListener("pointerdown", langDaneben, true);
+      document.removeEventListener("keydown", langEsc, true);
+      if (fokusZurueck && lb) try { lb.focus(); } catch (_e) {}
+    };
+    var langDaneben = function (e) {
+      if (langMenu && !langMenu.contains(e.target) && e.target !== lb && !(lb && lb.contains(e.target))) langZu(false);
+    };
+    var langEsc = function (e) {
+      if (e.key === "Escape") { e.preventDefault(); langZu(true); return; }
+      /* Pfeiltasten wandern durch die Auswahl — so erwartet es role="menu". */
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && langMenu) {
+        e.preventDefault();
+        var k = Array.prototype.slice.call(langMenu.querySelectorAll("button"));
+        var i = k.indexOf(document.activeElement);
+        var n = e.key === "ArrowDown" ? i + 1 : i - 1;
+        if (n < 0) n = k.length - 1; if (n >= k.length) n = 0;
+        try { k[n].focus(); } catch (_e) {}
+      }
+    };
+    var langAuf = function () {
+      if (!lb) return;
+      if (langMenu) { langZu(false); return; }
+      var r = lb.getBoundingClientRect();
+      langMenu = document.createElement("div");
+      langMenu.id = "langMenu";
+      langMenu.setAttribute("role", "menu");
+      langMenu.setAttribute("aria-label", getLang() === "de" ? "Sprache wählen" : "choose language");
+      [["de", "Deutsch"], ["en", "English"]].forEach(function (o) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.setAttribute("role", "menuitemradio");
+        b.setAttribute("aria-checked", o[0] === getLang() ? "true" : "false");
+        b.setAttribute("data-lang", o[0]);
+        b.setAttribute("lang", o[0]);
+        b.textContent = o[1];
+        b.addEventListener("click", function () { langZu(true); waehleSprache(o[0]); });
+        langMenu.appendChild(b);
+      });
+      langMenu.style.top = Math.round(r.bottom + 6) + "px";
+      document.body.appendChild(langMenu);
+      /* Rechtsbündig unter der Pille, aber nie über den Rand. */
+      var w = langMenu.offsetWidth;
+      var links = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+      langMenu.style.left = Math.round(links) + "px";
+      lb.setAttribute("aria-expanded", "true");
+      document.addEventListener("pointerdown", langDaneben, true);
+      document.addEventListener("keydown", langEsc, true);
+      var aktiv = langMenu.querySelector('[aria-checked="true"]');
+      try { (aktiv || langMenu.firstChild).focus(); } catch (_e) {}
+    };
+    alsKnopf(lb, langAuf,
       function () { return nameMitSichtbarem(lb, getLang() === "de"
-        ? "Sprache umschalten, Deutsch oder Englisch. Langer Druck: Browser-Übersetzer wieder zulassen"
-        : "switch language, German or English. Long press: allow the browser translator again"); });
+        ? "Sprache wählen, Deutsch oder Englisch. Langer Druck: Browser-Übersetzer wieder zulassen"
+        : "choose language, German or English. Long press: allow the browser translator again"); });
     langerDruckZuruecknehmen(lb);
     var tb = document.getElementById("themeBtn");
     alsKnopf(tb, function () { applyTheme(ti + 1); },
@@ -1004,7 +1076,17 @@
        * während der Knopf „läuft" zeigte; ein Tipp änderte nur einen Text,
        * den niemand sieht.
        * Jetzt: „≈ Bewegt" / „≈ Steht". Geht es auf dem Gerät nicht, wird er
-       * blass, und ein Tipp sagt den Grund SICHTBAR, für ein paar Sekunden. */
+       * blass, und ein Tipp sagt den Grund SICHTBAR, für ein paar Sekunden.
+       *
+       * ⚠ TAFEL-EVOLUTION, AM SELBEN TAG (Klaus 2026-10-06, abends): „Steht
+       * kann man auch wegnehmen. Da macht man einfach die zwei Striche, die
+       * senkrechten, als Pause … Einfach nur ein Symbol." Das Wort fiel, weil
+       * die Kopfleiste am Handy in vier Reihen brach. Zurück sind die Striche
+       * — aber als CSS-Form, nicht als Emoji ⏸ (das orange Emoji war mit dem
+       * Video-Knopf verwechselbar). Läuft er: zwei Striche, steht er: ein
+       * Dreieck. Der Vorlese-Name sagt den Zustand weiter in Worten; der Grund
+       * kommt als kleine Blase AN dem Knopf, nicht im Knopf — so wächst die
+       * Leiste nicht, wenn er erscheint. */
       var grundZeit = 0;
       var grundVon = function () {
         if (window.MycelBgAus) return window.MycelBgAus;            /* grafikchip · fehler */
@@ -1025,6 +1107,23 @@
               reduziert: "Reduced motion is set on this device, so the background stays still.",
               gebremst: "The background stopped because the device was too slow. Tap to try again." }
       };
+      /* Der Grund als Blase unter dem Knopf, 4 s lang. Sie hängt am <body>
+         (die Pille schneidet ab) und steht `position:fixed` — nichts rückt. */
+      var grundZeigen = function (text) {
+        var alt = document.getElementById("bgPauseHinweis");
+        if (alt) alt.remove();
+        var r = pb.getBoundingClientRect();
+        var h = document.createElement("div");
+        h.id = "bgPauseHinweis";
+        h.setAttribute("role", "status");
+        h.textContent = text;
+        h.style.top = Math.round(r.bottom + 6) + "px";
+        document.body.appendChild(h);
+        var w = h.offsetWidth;
+        h.style.left = Math.round(Math.min(Math.max(8, r.left + r.width / 2 - w / 2), window.innerWidth - w - 8)) + "px";
+        grundZeit = Date.now() + 4000;
+        setTimeout(function () { if (Date.now() >= grundZeit - 50) h.remove(); }, 4000);
+      };
       var pauseNachziehen = function () {
         /* Der Hintergrund ist die Auskunft, sobald es ihn gibt. Vorher steht
            die Wahrheit im Speicher — und die ist sofort lesbar, auch wenn
@@ -1040,15 +1139,12 @@
         var l = getLang() === "de" ? "de" : "en", de = l === "de";
         var grund = grundVon();
         if (grund) steht = true;
-        var z = document.getElementById("bgPauseZeichen");
-        var w = document.getElementById("bgPauseWort");
         var n = document.getElementById("bgPauseName");
         var wort = grund ? GRUND_LANG[l][grund] || ""
           : de ? (steht ? "Hintergrund-Bewegung fortsetzen" : "Hintergrund-Bewegung anhalten")
                : (steht ? "resume background motion" : "pause background motion");
-        if (z) z.textContent = "\u2248";
-        if (w && Date.now() > grundZeit) w.textContent = de ? (steht ? "Steht" : "Bewegt") : (steht ? "Still" : "Moving");
         if (n) n.textContent = wort;
+        pb.classList.toggle("bg-steht", !!steht);
         pb.classList.toggle("bg-aus", !!grund);
         pb.setAttribute("title", wort);
         pb.setAttribute("aria-pressed", steht ? "true" : "false");
@@ -1060,7 +1156,6 @@
           /* Es geht hier nicht. Der Knopf sagt es SICHTBAR, statt still zu
              bleiben: ein toter Knopf mit Beschriftung sieht aus wie Hilfe. */
           var l = getLang() === "de" ? "de" : "en";
-          var w0 = document.getElementById("bgPauseWort");
           var g = grund || "grafikchip";
           if (!window.MycelBgPause && !window.MycelBgAus) g = "";   /* noch nicht geladen: einfach merken */
           if (!g) {
@@ -1068,17 +1163,13 @@
             pauseNachziehen();
             return;
           }
-          if (w0) { w0.textContent = GRUND[l][g]; grundZeit = Date.now() + 4000; setTimeout(pauseNachziehen, 4100); }
+          grundZeigen(GRUND[l][g]);
           pauseNachziehen();
           return;
         }
         window.MycelBgPause.umschalten();
         pauseNachziehen();
-      }, function () {
-        return nameMitSichtbarem(pb, getLang() === "de"
-          ? "Hintergrund-Bewegung anhalten oder fortsetzen"
-          : "pause or resume background motion");
-      });
+      }, null);   /* den Vorlese-Namen setzt pauseNachziehen — er trägt den Zustand */
       /* Der Hintergrund wird erst nach `load` und im Leerlauf geholt. Beim
          ersten Nachziehen gibt es ihn also meistens noch nicht — deshalb
          meldet er sich, wenn er da ist, und wieder, wenn er sich anhält
