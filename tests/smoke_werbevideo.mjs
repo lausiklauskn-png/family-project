@@ -452,8 +452,18 @@ try {
     await q.evaluate(() => window.__rahmenSpieler[0].zeigen());
     await q.click("#tagesbildPad .vr-mehr");
     await bis(q, () => document.querySelectorAll("#tagesbildPad .vr-laden").length === 3, null, 5000);
-    const mh = await q.evaluate(() => { const m = document.querySelector("#tagesbildPad .vr-menue"); return { voll: m.scrollHeight, sicht: m.clientHeight }; });
-    ok(mh.voll <= mh.sicht + 1, `${breite} px: das Menü passt ohne Rollen in den Rahmen`, JSON.stringify(mh));
+    const mh = await q.evaluate(() => {
+      const m = document.querySelector("#tagesbildPad .vr-menue");
+      // Eine Zeile, deren Knöpfe umbrechen, ist höher als ihr höchster Knopf.
+      const zeilen = [...m.querySelectorAll(".vr-zeile")].filter((z) => z.offsetParent).map((z) => {
+        const k = [...z.querySelectorAll("button,a")].filter((b) => b.offsetParent);
+        const hoch = k.length ? Math.max(...k.map((b) => b.getBoundingClientRect().height)) : 0;
+        return { h: Math.round(z.getBoundingClientRect().height), hoch: Math.round(hoch) };
+      });
+      return { voll: m.scrollHeight, sicht: m.clientHeight, breitVoll: m.scrollWidth, breitSicht: m.clientWidth, zeilen };
+    });
+    ok(mh.voll <= mh.sicht + 1 && mh.breitVoll <= mh.breitSicht + 1, `${breite} px: das Menü passt ohne Rollen in den Rahmen`, JSON.stringify(mh));
+    ok(mh.zeilen.length > 0 && mh.zeilen.every((z) => z.h <= z.hoch + 4), `${breite} px: jede Zeile im Menü steht einreihig, kein Knopf bricht um`, JSON.stringify(mh.zeilen));
     await c.close();
   }
 } catch (e) {

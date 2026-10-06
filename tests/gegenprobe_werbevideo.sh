@@ -137,7 +137,7 @@ fall 'STOPP: Stopp lässt die Quelle stehen und lädt weiter' assets/abspielen-r
 
 fall 'MENUE: das Menü bekommt rechts wieder 44 px Rand' assets/abspielen-rahmen.js \
   'overflow:auto;padding:4px 8px 4px 10px;' 'overflow:auto;padding:4px 44px 4px 10px;' \
-  'passt ohne Rollen'
+  'einreihig'
 
 fall 'SEITE: der Rahmen trägt den Spieler nicht mehr' index.html \
   '                 data-video-rahmen
@@ -171,8 +171,11 @@ fall 'QUAL: die Qualitaet bleibt stehen' assets/abspielen-rahmen.js \
   'qualUhr = setTimeout(function () { qual.hidden = true; }, QUAL_MS);' 'qualUhr = null;' \
   'verschwindet nach 2 s'
 
+# Die Seite trägt keinen data-video-titel (M.titel ist leer); eine Sabotage, die nur
+# M.titel einsetzt, nähme „weiter bei" mit und fiele über den Neuladen-Wächter
+# (gemessen am 2026-10-06: „rot aus falschem Grund"). Sie hängt deshalb den Namen an.
 fall 'TITEL: der Name des Videos steht wieder sichtbar in der Leiste' assets/abspielen-rahmen.js \
-  'titel.textContent = stelle > 0 ? T.weiterBei + mmss(stelle) : "";' 'titel.textContent = M.titel;' \
+  'titel.textContent = stelle > 0 ? T.weiterBei + mmss(stelle) : "";' 'titel.textContent = (stelle > 0 ? T.weiterBei + mmss(stelle) : "") + (M.titel || "Werbevideo");' \
   'steht nicht im sichtbaren Text'
 
 echo
