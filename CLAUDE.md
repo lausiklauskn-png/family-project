@@ -1161,8 +1161,20 @@ damit auch nie mit dem orangen Emoji-⏸ der Kopfleiste verwechselbar.
 
 ```bash
 node tests/smoke_werbevideo.mjs            # A ohne Browser · B echter Browser, VP9-Stellvertreter
-bash tests/gegenprobe_werbevideo.sh        # 16 Fälle; Pin-Sabotagen mit eigenem Fall
+bash tests/gegenprobe_werbevideo.sh        # 15 Fälle; Pin-Sabotagen mit eigenem Fall
 ```
+
+⚠ **DER ERSTE GEGENPROBE-LAUF MELDETE 12 · 2 BLIND · 1 AUS FALSCHEM GRUND —
+alle drei in der PROBE, keiner im Spieler.** *Die Zahlen bleiben stehen, weil
+sie die Funde gemacht haben:*
+
+| Fall | warum er nichts (oder das Falsche) mass |
+|---|---|
+| **QUALITAET** (blind) | gewartet wurde, bis `currentTime ≥ alte Stelle` — ein Video, das **vorn** beginnt, spielt in 20 s einfach dorthin. Gemessen wird jetzt die **erste** Zeitmeldung nach dem Wechsel |
+| **MENUE** (blind) | gemessen bei 320/360 px — dort stehen die Größen nur im `title`, das Menü passte auch mit dem alten Rand. Der Fall war **380 px**. Jetzt 320 · 360 · 380 · 412 |
+| **FUENFFACH** (falscher Grund) | ohne Riegel öffnet der 5. Tipp das Bild-Fenster, dessen Hintergrund verdeckt den 6., `p.click` wartete 30 s und **warf**. Getippt wird jetzt per `element.click()`, und ein Stolpern der Probe ist eine rote Zeile mit Namen |
+
+Danach, in einer frischen Kopie: alle drei **schlagen an**, jeder mit seinem Namen.
 
 ⚠ **BENANNTE GRENZEN:** nicht gemessen sind das echte H.264-MP4 am Tablet und am
 DeX, **ob github.io den Abruf von family-projekt.de aus zulässt** (CORS; aus dem
@@ -1187,7 +1199,7 @@ Klaus: *„oben der Button funktioniert nicht. Außerdem steht er auf Pause."*
 
 ```bash
 node tests/smoke_bewegungsknopf.mjs        # drei Lagen: ohne Chip, mit Chip, gebremst; 320–412 px
-bash tests/gegenprobe_bewegungsknopf.sh    # 4 Fälle
+bash tests/gegenprobe_bewegungsknopf.sh    # 4 schlagen an · 0 blind · 0 aus falschem Grund · 0 tote Anker
 ```
 
 ⚠ **OFFEN, nur Klaus' Gerät kann es sagen:** ob sein DeX einen Grafikchip meldet
