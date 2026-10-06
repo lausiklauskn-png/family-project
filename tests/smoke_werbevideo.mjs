@@ -315,7 +315,7 @@ try {
   await ctx.close();
 
   /* B9 · schmale Handys: alles passt, nichts abgeschnitten */
-  for (const breite of [320, 360]) {
+  for (const breite of [320, 360, 380, 412]) {
     const c = await neuerKontext(breite); const q = await c.newPage();
     await q.goto(base + "/index.html", { waitUntil: "load" });
     await bis(q, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
