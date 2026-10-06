@@ -1348,8 +1348,12 @@ node tests/gegenprobe_videos_spiegel.mjs  # 16 Fälle, Wegwerf-Kopie; NUR_ANKER=
 ⚠ Ein Gegenprobe-Fall („unveränderte Teile werden nicht neu zusammengesetzt") war zuerst blind:
 der Teile-Vorrat behält die Teile ohnehin, und „unverändert" traf auch die 304-Zeile. Gemessen
 wird jetzt der Inode der Datei und die Meldung „unverändert (2 Teile)".
-⚠ **Nicht gemessen:** der echte Server, echte Downloads von github.io (aus dem Behälter gesperrt),
-Gesamtgröße, ob jede Adresse in `quellen.json` heute antwortet, das Tablet.
+✅ **Eingerichtet und gemessen am 2026-10-06 (Klaus, Hetzner Cloud):** erster Lauf 36 neu · 2 Fehler,
+zweiter Lauf **37 unverändert · 0 Fehler** — die zwei waren vorübergehend und wurden nachgeholt (welche
+Dateien, ist nicht mehr zu lesen: der erste Lauf schrieb nur ins Terminal). Von außen: `videos.json` 200 ·
+`workfloh-pdf-quer.mp4` 200 · `.spiegel/stand.json` 404. Hier stand: *„Nicht gemessen: der echte Server,
+echte Downloads von github.io … ob jede Adresse heute antwortet."* ⚠ Weiter nicht gemessen: Gesamtgröße,
+das Tablet. **Schritt 2 (Apps umstellen):** Brief `docs/BRIEF_VIDEO_SPIEGEL_SCHRITT2.md`.
 
 ## Dieses Repo trägt seine eigenen Rezepte
 
