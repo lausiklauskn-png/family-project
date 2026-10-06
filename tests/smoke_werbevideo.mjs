@@ -31,7 +31,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";
 const PIN = {
   "assets/abspielen-kern.js": "8cfd9c05816c7c5519fe5799a644944c9346c36f578ec3176f720f8c3eed702d",
-  "assets/abspielen-rahmen.js": "4a2915168e6c3994712f892feea36547a7f974afbe4dd0367c5d6fb66315d76c"
+  "assets/abspielen-rahmen.js": "c0bc33335711bc65fb43d6b30b5a4d8073a424383bd200f56bb5bf0f4cbf992c"
 };
 let gruen = 0, rot = 0, stumm = 0;
 const ok = (c, m, mehr) => { if (c) { gruen++; console.log("  ✓", m); } else { rot++; console.log("  ✗ ROT:", m + (mehr !== undefined ? "  → " + mehr : "")); } };
@@ -203,6 +203,15 @@ try {
   ok(lage.img, "das Bild des Tages ist geladen und bleibt im Rahmen");
 
   /* B2 · erster Tipp: streamt, ⏸, Teile werden geholt */
+  /* Die kreisenden Punkte stehen nur kurz da — ein Beobachter merkt sich, ob
+     sie je SICHTBAR waren, statt einen Augenblick zu erwischen. */
+  await p.evaluate(() => {
+    window.__punkteGesehen = 0;
+    const pad = document.getElementById("tagesbildPad");
+    const sieh = () => { pad.querySelectorAll(".vr-punkte").forEach((e) => {
+      if (e.offsetParent && e.querySelectorAll("i").length === 8) window.__punkteGesehen++; }); };
+    new MutationObserver(sieh).observe(pad, { subtree: true, childList: true, attributes: true, attributeFilter: ["hidden"] });
+  });
   await p.click("#tagesbildPad .vr-spielen");
   ok(await bis(p, () => { const s = window.__rahmenSpieler[0]; return s.vid.currentTime > 1 && !s.vid.paused; }, null, 25000),
     "nach dem Tipp läuft das Video im Rahmen", JSON.stringify(await zustand(p)));
@@ -211,6 +220,16 @@ try {
   ok(/^werbevideo\/werbevideo-67s-720p\.mp4$/.test(z.src || ""), "gestreamt wird über den Worker, zuerst 720p", z.src);
   ok(abrufe.some((a) => /teil-\d\d\.bin$/.test(a.rel)), "die Teile kommen von der Video-Seite");
   ok(fehler.length === 0, "keine Skriptfehler auf der Seite", fehler.join(" | "));
+  ok(await p.evaluate(() => window.__punkteGesehen > 0), "beim Laden kreisen Punkte (acht, sichtbar) — man sieht, dass es noch lädt");
+  const form = await p.evaluate(() => {
+    const s = window.__rahmenSpieler[0], r = s.rahmen.getBoundingClientRect(), v = s.vid.getBoundingClientRect();
+    return { rahmen: r.width / r.height, film: s.vid.videoWidth / s.vid.videoHeight, vb: v.width / r.width, vh: v.height / r.height,
+      knopf: (() => { const b = s.rahmen.querySelector(".vr-spielen").getBoundingClientRect(); return b.top >= 0 && b.bottom <= innerHeight; })() };
+  });
+  ok(form.film > 1 && Math.abs(form.rahmen - form.film) / form.film < 0.02,
+    "beim Abspielen nimmt der Rahmen die Form des Films an — keine schwarzen Balken", `${form.rahmen.toFixed(4)} gegen ${form.film.toFixed(4)}`);
+  ok(form.vb > 0.98 && form.vh > 0.98, "der Film füllt den Rahmen", JSON.stringify(form));
+  ok(form.knopf, "die Leiste steht nach dem Start im Fenster");
   const balken = await p.evaluate(() => {
     const z = document.querySelector("#tagesbildPad .vr-zeit");
     return { bg: z.style.background, text: z.getAttribute("aria-valuetext") || "", sichtbar: !!z.offsetParent };
@@ -310,9 +329,30 @@ try {
   z = await zustand(p);
   ok(z.zustand === "ruhe" && !z.src && !z.schicht && z.knopf === "spielen", "Stopp: das Bild steht wieder da, ▶, keine Quelle", JSON.stringify(z));
   ok(z.merk === null, "Stopp vergisst die Stelle — der nächste Start beginnt vorn", z.merk);
+  const ruheForm = await p.evaluate(() => { const r = document.getElementById("tagesbildPad").getBoundingClientRect(); return r.width / r.height; });
+  ok(Math.abs(ruheForm - 2.5016) < 0.02, "nach dem Stopp hat der Rahmen wieder das Maß des Bildes", ruheForm.toFixed(4));
   const n0 = abrufe.length; await warte(2000);
   ok(abrufe.length === n0, "nach dem Stopp wird nichts mehr geholt", abrufe.slice(n0).map((a) => a.rel).join(","));
   await ctx.close();
+
+  /* B10 · zu Ende gespielt: zurück in die Grundansicht (Klaus 2026-10-06) */
+  {
+    const c = await neuerKontext(380); const q = await c.newPage();
+    await q.goto(base + "/index.html", { waitUntil: "load" });
+    await bis(q, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
+    await q.click("#tagesbildPad .vr-spielen");
+    const lief = await bis(q, () => { const s = window.__rahmenSpieler[0]; return !s.vid.paused && s.vid.currentTime > 0.5 && s.vid.duration > 3; }, null, 25000);
+    ok(lief, "B10: das Video läuft an");
+    await q.evaluate(() => { const v = window.__rahmenSpieler[0].vid; v.currentTime = Math.max(0, v.duration - 1.2); });
+    const zurueck = await bis(q, () => window.__rahmenSpieler[0].zustand() === "ruhe", null, 20000);
+    const zz = await zustand(q);
+    ok(zurueck && zz.zustand === "ruhe" && !zz.src && !zz.schicht && zz.knopf === "spielen",
+      "am Ende geht es von selbst zurück in die Grundansicht: Bild, ▶, keine Quelle", JSON.stringify(zz));
+    ok(zz.merk === null, "am Ende wird keine Stelle gemerkt — der nächste Start beginnt vorn", zz.merk);
+    const f2 = await q.evaluate(() => { const r = document.getElementById("tagesbildPad").getBoundingClientRect(); return r.width / r.height; });
+    ok(Math.abs(f2 - 2.5016) < 0.02, "am Ende hat der Rahmen wieder das Maß des Bildes", f2.toFixed(4));
+    await c.close();
+  }
 
   /* B9 · schmale Handys: alles passt, nichts abgeschnitten */
   for (const breite of [320, 360, 380, 412]) {

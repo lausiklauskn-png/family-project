@@ -128,6 +128,19 @@ fall 'SEITE: der Rahmen trägt den Spieler nicht mehr' index.html \
 ' '' \
   'sitzt IM Bildrahmen'
 
+
+fall 'FORM: der Rahmen behaelt beim Abspielen die Bildform (schwarze Balken)' assets/abspielen-rahmen.js \
+  '".vr-rahmen:not([data-vr-zustand=ruhe]){aspect-ratio:var(--vr-format,1.7778)!important;' '".vr-rahmen:not([data-vr-zustand=ruhe]){' \
+  'Form des Films'
+
+fall 'ENDE: nach dem letzten Bild bleibt das Video stehen' assets/abspielen-rahmen.js \
+  'vid.addEventListener("ended", function () { if (zustand !== "ruhe") stoppe(); });' 'vid.addEventListener("ended", function () { });' \
+  'Grundansicht'
+
+fall 'PUNKTE: beim Laden kreist nichts' assets/abspielen-rahmen.js \
+  '  function punkte(eltern) {' '  function punkte(eltern) { return;' \
+  'kreisen Punkte'
+
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"
 rm -f "$LAUF"

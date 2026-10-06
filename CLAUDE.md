@@ -1186,6 +1186,24 @@ an der gemerkten Stelle weiter, aber erst auf Tipp. Den Sichttest ersetzt keine 
 Rahmen auf der Startseite, und die Kopfleiste bricht am Handy schon jetzt in drei
 Zeilen um. Eingereiht als Frage an Klaus, nicht gebaut.
 
+### Nach Klaus' erstem Test (2026-10-06)
+
+Klaus: *„Rechts und links sind ein großer breiter Balken"* · *„sobald das Video
+fertig ist … wieder in die Grundansicht"* · *„beim Start … mit Punkten …
+umkreisen während es lädt, damit die sehen, dass das Internet nicht
+unterbrochen wurde"*.
+
+| | |
+|---|---|
+| **Form des Films** | solange das Video spielt, trägt der Rahmen das Seitenverhältnis des Films (`--vr-format` aus `loadedmetadata`). In Ruhe hat er die Form des Bildes, im Vollbild steht `auto`. Gemessen: Rahmen = Film auf 2 %, der Film füllt ≥ 98 % |
+| **Ende → Grundansicht** | `ended` stoppt: Bild, ▶, keine Quelle, die gemerkte Stelle gelöscht |
+| **kreisende Punkte** | 8 Punkte, solange `readyState < 3`. Bei „weniger Bewegung" drehen sie sich nicht |
+
+Der Spieler ist wieder byte-1:1 aus FP-Videos (PR #8, SHA `c0bc3333…`).
+Gegenprobe: `FORM:` · `ENDE:` · `PUNKTE:` schlagen alle an, jede rote Zeile trägt
+ihren Namen. ⚠ Am Tablet nicht gemessen (Form des Rahmens auf dem DeX, Ende am Gerät).
+⚠ **Cache-Bump v140 → v141**, `ASSET_V` mitgezogen.
+
 ## ≈ DER BEWEGUNGS-KNOPF SAGT, WAS IST (Klaus 2026-10-06)
 
 Klaus: *„oben der Button funktioniert nicht. Außerdem steht er auf Pause."*
