@@ -19,7 +19,7 @@
 cd "$(dirname "$0")/.." || exit 1
 export PW_CORE="${PW_CORE:-/opt/node-tools/node_modules/playwright-core/index.mjs}"
 
-DATEIEN=(assets/abspielen-rahmen.js assets/abspielen-kern.js sw.js index.html)
+DATEIEN=(assets/abspielen-rahmen.js assets/abspielen-kern.js sw.js index.html assets/style.css)
 SICH="/tmp/gp_wv.$$"; mkdir -p "$SICH"
 for d in "${DATEIEN[@]}"; do mkdir -p "$SICH/$(dirname "$d")"; cp "$d" "$SICH/$d"; done
 heile(){ for d in "${DATEIEN[@]}"; do cp "$SICH/$d" "$d"; done; }
@@ -177,6 +177,16 @@ fall 'QUAL: die Qualitaet bleibt stehen' assets/abspielen-rahmen.js \
 fall 'TITEL: der Name des Videos steht wieder sichtbar in der Leiste' assets/abspielen-rahmen.js \
   'titel.textContent = stelle > 0 ? T.weiterBei + mmss(stelle) : "";' 'titel.textContent = (stelle > 0 ? T.weiterBei + mmss(stelle) : "") + (M.titel || "Werbevideo");' \
   'steht nicht im sichtbaren Text'
+
+# Der Rahmen in Ruhe wird nie groesser als das Werbevideo (Klaus 2026-10-06):
+# zwei Riegel, je einer fuer Form (JS) und Breite (CSS), jeder mit eigenem Fall.
+fall 'STARTBILD: ein hohes Bild macht den Rahmen wieder hoch' index.html \
+  'pad.style.aspectRatio = Math.max(img.naturalWidth / img.naturalHeight, FORMAT_VIDEO).toFixed(4);' 'pad.style.aspectRatio = (img.naturalWidth / img.naturalHeight).toFixed(4);' \
+  'als das Video'
+
+fall 'STARTBREITE: der Rahmen ist im flachen Fenster breiter als das Video' assets/style.css \
+  'aspect-ratio:16/5;max-width:calc(85vh * 16 / 9);' 'aspect-ratio:16/5;' \
+  '600: Rahmen .* als das Video'
 
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"

@@ -345,7 +345,9 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .doodle{position:relative;border-radius:22px;padding:2px;background:var(--holo-border);animation:holo-rot 14s linear infinite;box-shadow:var(--shadow),var(--glow)}
 .doodle .inner{border-radius:20px;background:linear-gradient(180deg,rgba(17,21,31,.92),rgba(11,13,20,.96));overflow:hidden}
 /* Pad: Bild liegt vollflächig; Verhältnis passt sich per JS dem Bild an. */
-.doodle .pad{position:relative;aspect-ratio:16/5;
+/* Nie groesser als das Werbevideo (Klaus 2026-10-06): dieselbe Hoechstbreite wie
+   der laufende Film (85vh x 16:9), und das JS haelt das Verhaeltnis bei mindestens 16:9. */
+.doodle .pad{position:relative;aspect-ratio:16/5;max-width:calc(85vh * 16 / 9);margin-left:auto;margin-right:auto;
   background:radial-gradient(700px 240px at 80% -30%,rgba(124,156,255,.18),transparent 60%),radial-gradient(520px 200px at 4% 130%,rgba(110,231,211,.14),transparent 60%)}
 .doodle .pad img.tagesimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0}
 .doodle .pad .fp-dust{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}

@@ -1224,6 +1224,24 @@ aus der Sicherung zurückgelegt. Seitdem kennt `gegenprobe_werbevideo.sh` `NUR_A
 jeden Anker auf genau einen Treffer, fasst den Baum nicht an). *Wer einen Schalter benutzt,
 sieht zuerst nach, ob das Skript ihn kennt.*
 
+### Der Rahmen in Ruhe ist nie größer als das Video (Klaus 2026-10-06)
+
+Klaus: *„Immer ein angepasster Container und das Bild sollte reingepasst werden … ohne
+Ränder"* · *„soll nicht größer sein als die Videoansicht."* Ein eigenes Startbild
+(5-fach-Tipp, `fp_tagesbild_img`) setzte das Seitenverhältnis des Rahmens auf das des
+Bildes — ein quadratisches Bild machte ihn 1016 × 1016 statt 1016 × 572.
+
+| | |
+|---|---|
+| Form | `renderTages` setzt `max(Bild, 16:9)` (`FORMAT_VIDEO`): ein breites Bild behält seine Form, ein hohes füllt den Rahmen per `cover` |
+| Breite | `.doodle .pad{max-width:calc(85vh * 16 / 9)}` — dieselbe Höchstbreite wie der laufende Film |
+
+Gemessen (Rahmen mit hohem Bild ⟷ Video): 2000×1100 1016×571 ⟷ 1016×572 · 1280×600
+907×510 ⟷ 907×510 · 360×740 316×178 ⟷ 316×178. Das Standardbild (2,5:1) bleibt unverändert.
+`smoke_werbevideo` B12 (105 grün) · Gegenprobe `STARTBILD:`/`STARTBREITE:` 2 schlagen an (STARTBREITE erst „aus falschem Grund“: das „×“ im Muster sind zwei Bytes). Cache v144.
+⚠ Bei hohem Bild wird oben und unten beschnitten (`cover`) — ohne Ränder geht es nicht anders.
+⚠ Am Tablet nicht gemessen.
+
 ## ≈ DER BEWEGUNGS-KNOPF SAGT, WAS IST (Klaus 2026-10-06)
 
 Klaus: *„oben der Button funktioniert nicht. Außerdem steht er auf Pause."*
