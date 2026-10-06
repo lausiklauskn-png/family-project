@@ -1262,6 +1262,13 @@ bash tests/gegenprobe_bewegungsknopf.sh   # GRUND/ZEICHEN nachgezogen, WORT neu
 `w0.textContent`, ZEICHEN auf das alte Markup). Nachgezogen, nicht gestrichen; die
 Gegenprobe kennt seitdem `NUR_ANKER`.
 
+**Gemessen (2026-10-06, in einer Wegwerf-Kopie):** `smoke_kopfleiste` **208 grün · 0 rot** ·
+`gegenprobe_bewegungsknopf` **6 schlagen an · 0 blind · 0 aus falschem Grund · 0 tot** ·
+`gegenprobe_kopfleiste` erst **4 schlagen an · 1 blind** — RELOAD sabotierte
+`index.html`, aber `mountReloadButton` schreibt die Beschriftung bei jedem Laden neu
+(`setLabel`), die Sabotage kam nie an. Er sabotiert jetzt `assets/app.js` und schlägt an.
+*Die Zahl davor bleibt stehen, weil sie den Fund gemacht hat.*
+
 ⚠ **Cache-Bump v141 → v142**, `ASSET_V` mitgezogen, alle `?v=` (95 Verweise).
 
 ## Dieses Repo trägt seine eigenen Rezepte
