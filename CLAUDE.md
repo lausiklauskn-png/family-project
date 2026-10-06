@@ -1255,6 +1255,27 @@ hellem Bild lesbar bleibt. Spieler byte-1:1 aus FP-Videos #10 (SHA `3e5c3b7c…a
 Gegenprobe `LEISTE:` schlägt an. Cache v145.
 ✅ Am Tablet bestätigt (Klaus 2026-10-06, mit Bild: nur ▶ und Vollbild zu sehen).
 
+### Lädt zu lange, Punkte unsichtbar (Klaus 2026-10-06)
+
+Klaus: *das Video lädt viel länger als 67 s und ruckelt; die Punkte bei „lädt kurz vor …"
+sind nicht zu sehen.*
+
+| | |
+|---|---|
+| **Herunterladen hält an** | ein Tipp auf einen Download im Menü hält das laufende Video an und merkt die Stelle — Stream und Download teilten sich sonst die Leitung |
+| **Punkte** | Kreis 24 px statt 14, Punkte 5 px statt 3; die Pille steht **mindestens 0,8 s** (`WARTE_MIN_MS`) statt aufzublitzen |
+| **Kern** | trägt jetzt `ausVorrat()` — genutzt nur im Worker von FP-Videos (dort holt die Lade-Seite einen Teil, den der Kern schon hält, nicht ein zweites Mal). Hier ohne Wirkung: die Teile kommen von github.io, und dieser Worker beantwortet nur `werbevideo/<kennung>.mp4` |
+
+Spieler und Kern byte-1:1 aus FP-Videos (Pins `29f72bdc…3bc8` · `7b7d8c6f…e2f1`).
+`smoke_werbevideo` **113 grün** (B2 misst Größe und Sichtzeit der Punkte, B5 die Pause beim
+Download), Gegenprobe `PUNKTEGROESSE:` · `PUNKTEZEIT:` · `LADENPAUSE:`.
+
+⚠ **BENANNTE GRENZE, gelesen, nicht gemessen:** der Kern antwortet erst, wenn der **ganze**
+Teil (14 MB) da und geprüft ist — bei 720p kommt das erste Bild, wenn die erste Hälfte der
+Datei geladen ist (bei 10 Mbit/s rund 11 s). Kleinere Teile wären die eigentliche Abhilfe;
+eine Frage an Klaus, nicht gebaut. Am Tablet nicht gemessen.
+⚠ **Cache-Bump v145 → v146**, `ASSET_V` mitgezogen, alle `?v=`.
+
 ## ≈ DER BEWEGUNGS-KNOPF SAGT, WAS IST (Klaus 2026-10-06)
 
 Klaus: *„oben der Button funktioniert nicht. Außerdem steht er auf Pause."*
