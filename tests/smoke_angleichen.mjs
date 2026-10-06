@@ -112,7 +112,17 @@ for (const e of mitVideo) {
      `VIDEO ${e.anchorId}: verlinkt, nicht kopiert (fremde Adresse)`);
 }
 ok(ohneVideo.every((e) => !block(seite(e.anchorId))), "keine Detailseite ohne Video trägt den Abschnitt");
-ok(!/\.mp4/.test(lies("sw.js")), "kein .mp4 im Service-Worker-Vorrat");
+/* Gemessen wird der VORRAT, nicht der Wortlaut der Datei: seit dem 2026-10-06
+   trägt sw.js die Route werbevideo/<kennung>.mp4 (der Abspiel-Kern setzt das
+   Video aus geprüften Teilen zusammen, NIE in der Cache Storage). Ein Wächter
+   auf den Text „.mp4" wäre dort rot, ohne dass ein Video im Vorrat läge. */
+{
+  const swQ = lies("sw.js");
+  const core = ((/var\s+CORE\s*=\s*\[([\s\S]*?)\]/.exec(swQ) || [])[1] || "");
+  ok(core.length > 0 && !/\.mp4/.test(core), "kein .mp4 im Service-Worker-Vorrat (CORE)");
+  const route = ((/if \(vw\) \{([\s\S]*?)\n  \}/.exec(swQ) || [])[1] || "");
+  ok(!/\.mp4/.test(swQ) || (route.length > 0 && !/caches\./.test(route)), "die Video-Route legt nichts in den Vorrat");
+}
 
 console.log("── Weg zur App ──");
 const mitApp = gebaut.filter((e) => e.appUrl && e.appUrl !== e.url);
