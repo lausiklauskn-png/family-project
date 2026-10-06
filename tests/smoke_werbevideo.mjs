@@ -466,6 +466,37 @@ try {
     ok(mh.zeilen.length > 0 && mh.zeilen.every((z) => z.h <= z.hoch + 4), `${breite} px: jede Zeile im Menü steht einreihig, kein Knopf bricht um`, JSON.stringify(mh.zeilen));
     await c.close();
   }
+  /* B12 · der Rahmen wird in Ruhe nie größer als das Werbevideo (Klaus 2026-10-06):
+     ein hohes, selbst eingesetztes Bild machte ihn quadratisch (1016 × 1016 statt
+     1016 × 572). Gemessen wird, was man sieht — Rahmen und Bild — bei mehreren
+     Fenstern, dazu die Gegenrichtung: ein breites Bild behält seine Form. */
+  for (const [bw, bh] of [[2000, 1100], [1280, 600], [360, 740]]) {
+    const c = await neuerKontext(bw, bh);
+    const q = await c.newPage();
+    await q.goto(base + "/index.html", { waitUntil: "load" });
+    const vorher = await q.evaluate(() => { const r = document.getElementById("tagesbildPad").getBoundingClientRect(); return { w: r.width, h: r.height }; });
+    ok(vorher.w > 0 && vorher.w / vorher.h > 2.2, `B12 ${bw}×${bh}: das breite Standardbild behält seine Form`, JSON.stringify(vorher));
+    await q.evaluate(() => {
+      const cv = document.createElement("canvas"); cv.width = 600; cv.height = 900;
+      const g = cv.getContext("2d"); g.fillStyle = "#2a4a8a"; g.fillRect(0, 0, 600, 900);
+      localStorage.setItem("fp_tagesbild_img", cv.toDataURL("image/jpeg", 0.8));
+    });
+    await q.reload({ waitUntil: "load" });
+    const geladen = await bis(q, () => { const i = document.querySelector("#tagesbildPad img.tagesimg"); return i && i.getAttribute("data-src").startsWith("data:") && i.complete && i.naturalWidth > 0; }, null, 8000);
+    ok(geladen, `B12 ${bw}×${bh}: das hohe Bild ist eingesetzt (sonst misst der Rest nichts)`);
+    await warte(150);
+    const m = await q.evaluate(() => {
+      const pad = document.getElementById("tagesbildPad"), r = pad.getBoundingClientRect();
+      const i = pad.querySelector("img.tagesimg").getBoundingClientRect();
+      const vw = Math.min(r.width, 0.85 * innerHeight * 16 / 9);
+      return { w: Math.round(r.width), h: Math.round(r.height), videoW: Math.round(vw), videoH: Math.round(vw * 9 / 16),
+        bild: [Math.round(i.left - r.left), Math.round(i.top - r.top), Math.round(i.width - r.width), Math.round(i.height - r.height)],
+        fit: getComputedStyle(pad.querySelector("img.tagesimg")).objectFit };
+    });
+    ok(m.h <= m.videoH + 1 && m.w <= m.videoW + 1, `B12 ${bw}×${bh}: Rahmen ${m.w}×${m.h} ist nicht größer als das Video (${m.videoW}×${m.videoH})`, JSON.stringify(m));
+    ok(m.bild.every((d) => Math.abs(d) <= 1) && m.fit === "cover", `B12 ${bw}×${bh}: das Bild füllt den Rahmen ohne Ränder`, JSON.stringify(m));
+    await c.close();
+  }
 } catch (e) {
   /* Eine Probe, die stolpert, ist ROT — mit dem Namen des Stolperns, und alles
      dahinter gilt als ungemessen. */
