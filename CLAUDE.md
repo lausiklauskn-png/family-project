@@ -1215,8 +1215,11 @@ ihren Namen. ⚠ Am Tablet nicht gemessen (Form des Rahmens auf dem DeX, Ende am
 
 Spieler byte-1:1 aus Family-Projekt.de-Video (SHA `bfc69ca9…460e`), `smoke_werbevideo`
 **89 grün** (B11 misst die vier Zusicherungen im Browser), Gegenprobe: **22 Fälle** (hier stand 23; gezählt sind 22) — Lauf 1: 20 schlagen an · 1 blind (MENUE) · 1 aus falschem Grund (TITEL) · 0 tot; beide geschärft. Lauf 2 (2026-10-06, Stand `f5b41c9`, je Fall eine Wegwerf-Kopie): **22 schlagen an · 0 blind · 0 aus falschem Grund · 0 tote Anker** — 15 im ersten Durchgang, der bei FORM an der Zeitgrenze abbrach, die übrigen 7 einzeln (`NUR_FALL="<NAME>:"`), Rückgabewert je 0.
-⚠ **Cache-Bump v142 → v143**, `ASSET_V` mitgezogen. ⚠ Am Tablet nicht gemessen
-(schlanke Leiste, Ausblenden mit dem Finger).
+⚠ **Cache-Bump v142 → v143**, `ASSET_V` mitgezogen.
+✅ **Klaus' Sichttest am Tablet (2026-10-06):** *„Ja, hat wunderbar funktioniert. Man sieht gar
+nichts mehr. So, genauso sollte es sein."* Hier stand: *„⚠ Am Tablet nicht gemessen (schlanke
+Leiste, Ausblenden mit dem Finger)."* Seine Auskunft gilt dem Ganzen (Leiste unten, Startbild);
+DeX hat er nicht getrennt genannt.
 
 ⚠ **Ein `NUR_ANKER=1`-Aufruf lief einmal als VOLLER Lauf im echten Baum** — das Skript
 kannte den Schalter nicht, und eine unbekannte Umgebungsvariable ist kein Fehler. Angehalten,
@@ -1240,7 +1243,17 @@ Gemessen (Rahmen mit hohem Bild ⟷ Video): 2000×1100 1016×571 ⟷ 1016×572 �
 907×510 ⟷ 907×510 · 360×740 316×178 ⟷ 316×178. Das Standardbild (2,5:1) bleibt unverändert.
 `smoke_werbevideo` B12 (105 grün) · Gegenprobe `STARTBILD:`/`STARTBREITE:` 2 schlagen an (STARTBREITE erst „aus falschem Grund“: das „×“ im Muster sind zwei Bytes). Cache v144.
 ⚠ Bei hohem Bild wird oben und unten beschnitten (`cover`) — ohne Ränder geht es nicht anders.
-⚠ Am Tablet nicht gemessen.
+✅ Klaus' Sichttest am Tablet (2026-10-06): in Ordnung. Hier stand: *„⚠ Am Tablet nicht gemessen."*
+
+### Die Leiste selbst ist unsichtbar (Klaus 2026-10-06)
+
+Klaus: *„es soll eigentlich nur der Play-Button und der Vollbild-Button stehen bleiben. Der
+Container selber soll unsichtbar sein."* `.vr-leiste` trägt keinen Grund und keinen Schatten
+mehr (`background:transparent; box-shadow:none`), die Zeit hat einen Text-Schatten, damit sie auf
+hellem Bild lesbar bleibt. Spieler byte-1:1 aus FP-Videos #10 (SHA `3e5c3b7c…a905a`).
+`smoke_werbevideo` B11 misst `rgba(0, 0, 0, 0) | none` bei 360×740, 740×360 und 1280×800;
+Gegenprobe `LEISTE:` schlägt an. Cache v145.
+✅ Am Tablet bestätigt (Klaus 2026-10-06, mit Bild: nur ▶ und Vollbild zu sehen).
 
 ## ≈ DER BEWEGUNGS-KNOPF SAGT, WAS IST (Klaus 2026-10-06)
 
