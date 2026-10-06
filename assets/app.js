@@ -996,6 +996,35 @@
      * Sorte, er sieht aus wie Hilfe. */
     var pb = document.getElementById("bgPauseBtn");
     if (pb) {
+      /* ── SEIT 2026-10-06 SAGT ER SEINEN ZUSTAND ALS WORT ──────────────
+       * Klaus: „oben der Button funktioniert nicht. Außerdem steht er auf
+       * Pause." Beides stimmte aus seiner Sicht: ⏸ hiess hier „läuft, Tippen
+       * hält an" — wie bei einem Video, und genau damit verwechselbar. Und
+       * nach der Selbst-Bremse oder ohne Grafikchip stand der Hintergrund,
+       * während der Knopf „läuft" zeigte; ein Tipp änderte nur einen Text,
+       * den niemand sieht.
+       * Jetzt: „≈ Bewegt" / „≈ Steht". Geht es auf dem Gerät nicht, wird er
+       * blass, und ein Tipp sagt den Grund SICHTBAR, für ein paar Sekunden. */
+      var grundZeit = 0;
+      var grundVon = function () {
+        if (window.MycelBgAus) return window.MycelBgAus;            /* grafikchip · fehler */
+        if (window.MycelBgPause && window.MycelBgPause.grund) return window.MycelBgPause.grund();
+        return "";
+      };
+      var GRUND = {
+        de: { grafikchip: "kein Grafikchip", fehler: "nicht geladen", reduziert: "Gerät: wenig Bewegung", gebremst: "zu langsam" },
+        en: { grafikchip: "no graphics chip", fehler: "not loaded", reduziert: "device: reduced motion", gebremst: "too slow" }
+      };
+      var GRUND_LANG = {
+        de: { grafikchip: "Der Hintergrund steht auf diesem Gerät still: es hat keinen Grafikchip.",
+              fehler: "Der bewegte Hintergrund ließ sich nicht laden.",
+              reduziert: "Am Gerät ist „weniger Bewegung“ eingestellt, deshalb steht der Hintergrund still.",
+              gebremst: "Der Hintergrund hat sich angehalten, weil das Gerät zu langsam war. Tippen versucht es noch einmal." },
+        en: { grafikchip: "The background stays still on this device: it has no graphics chip.",
+              fehler: "The moving background could not be loaded.",
+              reduziert: "Reduced motion is set on this device, so the background stays still.",
+              gebremst: "The background stopped because the device was too slow. Tap to try again." }
+      };
       var pauseNachziehen = function () {
         /* Der Hintergrund ist die Auskunft, sobald es ihn gibt. Vorher steht
            die Wahrheit im Speicher — und die ist sofort lesbar, auch wenn
@@ -1008,31 +1037,39 @@
           try { steht = localStorage.getItem("fp_bg_pause") === "ja"; }
           catch (_e) { steht = false; }
         }
+        var l = getLang() === "de" ? "de" : "en", de = l === "de";
+        var grund = grundVon();
+        if (grund) steht = true;
         var z = document.getElementById("bgPauseZeichen");
+        var w = document.getElementById("bgPauseWort");
         var n = document.getElementById("bgPauseName");
-        var de = getLang() === "de";
-        /* Nur das Zeichen ist sichtbar; das Wort steht fuer Vorleseprogramme
-           daneben und im `title`. Sonst waere der Knopf fuer Blinde stumm. */
-        var wort = de
-          ? (steht ? "Hintergrund-Bewegung fortsetzen" : "Hintergrund-Bewegung anhalten")
-          : (steht ? "resume background motion" : "pause background motion");
-        if (z) z.textContent = steht ? "\u25B6" : "\u23F8";
+        var wort = grund ? GRUND_LANG[l][grund] || ""
+          : de ? (steht ? "Hintergrund-Bewegung fortsetzen" : "Hintergrund-Bewegung anhalten")
+               : (steht ? "resume background motion" : "pause background motion");
+        if (z) z.textContent = "\u2248";
+        if (w && Date.now() > grundZeit) w.textContent = de ? (steht ? "Steht" : "Bewegt") : (steht ? "Still" : "Moving");
         if (n) n.textContent = wort;
+        pb.classList.toggle("bg-aus", !!grund);
         pb.setAttribute("title", wort);
         pb.setAttribute("aria-pressed", steht ? "true" : "false");
-        pb.setAttribute("aria-label", wort);
+        pb.setAttribute("aria-label", (de ? "Hintergrund: " : "background: ") + (steht ? (de ? "steht. " : "still. ") : (de ? "bewegt sich. " : "moving. ")) + wort);
       };
       alsKnopf(pb, function () {
-        if (!window.MycelBgPause) {
-          /* Kein bewegter Hintergrund auf diesem Geraet. Der Knopf sagt es
-             an sich selbst, statt stumm zu bleiben oder eine Meldung zu
-             rufen, die es nicht gibt. */
-          var wort0 = getLang() === "de"
-            ? "Der Hintergrund steht auf diesem Geraet ohnehin still."
-            : "The background is already still on this device.";
-          var n0 = document.getElementById("bgPauseName");
-          if (n0) n0.textContent = wort0;
-          pb.setAttribute("title", wort0);
+        var grund = grundVon();
+        if (!window.MycelBgPause || (grund && grund !== "gebremst")) {
+          /* Es geht hier nicht. Der Knopf sagt es SICHTBAR, statt still zu
+             bleiben: ein toter Knopf mit Beschriftung sieht aus wie Hilfe. */
+          var l = getLang() === "de" ? "de" : "en";
+          var w0 = document.getElementById("bgPauseWort");
+          var g = grund || "grafikchip";
+          if (!window.MycelBgPause && !window.MycelBgAus) g = "";   /* noch nicht geladen: einfach merken */
+          if (!g) {
+            try { localStorage.setItem("fp_bg_pause", localStorage.getItem("fp_bg_pause") === "ja" ? "nein" : "ja"); } catch (_e) {}
+            pauseNachziehen();
+            return;
+          }
+          if (w0) { w0.textContent = GRUND[l][g]; grundZeit = Date.now() + 4000; setTimeout(pauseNachziehen, 4100); }
+          pauseNachziehen();
           return;
         }
         window.MycelBgPause.umschalten();
@@ -1044,10 +1081,11 @@
       });
       /* Der Hintergrund wird erst nach `load` und im Leerlauf geholt. Beim
          ersten Nachziehen gibt es ihn also meistens noch nicht — deshalb
-         meldet er sich, wenn er da ist. Eine feste Wartezeit waere ein
-         Rennen: kommt er spaeter, stuende der Knopf dauerhaft falsch. */
+         meldet er sich, wenn er da ist, und wieder, wenn er sich anhält
+         (Selbst-Bremse) oder gar nicht kommt (kein Grafikchip, Ladefehler). */
       pauseNachziehen();
       global.addEventListener("fp:bg-bereit", pauseNachziehen);
+      global.addEventListener("fp:bg-zustand", pauseNachziehen);
       global.addEventListener("fp:lang", pauseNachziehen);
     }
 

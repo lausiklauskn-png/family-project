@@ -440,7 +440,11 @@ if (canvas) {
     if (bilderGezaehlt++ >= AUFWAERM_BILDER) {
       if (dt > BREMS_SCHWELLE) langsamInFolge++; else langsamInFolge = 0;
       if (langsamInFolge >= BREMS_GEDULD) {
+        gebremst = true;
         schleifeAnhalten();
+        /* Der Knopf muss es erfahren: bis 2026-10-06 zeigte er nach der
+           Bremse weiter „läuft", und ein Tipp darauf änderte sichtbar nichts. */
+        meldeZustand();
         return;                  // Schleife endet — kein Dauerlauf mehr
       }
     }
@@ -472,20 +476,32 @@ if (canvas) {
   let pausiert = false;
   try { pausiert = localStorage.getItem(PAUSE_SCHLUESSEL) === 'ja'; } catch (_e) {}
 
-  let laeuft = false;
+  let laeuft = false, gebremst = false;
+  function meldeZustand() { try { window.dispatchEvent(new Event('fp:bg-zustand')); } catch (_e) {} }
   function schleifeStarten() {
     if (laeuft || pausiert || reduce) return;
     laeuft = true;
+    gebremst = false;
     last = performance.now();
     langsamInFolge = 0; bilderGezaehlt = 0;   // Bremse neu bewerten
     requestAnimationFrame(tick);
   }
 
   window.MycelBgPause = {
-    /** Wahr, wenn der Hintergrund gerade steht. */
-    steht: function () { return pausiert || reduce; },
+    /** Wahr, wenn der Hintergrund gerade steht — aus WELCHEM Grund auch immer.
+     *  Die Selbst-Bremse zählt mit: vorher sagte der Knopf nach ihr „läuft". */
+    steht: function () { return pausiert || reduce || gebremst; },
+    /** Warum er steht, wenn nicht der Knopf es war: "reduziert" · "gebremst" · "". */
+    grund: function () { return reduce ? 'reduziert' : (gebremst && !pausiert ? 'gebremst' : ''); },
     /** Umschalten. Gibt den neuen Zustand zurueck. */
     umschalten: function () {
+      /* Nach der Bremse heißt ein Tipp: „ich will Bewegung" — nicht „anhalten".
+         Die Bremse wertet neu; ist das Gerät zu langsam, greift sie wieder. */
+      if (gebremst && !pausiert) {
+        gebremst = false;
+        schleifeStarten();
+        return false;
+      }
       pausiert = !pausiert;
       try { localStorage.setItem(PAUSE_SCHLUESSEL, pausiert ? 'ja' : 'nein'); } catch (_e) {}
       if (pausiert) schleifeAnhalten();
@@ -531,14 +547,23 @@ if (canvas) {
   /* Ohne Grafikchip wird three.js gar nicht erst geholt — 165 KiB, die auf
    * so einem Geraet nichts mehr ausrichten koennten. */
   const los = () => {
-    if (keinGrafikchip()) return;
+    if (keinGrafikchip()) {
+      /* Der Knopf in der Kopfleiste soll es SAGEN, statt ein „läuft" zu zeigen. */
+      window.MycelBgAus = 'grafikchip';
+      try { window.dispatchEvent(new Event('fp:bg-zustand')); } catch (_e) {}
+      return;
+    }
     import('three')
       .then((m) => { mycelBgStarten(m); if (window.MycelBg) { try { window.MycelBg.setTheme(); } catch (_e) {} } })
       /* Der Hintergrund ist Zierde: faellt er aus, laeuft die Seite weiter.
        * Aber er faellt nicht STUMM aus — ein verschluckter Startfehler war
        * am 2026-09-02 der Grund, warum der Pause-Schalter bei "Bewegung
        * reduzieren" fehlte und keine Probe es sah. */
-      .catch((e) => { try { console.warn('[mycel-bg] nicht gestartet:', e); } catch (_e) {} });
+      .catch((e) => {
+        try { console.warn('[mycel-bg] nicht gestartet:', e); } catch (_e) {}
+        window.MycelBgAus = 'fehler';
+        try { window.dispatchEvent(new Event('fp:bg-zustand')); } catch (_e) {}
+      });
   };
   const gleich = () => (window.requestIdleCallback
     ? requestIdleCallback(los, { timeout: 2000 })
