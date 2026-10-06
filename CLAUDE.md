@@ -1204,6 +1204,26 @@ Gegenprobe: `FORM:` · `ENDE:` · `PUNKTE:` schlagen alle an, jede rote Zeile tr
 ihren Namen. ⚠ Am Tablet nicht gemessen (Form des Rahmens auf dem DeX, Ende am Gerät).
 ⚠ **Cache-Bump v140 → v141**, `ASSET_V` mitgezogen.
 
+### Die schlanke Leiste (Klaus 2026-10-06)
+
+| | |
+|---|---|
+| **Leiste tritt zurück** | beim Abspielen nach `LEISE_MS` (2,5 s) → `data-vr-leise`; nicht während Menü, Ziehen oder Pause |
+| **ein Tipp holt sie** | ist sie zurückgetreten, holt ein Tipp aufs Video sie wieder (`wach()`), statt anzuhalten |
+| **Qualität** | „720p" verschwindet nach `QUAL_MS` (2 s) |
+| **Titel** | der Name des Videos steht nicht mehr sichtbar da, nur „weiter bei mm:ss", wenn eine Stelle gemerkt ist |
+
+Spieler byte-1:1 aus Family-Projekt.de-Video (SHA `bfc69ca9…460e`), `smoke_werbevideo`
+**89 grün** (B11 misst die vier Zusicherungen im Browser), Gegenprobe: **22 Fälle** (hier stand 23; gezählt sind 22) — Lauf 1: 20 schlagen an · 1 blind (MENUE) · 1 aus falschem Grund (TITEL) · 0 tot; beide geschärft. Lauf 2 (2026-10-06, Stand `f5b41c9`, je Fall eine Wegwerf-Kopie): **22 schlagen an · 0 blind · 0 aus falschem Grund · 0 tote Anker** — 15 im ersten Durchgang, der bei FORM an der Zeitgrenze abbrach, die übrigen 7 einzeln (`NUR_FALL="<NAME>:"`), Rückgabewert je 0.
+⚠ **Cache-Bump v142 → v143**, `ASSET_V` mitgezogen. ⚠ Am Tablet nicht gemessen
+(schlanke Leiste, Ausblenden mit dem Finger).
+
+⚠ **Ein `NUR_ANKER=1`-Aufruf lief einmal als VOLLER Lauf im echten Baum** — das Skript
+kannte den Schalter nicht, und eine unbekannte Umgebungsvariable ist kein Fehler. Angehalten,
+aus der Sicherung zurückgelegt. Seitdem kennt `gegenprobe_werbevideo.sh` `NUR_ANKER` (prüft
+jeden Anker auf genau einen Treffer, fasst den Baum nicht an). *Wer einen Schalter benutzt,
+sieht zuerst nach, ob das Skript ihn kennt.*
+
 ## ≈ DER BEWEGUNGS-KNOPF SAGT, WAS IST (Klaus 2026-10-06)
 
 Klaus: *„oben der Button funktioniert nicht. Außerdem steht er auf Pause."*

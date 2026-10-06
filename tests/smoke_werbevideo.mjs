@@ -31,7 +31,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";
 const PIN = {
   "assets/abspielen-kern.js": "8cfd9c05816c7c5519fe5799a644944c9346c36f578ec3176f720f8c3eed702d",
-  "assets/abspielen-rahmen.js": "c0bc33335711bc65fb43d6b30b5a4d8073a424383bd200f56bb5bf0f4cbf992c"
+  "assets/abspielen-rahmen.js": "bfc69ca9289eec392c3b52bd56ab4ea70220a6aa34c417b564d5e75483e9460e"
 };
 let gruen = 0, rot = 0, stumm = 0;
 const ok = (c, m, mehr) => { if (c) { gruen++; console.log("  ✓", m); } else { rot++; console.log("  ✗ ROT:", m + (mehr !== undefined ? "  → " + mehr : "")); } };
@@ -145,8 +145,8 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch({ executablePath: exe, args: ["--no-sandbox", "--autoplay-policy=no-user-gesture-required"] });
 
 const abrufe = [];   /* jeder Abruf an die Video-Seite, auch aus dem Worker */
-async function neuerKontext(breite) {
-  const ctx = await browser.newContext({ viewport: { width: breite, height: 800 }, serviceWorkers: "allow" });
+async function neuerKontext(breite, hoehe = 800, extra = {}) {
+  const ctx = await browser.newContext({ viewport: { width: breite, height: hoehe }, serviceWorkers: "allow", ...extra });
   /* Fremdes aus dem Netz (Schriften, Relais, Modelle) bleibt draußen; nur die Video-Seite wird gestellt. */
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, async (route) => {
     const u = route.request().url();
@@ -256,6 +256,7 @@ try {
   await p.evaluate(() => window.scrollTo(0, 0));
 
   /* B5 · Menü: drei Qualitäten, drei Downloads mit Größe, Wechsel behält die Stelle */
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-mehr");
   ok(await bis(p, () => [...document.querySelectorAll("#tagesbildPad .vr-laden")].every((a) => / MB$/.test(a.textContent)), null, 5000),
     "das Menü nennt die Größen aus der Liste der Video-Seite");
@@ -277,32 +278,41 @@ try {
     v.addEventListener("timeupdate", f);
   });
   const vorWechsel = (await zustand(p)).t;
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click('#tagesbildPad .vr-fassung[data-fassung="werbevideo-67s-480p"]');
   const wechselDa = await bis(p, () => window.__ersteNachWechsel !== null && !window.__rahmenSpieler[0].vid.paused, null, 20000);
   const erste = await p.evaluate(() => window.__ersteNachWechsel);
   ok(wechselDa && vorWechsel > 1 && erste >= vorWechsel - 1,
     "Qualität wechseln: 480p, läuft weiter an derselben Stelle", `vorher ${vorWechsel.toFixed(1)} s · erste Meldung danach ${erste === null ? "keine" : erste.toFixed(1) + " s"}`);
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-zu");
 
   /* B6 · Vollbild und zurück: läuft weiter */
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-voll");
   const vollAn = await bis(p, () => document.fullscreenElement === document.getElementById("tagesbildPad"), null, 5000);
   if (!vollAn) nichtLauffaehig("Vollbild", "der Testbrowser hat kein Vollbild gewährt");
   else {
+    await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
     const lv = await p.evaluate(() => { const l = document.querySelector("#tagesbildPad .vr-leiste").getBoundingClientRect(); return { b: l.width, sichtbar: l.height > 0 }; });
     ok(lv.sichtbar && lv.b > 300, "im Vollbild ist dieselbe Bedienung da, breit", lv.b);
     /* ±10 s: in der Leiste, wenn sie breit genug ist — sonst im Menü. Erreichbar sein müssen sie immer. */
+    await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
     const inLeiste = await p.isVisible("#tagesbildPad .vr-zurueck");
     let imMenue = false;
     if (!inLeiste) {
       const vor = (await zustand(p)).t;
+      await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
       await p.click("#tagesbildPad .vr-mehr");
+      await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
       await p.click('#tagesbildPad .vr-spring[data-sprung="10"]');
       await warte(200);
       imMenue = (await zustand(p)).t >= vor + 9;
+      await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
       await p.click("#tagesbildPad .vr-zu");
     }
     ok(inLeiste || imMenue, "im Vollbild sind ±10 s erreichbar (" + (inLeiste ? "in der Leiste" : "im Menü, weil hochkant schmal") + ")");
+    await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
     await p.click("#tagesbildPad .vr-voll");
     await bis(p, () => !document.fullscreenElement, null, 5000);
     const t1 = (await zustand(p)).t; await warte(1000); z = await zustand(p);
@@ -310,6 +320,7 @@ try {
   }
 
   /* B7 · Anhalten merkt die Stelle, neu laden bietet „weiter bei“ an */
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-spielen");
   await warte(300);
   z = await zustand(p);
@@ -319,11 +330,13 @@ try {
   await bis(p, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
   z = await zustand(p);
   ok(z.zustand === "ruhe" && /weiter bei/.test(z.titel), "nach dem Neuladen: kein Selbststart, aber „weiter bei …“", z.titel);
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-spielen");
   ok(gemerkt > 2 && await bis(p, (t) => { const s = window.__rahmenSpieler[0]; return !s.vid.paused && s.vid.currentTime >= t - 1; }, gemerkt, 20000),
     "nach dem Zurückkommen läuft es an der gemerkten Stelle weiter", `${gemerkt} → ${(await zustand(p)).t.toFixed(1)}`);
 
   /* B8 · Stopp: Bild wieder da, Quelle weg, kein Laden mehr, Stelle vergessen */
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-stopp");
   await warte(300);
   z = await zustand(p);
@@ -340,6 +353,7 @@ try {
     const c = await neuerKontext(380); const q = await c.newPage();
     await q.goto(base + "/index.html", { waitUntil: "load" });
     await bis(q, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
+    await q.evaluate(() => window.__rahmenSpieler[0].zeigen());
     await q.click("#tagesbildPad .vr-spielen");
     const lief = await bis(q, () => { const s = window.__rahmenSpieler[0]; return !s.vid.paused && s.vid.currentTime > 0.5 && s.vid.duration > 3; }, null, 25000);
     ok(lief, "B10: das Video läuft an");
@@ -354,13 +368,77 @@ try {
     await c.close();
   }
 
+  /* B11 · die schlanke Leiste (Klaus 2026-10-06): in Ruhe nur ▶ und ⛶, beim
+     Abspielen tritt sie nach 2,5 s zurück, ein Tipp holt sie wieder, „720p“
+     steht 2 s da. Gemessen bei 360×740 und 740×360 mit Finger, 1280×800 mit Maus.
+     Gestartet wird mit element.click(): eine Maus über dem Rahmen hielte die
+     Leiste wach, und gemessen wäre dann das Wachhalten statt das Zurücktreten. */
+  for (const [b, h, finger] of [[360, 740, true], [740, 360, true], [1280, 800, false]]) {
+    const groesse = `${b}×${h}`;
+    const c = await neuerKontext(b, h, finger ? { hasTouch: true, isMobile: true } : {}); const q = await c.newPage();
+    await q.goto(base + "/index.html", { waitUntil: "load" });
+    await bis(q, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
+    const ruhe = await q.evaluate(() => {
+      const pad = document.getElementById("tagesbildPad");
+      return { knoepfe: [...pad.querySelectorAll(".vr-leiste button")].filter((x) => x.offsetParent).map((x) => x.className.replace(/^vr-| .*$/g, "")),
+        text: pad.innerText };
+    });
+    ok(ruhe.knoepfe.join(" ") === "spielen voll", `${groesse}: in Ruhe stehen nur ▶ und ⛶ in der Leiste`, ruhe.knoepfe.join(" "));
+    ok(!/werbevideo/i.test(ruhe.text), `${groesse}: das Wort „Werbevideo“ steht nicht im sichtbaren Text`, JSON.stringify(ruhe.text));
+    await q.evaluate(() => document.querySelector("#tagesbildPad .vr-spielen").click());
+    const lief = await bis(q, () => { const s = window.__rahmenSpieler[0]; return !s.vid.paused && s.vid.currentTime > 0.3; }, null, 25000);
+    ok(lief, `${groesse}: das Video läuft an`);
+    const qualDa = await bis(q, () => { const e = document.querySelector("#tagesbildPad .vr-qual"); return e && !e.hidden && /720p/.test(e.textContent); }, null, 5000);
+    ok(qualDa, `${groesse}: „720p“ steht nach dem Start da`);
+    const qualWeg = await bis(q, () => { const e = document.querySelector("#tagesbildPad .vr-qual"); return e && e.hidden; }, null, 4500);
+    ok(qualDa && qualWeg, `${groesse}: „720p“ verschwindet nach 2 s wieder`);
+    const t0 = Date.now();
+    const leise = await bis(q, () => window.__rahmenSpieler[0].leise(), null, 5000);
+    await warte(450);
+    const op = await q.evaluate(() => getComputedStyle(document.querySelector("#tagesbildPad .vr-leiste")).opacity);
+    ok(leise && op === "0", `${groesse}: beim Abspielen tritt die Leiste zurück`, `nach ${Date.now() - t0} ms, Deckkraft ${op}`);
+    if (finger) {
+      const ort = await q.evaluate(() => { const r = window.__rahmenSpieler[0].vid.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height * 0.35 }; });
+      await q.touchscreen.tap(ort.x, ort.y); await warte(300);
+      let z2 = await zustand(q);
+      ok(!(await q.evaluate(() => window.__rahmenSpieler[0].leise())) && !z2.paused && !z2.modal,
+        `${groesse}: ein Tipp aufs Video holt die Leiste zurück — es läuft weiter`, JSON.stringify({ paused: z2.paused, modal: z2.modal }));
+      for (let i = 0; i < 4; i++) { await q.touchscreen.tap(ort.x, ort.y); await warte(120); }
+      await warte(300); z2 = await zustand(q);
+      ok(!z2.modal, `${groesse}: Tipps aufs Video zählen nicht zum Fünffach-Tipp aufs Bild`);
+    } else {
+      await q.mouse.move(b / 2, 50); await q.mouse.move(b / 2, 60);
+      const pad = await q.evaluate(() => { const r = document.getElementById("tagesbildPad").getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; });
+      await q.mouse.move(pad.x, pad.y, { steps: 3 }); await warte(200);
+      ok(!(await q.evaluate(() => window.__rahmenSpieler[0].leise())), `${groesse}: die Maus über dem Video holt die Leiste zurück`);
+    }
+    /* angehalten und mit offenem Menü bleibt sie stehen */
+    await q.evaluate(() => { const s = window.__rahmenSpieler[0]; s.zeigen(); if (!s.vid.paused) s.rahmen.querySelector(".vr-spielen").click(); });
+    await warte(3200);
+    ok(!(await q.evaluate(() => window.__rahmenSpieler[0].leise())), `${groesse}: angehalten bleibt die Leiste stehen`);
+    await q.evaluate(() => { const s = window.__rahmenSpieler[0]; s.rahmen.querySelector(".vr-spielen").click(); s.rahmen.querySelector(".vr-mehr").click(); });
+    await warte(3200);
+    ok(!(await q.evaluate(() => window.__rahmenSpieler[0].leise())), `${groesse}: mit offenem Menü bleibt die Leiste stehen`);
+    await c.close();
+  }
+  {
+    const c = await neuerKontext(380, 800, { reducedMotion: "reduce" }); const q = await c.newPage();
+    await q.goto(base + "/index.html", { waitUntil: "load" });
+    await bis(q, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
+    const tr = await q.evaluate(() => getComputedStyle(document.querySelector("#tagesbildPad .vr-leiste")).transitionDuration);
+    ok(/^0s(, 0s)*$/.test(tr), "bei „weniger Bewegung“ tritt die Leiste ohne Überblendung zurück", tr);
+    await c.close();
+  }
+
   /* B9 · schmale Handys: alles passt, nichts abgeschnitten */
   for (const breite of [320, 360, 380, 412]) {
     const c = await neuerKontext(breite); const q = await c.newPage();
     await q.goto(base + "/index.html", { waitUntil: "load" });
     await bis(q, () => window.__rahmenSpieler && window.__rahmenSpieler.length === 1);
+    await q.evaluate(() => window.__rahmenSpieler[0].zeigen());
     await q.click("#tagesbildPad .vr-spielen");
     await bis(q, () => window.__rahmenSpieler[0].zustand() !== "ruhe" && !window.__rahmenSpieler[0].vid.paused, null, 20000);
+    await q.evaluate(() => window.__rahmenSpieler[0].zeigen());
     const m = await q.evaluate(() => {
       const pad = document.getElementById("tagesbildPad"), r = pad.getBoundingClientRect();
       const sicht = [...pad.querySelectorAll(".vr-leiste > *")].filter((e) => e.offsetParent);
@@ -371,10 +449,21 @@ try {
     });
     ok(m.raus.length === 0 && m.knapp.length === 0 && m.zeit >= 30 && m.seite,
       `${breite} px: Leiste passt in den Rahmen, kein Knopf abgeschnitten, Ladebalken ${m.zeit} px breit`, JSON.stringify(m));
+    await q.evaluate(() => window.__rahmenSpieler[0].zeigen());
     await q.click("#tagesbildPad .vr-mehr");
     await bis(q, () => document.querySelectorAll("#tagesbildPad .vr-laden").length === 3, null, 5000);
-    const mh = await q.evaluate(() => { const m = document.querySelector("#tagesbildPad .vr-menue"); return { voll: m.scrollHeight, sicht: m.clientHeight }; });
-    ok(mh.voll <= mh.sicht + 1, `${breite} px: das Menü passt ohne Rollen in den Rahmen`, JSON.stringify(mh));
+    const mh = await q.evaluate(() => {
+      const m = document.querySelector("#tagesbildPad .vr-menue");
+      // Eine Zeile, deren Knöpfe umbrechen, ist höher als ihr höchster Knopf.
+      const zeilen = [...m.querySelectorAll(".vr-zeile")].filter((z) => z.offsetParent).map((z) => {
+        const k = [...z.querySelectorAll("button,a")].filter((b) => b.offsetParent);
+        const hoch = k.length ? Math.max(...k.map((b) => b.getBoundingClientRect().height)) : 0;
+        return { h: Math.round(z.getBoundingClientRect().height), hoch: Math.round(hoch) };
+      });
+      return { voll: m.scrollHeight, sicht: m.clientHeight, breitVoll: m.scrollWidth, breitSicht: m.clientWidth, zeilen };
+    });
+    ok(mh.voll <= mh.sicht + 1 && mh.breitVoll <= mh.breitSicht + 1, `${breite} px: das Menü passt ohne Rollen in den Rahmen`, JSON.stringify(mh));
+    ok(mh.zeilen.length > 0 && mh.zeilen.every((z) => z.h <= z.hoch + 4), `${breite} px: jede Zeile im Menü steht einreihig, kein Knopf bricht um`, JSON.stringify(mh.zeilen));
     await c.close();
   }
 } catch (e) {

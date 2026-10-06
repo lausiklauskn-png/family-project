@@ -22,11 +22,11 @@
  * bis ans Ende des Teils, nächster Teil vorgeholt, höchstens drei Teile im
  * Arbeitsspeicher, NIE in der Cache Storage. Fehlt der Kern, bleibt alles
  * andere am Worker heil (try), und das Video sagt im Rahmen, dass es hier nicht geht. */
-try { importScripts("assets/abspielen-kern.js?v=142"); } catch (_e) {}
+try { importScripts("assets/abspielen-kern.js?v=143"); } catch (_e) {}
 var VIDEO_BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";
 var VIDEO_WEG = /^\/werbevideo\/([a-z0-9][a-z0-9-]{1,59})\.mp4$/;
 
-var CACHE_VERSION = "family-projekt-v142";
+var CACHE_VERSION = "family-projekt-v143";
 
 /* ⚠ NUR EIGENE VORRAETE AUFRAEUMEN — `caches` gehoert dem URSPRUNG, nicht dem
  * Pfad. Auf lausiklauskn-png.github.io liegen rund zwanzig Apps; ein Filter,
@@ -51,7 +51,7 @@ var VORRAT_PRAEFIX = "family-projekt-";
 // Datei-Alters. Anderer Mechanismus, gleiche Wirkung, gleiche Gegenmaßnahme.
 // Merke: eine Vorlage im Repo ist kein Beweis für den Server.
 // tests/smoke_cache_version.mjs prüft, dass alles zusammenpasst.
-var ASSET_V = "142";
+var ASSET_V = "143";
 // Absichtlich NICHT mehr im Vorrat (Messung 2026-08-02):
 //
 // 1. "og-image.png" (386 KiB). Das ist das Vorschaubild für geteilte Links.
@@ -71,11 +71,11 @@ var ASSET_V = "142";
 var CORE = [
   "index.html", "netzwerk.html", "werkzeuge.html", "markt.html", "impressum.html", "sicherheit.html",
   // ?v= muss zur ASSET_V unten passen — die Seiten fordern genau diese Adressen an.
-  "assets/style.css?v=142", "assets/app.js?v=142", "assets/notranslate.js?v=142", "assets/status-widget.js?v=142",
+  "assets/style.css?v=143", "assets/app.js?v=143", "assets/notranslate.js?v=143", "assets/status-widget.js?v=143",
   "assets/tool-landing.js", "assets/sbkim-siegel-wappen.svg",
   // Das Werbevideo (2026-10-06): der Kern für den Worker und der Spieler im
   // Startseiten-Rahmen. Beide klein; das Video selbst steht NIE im Vorrat.
-  "assets/abspielen-kern.js?v=142", "assets/abspielen-rahmen.js?v=142",
+  "assets/abspielen-kern.js?v=143", "assets/abspielen-rahmen.js?v=143",
   "manifest.json", "icon-192.png", "icon-512.png",
   // Die KI-Schulung (2026-09-17): der Rahmen und die byte-gleiche Kopie der
   // Unterlage — eine Datei, die selbst nichts nachlädt und die ein Betrieb auch
