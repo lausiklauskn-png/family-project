@@ -188,6 +188,11 @@ fall 'STARTBREITE: der Rahmen ist im flachen Fenster breiter als das Video' asse
   'aspect-ratio:16/5;max-width:calc(85vh * 16 / 9);' 'aspect-ratio:16/5;' \
   '600: Rahmen .* als das Video'
 
+# Die Leiste selbst ist unsichtbar, nur ▶ und ⛶ tragen Grund (Klaus 2026-10-06).
+fall 'LEISTE: die Leiste traegt wieder einen dunklen Streifen von Knopf zu Knopf' assets/abspielen-rahmen.js \
+  'background:transparent;box-shadow:none;' 'background:rgba(6,10,16,.66);' \
+  'die Leiste selbst ist unsichtbar'
+
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"
 rm -f "$LAUF"
