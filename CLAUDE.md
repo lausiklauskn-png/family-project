@@ -1214,7 +1214,7 @@ ihren Namen. ⚠ Am Tablet nicht gemessen (Form des Rahmens auf dem DeX, Ende am
 | **Titel** | der Name des Videos steht nicht mehr sichtbar da, nur „weiter bei mm:ss", wenn eine Stelle gemerkt ist |
 
 Spieler byte-1:1 aus Family-Projekt.de-Video (SHA `bfc69ca9…460e`), `smoke_werbevideo`
-**89 grün** (B11 misst die vier Zusicherungen im Browser), Gegenprobe: 23 Fälle, der volle Lauf steht noch aus.
+**89 grün** (B11 misst die vier Zusicherungen im Browser), Gegenprobe: **22 Fälle** (hier stand 23; gezählt sind 22) — Lauf 1: 20 schlagen an · 1 blind (MENUE) · 1 aus falschem Grund (TITEL) · 0 tot; beide geschärft. Lauf 2 (2026-10-06, Stand `f5b41c9`, je Fall eine Wegwerf-Kopie): **22 schlagen an · 0 blind · 0 aus falschem Grund · 0 tote Anker** — 15 im ersten Durchgang, der bei FORM an der Zeitgrenze abbrach, die übrigen 7 einzeln (`NUR_FALL="<NAME>:"`), Rückgabewert je 0.
 ⚠ **Cache-Bump v142 → v143**, `ASSET_V` mitgezogen. ⚠ Am Tablet nicht gemessen
 (schlanke Leiste, Ausblenden mit dem Finger).
 
