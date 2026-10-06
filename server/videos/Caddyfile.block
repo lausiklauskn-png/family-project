@@ -1,0 +1,5 @@
+
+# Videos der Apps (Spiegel von github.io, siehe family-project/server/videos/)
+videos.family-projekt.de {
+	reverse_proxy videos:80
+}
