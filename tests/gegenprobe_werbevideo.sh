@@ -193,6 +193,19 @@ fall 'LEISTE: die Leiste traegt wieder einen dunklen Streifen von Knopf zu Knopf
   'background:transparent;box-shadow:none;' 'background:rgba(6,10,16,.66);' \
   'die Leiste selbst ist unsichtbar'
 
+# Klaus 2026-10-06: „die Punkte sind nicht zu sehen", „laedt viel laenger als 67 s".
+fall 'PUNKTEGROESSE: der Kreis ist wieder 14 px mit 3-px-Punkten' assets/abspielen-rahmen.js \
+  'width:24px;height:24px;margin-right:8px;' 'width:14px;height:14px;margin-right:8px;' \
+  'PUNKTE: der Kreis'
+
+fall 'PUNKTEZEIT: die Warte-Pille blitzt beim ersten Bild nur auf' assets/abspielen-rahmen.js \
+  'var WARTE_MIN_MS = 800,' 'var WARTE_MIN_MS = 0,' \
+  'PUNKTE: die Warte-Pille'
+
+fall 'LADENPAUSE: ein Tipp auf Herunterladen laesst das Video weiterlaufen' assets/abspielen-rahmen.js \
+  'if (zustand !== "ruhe" && !vid.paused) { vid.pause(); merke(); zeichne(); }' '' \
+  'LADENPAUSE:'
+
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"
 rm -f "$LAUF"

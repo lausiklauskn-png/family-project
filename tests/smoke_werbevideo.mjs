@@ -30,8 +30,8 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const BASIS = "https://lausiklauskn-png.github.io/Family-Projekt.de-Video/";
 const PIN = {
-  "assets/abspielen-kern.js": "8cfd9c05816c7c5519fe5799a644944c9346c36f578ec3176f720f8c3eed702d",
-  "assets/abspielen-rahmen.js": "3e5c3b7c2460658166d715d62ec513428e9aafa9179ca5ebcde2bc01aa5a905a"
+  "assets/abspielen-kern.js": "29f72bdc6fa03294bf0ee1e96881e57dc71c385c4f082aca2fd5dae01f723bc8",
+  "assets/abspielen-rahmen.js": "7b7d8c6fe6b306eb3028c13569540dcd0b21b39c3ea90ed2d848cb41f680e2f1"
 };
 let gruen = 0, rot = 0, stumm = 0;
 const ok = (c, m, mehr) => { if (c) { gruen++; console.log("  ✓", m); } else { rot++; console.log("  ✗ ROT:", m + (mehr !== undefined ? "  → " + mehr : "")); } };
@@ -211,6 +211,18 @@ try {
     const sieh = () => { pad.querySelectorAll(".vr-punkte").forEach((e) => {
       if (e.offsetParent && e.querySelectorAll("i").length === 8) window.__punkteGesehen++; }); };
     new MutationObserver(sieh).observe(pad, { subtree: true, childList: true, attributes: true, attributeFilter: ["hidden"] });
+    /* Klaus 2026-10-06: „die Punkte sind nicht zu sehen". Gemessen werden die
+       Größe des Kreises und wie lange die Warte-Pille am Stück steht. */
+    window.__punkteMass = { w: 0, i: 0 }; window.__warteMs = 0;
+    let seit = 0;
+    const warte = pad.querySelector(".vr-warte");
+    if (warte) new MutationObserver(() => {
+      if (!warte.hidden) {
+        if (!seit) seit = performance.now();
+        const k = warte.querySelector(".vr-punkte"), i = k && k.querySelector("i");
+        if (k && i) { const a = k.getBoundingClientRect(), b = i.getBoundingClientRect(); window.__punkteMass = { w: Math.max(window.__punkteMass.w, a.width), i: Math.max(window.__punkteMass.i, b.width) }; }
+      } else if (seit) { window.__warteMs = Math.max(window.__warteMs, performance.now() - seit); seit = 0; }
+    }).observe(warte, { attributes: true, attributeFilter: ["hidden"] });
   });
   await p.click("#tagesbildPad .vr-spielen");
   ok(await bis(p, () => { const s = window.__rahmenSpieler[0]; return s.vid.currentTime > 1 && !s.vid.paused; }, null, 25000),
@@ -221,6 +233,9 @@ try {
   ok(abrufe.some((a) => /teil-\d\d\.bin$/.test(a.rel)), "die Teile kommen von der Video-Seite");
   ok(fehler.length === 0, "keine Skriptfehler auf der Seite", fehler.join(" | "));
   ok(await p.evaluate(() => window.__punkteGesehen > 0), "beim Laden kreisen Punkte (acht, sichtbar) — man sieht, dass es noch lädt");
+  const pm = await p.evaluate(() => ({ ...window.__punkteMass, ms: Math.round(window.__warteMs) }));
+  ok(pm.w >= 22 && pm.i >= 4, "PUNKTE: der Kreis ist groß genug, um ihn zu sehen (≥ 22 px, Punkte ≥ 4 px)", JSON.stringify(pm));
+  ok(pm.ms >= 750, "PUNKTE: die Warte-Pille steht mindestens 0,8 s, statt nur aufzublitzen", JSON.stringify(pm));
   const form = await p.evaluate(() => {
     const s = window.__rahmenSpieler[0], r = s.rahmen.getBoundingClientRect(), v = s.vid.getBoundingClientRect();
     return { rahmen: r.width / r.height, film: s.vid.videoWidth / s.vid.videoHeight, vb: v.width / r.width, vh: v.height / r.height,
@@ -284,6 +299,21 @@ try {
   const erste = await p.evaluate(() => window.__ersteNachWechsel);
   ok(wechselDa && vorWechsel > 1 && erste >= vorWechsel - 1,
     "Qualität wechseln: 480p, läuft weiter an derselben Stelle", `vorher ${vorWechsel.toFixed(1)} s · erste Meldung danach ${erste === null ? "keine" : erste.toFixed(1) + " s"}`);
+  /* Herunterladen und Abspielen teilen sich die Leitung: ein Tipp auf einen
+     Download hält das Video an (Klaus 2026-10-06: „lädt viel länger als 67 s").
+     Das neue Fenster wird abgefangen — gemessen wird nur der Spieler. */
+  await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
+  const ladenPause = await p.evaluate(() => {
+    const v = window.__rahmenSpieler[0].vid, vorher = !v.paused;
+    const halt = (e) => e.preventDefault();
+    document.addEventListener("click", halt, true);
+    document.querySelector('#tagesbildPad .vr-laden[data-fassung="werbevideo-67s"]').click();
+    document.removeEventListener("click", halt, true);
+    return { vorher, nachher: v.paused };
+  });
+  ok(ladenPause.vorher && ladenPause.nachher, "LADENPAUSE: ein Tipp auf Herunterladen hält das laufende Video an", JSON.stringify(ladenPause));
+  await p.evaluate(() => window.__rahmenSpieler[0].vid.play().catch(() => {}));
+  await bis(p, () => !window.__rahmenSpieler[0].vid.paused, null, 5000);
   await p.evaluate(() => window.__rahmenSpieler[0].zeigen());
   await p.click("#tagesbildPad .vr-zu");
 
