@@ -230,7 +230,10 @@ console.log("\nVorlese-Name enthält den sichtbaren Text (WCAG 2.5.3)");
     });
   });
   for (const k of knoepfe) {
-    ok(!k.fehlt && k.sicht.length > 0 && k.name.includes(k.sicht),
+    /* ⚠ TAFEL-EVOLUTION (Klaus 2026-10-06): der Aktualisieren-Knopf zeigt nur
+     * noch ↻ (aria-hidden) — sein sichtbarer Text ist leer, und dann muss der
+     * Name allein tragen. Verlangt wird: ein Name ist da UND enthält, was sichtbar ist. */
+    ok(!k.fehlt && k.name.length > 0 && k.name.includes(k.sicht),
       `#${k.id}: „${k.name}" enthält „${k.sicht}"`);
   }
   await ctx.close();

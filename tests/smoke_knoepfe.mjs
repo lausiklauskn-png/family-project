@@ -160,9 +160,16 @@ console.log("\nTeil C — die Enter-Taste bewirkt wirklich etwas");
 {
   const page = await seite("/index.html");
 
-  // Sprache: Enter auf dem Sprach-Knopf schaltet <html lang> um.
+  /* Sprache: ⚠ TAFEL-EVOLUTION (Klaus 2026-10-06). Enter auf dem Sprachknopf
+   * öffnet die Auswahl; Pfeil ab wählt die andere Sprache, Enter bestätigt.
+   * Gemessen wird weiter die Wirkung: <html lang> schaltet um. */
   const vorher = await page.evaluate(() => document.documentElement.lang);
   await page.focus("#langBtn");
+  await page.keyboard.press("Enter");
+  await page.waitForSelector("#langMenu", { timeout: 3000 })
+    .then(() => ok(true, "Sprache — Enter öffnet die Auswahl"))
+    .catch(() => ok(false, "Sprache — Enter öffnet die Auswahl"));
+  await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await page.waitForFunction((v) => document.documentElement.lang !== v, vorher, { timeout: 3000 })
     .then(() => ok(true, "Sprache — Enter schaltet die Sprache wirklich um"))

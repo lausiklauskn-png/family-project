@@ -109,11 +109,34 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
  * lesen es weiter, und `title` zeigt es der Maus. Ein Knopf ohne jede
  * Beschriftung waere fuer Blinde ein toter Knopf.                          */
 .pill.pill-eng{padding:6px 9px}
-/* Der Knopf für die Hintergrund-Bewegung sagt seinen Zustand als WORT (Klaus
-   2026-10-06: „oben der Button funktioniert nicht. Außerdem steht er auf
-   Pause."). ⏸/▶ sahen aus wie ein Video-Knopf. Feste Breite, damit
-   „Bewegt"/„Steht" nichts verschiebt. Blass, wenn es auf dem Gerät nicht geht. */
-#bgPauseWort{display:inline-block;min-width:6ch;text-align:left}
+/* Der Knopf für die Hintergrund-Bewegung (Klaus 2026-10-06).
+   ⚠ TAFEL-EVOLUTION, AM SELBEN TAG: morgens wurde ⏸ zum Wort „≈ Bewegt/Steht"
+   (das Emoji sah aus wie ein Video-Knopf). Abends, weil die Kopfleiste am Handy
+   in vier Reihen brach: „Steht kann man auch wegnehmen … die zwei Striche, die
+   senkrechten, als Pause … Einfach nur ein Symbol." Zurück sind die Striche —
+   als CSS-FORM, kein Emoji, mit eigenem Vorlese-Namen. Läuft er: zwei Striche
+   (Tippen hält an). Steht er: ein Dreieck (Tippen startet). Beide Formen sind
+   gleich groß, der Knopf ändert seine Breite nie. */
+.bg-zeichen{display:inline-block;position:relative;width:10px;height:11px;vertical-align:-1px}
+.bg-zeichen::before,.bg-zeichen::after{content:"";position:absolute;top:0;width:3px;height:11px;background:currentColor;border-radius:1px}
+.bg-zeichen::before{left:1px}.bg-zeichen::after{right:1px}
+.bg-steht .bg-zeichen::after{display:none}
+.bg-steht .bg-zeichen::before{left:1px;width:0;height:0;background:none;border-radius:0;
+  border-top:5.5px solid transparent;border-bottom:5.5px solid transparent;border-left:9px solid currentColor}
+/* Der Grund (kein Grafikchip, gebremst …) als Blase AM Knopf, nicht im Knopf:
+   sie hängt am <body>, `position:fixed`, und verschiebt nichts. */
+#bgPauseHinweis{position:fixed;z-index:60;max-width:min(260px,calc(100vw - 16px));padding:6px 10px;border-radius:10px;
+  font:600 .74rem/1.3 var(--mono);color:var(--text);background:var(--bg2);border:1px solid var(--line);
+  box-shadow:0 8px 22px rgba(0,0,0,.35);pointer-events:none}
+/* Die Sprachwahl: Pille zeigt nur DE/EN, ein Tipp öffnet diese Auswahl.
+   Am <body>, weil `.pill` abschneidet (overflow:hidden). */
+#langMenu{position:fixed;z-index:60;display:flex;flex-direction:column;gap:2px;padding:4px;border-radius:12px;
+  background:var(--bg2);border:1px solid var(--line);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+#langMenu button{font:600 .82rem/1.2 var(--mono);color:var(--text);background:none;border:0;border-radius:8px;
+  padding:9px 14px;min-height:36px;text-align:left;cursor:pointer}
+#langMenu button:hover,#langMenu button:focus-visible{background:rgba(127,127,127,.18);outline:none}
+#langMenu button[aria-checked="true"]{color:var(--accent)}
+#langMenu button[aria-checked="true"]::after{content:" ✓"}
 .pill.pill-eng.bg-aus{opacity:.62}
 .nur-vorlesen{position:absolute;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
@@ -903,3 +926,7 @@ a.rf-step:hover{border-color:var(--accent);transform:translateY(-2px)}
 .wt-badge{display:inline-block;margin:2px 0 9px;padding:3px 11px;border-radius:999px;font-size:.74rem;font-weight:800;line-height:1.3}
 .wt-badge-node{color:var(--accent);background:rgba(124,156,255,.13);border:1px solid rgba(124,156,255,.42)}
 .wt-badge-app{color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--line)}
+/* Kopfleiste am kleinsten Handy (Klaus 2026-10-06: höchstens drei Reihen). Bei 320 px brachen
+   die vier Menü-Links in zwei Reihen, und die Leiste stand in vier. Etwas schmaler, dann passen
+   sie in eine. Gemessen in tests/smoke_kopfleiste.mjs. */
+@media (max-width:360px){nav.top{gap:5px}nav.top a{padding:7px 8px;font-size:.86rem}}

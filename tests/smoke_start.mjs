@@ -103,8 +103,12 @@ ok(await page.evaluate(() => document.getElementById("themeName").textContent ==
 ok(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() === "#f4f6fa"), "Hell-Thema setzt hellen Hintergrund");
 
 // Sprache wechseln (EN)
-await page.click("#langBtn"); await page.waitForTimeout(100);
-ok(await page.evaluate(() => document.documentElement.lang === "en"), "Sprach-Wechsel auf EN");
+/* ⚠ TAFEL-EVOLUTION (Klaus 2026-10-06): ein Tipp auf den Sprachknopf wechselt
+ * nicht mehr selbst, er öffnet eine Auswahl. Gewählt wird darin. */
+await page.click("#langBtn"); await page.waitForSelector("#langMenu [data-lang=\"en\"]");
+await page.click("#langMenu [data-lang=\"en\"]"); await page.waitForTimeout(100);
+ok(await page.evaluate(() => document.documentElement.lang === "en"), "Sprach-Wechsel auf EN (über die Auswahl)");
+ok(await page.evaluate(() => document.getElementById("langBtn").textContent.trim() === "EN"), "der Sprachknopf zeigt danach nur die aktuelle Sprache (EN)");
 ok(await page.evaluate(() => document.querySelector('[data-i18n="nav_market"]').textContent === "Marketplace"), "EN-Texte angewandt");
 
 await browser.close();
