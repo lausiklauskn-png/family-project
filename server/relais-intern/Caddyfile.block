@@ -1,0 +1,4 @@
+# Internes Relais (eigenes Netz, siehe family-project/server/relais-intern/)
+relay-intern.family-projekt.de {
+	reverse_proxy relay-intern:8080
+}

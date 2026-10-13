@@ -1407,3 +1407,19 @@ git diff --stat origin/main origin/<branch>     # leer = der PR wäre leer
 > verbindlich; sie sind zwanzig Stellen, an denen sie auseinanderlaufen kann.
 > Genau das war passiert. Die alte Fassung dieser Datei steht vollständig in
 > [`docs/archiv/CLAUDE-2026-08-22.md`](docs/archiv/CLAUDE-2026-08-22.md).
+
+## 🔒 Internes Relais `relay-intern.family-projekt.de` (2026-10-13)
+
+Für das eigene Netz (Sage, Modul 23 „Netz“). Werkzeug und Anleitung: `server/relais-intern/`
+(`EINRICHTEN.md`, `einrichten.sh`, `config.toml`, `Caddyfile.block`). Es ist ein zweiter
+Container `relay-intern` neben `relay` in `/opt/relay`. Er nutzt dieselbe Software
+(abgelesen, nicht geraten), Konfig und Datenbank liegen unter `/opt/relay-intern`.
+
+- **Keine pubkey_whitelist** (Klaus: „jederzeit ein neues Tool hinzufügen“).
+- Die Flut-Grenzen sind die des öffentlichen Relais.
+- Eine vorhandene Konfig wird nie überschrieben.
+- Das Caddyfile wird nur mit `>>` geändert und nur nach `validate` neu geladen.
+
+Proben: `smoke_relais_intern` (21, gestelltes docker) · `gegenprobe_relais_intern` (9 Fälle).
+
+⚠ Bis Klaus' Lauf auf dem Server ist nichts davon am echten Server gemessen.

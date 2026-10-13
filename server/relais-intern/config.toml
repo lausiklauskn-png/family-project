@@ -1,0 +1,31 @@
+# Relais „intern Family Project" — wss://relay-intern.family-projekt.de
+# Läuft als eigener Container `relay-intern` neben dem öffentlichen `relay`
+# (Hetzner Cloud-Server, /opt/relay). Eingerichtet von einrichten.sh, das diese
+# Datei nach /opt/relay-intern/config.toml kopiert — NUR beim ersten Mal.
+#
+# KEINE pubkey_whitelist, mit Absicht (Klaus 2026-10-13: „Es soll jederzeit
+# möglich sein, ein neues Tool hinzuzufügen."). Ein neues Werkzeug tritt per
+# Netz-Link bei; eine Liste erlaubter Schlüssel müsste dafür jedes Mal auf dem
+# Server geändert werden. Benannte Grenze: wer die Adresse kennt, kann schreiben —
+# geschützt ist der Inhalt durch den Netz-Code (Raum und Verschlüsselung in
+# Modul 23), nicht durch das Relais. Die Flut-Grenzen unten halten Missbrauch klein.
+
+[info]
+relay_url = "wss://relay-intern.family-projekt.de/"
+name = "intern Family Project"
+description = "Internes Relais fuer das eigene Netz der Apps von Family Project. Kein oeffentlicher Treffpunkt."
+
+[database]
+data_directory = "/usr/src/app/db"
+
+[network]
+address = "0.0.0.0"
+port = 8080
+
+[options]
+# Wie auf dem öffentlichen Relais (Kimboard/tools/relais-grenzen.sh, 2026-08-19).
+reject_future_seconds = 1800
+
+[limits]
+messages_per_sec = 5
+subscriptions_per_min = 30
