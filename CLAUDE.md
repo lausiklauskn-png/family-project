@@ -1423,3 +1423,17 @@ Container `relay-intern` neben `relay` in `/opt/relay`. Er nutzt dieselbe Softwa
 Proben: `smoke_relais_intern` (21, gestelltes docker) · `gegenprobe_relais_intern` (9 Fälle).
 
 ⚠ Bis Klaus' Lauf auf dem Server ist nichts davon am echten Server gemessen.
+
+## 🛡 Prüfliste vor dem KI-Richter · Halt bei „Text aus Foto" (Sage Bau 04.J / 24.R, 2026-10-14)
+
+Modul 04 und Modul 24 kommen neu aus dem Kanon (Sage #1082, verteilt mit `kanon-verteilen`). Der Richter prüft die Suchfrage und jede fremde Antwort mit der Prüfliste. Fehlt die Liste, läuft er nicht. Eine Antwort mit einer Anweisung an eine KI geht nicht an die KI; sie bekommt „gefahr" und `ausgeschlossen: "ki-anweisung"`. Hier nutzt ihn Modul 15 (`queryLocalJudged`).
+
+- `sbkim/pruefer-mail.js` ist byte-1:1 aus dem Auslieferungsprüfer und steht auf **jeder** Seite, die Modul 04 lädt, direkt danach (index, werkzeuge, referenzen, netzwerk, markt, mycelkarte). Die Probe findet diese Seiten selbst.
+- **📷 Text aus Foto** (`runOcr` in `assets/app.js`) geht über Modul 24. Das schickt nie das Original: ein Foto geht ohne Metadaten bzw. neu gezeichnet hinaus. Versteckter Text hält einmal an. Steht im erkannten Text eine Anweisung an eine KI, hält es ebenfalls einmal an: „OK" übernimmt den Text ohne diese Zeilen, „Abbrechen" übernimmt nichts.
+- ⚠ **Benannte Grenzen:**
+  - Heute tragen alle Felder auf den Seiten `data-noocr`, der 📷 erscheint also an keinem. Der Halt ist gebaut und gemessen, im Betrieb wird er erst an einem Feld ohne `data-noocr` sichtbar.
+  - Modul 24 lädt seine Reinigung von `/Workflow-PDF/`. Diese Adresse gibt es auf family-projekt.de nicht. Ein JPEG wird deshalb neu gezeichnet statt 1:1 ohne Metadaten gesendet; ein Original geht trotzdem nie hinaus.
+  - Ein PDF nimmt das Feld nicht an (`accept="image/*"`).
+- Proben: `node tests/smoke_ki_pruefliste.mjs` (21 grün, echtes Modul 24, Mistral gestellt, ein JPEG mit EXIF-Kennung) · `bash tests/gegenprobe_ki_pruefliste.sh` (8 gefangen · 0 durchgerutscht · 0 aus falschem Grund · 0 tote Anker; `NUR_ANKER=1`, `NUR_FALL=…`). Der erste Anker-Lauf meldete einen toten Anker (das Wort traf 14-mal); nachgezogen.
+- Alle 48 `tests/smoke_*.mjs` liefen danach mit Rückgabe 0. Cache v151 → v152 (der Verteiler hat `ASSET_V` an 96 Stellen mitgezogen).
+- ⚠ Am Tablet nicht gemessen, auch nicht mit einer echten KI.
