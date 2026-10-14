@@ -642,11 +642,27 @@
       camBtn.disabled = true; camBtn.classList.add("live"); camBtn.textContent = "⏳";
       function done() { camBtn.disabled = false; camBtn.classList.remove("live"); camBtn.textContent = prev; }
       fileToDataUrl(file).then(function (dataUrl) {
-        return global.SbkimOcr.recognize(dataUrl, { apiKey: key, mimeType: file.type || "image/png" });
+        // Bau 24.R (2026-10-14): Modul 24 schickt nie das Original (Foto ohne
+        // Metadaten bzw. neu gezeichnet). Versteckter Text → einmal anhalten.
+        return global.SbkimOcr.recognize(dataUrl, { apiKey: key, mimeType: file.type || "image/png",
+          onVersteckt: function (liste) {
+            return window.confirm((en ? "Hidden text found:\n" : "Versteckter Text gefunden:\n") +
+              liste.slice(0, 6).map(function (e) { return "· „" + String(e.text).slice(0, 80) + "“"; }).join("\n") +
+              (en ? "\n\nOK = send without it · Cancel = send nothing" : "\n\nOK = ohne ihn senden · Abbrechen = nichts senden"));
+          } });
       }).then(function (res) {
         if (res && res.available && res.text) {
+          var text = String(res.text);
+          // Prüfliste (Bau 04.J): eine Anweisung an eine KI im erkannten Text hält einmal an.
+          if (res.kiAnweisung && res.kiAnweisung.length) {
+            var weiter = window.confirm((en ? "The recognised text contains an instruction to an AI:\n" : "Im erkannten Text steht eine Anweisung an eine KI:\n") +
+              res.kiAnweisung.slice(0, 4).map(function (z) { return "· " + (en ? "line " : "Zeile ") + z.zeile + ": „" + String(z.inhalt).slice(0, 80) + "“"; }).join("\n") +
+              (en ? "\n\nOK = take it without these lines · Cancel = take nothing" : "\n\nOK = ohne diese Zeilen übernehmen · Abbrechen = nichts übernehmen"));
+            if (!weiter) { done(); return; }
+            text = global.SbkimOcr.ohneZeilen ? global.SbkimOcr.ohneZeilen(text, res.kiAnweisung) : "";
+          }
           var cur = input.value ? (input.value + " ") : "";
-          input.value = cur + String(res.text).replace(/\s+/g, " ").trim();
+          input.value = cur + text.replace(/\s+/g, " ").trim();
           try { input.dispatchEvent(new Event("input", { bubbles: true })); } catch (_e) {}
         } else {
           alert(res && res.reason ? res.reason : (en ? "Text recognition not available, please type." : "Texterkennung nicht möglich, bitte tippen."));
