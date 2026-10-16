@@ -318,7 +318,15 @@ console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
   /* Diese Seite lädt kein assets/app.js (keine Kopfleiste, keine Themen, kein
    * Mikrofon — sie wird auch im Siegel als iframe eingebettet). Bis zum
    * 2026-09-14 hatte sie deshalb GAR KEINE Übersetzung: 43 Stellen standen im
-   * Englisch-Modus auf Deutsch. */
+   * Englisch-Modus auf Deutsch.
+   *
+   * ⚠ TAFEL-EVOLUTION, BENANNT (2026-10-17). Seit dem Überblick aus Sage
+   * (Mycel, Siegel, Schutz S1–S5b) trägt die Seite ZWEI Sprachblöcke (#de, #en)
+   * statt `data-i18n`-Haken; `data-sprache-schluessel="fp_lang"` am <html>
+   * lässt sie derselben Wahl folgen wie der Rest. Der Wächter „Übersetzungs-
+   * Haken > 40" ist ersetzt durch „beide Blöcke da, und gezeigt wird nur einer".
+   * Gemessen wird weiter, was man SIEHT: Text in einem verborgenen Block zählt
+   * nicht. */
   const lies = async (sp) => {
     const ctx = await browser.newContext({ viewport: { width: 900, height: 1200 } });
     await ctx.addInitScript((l) => { try { localStorage.setItem("fp_lang", l); } catch (_e) {} }, sp);
@@ -326,32 +334,28 @@ console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
     await page.goto(`${base}/sicherheit.html`, { waitUntil: "load" });
     await page.waitForFunction(() => !!document.querySelector("h1"));
     const r = await page.evaluate(() => {
-      /* Gemessen wird deutscher Text, den man SIEHT. Eigennamen (Mycel, Hyphe,
-       * Spore, Apoptose …) tragen `translate="no"` und sind ausgenommen — ein
-       * Wächter, der sie mitzählt, verlangte ihre Übersetzung. */
       const DE = /\b(und|oder|nicht|eine[nmrs]?|der|die|das|dein[e]?|wird|sich|auch|mit|für|über|ohne|damit|wenn|beim|zum|zur|vom|nach|noch|hier|kein[e]?|sind|haben|Knoten|Seite|Schlüssel)\b|[äöüß]/;
       const rest = [];
       document.querySelectorAll("body *").forEach((el) => {
         if (/^(SCRIPT|STYLE)$/.test(el.tagName)) return;
-        if (el.getAttribute("translate") === "no") return;
+        if (el.closest("[hidden]")) return;            // a hidden language block is not shown
+        if (el.closest('[translate="no"]')) return;
         const eigen = [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(" ").trim();
         if (eigen.length < 4 || !DE.test(eigen)) return;
         rest.push(el.tagName + ": " + eigen.replace(/\s+/g, " ").slice(0, 60));
       });
-      /* Eigennamen MUESSEN stehen bleiben — „Hyphe" heisst auch auf Englisch
-       * „Hyphe", und ein Begriff, der im Woerterbuch erklaert wird, muss in
-       * beiden Sprachen derselbe sein. Ohne diese Zeile waere „alles ist
-       * uebersetzt" auch dann gruen, wenn die Eigennamen mit uebersetzt
-       * waeren. */
-      const eigen = [...document.querySelectorAll("dt")].map((n) => n.textContent.trim());
-      return { lang: document.documentElement.lang, h1: document.querySelector("h1").textContent,
-               haken: document.querySelectorAll("[data-i18n]").length, eigen, rest };
+      const sichtbar = (sel) => [...document.querySelectorAll(sel)].filter((n) => !n.closest("[hidden]"));
+      const h1 = sichtbar("h1")[0];
+      return { lang: document.documentElement.lang, h1: h1 ? h1.textContent : "",
+               bloecke: !!document.getElementById("de") && !!document.getElementById("en"),
+               gezeigt: sichtbar("[data-sprache]").length,
+               eigen: sichtbar("dt").map((n) => n.textContent.trim()), rest };
     });
     await ctx.close();
     return r;
   };
   const de = await lies("de"), en = await lies("en");
-  ok(de.haken > 40, `die Seite hat Übersetzungs-Haken (${de.haken})`);
+  ok(de.bloecke && de.gezeigt === 1 && en.gezeigt === 1, "die Seite trägt beide Sprachen und zeigt genau eine", `${de.gezeigt}/${en.gezeigt}`);
   ok(de.rest.length > 10, `auf Deutsch steht deutscher Text da (${de.rest.length} Stellen)`);
   ok(en.lang === "en", "im Englisch-Modus steht lang=en am Dokument", en.lang);
   ok(/How the mycelium works/.test(en.h1), "die Überschrift ist übersetzt", en.h1.slice(0, 60));
@@ -362,8 +366,10 @@ console.log("\nsicherheit.html trägt ihre Übersetzung selbst");
   // Sie folgt derselben Wahl wie die übrigen Seiten — wer auf dem Marktplatz
   // Englisch gewählt hat, bekommt diese Erklärung auf Englisch.
   ok(en.h1 !== de.h1, "sie folgt der Wahl aus fp_lang, ohne eigene Einstellung");
+  // Eigennamen bleiben auch auf Englisch stehen: ein Begriff im Wörterbuch heißt
+  // in beiden Sprachen gleich (gemessen am sichtbaren englischen Wörterbuch).
   for (const begriff of ["Hyphe", "Spore", "Apoptose", "PWA"]) {
-    ok(en.eigen.includes(begriff), `der Eigenname „${begriff}“ bleibt auch auf Englisch stehen`,
+    ok(en.eigen.some((d) => d === begriff || d.startsWith(begriff + " (")), `der Eigenname „${begriff}“ bleibt auch auf Englisch stehen`,
        en.eigen.join(" · "));
   }
 }
