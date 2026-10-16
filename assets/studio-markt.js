@@ -54,6 +54,23 @@
       f_spore: "Spore-Link des Anbieters (optional, https)",
       ph_spore: "https://…/sbkim/spore.json",
       f_sporeauto: "Beschreibung darf sich nachts selbst aus der Spore aktualisieren",
+      f_nodeid: "Kennung (nodeId) der App (optional)",
+      ph_nodeid: "steht in der Spore unter „id“",
+      nodeid_bad: "Die Kennung sieht nicht gültig aus (16 bis 128 Zeichen: Buchstaben, Ziffern, - und _). Das Feld bleibt leer.",
+      spc_btn: "🧬 Spore prüfen",
+      spc_busy: "Spore wird geprüft …",
+      spc_need: "Bitte zuerst einen Spore-Link eintragen, der mit https:// beginnt.",
+      spc_ok: "✓ Spore gültig.",
+      spc_ok_id: "✓ Spore gültig, die Kennung passt.",
+      spc_other: "✗ Kennung passt nicht: die Spore trägt eine andere Kennung als der Eintrag.",
+      spc_sig: "✗ Unterschrift ungültig.",
+      spc_np: "• Nicht prüfbar",
+      spc_suggest: "Kennung aus der Spore ins Feld geschrieben. Mit „Speichern“ übernehmen.",
+      spc_nomod: "Das Prüf-Modul ließ sich nicht laden.",
+      nv_h: "🕸 Netz-Verwaltung",
+      nv_intro: "Empfehlen, Widerrufen und die Sperrliste stehen auf einer eigenen Seite.",
+      nv_open: "🕸 Netz-Verwaltung öffnen",
+      nv_dirty: "Es gibt unveröffentlichte Änderungen im Studio. Sie gehen beim Wechseln verloren. Trotzdem öffnen?",
       sp_h: "🧬 Sporen der Anbieter",
       sp_intro: "Was die nächtliche Prüfung zuletzt gesehen hat. Ohne Haken am Eintrag wird eine geänderte Beschreibung nur gemeldet — übernommen wird sie erst hier.",
       sp_none: "Noch kein Bericht. Er entsteht beim ersten nächtlichen Lauf.",
@@ -216,6 +233,23 @@
       f_spore: "Provider spore link (optional, https)",
       ph_spore: "https://…/sbkim/spore.json",
       f_sporeauto: "Description may update itself from the spore overnight",
+      f_nodeid: "App ID (nodeId, optional)",
+      ph_nodeid: "found in the spore under “id”",
+      nodeid_bad: "The ID does not look valid (16 to 128 characters: letters, digits, - and _). The field stays empty.",
+      spc_btn: "🧬 Check spore",
+      spc_busy: "Checking spore …",
+      spc_need: "Please enter a spore link that starts with https:// first.",
+      spc_ok: "✓ Spore valid.",
+      spc_ok_id: "✓ Spore valid, the ID matches.",
+      spc_other: "✗ ID does not match: the spore carries a different ID than the entry.",
+      spc_sig: "✗ Signature invalid.",
+      spc_np: "• Cannot be checked",
+      spc_suggest: "ID from the spore written into the field. Press “Save” to keep it.",
+      spc_nomod: "The check module could not be loaded.",
+      nv_h: "🕸 Network administration",
+      nv_intro: "Recommending, revoking and the block list are on a page of their own.",
+      nv_open: "🕸 Open network administration",
+      nv_dirty: "There are unpublished changes in the studio. They are lost when you switch. Open anyway?",
       sp_h: "🧬 Provider spores",
       sp_intro: "What the nightly check last saw. Without the checkbox a changed description is only reported — you accept it here.",
       sp_none: "No report yet. It appears after the first nightly run.",
@@ -376,6 +410,8 @@
   function safeUrl(u) { u = String(u || "").trim(); return /^https?:\/\//i.test(u) ? u : ""; }
   function safeImg(u) { u = String(u || "").trim(); return /^https?:\/\//i.test(u) && !/\.svg(\?|$)/i.test(u) ? u : ""; }
   function slugify(s) { return String(s || "").toLowerCase().normalize("NFKD").replace(/[^\w]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "tool"; }
+  var NODE_ID_RE = /^[A-Za-z0-9_-]{16,128}$/;
+  function cleanNodeId(v) { v = String(v == null ? "" : v).trim(); return NODE_ID_RE.test(v) ? v : ""; }
   function utf8ToB64(s) { return btoa(unescape(encodeURIComponent(String(s)))); }
   function extFromType(t) { t = String(t || "").toLowerCase(); if (t.indexOf("png") >= 0) return "png"; if (t.indexOf("webp") >= 0) return "webp"; if (t.indexOf("jpeg") >= 0 || t.indexOf("jpg") >= 0) return "jpg"; return "png"; }
 
@@ -474,6 +510,12 @@
     // meldet die nächtliche Aktion eine Änderung nur (Klaus 2026-08-02).
     if (e.sporeUrl) o.sporeUrl = String(e.sporeUrl).trim();
     if (e.sporeAuto === true) o.sporeAuto = true;
+    /* S5b Teil 2: die Kennung der App, damit die Netz-Verwaltung sie
+     * empfehlen, widerrufen oder sperren kann. Positivliste — ohne diese Zeile
+     * fiele das Feld beim Veroeffentlichen still weg. Nur eine gueltige
+     * Kennung reist mit; alles andere bleibt weg statt halb. */
+    var nid = cleanNodeId(e.nodeId);
+    if (nid) o.nodeId = nid;
     return o;
   }
   function serialize() {
@@ -522,14 +564,16 @@
       by: panel.querySelector("[data-f=by]").value,
       mycel: panel.querySelector("[data-f=mycel]").checked,
       sporeUrl: panel.querySelector("[data-f=spore]").value,
-      sporeAuto: panel.querySelector("[data-f=sporeauto]").checked
+      sporeAuto: panel.querySelector("[data-f=sporeauto]").checked,
+      nodeId: panel.querySelector("[data-f=nodeid]").value
     };
   }
   function clearForm() {
     editIdx = -1; _pendingImg = null;
-    ["label", "desc", "url", "imgurl", "cat", "tags", "by", "spore"].forEach(function (f) { var el = panel.querySelector("[data-f=" + f + "]"); if (el) el.value = ""; });
+    ["label", "desc", "url", "imgurl", "cat", "tags", "by", "spore", "nodeid"].forEach(function (f) { var el = panel.querySelector("[data-f=" + f + "]"); if (el) el.value = ""; });
     var m = panel.querySelector("[data-f=mycel]"); if (m) m.checked = false;
     var sa = panel.querySelector("[data-f=sporeauto]"); if (sa) sa.checked = false;
+    var spc = panel.querySelector("[data-role=spcheck]"); if (spc) spc.textContent = "";
     setImgPreview("");
     panel.querySelector("[data-role=addbtn]").textContent = T("add_btn");
     panel.querySelector("[data-role=cancel]").style.display = "none";
@@ -563,6 +607,8 @@
       if (!img) { toast(v.imgUrl ? T("bad_img") : T("need_img"), false); return; }
     }
     var tags = tagsToArr(v.tags);
+    var nodeId = cleanNodeId(v.nodeId);
+    if (String(v.nodeId || "").trim() && !nodeId) toast(T("nodeid_bad"), false);
     var entry = {
       label: v.label.trim(),
       text: buildText(v.text, tags, v.mycel),
@@ -573,6 +619,7 @@
       tags: tags,
       mycel: !!v.mycel
     };
+    if (nodeId) entry.nodeId = nodeId;
     if (editIdx >= 0 && WORK[editIdx]) {
       entry.anchorId = WORK[editIdx].anchorId;      // ID stabil halten
       if (WORK[editIdx].own) entry.own = true;
@@ -599,6 +646,8 @@
     panel.querySelector("[data-f=mycel]").checked = !!e.mycel;
     panel.querySelector("[data-f=spore]").value = e.sporeUrl || "";
     panel.querySelector("[data-f=sporeauto]").checked = e.sporeAuto === true;
+    panel.querySelector("[data-f=nodeid]").value = cleanNodeId(e.nodeId);
+    var spc0 = panel.querySelector("[data-role=spcheck]"); if (spc0) spc0.textContent = "";
     setImgPreview(safeImg(e.img));
     panel.querySelector("[data-role=addbtn]").textContent = T("update_btn");
     panel.querySelector("[data-role=cancel]").style.display = "";
@@ -1929,6 +1978,59 @@
       .catch(function (err) { toast(T("pub_err") + fehlerText(err), false); });
   }
 
+  /* ------------------------------------------- Spore prüfen + Netz-Verwaltung
+   * S5b Teil 2 (Sage Modul 23b). Beides NUR auf Knopfdruck: beim Öffnen des
+   * Studios geht keine Anfrage an eine fremde Adresse. Modul 23b wird erst
+   * beim ersten Klick nachgeladen. */
+  var _nvLaden = null;
+  function nvModul() {
+    if (window.SbkimNetzVerwaltung) return Promise.resolve(window.SbkimNetzVerwaltung);
+    if (_nvLaden) return _nvLaden;
+    _nvLaden = new Promise(function (ok, nein) {
+      var s = document.createElement("script");
+      s.src = "sbkim/23b_netzverwaltung.js";
+      s.onload = function () { window.SbkimNetzVerwaltung ? ok(window.SbkimNetzVerwaltung) : nein(new Error("23b")); };
+      s.onerror = function () { _nvLaden = null; nein(new Error("23b")); };
+      document.head.appendChild(s);
+    });
+    return _nvLaden;
+  }
+  // Ergebnis von fetchSpore → ein Satz für Klaus. Nur als Text ins DOM.
+  function sporeErgebnisText(r, mitKennung) {
+    if (r && r.ok) return mitKennung ? T("spc_ok_id") : T("spc_ok");
+    var st = r && r.status, grund = String((r && r.reason) || "");
+    if (st === "andere-kennung") return T("spc_other");
+    if (st === "falsch" && /Unterschrift/.test(grund)) return T("spc_sig");
+    return T("spc_np") + (grund ? " (" + grund + ")" : "");
+  }
+  function sporePruefen() {
+    var out = panel.querySelector("[data-role=spcheck]");
+    var url = String(panel.querySelector("[data-f=spore]").value || "").trim();
+    var feld = panel.querySelector("[data-f=nodeid]");
+    var roh = String(feld.value || "").trim();
+    var erwartet = cleanNodeId(roh);
+    if (!/^https:\/\//i.test(url)) { out.textContent = T("spc_need"); return; }
+    if (roh && !erwartet) toast(T("nodeid_bad"), false);
+    out.textContent = T("spc_busy");
+    nvModul().then(function (nv) { return nv.fetchSpore(url, erwartet || undefined); })
+      .then(function (r) {
+        var t = sporeErgebnisText(r, !!erwartet);
+        // Feld leer und Spore gültig: die Kennung vorschlagen. Übernommen wird
+        // sie erst mit „Speichern" — der Nutzer bestätigt.
+        if (r && r.ok && !erwartet && cleanNodeId(r.id)) {
+          feld.value = cleanNodeId(r.id);
+          t += " " + T("spc_suggest");
+        }
+        out.textContent = t;
+      })
+      .catch(function () { out.textContent = T("spc_np") + " (" + T("spc_nomod") + ")"; });
+  }
+  // Eigene Seite, gleicher Tab (location.href) — kein window.open.
+  function netzVerwaltungOeffnen() {
+    if ((dirty || wacheDirty) && !window.confirm(T("nv_dirty"))) return;
+    location.href = "netz-verwaltung.html";
+  }
+
   function openPanel() {
     if (panel) { panel.style.display = "flex"; return; }
     panel = document.createElement("div");
@@ -1965,7 +2067,10 @@
           '<label>' + esc(T("f_tags")) + '<input data-f="tags" placeholder="' + esc(T("ph_tags")) + '"></label>' +
           '<label class="fpst-chk"><input type="checkbox" data-f="mycel"> ' + esc(T("f_mycel")) + '</label>' +
           '<label>' + esc(T("f_spore")) + '<input data-f="spore" placeholder="' + esc(T("ph_spore")) + '"></label>' +
+          '<div class="fpst-qbtnrow"><button type="button" data-role="spcheckbtn" class="fpst-btn">' + esc(T("spc_btn")) + '</button></div>' +
+          '<small class="fpst-spcheck" data-role="spcheck" aria-live="polite"></small>' +
           '<label class="fpst-chk"><input type="checkbox" data-f="sporeauto"> ' + esc(T("f_sporeauto")) + '</label>' +
+          '<label>' + esc(T("f_nodeid")) + '<input data-f="nodeid" autocomplete="off" spellcheck="false" placeholder="' + esc(T("ph_nodeid")) + '"></label>' +
           '<div class="fpst-formbtns">' +
             '<button type="button" data-role="addbtn" class="fpst-btn fpst-btn--go">' + esc(T("add_btn")) + '</button>' +
             '<button type="button" data-role="cancel" class="fpst-btn" style="display:none">' + esc(T("cancel_btn")) + '</button>' +
@@ -2014,6 +2119,11 @@
           '</div>' +
           '<div class="fpst-sporen" data-role="messung"></div>' +
         '</div>' +
+        '<div class="fpst-vec">' +
+          '<h4>' + esc(T("nv_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("nv_intro")) + '</p>' +
+          '<div class="fpst-qbtnrow"><button type="button" data-role="nvopen" class="fpst-btn">' + esc(T("nv_open")) + '</button></div>' +
+        '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
         '<div class="fpst-list" data-role="list"></div>' +
         '<div class="fpst-foot">' +
@@ -2027,6 +2137,8 @@
     panel.querySelector("[data-role=addbtn]").addEventListener("click", saveEntry);
     panel.querySelector("[data-role=cancel]").addEventListener("click", clearForm);
     panel.querySelector("[data-role=publish]").addEventListener("click", publish);
+    var scb = panel.querySelector("[data-role=spcheckbtn]"); if (scb) scb.addEventListener("click", sporePruefen);
+    var nvb = panel.querySelector("[data-role=nvopen]"); if (nvb) nvb.addEventListener("click", netzVerwaltungOeffnen);
     var vb = panel.querySelector("[data-role=vecbtn]"); if (vb) vb.addEventListener("click", buildVectors);
     var vr = panel.querySelector("[data-role=vecrecheck]"); if (vr) vr.addEventListener("click", function () { standLaden(); sporenLaden(); });
     var sb = panel.querySelector("[data-role=sporen]");
@@ -2238,7 +2350,7 @@
   }
   // öffentliche Testfläche (headless-Smoke) — harmlos in Produktion
   window.FPStudio = {
-    _t: { serialize: serialize, normEntry: normEntry, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64,
+    _t: { serialize: serialize, normEntry: normEntry, cleanNodeId: cleanNodeId, sporeErgebnisText: sporeErgebnisText, safeImg: safeImg, safeUrl: safeUrl, slugify: slugify, buildText: buildText, utf8ToB64: utf8ToB64,
           entryFromRec: entryFromRec, statusLabel: statusLabel, statusClass: statusClass, vecEntries: vecEntries, vecPruefe: vecPruefe,
           setWork: function (a) { WORK = a; }, getWork: function () { return WORK; }, setPrefix: function (p) { filePrefix = p; },
           kopfUndMin: kopfUndMin, setMin: function (n) { MIN_LEISTUNG = klemmeMin(n); }, getMin: function () { return MIN_LEISTUNG; },

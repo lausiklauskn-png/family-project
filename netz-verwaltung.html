@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Netz-Verwaltung · Family Projekt</title>
+  <!-- Eigene Seite der Netz-Verwaltung (Modul 23b, S5b Teil 2, Klaus 2026-10-16).
+       Gleiche Adresse, gleiche Schublade wie die Website → gleiche Identität.
+       Geöffnet aus dem Marktplatz-Studio („🕸 Netz-Verwaltung öffnen").
+       Beim Laden kein Netz: der Raum wird nur auf Knopfdruck gelesen. -->
+  <script>window.SBKIM_DB_SUFFIX="familyprojekt";</script>
+</head>
+<body style="background:#0b1117">
+  <noscript>Die Netz-Verwaltung braucht JavaScript.</noscript>
+  <div id="sbkim-netzverwaltung"></div>
+  <p style="max-width:900px;margin:8px auto;padding:0 12px;font:12px system-ui,sans-serif;color:#8899a8">
+    <a href="markt.html" style="color:#8fb4ff" data-fp-zurueck>← zurück zum Marktplatz</a></p>
+  <script src="sbkim/01_storage.js"></script>
+  <script src="sbkim/02_spore.js"></script>
+  <script type="module" src="sbkim/05b_nostr_relay.js"></script>
+  <script src="sbkim/23_rendezvous.js"></script>
+  <script src="sbkim/23b_netzverwaltung.js"></script>
+  <!-- Die Einträge des Marktplatzes, genau wie markt.html sie lädt — kein fetch. -->
+  <script src="assets/config/listings.js"></script>
+  <script>
+    (function () {
+      var en = false;
+      try { en = localStorage.getItem("fp_lang") === "en"; } catch (_e) {}
+      if (en) {
+        document.documentElement.lang = "en";
+        var z = document.querySelector("[data-fp-zurueck]"); if (z) z.textContent = "← back to the marketplace";
+      }
+      var eintraege = (window.FP_LISTINGS || []).filter(function (e) { return e && e.label; }).map(function (e) {
+        return { label: String(e.label), nodeId: e.nodeId || null, url: e.url || "" };
+      });
+      if (window.SbkimNetzVerwaltung) {
+        window.SbkimNetzVerwaltung.page({ nodeName: "Family Projekt", dbSuffix: "familyprojekt", entries: eintraege, lang: en ? "en" : "de" });
+      }
+    })();
+  </script>
+</body>
+</html>
