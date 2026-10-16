@@ -713,6 +713,63 @@ window.FP_LISTINGS = [
     "category": "Werkzeug",
     "own": true
   },
+  /* Klaus 2026-10-16: drei Knoten, die alle Pflicht-Module tragen, aber in
+     keinem Markt standen. Keine sporeUrl (keine sbkim/spore.json im Repo),
+     keine Messwerte erfunden: die Zahlen kommen aus dem naechtlichen Lauf. */
+  {
+    "label": "Mein In-and-Out-Book",
+    "anchorId": "eigen-in-and-out",
+    "text": "Prüft auf dem eigenen Gerät, was hereinkommt: Dateien, PDFs, Bilder, E-Mails und eingefügter Text. Sucht versteckte Anweisungen an eine KI, unsichtbaren Text im PDF, getarnte Dateien, Makros und fremde Abrufe. Jede Prüfung endet als Befund, ungeprüft oder kein Befund. Läuft offline im Browser, ohne Konto, ohne Server. Kein Virenscanner. Eingangsprüfung, Prompt-Injektion, KI-Sicherheit, Anhang prüfen, E-Mail prüfen.",
+    "text_en": "Checks on your own device what comes in: files, PDFs, images, e-mails and pasted text. Looks for hidden instructions to an AI, invisible text in a PDF, disguised files, macros and outside fetches. Every check ends as a finding, unchecked or no finding. Runs offline in the browser, with no account and no server. Not a virus scanner. Incoming check, prompt injection, AI safety, check an attachment, check an e-mail.",
+    "vorstellung": [
+      "Für alle, die Dateien und E-Mails an eine KI weitergeben",
+      "Findet versteckte Anweisungen in Text, PDF und Bild",
+      "Prüft E-Mails samt Anhängen",
+      "Läuft offline auf dem Gerät, ohne Konto"
+    ],
+    "besonders": "„Ungeprüft“ heißt nie „sauber“: was die App nicht prüfen konnte, sagt sie auch so.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/",
+    "img": "https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/icons/icon-512.png",
+    "category": "Sicherheit",
+    "own": true
+  },
+  {
+    "label": "Workflow Calculate",
+    "anchorId": "eigen-workflow-calculate",
+    "text": "Angebote kalkulieren für Werkstatt und Werbetechnik: Produkt wählen, Maße, Menge und Material eingeben. Die App rechnet Material, Arbeitszeit, Maschine, Verpackung und Versand nach der Zuschlagskalkulation und schreibt das Angebot. Die Kalkulation bleibt intern, der Kunde sieht nur Leistung, Staffelpreise und Summen. Offline, ohne Konto, ohne Server. Angebot, Kalkulation, Kosten berechnen, Staffelpreis, Nachkalkulation.",
+    "text_en": "Quotes for workshops and sign making: pick a product, enter size, quantity and material. The app works out material, labour time, machine, packaging and shipping using overhead costing and writes the quote. The costing stays internal; the customer only sees the work, tiered prices and totals. Offline, with no account and no server. Quote, costing, work out costs, tiered prices, post-calculation.",
+    "vorstellung": [
+      "Für Werkstätten, die Angebote schnell und nachvollziehbar rechnen wollen",
+      "Material, Arbeitszeit, Maschine, Verpackung und Versand",
+      "Der Kunde sieht Leistung und Summe, nicht die Kalkulation",
+      "Läuft offline im Browser, ohne Konto"
+    ],
+    "besonders": "Jede Alternative zeigt ihre Wirkung, bevor sie gilt.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Workflow-Calculate/",
+    "img": "https://lausiklauskn-png.github.io/Workflow-Calculate/icons/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
+  {
+    "label": "Workflow Bedarfsanalyse",
+    "anchorId": "eigen-workflow-needs",
+    "text": "Aufträge in drei Stufen: Bedarfsprotokoll mit 18 Bereichen ohne Betrag, dann Umfang und Schätzung als Spanne, dann das Angebot mit zwei Unterschriftsfeldern. Fassungen mit Vergleich und Nachtrag. Kundendaten bleiben auf dem Gerät. Offline im Browser, ohne Konto, ohne Server. Bedarfsanalyse, Anforderungen, Angebot, Schätzung, Auftrag.",
+    "text_en": "Jobs in three stages: a needs record with 18 areas and no amount, then scope and estimate as a range, then the quote with two signature fields. Versions with comparison and addendum. Customer data stays on the device. Offline in the browser, with no account and no server. Needs analysis, requirements, quote, estimate, job.",
+    "vorstellung": [
+      "Für alle, die vor dem Angebot erst den Bedarf klären",
+      "Bedarfsprotokoll, Schätzung und Angebot in einer App",
+      "Fassungen mit Vergleich und Nachtrag",
+      "Kundendaten bleiben auf dem Gerät"
+    ],
+    "besonders": "Das Bedarfsprotokoll für den Kunden zeigt nur, was freigegeben ist.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Workflow-Needs/",
+    "img": "https://lausiklauskn-png.github.io/Workflow-Needs/icons/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
