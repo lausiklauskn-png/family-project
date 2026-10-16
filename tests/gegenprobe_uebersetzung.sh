@@ -166,31 +166,24 @@ fall "der lange Druck nimmt die Wahl nicht mehr zurueck" assets/app.js \
   '    langerDruckZuruecknehmen(lb);' '    /* abgeschaltet */'
 
 echo; echo "═══ D · sicherheit.html traegt ihre Uebersetzung selbst ═══"
-# Die Seite laedt kein app.js. Faellt ihr eigenes Woerterbuch oder der Anwender
-# aus, steht sie im Englisch-Modus wieder vollstaendig auf Deutsch — genau der
-# Zustand vor dem 2026-09-14.
+# Seit 2026-10-17 (Ueberblick aus Sage) traegt die Seite ZWEI Sprachbloecke
+# (#de, #en) statt data-i18n-Haken. Die Faelle davor zielten auf das alte
+# Woerterbuch und sind ersetzt (Tafel-Evolution, benannt in smoke_uebersetzung).
 fall "die Ueberschrift verliert ihre englische Fassung" sicherheit.html \
-  'sh_h1: "How the mycelium works, and how you are protected.",' \
-  'sh_h1_AUS: "How the mycelium works, and how you are protected.",'
-fall "der Anwender schreibt nichts mehr" sicherheit.html \
-  '      if (w[k] != null) el.textContent = w[k];' \
-  '      /* abgeschaltet */'
+  '<h1>How the mycelium works. And how you are protected.</h1>' \
+  '<h1>So funktioniert das Mycel. Und so bist du geschützt.</h1>'
+fall "der englische Block wird nie gezeigt" sicherheit.html \
+  '    bloecke.en.hidden = aktuell !== "en";' \
+  '    bloecke.en.hidden = true;'
 fall "die Seite folgt fp_lang nicht mehr" sicherheit.html \
-  '  var lang = gewaehlt();' \
-  '  var lang = "de";'
-# Ein EINZELNER Woerterbuch-Eintrag verliert seine englische Fassung — dann
-# steht dort wieder deutscher Text, und genau das soll auffallen.
+  ' data-sprache-schluessel="fp_lang"' ''
+# Ein EINZELNER englischer Eintrag steht auf Deutsch — genau das soll auffallen.
 fall "ein einzelner Woerterbuch-Eintrag verliert seine EN-Fassung" sicherheit.html \
-  '    sh_g_hyphe: "a single fungal thread' \
-  '    sh_g_hyphe_AUS: "a single fungal thread'
-# Die Gegenrichtung: Eigennamen sollen STEHEN BLEIBEN. Bekommt „Hyphe" eine
-# Uebersetzung, ist das ein Fehler, den der Waechter fangen muss.
-# ⚠ Der Haken muss auf einen Schluessel zeigen, den es im englischen
-# Woerterbuch WIRKLICH gibt. Die erste Fassung nahm `sh_gt_hyphe` — den gibt es
-# nicht, `w[k] != null` war false, der Text blieb stehen, und der Fall aenderte
-# gar nichts. Eine Sabotage, die nichts aendert, misst nichts.
+  '<dd>a single fungal thread; here, a connection between two nodes.</dd>' \
+  '<dd>ein einzelner Pilzfaden; hier eine Verbindung zwischen zwei Knoten.</dd>'
+# Die Gegenrichtung: Eigennamen sollen STEHEN BLEIBEN.
 fall "ein Eigenname wird faelschlich uebersetzt" sicherheit.html \
-  '<dt translate="no">Hyphe</dt>' '<dt data-i18n="sh_gt_knoten">Hyphe</dt>'
+  '<dt id="en-w-hyphe">Hyphe (hypha)</dt>' '<dt id="en-w-hyphe">Hypha</dt>'
 
 echo
 echo "$gefangen gefangen · $durch durchgerutscht · $tot tote Anker"
