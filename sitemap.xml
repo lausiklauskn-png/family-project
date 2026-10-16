@@ -102,6 +102,11 @@
     <priority>0.6</priority>
   </url>
   <url>
+    <loc>https://family-projekt.de/apps/eigen-in-and-out/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://family-projekt.de/apps/eigen-kimtool-point/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -143,6 +148,16 @@
   </url>
   <url>
     <loc>https://family-projekt.de/apps/eigen-workfloh-page/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-workflow-calculate/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://family-projekt.de/apps/eigen-workflow-needs/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
