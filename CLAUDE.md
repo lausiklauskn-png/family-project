@@ -1437,3 +1437,19 @@ Modul 04 und Modul 24 kommen neu aus dem Kanon (Sage #1082, verteilt mit `kanon-
 - Proben: `node tests/smoke_ki_pruefliste.mjs` (21 grün, echtes Modul 24, Mistral gestellt, ein JPEG mit EXIF-Kennung) · `bash tests/gegenprobe_ki_pruefliste.sh` (8 gefangen · 0 durchgerutscht · 0 aus falschem Grund · 0 tote Anker; `NUR_ANKER=1`, `NUR_FALL=…`). Der erste Anker-Lauf meldete einen toten Anker (das Wort traf 14-mal); nachgezogen.
 - Alle 48 `tests/smoke_*.mjs` liefen danach mit Rückgabe 0. Cache v151 → v152 (der Verteiler hat `ASSET_V` an 96 Stellen mitgezogen).
 - ⚠ Am Tablet nicht gemessen, auch nicht mit einer echten KI.
+
+## ⬇ Installieren-Knopf (2026-10-18, Klaus: „In jede App“)
+
+`assets/installieren.js` ist byte-1:1 aus Sage-Protokol (SHA-256 `e0644084…c3`) — nie hier abwandeln. Keine Einstellungen,
+also steht er in der Kopfleiste vor ↻, auf den sechs Seiten mit Manifest (index, netzwerk, werkzeuge, markt, referenzen,
+mycelkarte); nur das Zeichen ⬇, wie ↻. Als installierte App verschwindet er.
+
+⚠ **Er erscheint erst nach dem Laden** — ein unsichtbarer Platzhalter `#install-platz` (gleiche Pille) hält seinen Platz
+vorher frei, der Knopf kommt davor (`data-vor="install-platz"`), danach blendet CSS den Platzhalter aus; als App ist er per
+`display-mode` von Anfang an weg. So bleibt `smoke_kopfleiste` („mit und ohne JavaScript gleich hoch“) grün. Gemessen:
+Kopfhöhe und CLS bei 320 · 360 · 412 · 900 · 1280 px gleich wie auf main.
+
+Cache v164, `ASSET_V` und alle `?v=` mitgezogen. Gemessen im Browser: sichtbar, als App weg, Meldung lesbar,
+`getInstallabilityErrors` leer. Alle 49 `tests/smoke_*.mjs` mit Rückgabe 0 (`smoke_kopfleiste` 208, `smoke_all` 125,
+`smoke_cache_version` 12) — ⚠ `smoke_netzverwaltung` war im ersten Lauf (Maschine unter Last) 4× rot („Failed to fetch“),
+danach zweimal 16 grün, auf main ebenfalls 16 grün. Am Tablet nicht gemessen.
