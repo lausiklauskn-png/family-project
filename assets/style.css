@@ -147,6 +147,13 @@ nav.top a:hover::before,nav.top a:focus-visible::before{opacity:1}
 .pill.pill-reload:hover{color:#08121a;border-color:transparent;
   background:linear-gradient(135deg,var(--accent),var(--accent3) 62%,var(--accent2));
   box-shadow:inset 0 1.5px 1px rgba(255,255,255,.6),0 8px 20px rgba(0,0,0,.4),var(--glow)}
+/* Installieren (2026-10-18, assets/installieren.js aus Sage): nur das Zeichen, wie ↻. Der Platzhalter
+   #install-platz hält den Platz frei, bis der Knopf davor steht; als App ist er von Anfang an weg. */
+.pill.pill-install{line-height:inherit;margin:0;font-weight:700;color:var(--accent)}
+.pill-install .t{display:none}
+#install-platz{visibility:hidden}
+#installieren + #install-platz{display:none}
+@media (display-mode: standalone),(display-mode: minimal-ui),(display-mode: window-controls-overlay){#install-platz{display:none}}
 .pill.pill-reload .rl-ic{display:inline-block;font-weight:700;transition:transform .5s ease}
 .pill.pill-reload:hover .rl-ic{transform:rotate(360deg)}
 .pill.pill-reload.spinning{pointer-events:none;opacity:.85}
