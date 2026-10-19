@@ -47,5 +47,9 @@
   "eigen-alis-warenwirtschaft": {
     "wartung": true,
     "wartungSeit": "2026-09-28"
+  },
+  "markt-privat-brain": {
+    "wartung": true,
+    "wartungSeit": "2026-10-19"
   }
 }
