@@ -21,6 +21,18 @@ die nächste Seite von vornherein gebaut wird.
 
 <!-- forschung:auto -->
 
+### 2026-10-23 · Sage-Protokol
+
+<https://lausiklauskn-png.github.io/Sage-Protokol/> · Quelle der Zahlen: Google PageSpeed Insights
+
+- **Leistung 73 → 97** (↑ 24, am 2026-10-24 noch 94)
+
+> Gesehen am 2026-10-23, **bestätigt durch die Messung vom 2026-10-24**. Ein Sprung allein macht keinen Eintrag mehr — er muss die nächste Messung überstehen (Klaus 2026-08-06, siehe `LEHREN.md` Lehre 6c).
+- Beanstandung weg: leistung: Reduziere nicht verwendetes JavaScript
+- Beanstandung neu: leistung: Netzwerkabhängigkeitsbaum
+
+**Warum:** _(noch nicht eingetragen)_
+
 ### 2026-09-25 · Jasons-Tresor
 
 <https://lausiklauskn-png.github.io/Jasons-Tresor/> · Quelle der Zahlen: Google PageSpeed Insights
