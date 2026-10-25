@@ -417,7 +417,7 @@
       }
     },
     "markt-privat-brain": {
-      "url": "https://lausiklauskn-png.github.io/Privat-Brain/sbkim/spore.json",
+      "url": "https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/sbkim/spore.json",
       "lage": "abweichend",
       "nodeName": "Private Brain",
       "nodeId": "6rmW2Q-53mzEylZiWuW4yNsbnxlyEoLD11860i3y0Cg",
@@ -426,17 +426,13 @@
       "neuerText": "Private Brain — dein privates zweites Gehirn: durchsucht deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) nach Bedeutung, offline, ohne dass Originale bewegt werden. Es liest jede Datei einmal, behält nur einen winzigen Bedeutungs-Katalog und lässt die Originale unangetastet — liest nur, schlägt vor, bewegt nichts.",
       "wache": {
         "ampel": "gruen",
-        "grund": "in_wartung",
+        "grund": "unveraendert",
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
-        "wartung": true,
-        "grundlage": "c5e7b70d24a9de2b",
-        "fgrundlage": "3d2d90abc0a740af",
         "sporeHash": "55b9ac52",
-        "pruefsumme": "7f7087ef6f494457",
         "status": 200,
         "seit": "2026-08-01",
-        "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
+        "url": "https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/"
       },
       "messung": {
         "leistung": 98,
@@ -520,7 +516,7 @@
           "noetig": 3,
           "seit": "2026-10-25"
         },
-        "url": "https://lausiklauskn-png.github.io/Privat-Brain/"
+        "url": "https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/"
       }
     },
     "markt-workfloh": {

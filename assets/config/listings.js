@@ -351,24 +351,25 @@ window.FP_LISTINGS = [
     "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Kimboard/main/sbkim/spore.json"
   },
   {
-    "label": "Private Brain",
+    "label": "Private Brain V3",
     "anchorId": "markt-privat-brain",
-    "text": "Private Brain, dein privates, offline betriebenes zweites Gehirn: lass einmal all deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) durchlaufen. Die App liest jede Datei nur einmal, merkt sich einen kleinen Bedeutungs-Katalog und lässt die Originale unberührt. Liest nur, schlägt vor, bewegt nichts. Danach semantische, kombinierende Suche über gemischte Daten. Wissen, Archiv, Dokumente, Notizen, Suche, zweites Gehirn, privat, offline. Läuft im Browser, kein großes Unternehmen dahinter.",
-    "text_en": "Private Brain, your private, offline second brain: run all your own data through it once (mail, documents, photos, notes). The app reads each file only once, keeps a small catalogue of meaning and leaves the originals untouched. It only reads, it suggests, it moves nothing. After that: semantic, combining search across mixed data. Knowledge, archive, documents, notes, search, second brain, private, offline. Runs in the browser, with no big company behind it.",
+    "text": "Private Brain V3, dein privates, offline betriebenes zweites Gehirn im Browser: lass deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) einmal durchlaufen. Die App liest jede Datei nur einmal, merkt sich einen kleinen Bedeutungs-Katalog und lässt die Originale unberührt. Suche nach Wort oder mit dem Schalter Bedeutung nach Sinn, quer über gemischte Daten. Postfach, Explorer mit ziehbaren Spaltenbreiten, fünf Designs zur Wahl, Deutsch, Englisch, Russisch, Polnisch. Installierbar als App. Wissen, Archiv, Dokumente, Notizen, Mails, Suche, zweites Gehirn, privat, offline. Kein großes Unternehmen dahinter.",
+    "text_en": "Private Brain V3, your private, offline second brain in the browser: run your own data through it once (mail, documents, photos, notes). The app reads each file only once, keeps a small catalogue of meaning and leaves the originals untouched. Search by word or, with the Meaning switch, by sense, across mixed data. Inbox, explorer with adjustable column widths, five designs to choose from, German, English, Russian, Polish. Installable as an app. Knowledge, archive, documents, notes, mail, search, second brain, private, offline. No big company behind it.",
     "vorstellung": [
       "Für alle, die ihre eigenen Daten wiederfinden wollen",
       "Mails, Dokumente, Fotos und Notizen einmal durchlaufen lassen",
-      "Die App merkt sich einen kleinen Katalog und lässt die Originale liegen",
-      "Danach suchen nach Sinn, quer über alles gemischt",
-      "Läuft offline, kein großes Unternehmen dahinter"
+      "Suchen nach Wort oder mit dem Schalter Bedeutung nach Sinn",
+      "Postfach und Explorer, Spaltenbreiten selbst ziehen, fünf Designs",
+      "Läuft offline im Browser und lässt sich als App installieren",
+      "Für Android und Windows entsteht daneben die App Private Brain V3 Pro, mit echten Mailkonten über das eigene Gerät"
     ],
     "besonders": "Liest nur, schlägt vor, bewegt nichts. Keine Datei wird verschoben, umbenannt oder gelöscht.",
     "by": "@klaus",
-    "url": "https://lausiklauskn-png.github.io/Privat-Brain/",
-    "img": "https://lausiklauskn-png.github.io/Privat-Brain/icon-512.png",
+    "url": "https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/",
+    "img": "https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/icon-v3-512.png",
     "category": "Büro",
     "own": true,
-    "sporeUrl": "https://lausiklauskn-png.github.io/Privat-Brain/sbkim/spore.json"
+    "sporeUrl": "https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/sbkim/spore.json"
   },
   {
     "label": "WorkFloh",

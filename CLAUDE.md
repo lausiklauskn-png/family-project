@@ -1453,3 +1453,30 @@ Cache v164, `ASSET_V` und alle `?v=` mitgezogen. Gemessen im Browser: sichtbar, 
 `getInstallabilityErrors` leer. Alle 49 `tests/smoke_*.mjs` mit Rückgabe 0 (`smoke_kopfleiste` 208, `smoke_all` 125,
 `smoke_cache_version` 12) — ⚠ `smoke_netzverwaltung` war im ersten Lauf (Maschine unter Last) 4× rot („Failed to fetch“),
 danach zweimal 16 grün, auf main ebenfalls 16 grün. Am Tablet nicht gemessen.
+
+## 🧠 Private Brain heißt jetzt Private Brain V3 (Klaus 2026-10-25)
+
+Die alte App „Private Brain“ (`lausiklauskn-png.github.io/Privat-Brain/`) ist eingestellt, ihr Depot privat.
+An ihre Stelle tritt die Browserfassung **Private Brain V3**: `https://lausiklauskn-png.github.io/Privat-Brain-Pro-V3/`
+(installierbar, Symbol `icon-v3-512.png`, Spore unter `sbkim/spore.json`, beides von `tools/native/prepare-pages.mjs`
+bzw. `prepare-web.mjs` im V3-Depot ausgeliefert — dort nachgelesen, von hier aus nicht abrufbar: der Proxy sperrt github.io).
+
+- **Die Kennung bleibt `markt-privat-brain`.** Sie ist die Identität der Messreihe; ein neuer Schlüssel hätte eine leere
+  Reihe begonnen (Präzedenzfall `eigen-toolpoint-pruefer`, oben). Geändert sind Titel, `url`, `img`, `sporeUrl`, `text`,
+  `text_en`, `vorstellung`. `besonders` bleibt („Liest nur, schlägt vor, bewegt nichts“), das gilt für V3 genauso.
+- **Die Wartung ist beendet.** Sie stand seit 2026-10-19 in `wache-hand.json` und im Bericht `spore-stand.json`
+  (`in_wartung`), weil die alte Adresse ging. Beide Stellen sind zurückgenommen, sonst bliebe die Karte bis zur Nacht
+  aus der gebauten Seite weg (benannte Grenze der Wartung, oben).
+- **Im Bericht ist die Grundlage des Wächters entfernt** (`grundlage`, `fgrundlage`, `pruefsumme`). Sie gehörte zur alten
+  Seite; mit ihr hätte die neue Adresse in der ersten Nacht „fingerabdruck_geaendert“ (gelb) bekommen. Ohne sie gilt
+  „erste_pruefung“. Die Adressen im Bericht zeigen auf V3.
+- ⚠ **BENANNTE GRENZE:** Verlauf und Messband zeigen bis zur nächsten Messung der neuen Adresse noch die Zahlen der
+  ALTEN App (die Reihe in `forschung/` wird hier nicht angefasst). Die Reihenfolge misst das Älteste zuerst; die letzte
+  Messung war am 2026-10-25, es kann also einige Nächte dauern.
+- ⚠ **Das Vektor-Paket ist für diesen Eintrag veraltet** (Hash passt nicht mehr zum Text). Das Modell ist im Behälter
+  nicht vorhanden; der Marktplatz rechnet einen solchen Eintrag zur Laufzeit selbst, und der nächtliche Lauf schreibt
+  den Vektor fort.
+- **Cache-Bump v164 → v165**, `ASSET_V` und alle `?v=` mitgezogen (101 Verweise). Nötig, weil `markt.html` neu gebaut
+  wird und in `CORE` steht; `smoke_cache_version` hat es gemeldet.
+- Die Spore von V3 trägt noch Namen und Text des alten Private Brain (eine Kopie); ohne `sporeAuto` wird ein Unterschied
+  nur gemeldet, nichts übernommen.
