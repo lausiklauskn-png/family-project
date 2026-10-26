@@ -1503,3 +1503,23 @@ seit 2026-08-04 auf `aktiv: false` („kein index.html“), **nie gemessen** (ke
   Vektor, Wächter-Ampel und erste Messung nicht bis zur Nacht warten; die Messung kommt in der Reihenfolge „ältester
   Befund zuerst“, nie Gemessene ganz vorn.
 - ⚠ Am Tablet nicht gemessen; die Karte im Browser nicht gesehen; die Adresse aus dem Netz nicht abgerufen (Proxy).
+
+## 📒 BookLedger Basic im Regal (Klaus 2026-10-26)
+
+Klaus: *„du kannst die BookLedger Basic in Family Project und PWA Toolpoint hochladen."* BookLedger Basic ist die
+**PWA-Fassung** von BookLedgerPro (`https://lausiklauskn-png.github.io/BookLedger-Basic/`, Depot `BookLedger-Basic`,
+Kopie von Pro mit eigener DB-Endung); das Pro-Depot wird die native App (Android, Windows) und bekommt später eine eigene
+Seite, nicht diesen Markt.
+- Eintrag `eigen-bookledger-basic` in `assets/config/listings.js`, hinten vor der Marke; **dieselbe Kennung in PWA Toolpoint**
+  (Identität der Messreihe, wie bei `eigen-workflow-pdf`). `markt-bookledgerpro` bleibt unverändert.
+- Bild: das App-Symbol `assets/icons/icon-512.png` der Basic-Adresse — das `og-image.png` dort trägt den Schriftzug
+  „BookLedgerPro" und wäre an dieser Karte eine falsche Auskunft. **Keine `sporeUrl`:** Basic trägt noch die Spore des
+  Pro-PWA; zwei Karten mit derselben Knoten-Identität wären für den Wächter eine Kollision. Kommt Klaus' eigene Basic-Spore,
+  wird sie hier nachgetragen.
+- Gebaut mit `statische-listen` (34 Karten, eine auf Wartung), `detailseiten` (`apps/eigen-bookledger-basic/`),
+  `sitemap-bauen` (48 Adressen). Cache `v166 → v167` (markt.html steht im Vorrat; v166 hatte parallel der Kim-sync-Eintrag #372 genommen), `ASSET_V` und alle `?v=` nachgezogen.
+- Gemessen: alle `tests/smoke_*.mjs` grün (u. a. `smoke_all` 125, `statische_listen` 45, `detail_gestalt` 209, `sitemap` 249,
+  `cache_version` 12, `a5_markt_sortierung`, `studio_vectors` 41, `stufe3_waechter` 94). ⚠ `smoke_hintergrund` ist **6 rot,
+  auch auf main** (Hintergrund-Schalter mit three.js; im Behälter nachgemessen, nicht angefasst). ⚠ Messung und Eigenschaften der
+  Karte kommen mit der nächsten Nacht; der Pages-Host ist aus dem Behälter nicht erreichbar, die Karte ist am Tablet nicht gesehen
+  (Sichttest ausstehend).

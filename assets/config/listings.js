@@ -790,6 +790,25 @@ window.FP_LISTINGS = [
     "category": "Büro",
     "own": true
   },
+  {
+    "label": "BookLedger Basic",
+    "anchorId": "eigen-bookledger-basic",
+    "text": "Die Browserfassung von BookLedgerPro: Buchhaltung und Kassenbuch für Selbstständige, kleine Betriebe und den privaten Haushalt. Belege, Rechnungen, Angebote, Konten, Umsatzsteuer und EÜR. Beleg fotografieren, Text lesen, nach Wörtern und Bedeutung suchen. Läuft als installierbare App offline im Browser, verschlüsselt, ohne Konto und ohne Server. Buchführung, Beleg, Rechnung schreiben, Steuer, Haushaltsbuch.",
+    "text_en": "The browser edition of BookLedgerPro: bookkeeping and cash book for freelancers, small businesses and private households. Receipts, invoices, quotes, accounts, VAT and cash-basis accounting. Photograph a receipt, read its text, search by words and by meaning. Runs as an installable app offline in the browser, encrypted, with no account and no server. Accounting, receipt, writing invoices, tax, household book.",
+    "vorstellung": [
+      "Für Selbstständige, kleine Betriebe und den privaten Haushalt",
+      "Belege, Rechnungen, Angebote und Konten an einer Stelle",
+      "Umsatzsteuer und EÜR im Blick",
+      "Beleg fotografieren, Text lesen, nach Wörtern und Bedeutung suchen",
+      "Läuft offline im Browser, verschlüsselt, ohne Konto und ohne Server"
+    ],
+    "besonders": "Dieselbe Buchhaltung wie BookLedgerPro, als freie Browserfassung zum Installieren. Alle Daten bleiben verschlüsselt auf dem Gerät.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/BookLedger-Basic/",
+    "img": "https://lausiklauskn-png.github.io/BookLedger-Basic/assets/icons/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
