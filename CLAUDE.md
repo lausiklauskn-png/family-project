@@ -1497,11 +1497,15 @@ seit 2026-08-04 auf `aktiv: false` („kein index.html“), **nie gemessen** (ke
 - `tools/statische-listen.mjs` (markt.html 34 Einträge), `tools/detailseiten.mjs` (`apps/eigen-kim-sync/`),
   `tools/sitemap-bauen.mjs` (48 Adressen). Cache **v165 → v166**, `ASSET_V` und alle `?v=` mitgezogen (markt.html steht
   in `CORE`).
-- **Bedeutungssuche:** das Vektor-Paket (`listings-vec.json`) kennt den Eintrag noch nicht. Das Modell ist im Behälter
-  nicht vorhanden; der Marktplatz rechnet einen fehlenden Vektor zur Laufzeit selbst, und der Lauf
-  `vektoren-taeglich.yml` schreibt ihn fort. Er wurde nach dem Merge **von Hand angestoßen** (workflow_dispatch), damit
-  Vektor, Wächter-Ampel und erste Messung nicht bis zur Nacht warten; die Messung kommt in der Reihenfolge „ältester
-  Befund zuerst“, nie Gemessene ganz vorn.
+- **Bedeutungssuche und Messung, erledigt am selben Tag:** PR #372 übernommen, danach `vektoren-taeglich.yml` von Hand
+  angestoßen (Lauf 40376740750, grün). Ergebnis auf `main` (Commit `1dd4a37`): Vektor für `eigen-kim-sync` im Paket
+  (`built` 2026-10-26), Wächter-Ampel **grün** (`erste_pruefung`, HTTP 200, `ohne_spore`), erste Messung in
+  `forschung/messreihe.json` und im Bericht: Leistung **99**, Bedienbarkeit 100, gute Praxis 100, Auffindbarkeit 100
+  (Handy, Lighthouse 13.5.0, Quelle google). PWA Toolpoint hat die Zahlen über seinen Messwerte-Lauf sofort übernommen.
+- Browserproben vor dem Merge: alle 23 grün (`smoke_all` 125, `smoke_kopfleiste` 208, `smoke_detail_gestalt` 209,
+  `smoke_stufe5_messung` 153, `smoke_stufe3_waechter` 94, `smoke_kartenknoepfe` 83, `smoke_markt_vecpack` 11 …);
+  im Behälter brauchen sie `node_modules/playwright` und `playwright-core` als Verweis auf `/opt/node-tools`, nicht
+  committet. Die Proben ohne Browser waren schon vorher alle grün.
 - ⚠ Am Tablet nicht gemessen; die Karte im Browser nicht gesehen; die Adresse aus dem Netz nicht abgerufen (Proxy).
 
 ## 📒 BookLedger Basic im Regal (Klaus 2026-10-26)
