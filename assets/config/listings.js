@@ -351,6 +351,25 @@ window.FP_LISTINGS = [
     "sporeUrl": "https://raw.githubusercontent.com/lausiklauskn-png/Kimboard/main/sbkim/spore.json"
   },
   {
+    "label": "Kim-sync",
+    "anchorId": "eigen-kim-sync",
+    "text": "Kim-sync, der kleine Messenger für Familie und Freunde: Bilder, Videos, Dateien und kurze Nachrichten zwischen den eigenen Geräten und in Gruppen, Ende-zu-Ende verschlüsselt über einen gemeinsamen Raum-Code, ohne Konto und ohne Telefonnummer. Gruppen mit Profilbild und Leitung, Einlass nur nach Bestätigung, private Nachricht an eine Person, Lesebestätigung, Suche nach Wort und Bedeutung, Diktat, Übersetzen auf dem Gerät, Sicherung in eine Datei, eigene oder öffentliche Relais, Dateien bis 200 MB. Messenger, Chat, Bilder teilen, Familie, verschlüsselt, ohne Konto, Nachrichten. Läuft als App im Browser, die Schlüssel bleiben auf dem Gerät.",
+    "text_en": "Kim-sync, the small messenger for family and friends: pictures, videos, files and short messages between your own devices and in groups, end-to-end encrypted with a shared room code, no account and no phone number. Groups with profile picture and a leader, admission only after confirmation, private message to one person, read receipts, search by word and by meaning, dictation, translation on the device, backup to a file, your own or public relays, files up to 200 MB. Messenger, chat, share pictures, family, encrypted, no account, messages. Runs as an app in the browser, the keys stay on the device.",
+    "vorstellung": [
+      "Für Familien und kleine Gruppen, die Bilder und Nachrichten ohne großen Anbieter austauschen wollen",
+      "Bilder, Videos, Dateien und kurze Nachrichten, verschlüsselt über einen gemeinsamen Raum-Code",
+      "Gruppen mit Profilbild und Leitung, Einlass nur nach Bestätigung",
+      "Suche nach Wort und Bedeutung, Diktat und Übersetzen auf dem Gerät",
+      "Sicherung in eine Datei, eigene oder öffentliche Relais, kein Konto"
+    ],
+    "besonders": "Kein Konto und keine Telefonnummer. Ein Raum-Code genügt, und wer ihn hat, kommt erst hinein, wenn die Leitung der Gruppe es bestätigt.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Kim-sync/",
+    "img": "https://lausiklauskn-png.github.io/Kim-sync/icons/icon-512.png",
+    "category": "Werkzeug",
+    "own": true
+  },
+  {
     "label": "Private Brain V3",
     "anchorId": "markt-privat-brain",
     "text": "Private Brain V3, dein privates, offline betriebenes zweites Gehirn im Browser: lass deine eigenen Daten (Mails, Dokumente, Fotos, Notizen) einmal durchlaufen. Die App liest jede Datei nur einmal, merkt sich einen kleinen Bedeutungs-Katalog und lässt die Originale unberührt. Suche nach Wort oder mit dem Schalter Bedeutung nach Sinn, quer über gemischte Daten. Postfach, Explorer mit ziehbaren Spaltenbreiten, fünf Designs zur Wahl, Deutsch, Englisch, Russisch, Polnisch. Installierbar als App. Wissen, Archiv, Dokumente, Notizen, Mails, Suche, zweites Gehirn, privat, offline. Kein großes Unternehmen dahinter.",

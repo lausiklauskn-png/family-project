@@ -131,7 +131,7 @@
       "url": "https://lausiklauskn-png.github.io/Kim-sync/",
       "repo": "Kim-sync",
       "aktiv": false,
-      "grund": "kein index.html in der Wurzel von main (Stand 2026-08-04) — es gäbe nichts zu messen. Sobald dort eine Seite liegt: aktiv auf true."
+      "grund": "steht seit 2026-10-26 selbst im Marktplatz (und bei PWA Toolpoint) und wird dort gemessen. Zweimal geführt hieße zwei Punkte für denselben Tag aus zwei Wegen — dasselbe Muster wie eigen-sage. ⚠ Die KENNUNG bleibt absichtlich dieselbe: sie IST die Identität der Messreihe (siehe _felder.id). Bis 2026-10-26 stand hier: kein index.html in der Wurzel (Stand 2026-08-04); die Seite liegt seit dem 2026-10-03 dort, gemessen wurde sie nie. Fällt der Marktplatz-Eintrag weg, hier wieder auf true."
     },
     {
       "id": "eigen-kimhub",

@@ -1480,3 +1480,26 @@ bzw. `prepare-web.mjs` im V3-Depot ausgeliefert — dort nachgelesen, von hier a
   wird und in `CORE` steht; `smoke_cache_version` hat es gemeldet.
 - Die Spore von V3 trägt noch Namen und Text des alten Private Brain (eine Kopie); ohne `sporeAuto` wird ein Unterschied
   nur gemeldet, nichts übernommen.
+
+## 💬 Kim-sync im Marktplatz (Klaus 2026-10-26)
+
+Klaus: *„Kannst du Kim-sync jetzt hochladen auf Family Project und PWA Toolpoint? Mit allem drum und dran … die
+Bedeutungssuche gleich aktivieren, alle Einträge machen und genehmigen.“* Kim-sync (`lausiklauskn-png.github.io/Kim-sync/`,
+privates Depot, Pages liefert aus) stand bis dahin in **keinem** Markt. Hier gab es nur das Messziel `eigen-kim-sync`,
+seit 2026-08-04 auf `aktiv: false` („kein index.html“), **nie gemessen** (keine Reihe in `forschung/messreihe.json`).
+
+- **Die Kennung bleibt `eigen-kim-sync`** (Identität der Messreihe, siehe `_felder.id`; Präzedenzfall
+  `eigen-toolpoint-pruefer`). Das Messziel bleibt `aktiv: false`, der Grund ist neu: der Markt-Lauf misst jetzt. Über
+  `bekannteKennungen()` findet der Fremdmarkt-Weg die Kennung auch bei PWA Toolpoint nicht ein zweites Mal.
+- Eintrag in `listings.js` hinter Kimboard, mit `vorstellung` (Stichpunkte, für wen) und `besonders` (eine Hervorhebung,
+  kein Gedankenstrich). Kein `sporeUrl`: im Depot liegt keine Spore (sie entsteht in Klaus' Browser), der Bericht schreibt
+  `ohne_spore`. Keine Wartung, keine Ampel: freigegeben.
+- `tools/statische-listen.mjs` (markt.html 34 Einträge), `tools/detailseiten.mjs` (`apps/eigen-kim-sync/`),
+  `tools/sitemap-bauen.mjs` (48 Adressen). Cache **v165 → v166**, `ASSET_V` und alle `?v=` mitgezogen (markt.html steht
+  in `CORE`).
+- **Bedeutungssuche:** das Vektor-Paket (`listings-vec.json`) kennt den Eintrag noch nicht. Das Modell ist im Behälter
+  nicht vorhanden; der Marktplatz rechnet einen fehlenden Vektor zur Laufzeit selbst, und der Lauf
+  `vektoren-taeglich.yml` schreibt ihn fort. Er wurde nach dem Merge **von Hand angestoßen** (workflow_dispatch), damit
+  Vektor, Wächter-Ampel und erste Messung nicht bis zur Nacht warten; die Messung kommt in der Reihenfolge „ältester
+  Befund zuerst“, nie Gemessene ganz vorn.
+- ⚠ Am Tablet nicht gemessen; die Karte im Browser nicht gesehen; die Adresse aus dem Netz nicht abgerufen (Proxy).
