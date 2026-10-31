@@ -1,3 +1,5 @@
+**🔬 Regel: Forschung nur in Kimhub (Klaus 2026-10-31):** jeder Forschungseintrag (Sitzungs-Befunde, Messungen, Stunden-Auswertungen, Forschungsnotizen) kommt nach Kimhub `forschung/messungen/`; in diesem Repo werden keine Forschungseinträge geführt und keine Forschungsdateien angelegt. Öffentliche Forschungsaufgaben stehen in Sage-Protokol. **Benannte Ausnahme:** `forschung/` hier ist die Messstation des Marktplatzes (die nächtliche Aktion `vektoren-taeglich.yml` schreibt Messreihe, Journal und Tabelle; `tools/detailseiten.mjs`, `tools/lib/fremdmarkt.mjs` und rund zehn Proben lesen sie) und bleibt deshalb in Betrieb; ein Abbild (Stand `478f5ee`) liegt in Kimhub `forschung/family-project/`. Neue Forschungsnotizen kommen nicht hierher.
+
 # Family Projekt — Sitzungs-Anker
 
 **Kurz-Verfassung.** Ausführliches steht netzweit in **Sage-Protokol**; hier steht nur,
