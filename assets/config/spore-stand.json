@@ -1,6 +1,6 @@
 {
   "_hinweis": "Bericht der nächtlichen Prüfung (Katalog-Spore Stufe 2 + 3). Wird von tools/vektoren-bauen.mjs geschrieben — Änderungen von Hand gehen beim nächsten Lauf verloren. Sperren und Freigaben gehören in assets/config/wache-hand.json.",
-  "geprueft": "2026-11-06T09:47:52.341Z",
+  "geprueft": "2026-11-07T09:11:25.210Z",
   "eintraege": {
     "markt-bookledgerpro": {
       "url": "https://lausiklauskn-png.github.io/BookLedgerPro/sbkim/spore.json",
@@ -30,6 +30,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -47,7 +48,6 @@
             "t": "Netzwerkabhängigkeitsbaum"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/BookLedgerPro/"
       }
     },
@@ -205,7 +205,7 @@
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
-          "gemessen": "2026-11-06",
+          "gemessen": "2026-11-07",
           "quelle": "google",
           "werkzeug": "13.6.0",
           "hinweise": [
@@ -225,7 +225,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-11-06"
         },
@@ -235,7 +235,7 @@
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
-          "gemessen": "2026-11-06",
+          "gemessen": "2026-11-07",
           "quelle": "google",
           "werkzeug": "13.6.0",
           "hinweise": [
@@ -286,6 +286,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -303,7 +304,6 @@
             "t": "JavaScript komprimieren"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Kim-Bell/"
       }
     },
@@ -561,14 +561,14 @@
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "spore_unveraendert",
         "sporeHash": "cd9214a2",
-        "grundlage": "0142032d1f38469a",
+        "grundlage": "4e4e5a3a7501977f",
         "fgrundlage": "e49bf89e183c97bb",
         "fingerabdruck": "e49bf89e183c97bb",
         "fremde": [
           "family-projekt.de",
           "lausiklauskn-png.github.io"
         ],
-        "pruefsumme": "0142032d1f38469a",
+        "pruefsumme": "4e4e5a3a7501977f",
         "status": 200,
         "seit": "2026-09-18",
         "url": "https://pwa-toolpoint.de/"
@@ -812,6 +812,7 @@
         "bedienbarkeit": 95,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -838,7 +839,6 @@
             "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Muttis-Rezeptbuch/"
       }
     },
@@ -1077,17 +1077,18 @@
           }
         ],
         "frisch": {
-          "leistung": 98,
+          "leistung": 95,
           "bedienbarkeit": 100,
           "gute_praxis": 100,
           "auffindbarkeit": 100,
-          "gemessen": "2026-11-06",
+          "gemessen": "2026-11-07",
           "quelle": "google",
           "werkzeug": "13.6.0",
           "hinweise": [
             {
               "k": "leistung",
-              "t": "Netzwerkabhängigkeitsbaum"
+              "t": "JavaScript komprimieren",
+              "ms": 150
             },
             {
               "k": "leistung",
@@ -1095,7 +1096,7 @@
             },
             {
               "k": "leistung",
-              "t": "CSS komprimieren"
+              "t": "Erzwungener dynamischer Umbruch"
             },
             {
               "k": "bedienbarkeit",
@@ -1104,7 +1105,7 @@
           ]
         },
         "zurueckgehalten": {
-          "zahl": 1,
+          "zahl": 2,
           "noetig": 3,
           "seit": "2026-11-06"
         },
@@ -1135,15 +1136,10 @@
         "bedienbarkeit": 88,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-10-31",
+        "gemessen": "2026-11-07",
         "quelle": "google",
         "werkzeug": "13.6.0",
         "hinweise": [
-          {
-            "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
-          },
           {
             "k": "leistung",
             "t": "Netzwerkabhängigkeitsbaum"
@@ -1151,6 +1147,10 @@
           {
             "k": "leistung",
             "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
           },
           {
             "k": "bedienbarkeit",
@@ -1161,6 +1161,7 @@
             "t": "Die Formularelemente sind nicht mit Labels verknüpft"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/mycel-karte/"
       }
     },
@@ -1208,6 +1209,35 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
+        "frisch": {
+          "leistung": 98,
+          "bedienbarkeit": 100,
+          "gute_praxis": 100,
+          "auffindbarkeit": 100,
+          "gemessen": "2026-11-07",
+          "quelle": "google",
+          "werkzeug": "13.6.0",
+          "hinweise": [
+            {
+              "k": "leistung",
+              "t": "Reduziere nicht verwendetes JavaScript",
+              "ms": 150
+            },
+            {
+              "k": "leistung",
+              "t": "Effiziente Verweildauer im Cache verwenden"
+            },
+            {
+              "k": "leistung",
+              "t": "Erzwungener dynamischer Umbruch"
+            }
+          ]
+        },
+        "zurueckgehalten": {
+          "zahl": 1,
+          "noetig": 3,
+          "seit": "2026-11-07"
+        },
         "url": "https://lausiklauskn-png.github.io/Kim-sync/"
       }
     },
@@ -1295,6 +1325,34 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
+        "frisch": {
+          "leistung": 98,
+          "bedienbarkeit": 100,
+          "gute_praxis": 100,
+          "auffindbarkeit": 100,
+          "gemessen": "2026-11-07",
+          "quelle": "google",
+          "werkzeug": "13.6.0",
+          "hinweise": [
+            {
+              "k": "leistung",
+              "t": "Effiziente Verweildauer im Cache verwenden"
+            },
+            {
+              "k": "leistung",
+              "t": "Netzwerkabhängigkeitsbaum"
+            },
+            {
+              "k": "leistung",
+              "t": "Anfragen zum Blockieren des Renderings"
+            }
+          ]
+        },
+        "zurueckgehalten": {
+          "zahl": 1,
+          "noetig": 3,
+          "seit": "2026-11-07"
+        },
         "url": "https://family-projekt.de/werkzeuge/ki-schulung.html"
       }
     },
@@ -1400,6 +1458,7 @@
         "bedienbarkeit": 94,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -1425,7 +1484,6 @@
             "t": "Dokument hat keine Hauptmarkierung."
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Sage-Protokol/sbkim-demo/"
       }
     },
@@ -1450,8 +1508,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 96,
         "auffindbarkeit": 90,
-        "stand": "gemessen",
-        "gemessen": "2026-10-31",
+        "gemessen": "2026-11-07",
         "quelle": "google",
         "werkzeug": "13.6.0",
         "hinweise": [
@@ -1482,6 +1539,7 @@
             "t": "Dokument enthält keine Meta-Beschreibung"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/SB-KIMTool-Point/"
       }
     },
@@ -1506,15 +1564,10 @@
         "bedienbarkeit": 93,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-10-31",
+        "gemessen": "2026-11-07",
         "quelle": "google",
         "werkzeug": "13.6.0",
         "hinweise": [
-          {
-            "k": "leistung",
-            "t": "Erzwungener dynamischer Umbruch"
-          },
           {
             "k": "leistung",
             "t": "Netzwerkabhängigkeitsbaum"
@@ -1522,6 +1575,10 @@
           {
             "k": "leistung",
             "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "Bildübermittlung verbessern"
           },
           {
             "k": "bedienbarkeit",
@@ -1536,6 +1593,7 @@
             "t": "Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen."
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Sage-Protokol/such-tool/"
       }
     },
@@ -1563,8 +1621,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-10-31",
+        "gemessen": "2026-11-07",
         "quelle": "google",
         "werkzeug": "13.6.0",
         "hinweise": [
@@ -1582,6 +1639,7 @@
             "t": "Netzwerkabhängigkeitsbaum"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Sage-Protokol/pinnwand/"
       }
     },
@@ -1609,8 +1667,7 @@
         "bedienbarkeit": 96,
         "gute_praxis": 96,
         "auffindbarkeit": 100,
-        "stand": "gemessen",
-        "gemessen": "2026-10-31",
+        "gemessen": "2026-11-07",
         "quelle": "google",
         "werkzeug": "13.6.0",
         "hinweise": [
@@ -1636,6 +1693,7 @@
             "t": "Es wurden Browserfehler in der Konsole protokolliert"
           }
         ],
+        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-Workfloh-Page/"
       }
     },
@@ -1915,6 +1973,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -1932,7 +1991,6 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Mein-In-and-Out-Book/"
       }
     },
@@ -1957,6 +2015,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -1976,7 +2035,6 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Workflow-Calculate/"
       }
     },
@@ -2001,6 +2059,7 @@
         "bedienbarkeit": 100,
         "gute_praxis": 100,
         "auffindbarkeit": 100,
+        "stand": "gemessen",
         "gemessen": "2026-11-06",
         "quelle": "google",
         "werkzeug": "13.6.0",
@@ -2020,7 +2079,6 @@
             "t": "Effiziente Verweildauer im Cache verwenden"
           }
         ],
-        "stand": "gemessen",
         "url": "https://lausiklauskn-png.github.io/Workflow-Needs/"
       }
     },
