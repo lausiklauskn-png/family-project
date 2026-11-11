@@ -1529,3 +1529,16 @@ Seite, nicht diesen Markt.
   auch auf main** (Hintergrund-Schalter mit three.js; im Behälter nachgemessen, nicht angefasst). ⚠ Messung und Eigenschaften der
   Karte kommen mit der nächsten Nacht; der Pages-Host ist aus dem Behälter nicht erreichbar, die Karte ist am Tablet nicht gesehen
   (Sichttest ausstehend).
+
+## ⚖ Rechtstexte für alle Apps: eine Quelle (Klaus 2026-11-11)
+
+Klaus' Ja zu allen vier Punkten, „Inhaber Klaus Nitzsche“: `rechtstexte/rechtstexte.html` ist die **einzige** Quelle für
+Impressum, Haftungsausschluss und Datenschutz aller Apps (Abschnitte je App mit Anker: `#familienakte`, `#bookledger`,
+`#private-brain`, `#workflow-pdf`, `#workflow-calculate`, `#workflow-needs`, `#kimboard`, `#kimseek`, `#tresor-leser`).
+Einheitlich: Family-Projekt, Inhaber Klaus Nitzsche; nicht gewerblich, keine Preise, keine USt-ID; Rechtsgrundlagen
+lit. b (Nutzung), lit. f (Auslieferung), lit. a (freiwillige Übertragungen).
+
+- Ohne fremde Adressen und ohne Skript, damit sie offline und unter jeder CSP in jeder App geht. `noindex`, nicht in der Sitemap.
+- In die Apps nur byte-gleich: `node rechtstexte/verteilen.mjs <ziel>/rechtstexte.html` schreibt Datei und Pin
+  (`rechtstexte.herkunft.json`), `--pruefen` misst beides. **Nie in einer App von Hand ändern.**
+- Geändert wird hier, danach in jede App neu kopiert und mit deren nächster gesammelter Fassung ausgegeben.
