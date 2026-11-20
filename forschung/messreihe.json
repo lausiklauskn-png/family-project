@@ -681,6 +681,22 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Reduziere nicht verwendete CSS"
+     ]
     }
    ]
   },
@@ -2123,6 +2139,23 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Time to Interactive"
+     ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 97,
+     "bedienbarkeit": 97,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
      ]
     }
    ]
@@ -6500,6 +6533,23 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 81,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -6909,6 +6959,22 @@
       "leistung: Bildübermittlung verbessern",
       "leistung: Effiziente Verweildauer im Cache verwenden",
       "leistung: Netzwerkabhängigkeitsbaum"
+     ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 98,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "leistung: Bildübermittlung verbessern",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Erzwungener dynamischer Umbruch"
      ]
     }
    ]
@@ -9480,7 +9546,7 @@
     },
     {
      "von": "2026-11-07",
-     "bis": "2026-11-13",
+     "bis": "2026-11-20",
      "leistung": 100,
      "bedienbarkeit": 88,
      "gute_praxis": 100,
@@ -11859,6 +11925,24 @@
       "leistung: Erzwungener dynamischer Umbruch",
       "leistung: Reduziere nicht verwendete CSS"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 97,
+     "bedienbarkeit": 97,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "bedienbarkeit: Links sind durch Farbe erkennbar.",
+      "leistung: CSS komprimieren",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -12973,6 +13057,23 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendete CSS"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 80,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -13916,6 +14017,23 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 87,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: CSS komprimieren",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -14388,6 +14506,25 @@
      "von": "2026-11-19",
      "bis": "2026-11-19",
      "leistung": 95,
+     "bedienbarkeit": 100,
+     "gute_praxis": 96,
+     "auffindbarkeit": 90,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "auffindbarkeit: Dokument enthält keine Meta-Beschreibung",
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 93,
      "bedienbarkeit": 100,
      "gute_praxis": 96,
      "auffindbarkeit": 90,
@@ -16527,6 +16664,24 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 99,
+     "bedienbarkeit": 96,
+     "gute_praxis": 96,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand.",
+      "gute_praxis: Es wurden Browserfehler in der Konsole protokolliert",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Netzwerkabhängigkeitsbaum"
+     ]
     }
    ]
   },
@@ -18372,6 +18527,23 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 99,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendete CSS",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -19345,6 +19517,23 @@
      "mangel": [
       "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
       "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 99,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: CSS komprimieren",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
@@ -20600,6 +20789,23 @@
       "leistung: CSS komprimieren",
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 100,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: Anfragen zum Blockieren des Renderings",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: Netzwerkabhängigkeitsbaum"
      ]
     }
    ]
@@ -23437,7 +23643,7 @@
     },
     {
      "von": "2026-11-18",
-     "bis": "2026-11-19",
+     "bis": "2026-11-20",
      "leistung": 100,
      "bedienbarkeit": 100,
      "gute_praxis": 100,
@@ -23817,7 +24023,7 @@
     },
     {
      "von": "2026-11-13",
-     "bis": "2026-11-19",
+     "bis": "2026-11-20",
      "leistung": 100,
      "bedienbarkeit": 100,
      "gute_praxis": 100,
@@ -25530,7 +25736,7 @@
     },
     {
      "von": "2026-11-11",
-     "bis": "2026-11-19",
+     "bis": "2026-11-20",
      "leistung": 78,
      "bedienbarkeit": 100,
      "gute_praxis": 100,
@@ -26130,6 +26336,23 @@
       "leistung: Umfangreiche Layoutverschiebungen vermeiden",
       "leistung: Verursacher von Layout Shifts"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 80,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "computer",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "bedienbarkeit: Elemente mit sichtbarem Textlabel haben keine passenden barrierefreien Namen.",
+      "leistung: Erzwungener dynamischer Umbruch",
+      "leistung: Netzwerkabhängigkeitsbaum",
+      "leistung: Verursacher von Layout Shifts"
+     ]
     }
    ]
   },
@@ -26311,6 +26534,23 @@
      "von": "2026-11-19",
      "bis": "2026-11-19",
      "leistung": 75,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "gute_praxis: Fehlende Quellzuordnungen für große eigene JavaScript-Dateien",
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 81,
      "bedienbarkeit": 100,
      "gute_praxis": 100,
      "auffindbarkeit": 100,
@@ -26510,7 +26750,7 @@
     },
     {
      "von": "2026-11-11",
-     "bis": "2026-11-19",
+     "bis": "2026-11-20",
      "leistung": 100,
      "bedienbarkeit": 96,
      "gute_praxis": 100,
@@ -27169,6 +27409,22 @@
       "leistung: JavaScript komprimieren",
       "leistung: Reduziere nicht verwendetes JavaScript"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 94,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "leistung: Effiziente Verweildauer im Cache verwenden",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   },
@@ -27374,9 +27630,25 @@
       "leistung: Netzwerkabhängigkeitsbaum",
       "leistung: Reduziere nicht verwendete CSS"
      ]
+    },
+    {
+     "von": "2026-11-20",
+     "bis": "2026-11-20",
+     "leistung": 86,
+     "bedienbarkeit": 100,
+     "gute_praxis": 100,
+     "auffindbarkeit": 100,
+     "geraet": "handy",
+     "quelle": "google",
+     "werkzeug": "13.6.0",
+     "mangel": [
+      "leistung: CSS komprimieren",
+      "leistung: JavaScript komprimieren",
+      "leistung: Reduziere nicht verwendetes JavaScript"
+     ]
     }
    ]
   }
  },
- "gepflegt": "2026-11-19"
+ "gepflegt": "2026-11-20"
 }
