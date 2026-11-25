@@ -132,10 +132,11 @@ window.FP_LISTINGS = [
     "besonders": "Das KI-Labor erfindet Rezepte nach deinem Geschmack. Du bewertest, das Gute bleibt im Buch.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/",
-    "appUrl": "https://lausiklauskn-png.github.io/Mein-Mixarium/",
-    "img": "https://lausiklauskn-png.github.io/Mein-Mixarium/mixarium_icon.png",
+    "appUrl": "https://lausiklauskn-png.github.io/Mein-Mixarium/neu/",
+    "img": "https://lausiklauskn-png.github.io/Mein-Mixarium/icons/mixarium-neu-512.png?v=2",
     "category": "Getränke",
-    "own": true
+    "own": true,
+    "neu": "2026-11-25"
   },
   {
     "label": "BookLedgerPro",
