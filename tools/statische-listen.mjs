@@ -264,7 +264,9 @@ export function markteintraege(listings, wache) {
          * steht auf der Detailseite. Beide stehen HIER, weil diese Liste
          * beschneidet (siehe `vorstellung` darüber). Rot: kein Weg zur App. */
         appUrl: aufEis ? "" : safeUrl(x.appUrl),
-        video: videoVon(x)
+        video: videoVon(x),
+        /* Vermerk „neu gestaltet“ (Klaus 2026-11-25): ein Datum für den Neu-Knopf an der Karte. Diese Liste beschneidet. */
+        neu: /^\d{4}-\d{2}-\d{2}$/.test(String(x.neu || "")) ? String(x.neu) : ""
       };
     });
 }

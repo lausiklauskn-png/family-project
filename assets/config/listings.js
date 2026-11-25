@@ -9,6 +9,9 @@
  *     by:       Anbieter-Handle (KEIN Klarname / kein PII),
  *     url:      Link zur Anbieter-Seite (target=_blank rel=noopener). Dorthin
  *               führt der Knopf „→ Zur Seite".
+ *     neu:      optional — Datum (YYYY-MM-DD), an dem die App NEU GESTALTET
+ *               online ging (Klaus 2026-11-25, Mein Rezeptbuch). Vermerk für den
+ *               „Neu"-Knopf an der Karte; Kennung und Messreihe bleiben.
  *     appUrl:   optional — die eigentliche App, WENN der Eintrag ein
  *               Schaufenster (eine vorgeschaltete Landingpage) hat. Klaus'
  *               Entscheidung 2026-08-02: gemessen und auf der Karte gezeigt
@@ -89,10 +92,11 @@ window.FP_LISTINGS = [
     "besonders": "Die KI erkennt ein Rezept vom Foto. Blatt abfotografieren genügt, Zutaten und Schritte stehen danach im Buch.",
     "by": "@klaus",
     "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/",
-    "appUrl": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/",
-    "img": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/icons/icon-book-blue-512.png",
+    "appUrl": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/neu/",
+    "img": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/icons/rezeptbuch-neu-512.png",
     "category": "Küche",
-    "own": true
+    "own": true,
+    "neu": "2026-11-25"
   },
   {
     "label": "Muttis Rezeptbuch",
