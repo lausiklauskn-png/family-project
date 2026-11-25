@@ -53,7 +53,7 @@ function block(html) {
 function links(text) {
   return [...text.matchAll(/<a\b([^>]*)>/g)].map((m) => {
     const attr = (n) => (m[1].match(new RegExp(`\\b${n}="([^"]*)"`)) || [, ""])[1];
-    return { href: attr("href"), rel: attr("rel"), target: attr("target") };
+    return { href: attr("href"), rel: attr("rel"), target: attr("target"), cls: attr("class") };
   });
 }
 
@@ -87,12 +87,19 @@ console.log("\nmarkt.html");
    * Getrennt ist es SCHAERFER als vorher, nicht lockerer: jede Sorte hat jetzt
    * ihre eigene Zusicherung, und der Innen-Link wird ueberhaupt erst gemessen. */
   const alleLinks = links(b);
-  const gefunden = alleLinks.filter((l) => /^https?:/i.test(l.href));
+  /* Seit 2026-11-25 trägt eine neu gestaltete App neben dem Namen den Knopf „Neu“ (class mk-neu) in die neue App – eine eigene Sorte:
+   * genau einer je Eintrag mit `neu` und `appUrl`, und er führt auf DIESE appUrl. */
+  const neuL = alleLinks.filter((l) => /\bmk-neu\b/.test(l.cls));
+  const sollNeu = markt.filter((e) => e.neu && e.appUrl).map((e) => e.appUrl);
+  ok(neuL.length === sollNeu.length && neuL.every((l) => sollNeu.includes(l.href)) && sollNeu.length > 0,
+    `jeder „Neu“-Knopf gehört zu einer neu gestalteten App und führt in sie (${neuL.length} von ${sollNeu.length})`);
+  ok(neuL.every((l) => l.target === "_blank" && /noopener/.test(l.rel)), "„Neu“ öffnet die App in einem neuen Tab, mit noopener");
+  const gefunden = alleLinks.filter((l) => /^https?:/i.test(l.href) && !neuL.includes(l));
   /* Seit 2026-09-28 fuehrt der Video-Hinweis auf `apps/<id>/#video` — eine
    * eigene Sorte, sonst zaehlte er als zweiter Detailseiten-Link. */
   const videoL = alleLinks.filter((l) => /^apps\/[^/]+\/#video$/.test(l.href));
   const innen = alleLinks.filter((l) => l.href.startsWith("apps/") && !videoL.includes(l));
-  const sonstige = alleLinks.filter((l) => !gefunden.includes(l) && !innen.includes(l) && !videoL.includes(l));
+  const sonstige = alleLinks.filter((l) => !gefunden.includes(l) && !innen.includes(l) && !videoL.includes(l) && !neuL.includes(l));
   const sollVideo = markt.filter((e) => e.video && e.anchorId).map((e) => `apps/${e.anchorId}/#video`);
   ok(videoL.length === sollVideo.length && videoL.every((l) => sollVideo.includes(l.href)),
     `jeder Video-Hinweis gehoert zu einem Eintrag mit Video (${videoL.length} von ${sollVideo.length})`);

@@ -939,3 +939,6 @@ a.rf-step:hover{border-color:var(--accent);transform:translateY(-2px)}
    die vier Menü-Links in zwei Reihen, und die Leiste stand in vier. Etwas schmaler, dann passen
    sie in eine. Gemessen in tests/smoke_kopfleiste.mjs. */
 @media (max-width:360px){nav.top{gap:5px}nav.top a{padding:7px 8px;font-size:.86rem}}
+/* „Neu“ am Namen einer neu gestalteten App (Klaus 2026-11-25): klein, neben dem Namen, führt in die neue App */
+.listing h3 .mk-neu{display:inline-block;vertical-align:middle;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.03em;line-height:1.5;text-decoration:none;color:#06231a;background:var(--accent,#7fe0b4);border:1px solid rgba(0,0,0,.08)}
+.listing h3 .mk-neu:hover,.listing h3 .mk-neu:focus-visible{filter:brightness(1.08)}
