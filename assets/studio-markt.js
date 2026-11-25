@@ -516,6 +516,16 @@
      * Kennung reist mit; alles andere bleibt weg statt halb. */
     var nid = cleanNodeId(e.nodeId);
     if (nid) o.nodeId = nid;
+    /* Die Felder der Detailseite und der Weg zur App (2026-09-22/28) und der Vermerk „neu“ (Klaus 2026-11-25).
+     * Bis zum 2026-11-25 fehlten sie hier: das nächste Veröffentlichen aus dem Studio hätte bei allen 37 Einträgen
+     * `vorstellung` und `besonders` still weggeworfen, bei vieren `appUrl`, bei einem `video`. Die Probe
+     * tests/smoke_studio_felder.mjs lässt jeden echten Eintrag durch normEntry laufen und besteht darauf, dass kein Feld fehlt. */
+    if (Array.isArray(e.vorstellung)) o.vorstellung = e.vorstellung.map(function (z) { return String(z || ""); });
+    else if (e.vorstellung) o.vorstellung = String(e.vorstellung);
+    if (e.besonders) o.besonders = String(e.besonders);
+    if (e.appUrl) o.appUrl = String(e.appUrl).trim();
+    if (e.video && typeof e.video === "object") o.video = e.video;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(String(e.neu || ""))) o.neu = String(e.neu);
     return o;
   }
   function serialize() {
