@@ -2038,6 +2038,74 @@
         ],
         "url": "https://lausiklauskn-png.github.io/BookLedger-Basic/"
       }
+    },
+    "eigen-private-akte": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 100,
+        "bedienbarkeit": 100,
+        "gute_praxis": 100,
+        "auffindbarkeit": 63,
+        "gemessen": "2026-11-26",
+        "quelle": "google",
+        "werkzeug": "13.6.0",
+        "hinweise": [
+          {
+            "k": "auffindbarkeit",
+            "t": "Seite ist von Indexierung ausgeschlossen"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "JavaScript komprimieren"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendetes JavaScript"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Private-Akte/"
+      }
+    },
+    "eigen-familienakte": {
+      "lage": "ohne_spore",
+      "messung": {
+        "stand": "gemessen",
+        "leistung": 99,
+        "bedienbarkeit": 96,
+        "gute_praxis": 100,
+        "auffindbarkeit": 100,
+        "gemessen": "2026-11-26",
+        "quelle": "google",
+        "werkzeug": "13.6.0",
+        "hinweise": [
+          {
+            "k": "bedienbarkeit",
+            "t": "Berührungszielbereiche haben eine unzureichende Größe oder einen unzureichenden Abstand."
+          },
+          {
+            "k": "gute_praxis",
+            "t": "Fehlende Quellzuordnungen für große eigene JavaScript-Dateien"
+          },
+          {
+            "k": "leistung",
+            "t": "Effiziente Verweildauer im Cache verwenden"
+          },
+          {
+            "k": "leistung",
+            "t": "Netzwerkabhängigkeitsbaum"
+          },
+          {
+            "k": "leistung",
+            "t": "Reduziere nicht verwendete CSS"
+          }
+        ],
+        "url": "https://lausiklauskn-png.github.io/Meine-Familienakte/"
+      }
     }
   },
   "wacheZaehler": {
