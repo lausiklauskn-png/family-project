@@ -1,0 +1,88 @@
+<!doctype html>
+<!-- Family Projekt — Marktplatz Spezial (Klaus 2026-11-26, Weg B): die Pro-Apps für Android
+     und Windows. Die Karten zeigt jeder; laden geht nur mit einem Passkey, den der Server
+     auf spezial.family-projekt.de prüft. In dieser Seite steht keine Download-Adresse.
+     noindex: eine Freischalt-Seite, keine Einladung an Suchmaschinen (benannt, Klaus kann es ändern). -->
+<html lang="de">
+<head>
+<script>/* FP-SPRACHRIEGEL — Begruendung in assets/app.js § Sprachriegel. MUSS inline und vor dem ersten Anstrich laufen: danach hat Chrome laengst entschieden. */(function(){try{if(localStorage.getItem("fp_lang_wahl")!=="1")return;var h=document.documentElement;h.lang=localStorage.getItem("fp_lang")==="en"?"en":"de";h.setAttribute("translate","no");h.classList.add("notranslate");var m=document.createElement("meta");m.name="google";m.content="notranslate";(document.head||h).appendChild(m);}catch(e){}})();</script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Marktplatz Spezial — Pro-Apps für Android und Windows — Family Projekt</title>
+  <meta name="description" content="Die Pro-Fassungen der Apps von Family Projekt für Android und Windows. Laden mit einem persönlichen Passkey." />
+  <meta name="robots" content="noindex, follow" />
+  <meta name="theme-color" content="#0b0d14" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ee7d3'/%3E%3Cstop offset='.5' stop-color='%237c9cff'/%3E%3Cstop offset='1' stop-color='%23a06bff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Cg fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round'%3E%3Cpath d='M20 42 L32 22 L44 42'/%3E%3Cpath d='M20 42 L44 42'/%3E%3C/g%3E%3Ccircle cx='32' cy='22' r='5' fill='white'/%3E%3Ccircle cx='20' cy='42' r='5' fill='white'/%3E%3Ccircle cx='44' cy='42' r='5' fill='white'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="assets/style.css?v=172" />
+  <style>
+    .sp-form{justify-content:flex-start;max-width:760px}
+    .sp-form .field input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.85rem}
+    .sp-meldung{min-height:1.4em;margin:10px 0 0;color:var(--muted)}
+    .sp-meldung.sp-gut{color:#3fd18b} .sp-meldung.sp-schlecht{color:#e8c14a}
+    .sp-liste{margin-top:18px}
+    .sp-karte .body{padding:18px 20px}
+    .sp-karte h3{display:flex;align-items:center;gap:12px}
+    .sp-sym{width:40px;height:40px;border-radius:10px;flex:none}
+    .sp-karte .listing-foot{display:flex;flex-wrap:wrap;gap:8px}
+    .sp-karte .listing-foot .btn small{opacity:.75;font-weight:400}
+    .sp-karte .btn[disabled]{opacity:.55;cursor:not-allowed}
+    .sp-keine{font-size:.82rem;color:var(--muted);align-self:center}
+    .sp-hin{font-size:.82rem;color:var(--muted);margin:8px 0 0}
+  </style>
+  <script type="importmap">{ "imports": { "three": "./vendor/three.module.min.js" } }</script>
+</head>
+<body>
+  <canvas id="bg" aria-hidden="true"></canvas>
+  <header>
+    <div class="wrap bar">
+      <span class="brand">
+        <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6ee7d3"/><stop offset=".5" stop-color="#7c9cff"/><stop offset="1" stop-color="#a06bff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#hg)"/><g fill="none" stroke="white" stroke-width="3.4" stroke-linecap="round"><path d="M20 42 L32 22 L44 42"/><path d="M20 42 L44 42"/></g><circle cx="32" cy="22" r="5" fill="white"/><circle cx="20" cy="42" r="5" fill="white"/><circle cx="44" cy="42" r="5" fill="white"/></svg>
+        <a href="index.html" class="holo">Family Projekt</a>
+      </span>
+      <nav class="top">
+        <a href="index.html" data-i18n="nav_start">Start</a>
+        <a href="netzwerk.html" data-i18n="nav_network">Netzwerk</a>
+        <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+        <a href="markt.html" data-i18n="nav_market">Marktplatz</a>
+        <span id="fp-dock" class="fp-dock" title="Knoten-Status"></span>
+        <span class="pill pill-install" id="install-platz" aria-hidden="true">⬇</span>
+        <span class="pill pill-reload" id="fpReload" title="Seite frisch laden, holt die neueste Version (Cache leeren)" aria-label="Aktualisieren — Seite frisch laden"><span class="rl-ic" aria-hidden="true">↻</span></span>
+        <span class="pill pill-lang" id="langBtn" title="Sprache / Language" aria-haspopup="true" aria-expanded="false">DE</span>
+        <span class="pill" id="themeBtn" title="Thema wechseln">◐ <span id="themeName">Dunkel</span></span>
+        <span class="pill pill-eng" id="bgPauseBtn" role="button" tabindex="0"
+              aria-pressed="false" title="Hintergrund-Bewegung anhalten"><span id="bgPauseZeichen" class="bg-zeichen" aria-hidden="true"></span><span id="bgPauseName" class="nur-vorlesen">Bewegung anhalten</span></span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <div class="wrap">
+        <span class="eyebrow">🔑 <span>Marktplatz Spezial</span></span>
+        <h1>Die Pro-Apps für Android und Windows.</h1>
+        <p class="lead">Mit deinem persönlichen Passkey lädst du die Pro-Fassungen direkt von unserem Server. Er gilt für die Apps, die du bekommen hast.</p>
+        <noscript><p>Zum Freischalten braucht diese Seite JavaScript.</p></noscript>
+        <div id="spezial"></div>
+        <p class="sub" style="margin-top:22px"><a href="markt.html">← zurück zum Marktplatz</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap frow">
+      <span class="brand" style="font-size:.95rem"><span class="holo">Family Projekt</span></span>
+      <a href="index.html" data-i18n="footer_back">← zur Startseite</a>
+      <a href="werkzeuge.html" data-i18n="nav_tools">Werkzeuge</a>
+      <a href="https://pwa-toolpoint.de/" target="_blank" rel="noopener">PWA Toolpoint ↗</a>
+      <a href="impressum.html" style="margin-left:auto" data-i18n="imprint">Impressum &amp; Datenschutz</a>
+    </div>
+    <div class="wrap" style="margin-top:12px;opacity:.85">© 2026 Family Projekt</div>
+  </footer>
+
+  <script type="module" src="assets/mycel-bg.js?v=172"></script>
+  <script src="assets/notranslate.js?v=172"></script>
+  <script src="assets/app.js?v=172"></script>
+  <script src="assets/config/spezial.js?v=172"></script>
+  <script src="assets/spezial-seite.js?v=172"></script>
+</body>
+</html>

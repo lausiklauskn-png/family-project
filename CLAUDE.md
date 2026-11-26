@@ -1530,6 +1530,35 @@ Seite, nicht diesen Markt.
   Karte kommen mit der nächsten Nacht; der Pages-Host ist aus dem Behälter nicht erreichbar, die Karte ist am Tablet nicht gesehen
   (Sichttest ausstehend).
 
+## 🔑 Marktplatz Spezial: Pro-Apps nur gegen Passkey (Klaus 2026-11-26, Weg B)
+
+Klaus: *„Alle Pro-Apps, die jetzt Android und Windows sind … eine separate Seite … die erst aufgeht, wenn ich
+Marktplatz Spezial klicke … mit einem Passkey, den ich persönlich vergebe, in meinem Studio."* Entschieden: **Weg B**
+(der Server gibt die Dateien aus), Node-Dienst auf dem Cloud-Server, Passkey je App wählbar, **je Seite ein eigener
+Herausgeber-Schlüssel**, Knopf sichtbar für alle, GitHub-Releases **vorerst öffentlich** (benanntes Schlupfloch).
+
+| | |
+|---|---|
+| `assets/spezial-kern.js` | Passkey `FPK1.<daten>.<unterschrift>` (PWA Toolpoint `TPK1.`), BIP-340 Schnorr wie die Freischalt-Codes von Private Brain Pro; Sperre `FPS1.` vom selben Schlüssel unterschrieben. **Byte-gleich in PWA Toolpoint** (dort im Drift-Guard) |
+| `assets/spezial-seite.js` · `markt-spezial.html` | Käufer-Seite: Karten mit den **eigenen App-Symbolen** (`assets/spezial/`, Herkunft in `HERKUNFT.json`, Klaus: keine Emojis), Passkey-Feld, Download über einen 10-Minuten-Link. Keine Download-Adresse in der Seite. `noindex` |
+| `assets/spezial-studio.js` · `spezial-studio.html` | Studio (aus dem Marktplatz-Studio verlinkt): Schlüssel anlegen (verschlüsselt im Browser, PBKDF2 600 000 → AES-GCM), Sicherung `FPSTUDIO1.`, Passkey erstellen, Liste, Sperren |
+| `assets/config/spezial.js` | die Apps; **Kennungen nie umbenennen**, sie stehen unter der Unterschrift ausgegebener Passkeys |
+| `server/spezial/` | `dienst.mjs` (prüft, Link, Datei mit Range, Sperre, Zähler), `spiegeln.mjs` (holt stündlich die neueste Freigabe je App/Art, SHA-256), `quellen.json`, `schluessel.json` (**öffentliche** Schlüssel; leer, bis Klaus sie schickt), Einrichten: `EINRICHTEN.md` |
+
+⚠ **Bis Klaus' Schritte am Server und im Studio gelaufen sind, gilt kein Passkey** (`schluessel.json` leer, DNS
+`spezial.family-projekt.de` / `spezial.pwa-toolpoint.de` fehlt). Nicht gemessen: der echte Server, echte Releases
+(GitHub-API aus dem Behälter gesperrt; welche Datei je Release liegt, sagt erst der erste Spiegel-Lauf), das Tablet.
+
+```bash
+node tests/smoke_spezial_dienst.mjs      # Spiegel + Dienst gegen gestelltes GitHub (34)
+node tests/smoke_spezial_seite.mjs       # echter Browser: Studio → Passkey → Download → Sperre (24)
+bash tests/gegenprobe_spezial_dienst.sh  # 9 Riegel, je einer ausgebaut, in einer Wegwerf-Kopie
+```
+
+Erster Gegenprobe-Lauf: 7 Fälle, **2 blind** (Markt unter der Unterschrift; SHA-Vergleich) — geschärft, jetzt 9 · 0 · 0.
+Cache v170 → v171 (markt.html), `ASSET_V` und alle `?v=` mitgezogen. `smoke_angleichen` (Private Akte / Familienakte
+fehlen hier als PWA) und `smoke_bewegungsknopf` sind auch auf `main` rot — nicht von dieser Arbeit.
+
 ## 🗂 Private Akte und Meine Familienakte im Regal (Klaus 2026-11-26)
 
 Klaus: *„Privatakte und Familienakte als PWA-App online stellen auf Family Project und PWA Toolpoint."* Beide standen bis
@@ -1539,6 +1568,7 @@ geprüft). PWA Toolpoint macht eine eigene Sitzung mit **denselben Kennungen** (
   (`https://lausiklauskn-png.github.io/Meine-Familienakte/`) in `assets/config/listings.js`, hinten vor der Marke, Kategorie
   „Büro", Bild je `icons/icon-512.png`. Kein `sporeUrl`, keine Wartung, `own: true`. Texte ohne Gedankenstrich.
 - Gebaut mit `statische-listen` (markt.html 37 Karten), `detailseiten` (`apps/eigen-private-akte/`, `apps/eigen-familienakte/`),
-  `sitemap-bauen` (51 Adressen). Cache `v170 → v171`, `ASSET_V` und alle `?v=` nachgezogen.
+  `sitemap-bauen` (51 Adressen). Cache `v171 → v172` (v171 hatte parallel Marktplatz Spezial #381 genommen), `ASSET_V`
+  und alle `?v=` nachgezogen.
 - ⚠ Messung und Vektor kommen mit der nächsten Nacht (`vektoren-taeglich.yml`); die Pages-Adressen sind aus dem Behälter nicht
   abgerufen, die Karten am Tablet nicht gesehen.
