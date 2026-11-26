@@ -6,7 +6,7 @@
   "ohneDatei": ["debug"],
   "apps": [
     { "id": "private-akte", "name": "Private Akte Pro", "repo": "Private-Akte" },
-    { "id": "familienakte", "name": "Familienakte Pro", "repo": "Meine-Familienakte" },
+    { "id": "familienakte", "name": "Familienakte Pro", "repo": "Meine-Familienakte", "vorab": ["android"], "_vorab": "Der Android-Release-Lauf der Familienakte markiert jede ausgegebene APK als Vorabfassung (auch 2.28.78, ausgegeben 24.11.2026). Nur für diese Art zählen Vorabfassungen mit; ohneTag (test, preview) gilt weiter." },
     { "id": "privat-brain-pro", "name": "Private Brain Pro", "repo": "Privat-Brain-Pro" },
     { "id": "datei-organizer", "name": "Datei-Organizer Pro", "repo": "Datei-Organizer" },
     { "id": "workflow-pdf-pro", "name": "Workflow PDF Pro", "repo": "Workflow-PDF-Pro" },

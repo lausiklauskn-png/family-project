@@ -46,12 +46,13 @@ export function dateiNameOk(n) { return typeof n === "string" && DATEI_NAME.test
 
 /* Die neueste passende Datei einer Art aus der Release-Liste. Rein, also einzeln prüfbar.
  * releases: Antwort von GET /repos/{o}/{r}/releases; art: "android" | "windows". */
-export function waehle(releases, art, cfg) {
+export function waehle(releases, art, cfg, app = {}) {
   const muster = new RegExp(cfg.muster[art], "i");
   const ohneTag = (cfg.ohneTag || []).map((s) => String(s).toLowerCase());
   const ohneDatei = (cfg.ohneDatei || []).map((s) => String(s).toLowerCase());
   const liste = (Array.isArray(releases) ? releases : [])
-    .filter((r) => r && !r.draft && !r.prerelease && typeof r.tag_name === "string")
+    // Vorabfassungen zählen nur, wo quellen.json sie für diese App und Art ausdrücklich erlaubt (app.vorab)
+    .filter((r) => r && !r.draft && (!r.prerelease || (Array.isArray(app.vorab) && app.vorab.includes(art))) && typeof r.tag_name === "string")
     .filter((r) => !ohneTag.some((w) => r.tag_name.toLowerCase().includes(w)))
     .sort((a, b) => String(b.published_at || b.created_at || "").localeCompare(String(a.published_at || a.created_at || "")));
   for (const r of liste) {
@@ -123,7 +124,7 @@ export async function spiegeln({ quellen = QUELLEN, daten = DATEN, api = API, lo
       const eintrag = stand.apps[app.id] || {};
       eintrag.name = app.name;
       for (const art of ["android", "windows"]) {
-        const w = waehle(releases, art, cfg);
+        const w = waehle(releases, art, cfg, app);
         if (!w) { if (eintrag[art]) log(`! ${app.id}/${art}: an der Quelle nichts Passendes mehr — die vorhandene Datei bleibt`); else log(`· ${app.id}/${art}: keine Datei`); continue; }
         const ordner = join(daten, "dateien", app.id);
         await mkdir(ordner, { recursive: true });
