@@ -108,18 +108,22 @@ export async function spiegeln({ quellen = QUELLEN, daten = DATEN, api = API, lo
   const lock = await sperre(join(daten, ".spiegel.lock"));
   if (!lock) { log("· ein anderer Lauf ist noch dran — nichts zu tun"); return 0; }
   const standPfad = join(daten, "stand.json");
-  let stand = { apps: {}, etags: {} };
-  try { stand = JSON.parse(await readFile(standPfad, "utf8")); stand.apps ||= {}; stand.etags ||= {}; } catch { /* erster Lauf */ }
+  let stand = { apps: {}, etags: {}, einstellung: {} };
+  try { stand = JSON.parse(await readFile(standPfad, "utf8")); stand.apps ||= {}; stand.etags ||= {}; stand.einstellung ||= {}; } catch { /* erster Lauf */ }
   const tok = await token();
   let fehler = 0;
   try {
     for (const app of cfg.apps) {
       const url = `${api}/repos/${cfg.besitzer}/${app.repo}/releases?per_page=40`;
       let releases;
+      // Ein ETag gilt nur für die Einstellung, unter der die Liste ausgewertet wurde:
+      // ändert sich die Zeile in quellen.json (z. B. „vorab"), wird neu gewählt, auch wenn GitHub „unverändert" sagt.
+      const einstellung = JSON.stringify([app, cfg.muster, cfg.ohneTag, cfg.ohneDatei]);
+      const etag = stand.etags[app.id] && stand.apps[app.id] && stand.einstellung[app.id] === einstellung ? stand.etags[app.id] : null;
       try {
-        const r = await holeJson(url, stand.etags[app.id] && stand.apps[app.id] ? stand.etags[app.id] : null, tok);
+        const r = await holeJson(url, etag, tok);
         if (r.unveraendert) { log(`= ${app.id}: unverändert`); continue; }
-        releases = r.json; stand.etags[app.id] = r.etag || null;
+        releases = r.json; stand.etags[app.id] = r.etag || null; stand.einstellung[app.id] = einstellung;
       } catch (e) { log(`✗ ${app.id}: Liste nicht erreichbar (${e.message})`); fehler++; continue; }
       const eintrag = stand.apps[app.id] || {};
       eintrag.name = app.name;
