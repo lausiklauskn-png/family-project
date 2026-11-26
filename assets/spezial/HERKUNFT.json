@@ -66,6 +66,14 @@
       "datei": "mixarium-pro.png",
       "sha256": "410136308ca611c7bbe7a85dac397730346f05f7e811e60f4106f7822d41eac5",
       "_": "vorläufig das Symbol der Web-App; das dunkle Pro-Symbol kommt mit der Pro-Fassung"
+    },
+    "pseudodoc-pro": {
+      "repo": "lausiklauskn-png/PseudoDoc",
+      "stand": "48e2b10",
+      "pfad": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "datei": "pseudodoc-pro.png",
+      "sha256": "7d3fa974e355988cfdc30281717f2d96780652c11cf347ac57adbaa8e2ba18b7",
+      "_": "das Android-Symbol der Pro-App, auf 128 px verkleinert"
     }
   },
   "qrcode-generator": {

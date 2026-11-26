@@ -62,6 +62,11 @@
       "id": "mixarium-pro",
       "repo": "Mein-Mixarium",
       "name": "Mein Mixarium Pro"
+    },
+    {
+      "id": "pseudodoc-pro",
+      "repo": "PseudoDoc",
+      "name": "PseudoDoc Pro"
     }
   ]
 }
