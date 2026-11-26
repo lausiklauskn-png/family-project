@@ -12,8 +12,10 @@
     de: {
       feld: "Passkey", pruefen: "Freischalten", vergessen: "Passkey hier vergessen", laeuft: "Wird geprüft …",
       ok: "✓ Freigeschaltet für {n}", nichtfrei: "nicht in deinem Passkey", ohne: "Mit einem Passkey kannst du hier laden.",
-      android: "Android (APK)", windows: "Windows", keine: "noch keine Datei", holt: "Link wird geholt …",
+      android: "Android (APK)", windows: "Windows (Installer)", keine: "noch keine Datei", holt: "Link wird geholt …",
       offline: "Der Server antwortet gerade nicht. Bitte später noch einmal.", fassung: "Fassung",
+      zuTitel: "🔒 Dein Passkey ist mit einem Code verschlossen.", zuHin: "Gib den Code ein, den du getrennt bekommen hast (z. B. am Telefon).",
+      zuFeld: "Code, z. B. K7M4-P9XR", zuOeffnen: "Öffnen", zuLaeuft: "Wird geöffnet …", zuFalsch: "Der Code passt nicht. Bitte noch einmal genau eingeben.",
       warum: { form: "Das ist kein Passkey dieser Seite. Er beginnt mit „{p}.“ — bitte genau so einfügen, wie du ihn bekommen hast.",
         unterschrift: "Dieser Passkey passt nicht. Bitte genau so einfügen, wie du ihn bekommen hast.",
         markt: "Dieser Passkey gehört zu einer anderen Seite. Hier gelten Passkeys, die mit „{p}.“ beginnen.", anderer_markt: "Dieser Passkey gehört zu einer anderen Seite.",
@@ -24,8 +26,10 @@
     en: {
       feld: "Passkey", pruefen: "Unlock", vergessen: "Forget the passkey here", laeuft: "Checking …",
       ok: "✓ Unlocked for {n}", nichtfrei: "not in your passkey", ohne: "With a passkey you can download here.",
-      android: "Android (APK)", windows: "Windows", keine: "no file yet", holt: "Fetching link …",
+      android: "Android (APK)", windows: "Windows (installer)", keine: "no file yet", holt: "Fetching link …",
       offline: "The server is not answering right now. Please try again later.", fassung: "Version",
+      zuTitel: "🔒 Your passkey is locked with a code.", zuHin: "Enter the code you received separately (e.g. by phone).",
+      zuFeld: "Code, e.g. K7M4-P9XR", zuOeffnen: "Open", zuLaeuft: "Opening …", zuFalsch: "The code does not fit. Please enter it again exactly.",
       warum: { form: "This is not a passkey for this site. It starts with “{p}.” — please paste it exactly as you received it.",
         unterschrift: "This passkey does not fit. Please paste it exactly as you received it.",
         markt: "This passkey belongs to another site. Passkeys here start with “{p}.”.", anderer_markt: "This passkey belongs to another site.",
@@ -71,8 +75,41 @@
 
   function melde(text, gut) { el.meldung.textContent = text; el.meldung.className = "sp-meldung" + (gut ? " sp-gut" : text ? " sp-schlecht" : ""); }
 
+  // Ein geschickter Link (…#k=FPK1.… oder …#z=FPZ1.…) oder sein Inhalt, ins Feld eingefügt.
+  function ausLink(v) {
+    v = String(v || "").replace(/\s+/g, "");
+    var m = /[#&]([kz])=([A-Za-z0-9._-]+)/.exec(v);
+    if (m) return { art: m[1], wert: m[2] };
+    var K = window.SpezialKern, zu = K && K.MAERKTE[C.markt] && K.MAERKTE[C.markt].zu;
+    if (zu && v.indexOf(zu + ".") === 0) return { art: "z", wert: v };
+    return null;
+  }
+  var ZU = null;
+  function verschlossen(z) {
+    ZU = z; el.zu.hidden = false; el.form.hidden = true; melde("");
+    setTimeout(function () { try { el.code.focus(); } catch (e) {} }, 0);
+  }
+  function entriegeln() {
+    var K = window.SpezialKern; if (!K || !ZU) return;
+    el.zuMeld.textContent = t("zuLaeuft"); el.zuMeld.className = "sp-meldung";
+    K.auswickeln(ZU, el.code.value, C.markt).then(function (text) {
+      ZU = null; el.zu.hidden = true; el.form.hidden = false; el.code.value = ""; el.zuMeld.textContent = "";
+      el.feld.value = text; pruefen(false);
+    }, function (e) {
+      el.zuMeld.textContent = e && e.message === "form" ? warum("form") : t("zuFalsch"); el.zuMeld.className = "sp-meldung sp-schlecht";
+    });
+  }
+  function ausAdresse() {
+    var l = ausLink(location.hash); if (!l) return false;
+    try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    if (l.art === "z") verschlossen(l.wert); else { el.feld.value = l.wert; pruefen(false); }
+    return true;
+  }
+
   function pruefen(leise) {
     var v = String(el.feld.value || "").replace(/\s+/g, "");
+    var l = ausLink(v);
+    if (l) { if (l.art === "z") { el.feld.value = ""; return verschlossen(l.wert); } v = l.wert; el.feld.value = v; }
     if (!v) { FREI = null; melde(""); zeichne(); return; }
     // Das Präfix verrät die Seite: ein Passkey der anderen Seite geht gar nicht erst hinaus.
     if (v.slice(0, 5) !== praefix() + ".") { FREI = null; melde(warum(/^[A-Z]{3}1\./.test(v) ? "markt" : "form")); zeichne(); return; }
@@ -101,16 +138,23 @@
         '<div class="field"><input id="spPasskey" type="text" spellcheck="false" autocapitalize="off" placeholder="' + esc(praefix()) + '.…" aria-label="' + esc(t("feld")) + '"></div>' +
         '<button class="btn primary" type="submit">' + esc(t("pruefen")) + "</button>" +
       "</form>" +
+      '<div class="glass sp-zu" id="spZu" hidden><p><strong>' + esc(t("zuTitel")) + "</strong><br>" + esc(t("zuHin")) + "</p>" +
+        '<form class="searchrow" id="spZuForm" autocomplete="off"><div class="field"><input id="spCode" type="text" spellcheck="false" autocapitalize="characters" placeholder="' + esc(t("zuFeld")) + '" aria-label="' + esc(t("zuFeld")) + '"></div>' +
+        '<button class="btn primary" type="submit">' + esc(t("zuOeffnen")) + "</button></form>" +
+        '<p class="sp-meldung" id="spZuMeld" role="status" aria-live="polite"></p></div>' +
       '<p class="sp-meldung" id="spMeldung" role="status" aria-live="polite">' + esc(t("ohne")) + "</p>" +
       '<p><button type="button" class="btn ghost sp-vergessen" id="spVergessen" hidden>' + esc(t("vergessen")) + "</button></p>" +
       '<div class="grid listings sp-liste" id="spListe"></div>';
-    el = { feld: document.getElementById("spPasskey"), meldung: document.getElementById("spMeldung"), liste: document.getElementById("spListe"), vergessen: document.getElementById("spVergessen") };
+    el = { feld: document.getElementById("spPasskey"), meldung: document.getElementById("spMeldung"), liste: document.getElementById("spListe"), vergessen: document.getElementById("spVergessen"),
+      form: document.getElementById("spForm"), zu: document.getElementById("spZu"), code: document.getElementById("spCode"), zuMeld: document.getElementById("spZuMeld") };
+    document.getElementById("spZuForm").addEventListener("submit", function (e) { e.preventDefault(); entriegeln(); });
+    window.addEventListener("hashchange", ausAdresse);
     document.getElementById("spForm").addEventListener("submit", function (e) { e.preventDefault(); pruefen(false); });
     el.vergessen.addEventListener("click", function () { merke(""); el.feld.value = ""; FREI = null; el.vergessen.hidden = true; melde(t("ohne")); zeichne(); });
     el.liste.addEventListener("click", function (e) { var b = e.target.closest("button[data-app]"); if (b && !b.disabled) laden(b.getAttribute("data-app"), b.getAttribute("data-art"), b); });
     zeichne();
     holen("/apps").then(function (j) { KATALOG = j || { apps: [] }; zeichne(); }).catch(function () { melde(t("offline")); });
-    var alt = lies(); if (alt) { el.feld.value = alt; pruefen(true); }
+    if (!ausAdresse()) { var alt = lies(); if (alt) { el.feld.value = alt; pruefen(true); } }
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
   window.SpezialSeite = { _neu: start };

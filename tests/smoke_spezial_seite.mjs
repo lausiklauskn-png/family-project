@@ -15,6 +15,8 @@ const K = require(join(WURZEL, "assets/spezial-kern.js"));
 const noble = await import(pathToFileURL(join(WURZEL, "sbkim/noble-secp256k1.js")).href);
 let gruen = 0, rot = 0;
 function soll(name, wahr, mehr) { if (wahr) { gruen++; console.log("✓ " + name); } else { rot++; console.log("✗ " + name + (mehr ? "  → " + mehr : "")); } }
+// Wartet auf eine Bedingung; ein Ablauf der Frist ist ein ROT mit Namen, kein Absturz ohne Schlusszeile.
+async function warte(seite, fn, ms = 20000) { try { await seite.waitForFunction(fn, null, { timeout: ms }); return true; } catch { return false; } }
 async function ende(code) { console.log(`${gruen} grün · ${rot} ROT`); process.exitCode = code; }
 process.on("unhandledRejection", (e) => { rot++; console.log("✗ Probe gestolpert: " + (e && e.message || e)); ende(1); setTimeout(() => process.exit(1), 50); });
 
@@ -53,13 +55,15 @@ let pw; try { pw = require("playwright"); } catch { console.log("⊘ kein Playwr
 const br = await pw.chromium.launch();
 const ctx = await br.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true });
 // spezial.family-projekt.de → echter Dienst; Origin wie auf der echten Seite
-await ctx.route("https://spezial.family-projekt.de/**", async (route) => {
+const weiter = async (route) => {
   const r = route.request(), u = new URL(r.url());
   const antwort = await fetch(DIENST + u.pathname + u.search, { method: r.method(), body: r.method() === "POST" ? r.postData() : undefined,
     headers: { "Content-Type": "application/json", Origin: "https://family-projekt.de", "X-Forwarded-Host": "spezial.family-projekt.de" } });
   const kopf = Object.fromEntries(antwort.headers); kopf["access-control-allow-origin"] = SEITE;
   await route.fulfill({ status: antwort.status, headers: kopf, body: Buffer.from(await antwort.arrayBuffer()) });
-});
+};
+ctx._weiter = weiter;
+await ctx.route("https://spezial.family-projekt.de/**", weiter);
 await ctx.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
 const pg = await ctx.newPage();
 const fehler = []; pg.on("pageerror", (e) => fehler.push(e.message));
@@ -81,11 +85,17 @@ await pg.fill("#spsPw", "falsch-falsch"); await pg.click("#spsMachen");
 await pg.waitForFunction(() => /Falsches Studio-Passwort/.test(document.getElementById("spsM2").textContent), null, { timeout: 30000 });
 soll("Studio: falsches Passwort macht keinen Passkey", true);
 await pg.fill("#spsPw", "studio-passwort-1"); await pg.click("#spsMachen");
-await pg.waitForFunction(() => /^FPK1\./.test(document.getElementById("spsErgebnis").value), null, { timeout: 30000 });
-const passkey = await pg.inputValue("#spsErgebnis");
+await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb .sps-link"); return l && /#k=FPK1\./.test(l.value); }, null, { timeout: 30000 });
+const link = await pg.inputValue("#spsUeb .sps-link");
+const passkey = decodeURIComponent(link.split("#k=")[1]);
+soll("Studio: die Übergabe ist ein Link auf markt-spezial.html, der Passkey steht nach dem # (geht nicht an den Server)", new URL(link).pathname === "/markt-spezial.html" && !new URL(link).search, link.slice(0, 80));
 const check = await K.pruefe(noble, passkey, "fp", [pub]);
 soll("Studio: Passkey trägt Pseudonym und genau die gewählte App", check.ok && check.daten.n === "Testkäufer" && check.daten.a.join() === "private-akte", JSON.stringify(check));
 soll("Studio: Passkey steht in der Liste", /Testkäufer/.test(await pg.textContent(".sps-tab")));
+await pg.waitForFunction(() => { const i = document.querySelector("#spsUeb .sps-qr img"); return i && i.complete && i.naturalWidth >= 600; }, null, { timeout: 20000 });
+soll("Studio: der QR-Schlüssel ist ein Bild zum Speichern (PNG)", /^data:image\/png/.test(await pg.getAttribute("#spsUeb .sps-qr img", "src")) && /^Schluessel-Testk/.test(await pg.getAttribute("#spsUeb .sps-qr a[download]", "download")));
+soll("Studio: ohne Code-Haken steht kein Code da", !(await pg.$("#spsUeb .sps-code")));
+soll("Studio: sagt, dass ein Passkey für Android UND Windows gilt", /Android \(APK\) und Windows \(Installer\)/.test(await pg.textContent(".sps-apps")));
 
 // ── 2 · Seite ───────────────────────────────────────────────────────────
 await pg.goto(SEITE + "/markt.html");
@@ -118,16 +128,57 @@ const pfad = await dl.path();
 soll("Seite: Download liefert die APK vom Server", dl.suggestedFilename() === "Private-Akte-Pro-0.9.11.apk" && readFileSync(pfad).equals(APK), dl.suggestedFilename());
 await pg.reload(); await pg.waitForFunction(() => /Freigeschaltet/.test(document.getElementById("spMeldung").textContent), null, { timeout: 15000 });
 soll("Seite: der Passkey bleibt in diesem Browser gemerkt", true);
+soll("Seite: die Windows-Fassung heißt „Windows (Installer)“", /Windows \(Installer\)/.test(await pg.textContent('[data-sp-app="private-akte"]')));
+{ // der Link aus dem Studio, in einem frischen Browser geöffnet
+  const c2 = await br.newContext({ viewport: { width: 412, height: 900 } }); await c2.route("https://spezial.family-projekt.de/**", (r) => ctx._weiter(r)); await c2.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+  const p2 = await c2.newPage(); await p2.goto(SEITE + "/markt-spezial.html#k=" + passkey);
+  const offen2 = await warte(p2, () => /Freigeschaltet/.test(document.getElementById("spMeldung").textContent) && document.querySelector(".sp-karte button[data-art]:not([disabled])"), 15000);
+  soll("Link: öffnet den Marktplatz Spezial gleich freigeschaltet", offen2 && (await p2.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.length)) === 1);
+  soll("Link: der Passkey verschwindet danach aus der Adresszeile", !(await p2.evaluate(() => location.hash)));
+  await c2.close();
+}
 const breit = await (async () => { const p2 = await ctx.newPage(); await p2.setViewportSize({ width: 360, height: 760 }); await p2.goto(SEITE + "/markt-spezial.html"); await p2.waitForSelector(".sp-karte"); const w = await p2.evaluate(() => document.documentElement.scrollWidth); await p2.close(); return w; })();
 soll("Seite: 360 px ohne seitliches Rollen", breit <= 360, breit + " px");
 
 if (process.env.SPEZIAL_BILD) { await pg.goto(SEITE + "/spezial-studio.html"); await pg.waitForSelector(".sps-tab"); await pg.screenshot({ path: process.env.SPEZIAL_BILD + "/spezial-studio-fp.png", fullPage: true }); }
+// ── 2b · mit Code verschlossen ──────────────────────────────────────────
+await pg.goto(SEITE + "/spezial-studio.html"); await pg.waitForSelector("#spsName");
+await pg.fill("#spsName", "Codekäufer"); await pg.check('.sps-apps input[value="private-akte"]'); await pg.check("#spsMitCode");
+await pg.fill("#spsPw", "studio-passwort-1"); await pg.click("#spsMachen");
+await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb .sps-link"); return l && /#z=FPZ1\./.test(l.value); }, null, { timeout: 60000 });
+const zuLink = await pg.inputValue("#spsUeb .sps-link"), code = await pg.evaluate(() => (document.querySelector("#spsUeb .sps-code strong") || { textContent: "" }).textContent.trim());
+soll("Code: der Link trägt nur den verschlossenen Passkey, nicht den Klartext", !/FPK1/.test(zuLink) && /^[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(code), zuLink.slice(0, 60) + " " + code);
+soll("Code: das Studio warnt, den Code getrennt zu schicken, und bietet keinen Klartext an", /NICHT in dieselbe Nachricht/.test(await pg.textContent("#spsUeb")) && !(await pg.$('#spsUeb [data-u="text"]')));
+soll("Code: der Code steht nicht im QR-Bild-Link und nicht im Link", !zuLink.includes(code.replace("-", "")) && !zuLink.includes(code));
+{
+  const c3 = await br.newContext({ viewport: { width: 412, height: 900 } }); await c3.route("https://spezial.family-projekt.de/**", (r) => weiter(r)); await c3.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+  const p3 = await c3.newPage(); const f3 = []; p3.on("pageerror", (e) => f3.push(e.message));
+  await p3.goto(SEITE + "/markt-spezial.html#" + zuLink.split("#")[1]);
+  const feld3 = await warte(p3, () => { const z = document.getElementById("spZu"); return z && !z.hidden; }, 10000);
+  soll("Code: ohne Code bleibt alles zu, das Code-Feld steht da", feld3 && (await p3.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.length)) === 0 && await p3.isVisible("#spCode"));
+  if (feld3) {
+  await p3.fill("#spCode", "AAAA-AAAA"); await p3.click("#spZuForm button");
+  const nein3 = await warte(p3, () => /passt nicht/.test(document.getElementById("spZuMeld").textContent));
+  soll("Code: ein falscher Code öffnet nichts", nein3 && (await p3.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.length)) === 0);
+  await p3.fill("#spCode", code.toLowerCase().replace("-", " ")); await p3.click("#spZuForm button");
+  const ja3 = await warte(p3, () => /Freigeschaltet für Codekäufer/.test(document.getElementById("spMeldung").textContent));
+  soll("Code: der richtige Code (auch klein und mit Leerzeichen getippt) schaltet frei", ja3 && (await p3.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.length)) === 1 && await p3.isHidden("#spZu"));
+  }
+  soll("Code: danach merkt sich der Browser den Passkey, nicht den Code", /^FPK1\./.test(await p3.evaluate(() => localStorage.getItem("spezial_passkey_fp"))) && !(await p3.evaluate(() => location.hash)));
+  soll("Code: keine Skriptfehler", f3.length === 0, f3.join(" | "));
+  await c3.close();
+}
+await pg.waitForSelector('#spezialStudio [data-kop]');
+await pg.click('#spezialStudio [data-kop]');
+await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb3 .sps-link"); return l && /#z=FPZ1/.test(l.value) && document.querySelector("#spsUeb3 .sps-code"); }, null, { timeout: 20000 });
+soll("Studio: „Übergabe“ in der Liste zeigt Link, Code und QR für einen älteren Passkey wieder", true);
+
 // ── 3 · Sperren aus dem Studio ──────────────────────────────────────────
 await pg.goto(SEITE + "/spezial-studio.html");
 await pg.waitForSelector("[data-sperr]");
 await pg.fill("#spsPw", "studio-passwort-1");
 pg.once("dialog", (d) => d.accept());
-await pg.click("[data-sperr]");
+await pg.click(`[data-sperr="${check.daten.id}"]`);
 await pg.waitForFunction(() => /Gesperrt/.test(document.getElementById("spsM3").textContent), null, { timeout: 30000 });
 const nach = await (await fetch(DIENST + "/pruefen", { method: "POST", body: JSON.stringify({ passkey }) })).json();
 soll("Studio: Sperren wirkt auf dem Server", nach.warum === "gesperrt", JSON.stringify(nach));

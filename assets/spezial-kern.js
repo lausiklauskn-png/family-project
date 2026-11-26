@@ -25,8 +25,8 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
   var MAERKTE = {
-    fp: { name: "family-projekt.de", code: "FPK1", sperre: "FPS1", studio: "FPSTUDIO1" },
-    tp: { name: "PWA Toolpoint", code: "TPK1", sperre: "TPS1", studio: "TPSTUDIO1" }
+    fp: { name: "family-projekt.de", code: "FPK1", sperre: "FPS1", studio: "FPSTUDIO1", zu: "FPZ1" },
+    tp: { name: "PWA Toolpoint", code: "TPK1", sperre: "TPS1", studio: "TPSTUDIO1", zu: "TPZ1" }
   };
   var enc = new TextEncoder(), dec = new TextDecoder();
   function sub() { return globalThis.crypto.subtle; }
@@ -129,8 +129,41 @@
     }).then(function (b) { return new Uint8Array(b); });
   }
 
+  // ── Passkey mit Code verschließen (Klaus 2026-11-26: „verschlüsselte Version, die erst beim Kunden aufgeht") ──
+  // Link oder QR tragen dann nur FPZ1.… — ohne den getrennt übermittelten Code nutzlos.
+  // Code: 8 Zeichen aus 31 gut unterscheidbaren (ohne 0 O 1 I L) ≈ 39 Bit; dazu PBKDF2 600 000.
+  var CODE_ZEICHEN = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  function neuerCode() {
+    var out = "", b = zufall(16), i = 0;
+    while (out.length < 8) { if (i >= b.length) { b = zufall(16); i = 0; } var x = b[i++]; if (x < 248) out += CODE_ZEICHEN[x % 31]; }
+    return out.slice(0, 4) + "-" + out.slice(4);
+  }
+  function codeNorm(c) { return String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/O/g, "0").replace(/[IL]/g, "1"); }
+  function einwickeln(text, code, markt) {
+    var M = MAERKTE[markt]; if (!M) return Promise.reject(new Error("markt"));
+    var salz = zufall(16), iv = zufall(12);
+    return wickel(codeNorm(code), salz).then(function (k) {
+      return sub().encrypt({ name: "AES-GCM", iv: iv, additionalData: enc.encode("spezial-passkey-" + markt) }, k, enc.encode(text));
+    }).then(function (ct) {
+      var c = new Uint8Array(ct), alles = new Uint8Array(28 + c.length);
+      alles.set(salz, 0); alles.set(iv, 16); alles.set(c, 28);
+      return M.zu + "." + b64u(alles);
+    });
+  }
+  // Gibt den Passkey-Text zurück; wirft "form" (kein Verschluss dieser Seite) oder "code" (Code passt nicht).
+  function auswickeln(z, code, markt) {
+    var M = MAERKTE[markt]; if (!M) return Promise.reject(new Error("markt"));
+    var m = new RegExp("^" + M.zu + "\\.([A-Za-z0-9_-]{40,})$").exec(String(z || "").replace(/\s+/g, ""));
+    if (!m) return Promise.reject(new Error("form"));
+    var b; try { b = unb64u(m[1]); } catch (e) { return Promise.reject(new Error("form")); }
+    return wickel(codeNorm(code), b.slice(0, 16)).then(function (k) {
+      return sub().decrypt({ name: "AES-GCM", iv: b.slice(16, 28), additionalData: enc.encode("spezial-passkey-" + markt) }, k, b.slice(28));
+    }).then(function (t) { return dec.decode(t); }, function () { throw new Error("code"); });
+  }
+
   return {
     MAERKTE: MAERKTE, APP_RE: APP_RE,
+    neuerCode: neuerCode, codeNorm: codeNorm, einwickeln: einwickeln, auswickeln: auswickeln,
     pruefe: pruefe, erstelle: erstelle, sperrErklaerung: sperrErklaerung,
     versiegle: versiegle, oeffne: oeffne, zerlege: zerlege,
     b64u: b64u, unb64u: unb64u, hex: hex, unhex: unhex, heute: heute
