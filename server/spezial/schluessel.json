@@ -1,0 +1,5 @@
+{
+  "_": "Öffentliche Herausgeber-Schlüssel (nicht geheim) je Markt. Klaus legt den Schlüssel im Studio an (spezial-studio.html) und schickt nur den ÖFFENTLICHEN Teil; der geheime verlässt seinen Browser nie. Solange eine Liste leer ist, nimmt der Server für diesen Markt keinen Passkey an.",
+  "fp": [],
+  "tp": []
+}

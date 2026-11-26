@@ -1,0 +1,16 @@
+{
+  "_": "Marktplatz Spezial: welche Pro-App aus welchem Repo gespiegelt wird. Gewählt wird je Art (android/windows) die neueste Freigabe (kein Entwurf, keine Vorabfassung), deren Tag nichts aus 'ohneTag' enthält und die eine Datei mit passender Endung trägt. Kennungen = die App-Kennungen in den Passkeys; nie umbenennen, sonst öffnen ausgegebene Passkeys diese App nicht mehr.",
+  "besitzer": "lausiklauskn-png",
+  "ohneTag": ["test", "preview", "sicherung"],
+  "muster": { "android": "\\.apk$", "windows": "\\.(exe|msi)$" },
+  "ohneDatei": ["debug"],
+  "apps": [
+    { "id": "private-akte", "name": "Private Akte Pro", "repo": "Private-Akte" },
+    { "id": "familienakte", "name": "Familienakte Pro", "repo": "Meine-Familienakte" },
+    { "id": "privat-brain-pro", "name": "Private Brain Pro", "repo": "Privat-Brain-Pro" },
+    { "id": "datei-organizer", "name": "Datei-Organizer Pro", "repo": "Datei-Organizer" },
+    { "id": "workflow-pdf-pro", "name": "Workflow PDF Pro", "repo": "Workflow-PDF-Pro" },
+    { "id": "bookledger-pro", "name": "BookLedger Pro", "repo": "BookLedgerPro" },
+    { "id": "familienbuero-pro", "name": "Familienbüro Pro", "repo": "Familienbuero-Pro" }
+  ]
+}

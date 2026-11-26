@@ -70,6 +70,9 @@
       nv_h: "🕸 Netz-Verwaltung",
       nv_intro: "Empfehlen, Widerrufen und die Sperrliste stehen auf einer eigenen Seite.",
       nv_open: "🕸 Netz-Verwaltung öffnen",
+      sp_h: "Marktplatz Spezial",
+      sp_intro: "Passkeys für die Pro-Apps erstellen und sperren. Eigene Seite, der geheime Schlüssel bleibt in diesem Browser.",
+      sp_open: "🔑 Marktplatz Spezial: Passkeys",
       nv_dirty: "Es gibt unveröffentlichte Änderungen im Studio. Sie gehen beim Wechseln verloren. Trotzdem öffnen?",
       sp_h: "🧬 Sporen der Anbieter",
       sp_intro: "Was die nächtliche Prüfung zuletzt gesehen hat. Ohne Haken am Eintrag wird eine geänderte Beschreibung nur gemeldet — übernommen wird sie erst hier.",
@@ -249,6 +252,9 @@
       nv_h: "🕸 Network administration",
       nv_intro: "Recommending, revoking and the block list are on a page of their own.",
       nv_open: "🕸 Open network administration",
+      sp_h: "Marketplace Special",
+      sp_intro: "Create and block passkeys for the Pro apps. Own page, the secret key stays in this browser.",
+      sp_open: "🔑 Marketplace Special: passkeys",
       nv_dirty: "There are unpublished changes in the studio. They are lost when you switch. Open anyway?",
       sp_h: "🧬 Provider spores",
       sp_intro: "What the nightly check last saw. Without the checkbox a changed description is only reported — you accept it here.",
@@ -2133,6 +2139,11 @@
           '<h4>' + esc(T("nv_h")) + '</h4>' +
           '<p class="fpst-qintro">' + esc(T("nv_intro")) + '</p>' +
           '<div class="fpst-qbtnrow"><button type="button" data-role="nvopen" class="fpst-btn">' + esc(T("nv_open")) + '</button></div>' +
+        '</div>' +
+        '<div class="fpst-vec">' +
+          '<h4>' + esc(T("sp_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("sp_intro")) + '</p>' +
+          '<div class="fpst-qbtnrow"><a href="spezial-studio.html" data-role="spopen" class="fpst-btn">' + esc(T("sp_open")) + '</a></div>' +
         '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
         '<div class="fpst-list" data-role="list"></div>' +

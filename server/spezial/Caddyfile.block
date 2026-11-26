@@ -1,0 +1,7 @@
+# Marktplatz Spezial: Pro-Dateien nur gegen Passkey (siehe family-project/server/spezial/)
+spezial.family-projekt.de, spezial.pwa-toolpoint.de {
+	request_body {
+		max_size 16KB
+	}
+	reverse_proxy spezial:8080
+}
