@@ -851,6 +851,25 @@ window.FP_LISTINGS = [
     "category": "Büro",
     "own": true
   },
+  {
+    "label": "PseudoDoc",
+    "anchorId": "eigen-pseudodoc",
+    "text": "Datei rein, pseudonymisiert zur KI, Antwort zurück. Brief, Vertrag, PDF, Scan, Foto oder E-Mail mit Anhängen hineinziehen. Namen, Anschriften und Nummern mit Prüfziffer werden zu Platzhaltern, in allen Dateien gleich. In Bildern Stellen schwarz abdecken, Kennzeichen und Namen schlägt die App selbst vor. Ein Klick auf ChatGPT, Claude oder Gemini, die Antwort bekommt danach die echten Angaben zurück. Hinaus gehen nur Text und neu gezeichnete Bilder, ohne Dateinamen und ohne Orts- und Kameraangaben. Alles auf dem Gerät, ohne Konto. KI, Datenschutz, Pseudonymisierung, DSGVO, Schwärzen.",
+    "text_en": "File in, pseudonymised to the AI, answer back. Drop in a letter, contract, PDF, scan, photo or e-mail with attachments. Names, addresses and numbers with check digits become placeholders, the same in every file. Black out areas in images, the app suggests number plates and names itself. One click to ChatGPT, Claude or Gemini, and the answer gets the real details back. Only text and freshly drawn images leave the device, without file names and without location or camera data. Everything on the device, with no account. AI, privacy, pseudonymisation, GDPR, redaction.",
+    "vorstellung": [
+      "Für alle, die Unterlagen mit einer KI besprechen wollen, ohne ihre Daten herzugeben",
+      "Namen, Anschriften und Nummern werden zu Platzhaltern",
+      "Stellen in Bildern schwarz abdecken, Vorschläge inklusive",
+      "Ein Klick zu ChatGPT, Claude oder Gemini",
+      "Die Antwort bekommt die echten Angaben zurück"
+    ],
+    "besonders": "Die KI sieht nur Platzhalter, und ihre Antwort kommt trotzdem mit den echten Namen zurück.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/PseudoDoc/app/",
+    "img": "https://lausiklauskn-png.github.io/PseudoDoc/app/pseudodoc-512.png",
+    "category": "Büro",
+    "own": true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];

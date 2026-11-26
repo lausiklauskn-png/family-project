@@ -1585,3 +1585,13 @@ geprüft). PWA Toolpoint macht eine eigene Sitzung mit **denselben Kennungen** (
 in `assets/config/spezial.js` und in `server/spezial/quellen.json`. Ihre Karte erscheint erst, wenn der Spiegel eine APK oder
 einen Windows-Installer gefunden hat; im Studio lassen sich schon Passkeys ausgeben. PseudoDoc trägt sein Android-Symbol
 (`HERKUNFT.json`), Rezeptbuch und Mixarium vorläufig das Symbol der Web-App. Cache v175.
+
+## 🕶 PseudoDoc im Regal (Klaus 2026-11-26)
+
+Klaus: *„Pseudodoc Basic kann in PWA Toolpoint und in Family Project mit rein.“* Eintrag `eigen-pseudodoc`
+(`https://lausiklauskn-png.github.io/PseudoDoc/app/`, Bild `app/pseudodoc-512.png`), Kategorie „Büro“, dieselbe Kennung in
+PWA Toolpoint. PseudoDoc Pro steht im Marktplatz Spezial (`bald`). ⚠ Die Windows-Datei von PseudoDoc Pro 0.1.0 liegt nur
+auf dem Update-Server (`family-projekt.de/updates/pseudodoc/`), nicht am GitHub-Release v0.1.0 (gemessen: APK 206, EXE 404) –
+der Spiegel liest nur GitHub, also bietet Spezial vorerst nur die APK an.
+Dazu `tools/messung-nachziehen.mjs` gefahren: Private Akte und Familienakte trugen eine Reihe, aber keine Messung auf der Karte
+(`smoke_messung_nachziehen` war auf main rot). Cache v176.
