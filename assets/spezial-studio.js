@@ -22,6 +22,71 @@
   function sag(id, text, gut) { var e = $(id); if (e) { e.textContent = text; e.className = "sps-meld" + (gut === true ? " sps-gut" : gut === false ? " sps-schlecht" : ""); } }
   function kopier(text, meld) { (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { sag(meld, "Kopiert.", true); }, function () { sag(meld, text); }); }
 
+  // ── Übergabe an den Käufer: Link, QR-Bild, auf Wunsch mit getrenntem Code (Klaus 2026-11-26) ──
+  function qrLib() {
+    if (window.qrcode) return Promise.resolve(window.qrcode);
+    return new Promise(function (ok, nein) {
+      var sc = document.createElement("script"); sc.src = new URL("qrcode-generator.js", SRC).href;
+      sc.onload = function () { window.qrcode ? ok(window.qrcode) : nein(new Error("qr")); }; sc.onerror = function () { nein(new Error("qr")); };
+      document.head.appendChild(sc);
+    });
+  }
+  function linkVon(e) { return new URL("markt-spezial.html", location.href).href.split("#")[0] + "#" + (e.zu ? "z=" + e.zu : "k=" + e.text); }
+  function qrBild(link, e) {
+    return qrLib().then(function (qrcode) {
+      var q = qrcode(0, "M"); q.addData(link); q.make();
+      var n = q.getModuleCount(), B = 720, H = 940, rand = 4, feld = 560, zelle = feld / (n + 2 * rand), x0 = (B - feld) / 2, y0 = 170;
+      var cv = document.createElement("canvas"); cv.width = B; cv.height = H;
+      var g = cv.getContext("2d");
+      g.fillStyle = "#0c1a2e"; g.fillRect(0, 0, B, H);
+      g.fillStyle = "#ffffff"; g.beginPath(); if (g.roundRect) g.roundRect(x0 - 14, y0 - 14, feld + 28, feld + 28, 24); else g.rect(x0 - 14, y0 - 14, feld + 28, feld + 28); g.fill();
+      g.fillStyle = "#000000";
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c)) g.fillRect(Math.floor(x0 + (c + rand) * zelle), Math.floor(y0 + (r + rand) * zelle), Math.ceil(zelle), Math.ceil(zelle));
+      g.textAlign = "center"; g.fillStyle = "#f2c14e"; g.font = "bold 44px system-ui, sans-serif"; g.fillText("🔑 Marktplatz Spezial", B / 2, 78);
+      g.fillStyle = "#cfe3f5"; g.font = "28px system-ui, sans-serif"; g.fillText(M.name, B / 2, 124);
+      g.fillStyle = "#ffffff"; g.font = "bold 32px system-ui, sans-serif"; g.fillText("für " + e.n, B / 2, y0 + feld + 76);
+      g.fillStyle = "#cfe3f5"; g.font = "24px system-ui, sans-serif";
+      g.fillText(e.zu ? "🔒 Mit Code verschlossen — den Code bekommst du getrennt." : "Scannen oder antippen: der Marktplatz öffnet sich freigeschaltet.", B / 2, y0 + feld + 120);
+      g.fillText("Gilt für: " + (e.a || []).length + (e.a && e.a.length === 1 ? " App" : " Apps") + (e.x ? " · bis " + e.x : ""), B / 2, y0 + feld + 156);
+      return new Promise(function (ok) { cv.toBlob(function (b) { ok({ blob: b, url: cv.toDataURL("image/png") }); }, "image/png"); });
+    });
+  }
+  function dateiname(e) { return "Schluessel-" + String(e.n).replace(/[^A-Za-z0-9äöüÄÖÜß_-]+/g, "-").slice(0, 40) + ".png"; }
+  function uebergabe(ziel, e) {
+    var box = $(ziel); if (!box) return;
+    var link = linkVon(e), teilen = !!navigator.share;
+    box.hidden = false;
+    box.innerHTML =
+      '<p class="sps-gut">Übergabe für ' + esc(e.n) + ":</p>" +
+      '<textarea rows="2" readonly class="sps-link">' + esc(link) + "</textarea>" +
+      '<div class="sps-reihe"><button class="btn primary" data-u="link">Link kopieren</button>' + (teilen ? '<button class="btn" data-u="teilen">Link teilen</button>' : "") + "</div>" +
+      (e.code ? '<p class="sps-code">Code: <strong>' + esc(e.code) + '</strong></p><p class="sps-schlecht">⚠ Den Code NICHT in dieselbe Nachricht. Getrennt sagen, z. B. am Telefon oder per SMS.</p>' +
+        '<div class="sps-reihe"><button class="btn" data-u="code">Code kopieren</button></div>' : "") +
+      '<div class="sps-qr"><p class="sps-klein">QR-Schlüssel wird gezeichnet …</p></div>' +
+      (e.code ? "" : '<p class="sps-klein">Oder nur den Passkey als Text: <button class="btn ghost" data-u="text">Passkey-Text kopieren</button></p>') +
+      '<p class="sps-meld" data-u-meld></p>';
+    var meld = box.querySelector("[data-u-meld]"); meld.id = ziel + "M";
+    var bild = null;
+    box.onclick = function (ev) {
+      var b = ev.target.closest("[data-u]"); if (!b) return;
+      var w = b.getAttribute("data-u");
+      if (w === "link") kopier(link, meld.id);
+      else if (w === "code") kopier(e.code, meld.id);
+      else if (w === "text") kopier(e.text, meld.id);
+      else if (w === "teilen") navigator.share({ title: "Marktplatz Spezial", text: "Dein Schlüssel für den Marktplatz Spezial (" + M.name + "):", url: link }).catch(function () {});
+      else if (w === "bildteilen" && bild) {
+        var f = new File([bild.blob], dateiname(e), { type: "image/png" });
+        navigator.share({ files: [f], title: "Marktplatz Spezial" }).catch(function () {});
+      }
+    };
+    qrBild(link, e).then(function (b) {
+      bild = b;
+      var kannBild = teilen && navigator.canShare && navigator.canShare({ files: [new File([b.blob], "x.png", { type: "image/png" })] });
+      box.querySelector(".sps-qr").innerHTML = '<img src="' + b.url + '" alt="QR-Schlüssel für ' + esc(e.n) + '" width="240" height="313">' +
+        '<div class="sps-reihe"><a class="btn" download="' + esc(dateiname(e)) + '" href="' + b.url + '">Bild speichern</a>' + (kannBild ? '<button class="btn" data-u="bildteilen">Bild teilen</button>' : "") + "</div>";
+    }, function () { box.querySelector(".sps-qr").innerHTML = '<p class="sps-schlecht">Der QR-Schlüssel ließ sich nicht zeichnen. Der Link geht trotzdem.</p>'; });
+  }
+
   function geheim(pw) {
     var box = lies(LS_KEY, null); if (!box) return Promise.reject(new Error("kein"));
     return K.oeffne(box, pw).catch(function () { throw new Error("pw"); });
@@ -55,16 +120,18 @@
           '<input type="text" id="spsName" maxlength="60" placeholder="Pseudonym des Käufers (wie beim Kauf angegeben)">' +
           '<fieldset class="sps-apps"><legend>Welche Apps?</legend>' + (C.apps || []).map(function (a) {
             return '<label><input type="checkbox" value="' + esc(a.id) + '"> ' + (a.bild ? '<img class="sps-sym" src="' + esc(a.bild) + '" alt="" width="22" height="22"> ' : "") + esc(a.name) + "</label>";
-          }).join("") + "</fieldset>" +
+          }).join("") + '<p class="sps-klein sps-voll">Ein Passkey gilt je App für beide Fassungen: Android (APK) und Windows (Installer).</p></fieldset>' +
           '<label class="sps-klein">Gültig bis (frei lassen = ohne Ablauf) <input type="date" id="spsBis"></label>' +
           '<input type="password" id="spsPw" placeholder="Studio-Passwort" autocomplete="current-password">' +
+          '<label class="sps-klein"><input type="checkbox" id="spsMitCode"> Mit Code verschließen: Link und QR-Bild gehen nur zusammen mit einem Code auf, den du getrennt sagst (z. B. am Telefon).</label>' +
           '<button class="btn primary" id="spsMachen">Passkey erstellen</button><p id="spsM2" class="sps-meld"></p>' +
-          '<textarea id="spsErgebnis" rows="3" readonly hidden></textarea><button class="btn" id="spsErgKop" hidden>Passkey kopieren</button></section>' +
+          '<div id="spsUeb" class="sps-ueb" hidden></div></section>' +
           '<section class="glass sps-teil"><h3>Vergebene Passkeys (' + log.length + ")</h3>" +
           (log.length ? '<table class="sps-tab"><tr><th>Pseudonym</th><th>Apps</th><th>am</th><th></th></tr>' + log.slice().reverse().map(function (e) {
             return "<tr><td>" + esc(e.n) + "</td><td>" + esc(e.a.join(", ")) + "</td><td>" + esc(e.d) + (e.x ? " bis " + esc(e.x) : "") + "</td><td>" +
-              (e.gesperrt ? "🚫 gesperrt" : '<button class="btn ghost" data-kop="' + esc(e.id) + '">Kopieren</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button>') + "</td></tr>";
+              (e.gesperrt ? "🚫 gesperrt" : (e.code ? "🔒 " : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button>') + "</td></tr>";
           }).join("") + "</table>" : "<p>Noch keiner.</p>") +
+          '<div id="spsUeb3" class="sps-ueb" hidden></div>' +
           '<p class="sps-klein">Die Liste liegt nur in diesem Browser. Sperren braucht das Studio-Passwort (Feld oben) und Netz.</p><p id="spsM3" class="sps-meld"></p></section>');
     verdrahte();
   }
@@ -98,20 +165,25 @@
       var name = $("spsName").value.trim(), apps = [].slice.call(document.querySelectorAll(".sps-apps input:checked")).map(function (i) { return i.value; });
       if (!name || !apps.length) return sag("spsM2", "Bitte Pseudonym eintragen und mindestens eine App wählen.", false);
       sag("spsM2", "Wird unterschrieben …");
+      var mitCode = $("spsMitCode").checked;
       Promise.all([geheim($("spsPw").value), nob()]).then(function (r) {
         return K.erstelle(r[1], r[0], C.markt, name, apps, $("spsBis").value);
       }).then(function (c) {
-        var log = lies(LS_LOG, []); log.push({ id: c.daten.id, n: c.daten.n, a: c.daten.a, d: c.daten.d, x: c.daten.x || "", text: c.text }); schreib(LS_LOG, log);
+        var e = { id: c.daten.id, n: c.daten.n, a: c.daten.a, d: c.daten.d, x: c.daten.x || "", text: c.text };
+        if (!mitCode) return e;
+        e.code = K.neuerCode();
+        return K.einwickeln(c.text, e.code, C.markt).then(function (zu) { e.zu = zu; return e; });
+      }).then(function (e) {
+        var log = lies(LS_LOG, []); log.push(e); schreib(LS_LOG, log);
         zeichne();
-        var e = $("spsErgebnis"); e.hidden = false; e.value = c.text; $("spsErgKop").hidden = false;
-        $("spsErgKop").onclick = function () { kopier(c.text, "spsM2"); };
-        sag("spsM2", "Passkey für " + c.daten.n + " — per Mail oder Nachricht schicken:", true);
+        uebergabe("spsUeb", e);
+        sag("spsM2", "✓ Passkey für " + e.n + " erstellt.", true);
       }).catch(function (e) { sag("spsM2", e.message === "pw" ? "Falsches Studio-Passwort." : "Ging nicht: " + e.message, false); });
     };
     var w = $("spezialStudio");
     w.onclick = function (ev) {
       var kb = ev.target.closest("[data-kop]");
-      if (kb) { var e1 = lies(LS_LOG, []).find(function (x) { return x.id === kb.getAttribute("data-kop"); }); if (e1) kopier(e1.text, "spsM3"); return; }
+      if (kb) { var e1 = lies(LS_LOG, []).find(function (x) { return x.id === kb.getAttribute("data-kop"); }); if (e1) { uebergabe("spsUeb3", e1); $("spsUeb3").scrollIntoView({ block: "nearest" }); } return; }
       var sb = ev.target.closest("[data-sperr]"); if (!sb) return;
       var id = sb.getAttribute("data-sperr");
       if (!confirm("Diesen Passkey wirklich sperren? Das lässt sich nicht zurücknehmen.")) return;

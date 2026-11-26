@@ -1555,6 +1555,14 @@ node tests/smoke_spezial_seite.mjs       # echter Browser: Studio → Passkey �
 bash tests/gegenprobe_spezial_dienst.sh  # 9 Riegel, je einer ausgebaut, in einer Wegwerf-Kopie
 ```
 
+**Übergabe an den Käufer (Klaus 2026-11-26):** das Studio gibt keinen nackten Text mehr aus, sondern einen **Link**
+(`markt-spezial.html#k=FPK1.…`, der Teil nach `#` geht nicht an den Server; die Seite schaltet sofort frei und nimmt ihn aus
+der Adresszeile), ein **QR-Bild** zum Speichern/Teilen (`assets/qrcode-generator.js`, MIT, unverändert aus npm, nur im Studio)
+und auf Haken **„Mit Code verschließen"**: der Link trägt dann nur `FPZ1.…` (AES-GCM, PBKDF2 600 000, Code 8 Zeichen), der
+Code geht getrennt (Telefon/SMS). ⚠ **Ein Bild verschlüsselt nichts** — ohne Code ist der QR so offen wie der Text.
+Probe `smoke_spezial_seite` 40 grün; drei Sabotagen (kein Hash-Lesen · falscher Code öffnet · kein Code erzeugt) je mit Namen rot.
+Die Karten heißen jetzt „Android (APK)" und „Windows (Installer)"; ein Passkey gilt je App für beide. Cache v173.
+
 Erster Gegenprobe-Lauf: 7 Fälle, **2 blind** (Markt unter der Unterschrift; SHA-Vergleich) — geschärft, jetzt 9 · 0 · 0.
 Cache v170 → v171 (markt.html), `ASSET_V` und alle `?v=` mitgezogen. `smoke_angleichen` (Private Akte / Familienakte
 fehlen hier als PWA) und `smoke_bewegungsknopf` sind auch auf `main` rot — nicht von dieser Arbeit.

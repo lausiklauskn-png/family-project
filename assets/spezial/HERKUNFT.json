@@ -10,10 +10,10 @@
     },
     "familienakte": {
       "repo": "lausiklauskn-png/Meine-Familienakte",
-      "stand": "6682d68",
+      "stand": "8358eee",
       "pfad": "windows/src-tauri/icons/128x128@2x.png",
       "datei": "familienakte.png",
-      "sha256": "f24fdb9360e0cd9ab8163e3144f8710198800309d3a0d9c0cb5c0931eb00c6d8"
+      "sha256": "2aaea1289c8c0a286e9ef5993748bf3999ae4b0c68b1a82b127e7675b870c6fd"
     },
     "privat-brain-pro": {
       "repo": "lausiklauskn-png/Privat-Brain-Pro",
@@ -50,5 +50,12 @@
       "datei": "familienbuero-pro.png",
       "sha256": "27fea4e25c0923c89586d018adc38cc8f47c8e9ab186aa401dbdd56845223f38"
     }
+  },
+  "qrcode-generator": {
+    "_": "QR-Zeichner fürs Studio (Übergabe-Bild). Unverändert aus npm, MIT, Kazuhiko Arase. Nur im Studio geladen, nie auf der Käufer-Seite.",
+    "paket": "qrcode-generator@2.0.4",
+    "pfad": "dist/qrcode.js",
+    "datei": "../qrcode-generator.js",
+    "sha256": "79ec86f82856005b1c887905cfccfcfbec3821ca61c7fd5a952faa5f778f791c"
   }
 }
