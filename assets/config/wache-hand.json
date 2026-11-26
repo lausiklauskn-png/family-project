@@ -47,5 +47,15 @@
   "eigen-alis-warenwirtschaft": {
     "wartung": true,
     "wartungSeit": "2026-09-28"
+  },
+  "markt-mycel-karte": {
+    "gesehen": "797fc38b005281b6",
+    "gesehen_am": "2026-11-26",
+    "grund": "Klaus 26.11.2026: der Hinweis vom 14.10. ist überholt, aufheben. Kennzeichen atob, keine fremde Herkunft (Abdruck 3d2d90abc0a740af)."
+  },
+  "markt-privat-brain": {
+    "gesehen": "35f650ff377bba7f",
+    "gesehen_am": "2026-11-26",
+    "grund": "Klaus 26.11.2026: die Änderung ist der Wechsel auf Private Brain V3 (25.10.); kein Kennzeichen, keine fremde Herkunft (Abdruck d03a998f4df78896)."
   }
 }
