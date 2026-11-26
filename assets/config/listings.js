@@ -854,14 +854,14 @@ window.FP_LISTINGS = [
   {
     "label": "PseudoDoc",
     "anchorId": "eigen-pseudodoc",
-    "text": "Datei rein, pseudonymisiert zur KI, Antwort zurück. Brief, Vertrag, PDF, Scan, Foto oder E-Mail mit Anhängen hineinziehen. Namen, Anschriften und Nummern mit Prüfziffer werden zu Platzhaltern, in allen Dateien gleich. In Bildern Stellen schwarz abdecken, Kennzeichen und Namen schlägt die App selbst vor. Ein Klick auf ChatGPT, Claude oder Gemini, die Antwort bekommt danach die echten Angaben zurück. Hinaus gehen nur Text und neu gezeichnete Bilder, ohne Dateinamen und ohne Orts- und Kameraangaben. Alles auf dem Gerät, ohne Konto. KI, Datenschutz, Pseudonymisierung, DSGVO, Schwärzen.",
-    "text_en": "File in, pseudonymised to the AI, answer back. Drop in a letter, contract, PDF, scan, photo or e-mail with attachments. Names, addresses and numbers with check digits become placeholders, the same in every file. Black out areas in images, the app suggests number plates and names itself. One click to ChatGPT, Claude or Gemini, and the answer gets the real details back. Only text and freshly drawn images leave the device, without file names and without location or camera data. Everything on the device, with no account. AI, privacy, pseudonymisation, GDPR, redaction.",
+    "text": "Dateien prüfen, pseudonymisieren und sicher weitergeben: vor dem Öffnen, auf dem Weg zur KI und vor dem Teilen. Rein: prüft eine Datei oder Mail, bevor du sie öffnest, auf versteckten Text, Anweisungen an eine KI, Makros und getarnte Programme. Zur KI: Namen, Anschriften und Nummern mit Prüfziffer werden zu Platzhaltern, in Bildern deckst du Stellen schwarz ab, ein Klick auf ChatGPT, Claude oder Gemini, und die Antwort bekommt die echten Angaben zurück, geprüft auf erfundene Platzhalter und neue Kontonummern. Raus: entfernt vor dem Weitergeben Ort und Kamera aus Fotos, Autor aus Word und Dokument-Infos aus PDF, auf Wunsch pseudonymisiert. Alles auf dem Gerät, ohne Konto. KI, Datenschutz, Pseudonymisierung, DSGVO, Schwärzen, Metadaten.",
+    "text_en": "Check files, pseudonymise and share safely: before opening, on the way to the AI and before sharing. In: checks a file or e-mail before you open it for hidden text, instructions to an AI, macros and disguised programs. To the AI: names, addresses and numbers with check digits become placeholders, you black out areas in images, one click to ChatGPT, Claude or Gemini, and the answer gets the real details back, checked for invented placeholders and new account numbers. Out: before sharing, removes location and camera data from photos, the author from Word files and document info from PDFs, pseudonymised on request. Everything on the device, with no account. AI, privacy, pseudonymisation, GDPR, redaction, metadata.",
     "vorstellung": [
-      "Für alle, die Unterlagen mit einer KI besprechen wollen, ohne ihre Daten herzugeben",
-      "Namen, Anschriften und Nummern werden zu Platzhaltern",
-      "Stellen in Bildern schwarz abdecken, Vorschläge inklusive",
-      "Ein Klick zu ChatGPT, Claude oder Gemini",
-      "Die Antwort bekommt die echten Angaben zurück"
+      "Für alle, die Unterlagen mit einer KI besprechen oder weitergeben wollen, ohne ihre Daten herzugeben",
+      "Rein: Datei oder Mail vor dem Öffnen prüfen",
+      "Zur KI: Namen und Nummern werden zu Platzhaltern, Bilder schwarz abdecken",
+      "Die Antwort bekommt die echten Angaben zurück und wird geprüft",
+      "Raus: bereinigte Kopie ohne Ort, Autor und Dokument-Infos"
     ],
     "besonders": "Die KI sieht nur Platzhalter, und ihre Antwort kommt trotzdem mit den echten Namen zurück.",
     "by": "@klaus",
