@@ -99,6 +99,7 @@ for (let lauf = 1; lauf <= LAEUFE; lauf++) {
   const lh = (await import("lighthouse")).default;
   const res = await lh(`${base}/${SEITE}`, { port: 9222, output: "json", logLevel: "error" }, LH_CONFIG);
   const r = res.lhr;
+  if (process.env.LH_JSON) fs.writeFileSync(`${process.env.LH_JSON}-${GERAET}-${lauf}.json`, JSON.stringify(r));   /* der ganze Bericht zum Nachlesen (LCP-Phasen, Abhängigkeitsbaum); die Ausgabe unten kürzt */
 
   const kat = (k) => (r.categories[k] ? Math.round(r.categories[k].score * 100) : "-");
   console.log(`\n=== ${SEITE} — ${GERAET.toUpperCase()} — Lauf ${lauf}/${LAEUFE} ===`);
