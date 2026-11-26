@@ -70,6 +70,11 @@ soll("Spiegel: SHA-256 der abgelegten APK stimmt", pa?.android?.sha256 === shaHe
 soll("Spiegel: Windows-Installer liegt", pa?.windows?.datei === "Private-Akte-Pro_0.9.11_x64-setup.exe");
 const vorher = abrufe; await spiegeln({ daten: DATEN, api, log: (s) => logs.push(s) });
 soll("Spiegel: zweiter Lauf fragt mit If-None-Match (304, nichts neu)", abrufe === vorher + 1 && logs.some((l) => /private-akte: unverändert/.test(l)));
+// eine geänderte Zeile in quellen.json gilt sofort, auch wenn GitHub 304 antworten würde
+const Q2 = join(DATEN, "quellen-geaendert.json");
+await writeFile(Q2, JSON.stringify({ ...cfg, apps: cfg.apps.map((a) => a.id === "private-akte" ? { ...a, vorab: ["windows"] } : a) }));
+const logs3 = []; await spiegeln({ quellen: Q2, daten: DATEN, api, log: (s) => logs3.push(s) });
+soll("Spiegel: nach geänderter Einstellung wird ohne If-None-Match neu gewählt", !logs3.some((l) => /private-akte: unverändert/.test(l)) && logs3.some((l) => /private-akte\/android: .* liegt schon/.test(l)), logs3.join(" | "));
 
 // eine Datei, deren SHA-256 nicht zu GitHubs Angabe passt, wird nicht abgelegt
 falschesDigest = true;
