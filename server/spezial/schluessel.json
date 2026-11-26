@@ -1,5 +1,9 @@
 {
-  "_": "Öffentliche Herausgeber-Schlüssel (nicht geheim) je Markt. Klaus legt den Schlüssel im Studio an (spezial-studio.html) und schickt nur den ÖFFENTLICHEN Teil; der geheime verlässt seinen Browser nie. Solange eine Liste leer ist, nimmt der Server für diesen Markt keinen Passkey an.",
-  "fp": [],
-  "tp": []
+  "_": "Öffentliche Herausgeber-Schlüssel (nicht geheim) je Markt. Klaus legt den Schlüssel im Studio an (spezial-studio.html) und schickt nur den ÖFFENTLICHEN Teil; der geheime verlässt seinen Browser nie. Solange eine Liste leer ist, nimmt der Server für diesen Markt keinen Passkey an. Eingetragen 2026-11-26.",
+  "fp": [
+    "57e66e21aa86b0fe9d07a77244254be44d52ada37d73ef2493d97865c9f9bb4f"
+  ],
+  "tp": [
+    "764b7edc2e69f0d192a10d1005bf9278d043478af544029f664fa11e7c4cdffb"
+  ]
 }
