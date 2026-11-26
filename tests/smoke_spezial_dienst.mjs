@@ -50,6 +50,8 @@ const { waehle, spiegeln } = await import(pathToFileURL(join(WURZEL, "server/spe
 const cfg = JSON.parse(await readFile(join(WURZEL, "server/spezial/quellen.json"), "utf8"));
 const rel = [{ tag_name: "v2-test", published_at: "3", assets: [{ name: "a.apk" }] }, { tag_name: "v1", published_at: "2", prerelease: true, assets: [{ name: "b.apk" }] }, { tag_name: "v0.5", published_at: "1", assets: [{ name: "c-debug.apk" }, { name: "c.apk" }, { name: "c.msi" }] }];
 soll("waehle: überspringt Test-Tag, Vorabfassung und Debug-Datei", waehle(rel, "android", cfg)?.datei === "c.apk", JSON.stringify(waehle(rel, "android", cfg)));
+soll("waehle: eine Vorabfassung zählt nur, wo die App sie für diese Art erlaubt", waehle(rel, "android", cfg, { vorab: ["android"] })?.datei === "b.apk" && waehle(rel, "android", cfg, { vorab: ["windows"] })?.datei === "c.apk");
+soll("quellen.json: Familienakte nimmt Android-Vorabfassungen (so gibt ihr Release-Lauf aus)", (cfg.apps.find((a) => a.id === "familienakte")?.vorab || []).join() === "android");
 soll("waehle: Windows nimmt .msi", waehle(rel, "windows", cfg)?.datei === "c.msi");
 soll("waehle: ohne passende Datei → null", waehle([{ tag_name: "v1", assets: [{ name: "x.zip" }] }], "android", cfg) === null);
 soll("waehle: ein Dateiname mit Pfad wird nicht genommen", waehle([{ tag_name: "v1", assets: [{ name: "../böse.apk" }] }], "android", cfg) === null);
