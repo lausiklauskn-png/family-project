@@ -11,6 +11,10 @@ window.SPEZIAL = {
     { id: "datei-organizer", name: "Datei-Organizer Pro", bild: "assets/spezial/datei-organizer.png", text: "Große Mengen Dateien einlesen und sortieren. Lernt aus jeder Korrektur.", text_en: "Read in and sort large amounts of files. Learns from every correction." },
     { id: "workflow-pdf-pro", name: "Workflow PDF Pro", bild: "assets/spezial/workflow-pdf-pro.png", text: "Scannen, PDF bearbeiten und zusammenfügen, mit Texterkennung.", text_en: "Scan, edit and merge PDFs, with text recognition." },
     { id: "bookledger-pro", name: "BookLedger Pro", bild: "assets/spezial/bookledger-pro.png", text: "Buchhaltung mit Kasse, Bank einlesen und Monatsabschluss.", text_en: "Bookkeeping with cash book, bank import and monthly closing." },
-    { id: "familienbuero-pro", name: "Familienbüro Pro", bild: "assets/spezial/familienbuero-pro.png", text: "Briefe, Tabellen und Dokumente bearbeiten, mit ONLYOFFICE.", text_en: "Edit letters, spreadsheets and documents, with ONLYOFFICE." }
+    { id: "familienbuero-pro", name: "Familienbüro Pro", bild: "assets/spezial/familienbuero-pro.png", text: "Briefe, Tabellen und Dokumente bearbeiten, mit ONLYOFFICE.", text_en: "Edit letters, spreadsheets and documents, with ONLYOFFICE." },
+    // Klaus 2026-11-26: die nächsten Pro-Fassungen. „bald“: die Karte erscheint erst, wenn der Server eine Datei hat;
+    // im Studio lassen sich schon Passkeys dafür ausgeben. Bild vorläufig das Symbol der Web-App, das Pro-Symbol folgt.
+    { id: "rezeptbuch-pro", bald: true, name: "Mein Rezeptbuch Pro", bild: "assets/spezial/rezeptbuch-pro.png", text: "Rezepte sammeln, scannen und ordnen, mit Wochenplan und Einkaufsliste.", text_en: "Collect, scan and sort recipes, with weekly plan and shopping list." },
+    { id: "mixarium-pro", bald: true, name: "Mein Mixarium Pro", bild: "assets/spezial/mixarium-pro.png", text: "Dein Getränke-Labor: Cocktails, Mocktails, Smoothies und mehr.", text_en: "Your drinks lab: cocktails, mocktails, smoothies and more." }
   ]
 };

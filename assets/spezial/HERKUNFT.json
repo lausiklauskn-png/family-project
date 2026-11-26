@@ -50,6 +50,22 @@
       "pfad": "windows/src-tauri/icons/icon.png",
       "datei": "familienbuero-pro.png",
       "sha256": "27fea4e25c0923c89586d018adc38cc8f47c8e9ab186aa401dbdd56845223f38"
+    },
+    "rezeptbuch-pro": {
+      "repo": "lausiklauskn-png/Mein-Rezeptbuch",
+      "stand": "28fe534",
+      "pfad": "icons/icon-book-1024.png",
+      "datei": "rezeptbuch-pro.png",
+      "sha256": "ab48cea51ee3bf700413d27d2bf24c29d08301b9e6e470d2539c8b0da0be7196",
+      "_": "vorläufig das Symbol der Web-App; das dunkle Pro-Symbol kommt mit der Pro-Fassung"
+    },
+    "mixarium-pro": {
+      "repo": "lausiklauskn-png/Mein-Mixarium",
+      "stand": "02ff25c",
+      "pfad": "icons/mixarium-192.png",
+      "datei": "mixarium-pro.png",
+      "sha256": "410136308ca611c7bbe7a85dac397730346f05f7e811e60f4106f7822d41eac5",
+      "_": "vorläufig das Symbol der Web-App; das dunkle Pro-Symbol kommt mit der Pro-Fassung"
     }
   },
   "qrcode-generator": {

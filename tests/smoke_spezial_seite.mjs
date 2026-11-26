@@ -95,6 +95,7 @@ soll("Studio: Passkey steht in der Liste", /Testkäufer/.test(await pg.textConte
 await pg.waitForFunction(() => { const i = document.querySelector("#spsUeb .sps-qr img"); return i && i.complete && i.naturalWidth >= 600; }, null, { timeout: 20000 });
 soll("Studio: der QR-Schlüssel ist ein Bild zum Speichern (PNG)", /^data:image\/png/.test(await pg.getAttribute("#spsUeb .sps-qr img", "src")) && /^Schluessel-Testk/.test(await pg.getAttribute("#spsUeb .sps-qr a[download]", "download")));
 soll("Studio: ohne Code-Haken steht kein Code da", !(await pg.$("#spsUeb .sps-code")));
+soll("Studio: kommende Pro-Apps lassen sich schon in einen Passkey nehmen", (await pg.locator('.sps-apps input[value="rezeptbuch-pro"], .sps-apps input[value="mixarium-pro"]').count()) === 2);
 soll("Studio: sagt, dass ein Passkey für Android UND Windows gilt", /Android \(APK\) und Windows \(Installer\)/.test(await pg.textContent(".sps-apps")));
 
 // ── 2 · Seite ───────────────────────────────────────────────────────────
@@ -103,8 +104,10 @@ soll("Marktplatz: Knopf „Marktplatz Spezial“ führt zur Seite", (await pg.ge
 await pg.goto(SEITE + "/markt-spezial.html");
 await pg.waitForSelector(".sp-karte button[data-art=android]", { timeout: 15000 });
 const karten = await pg.$$eval(".sp-karte", (k) => k.map((x) => x.getAttribute("data-sp-app")));
-const cfg = await pg.evaluate(() => window.SPEZIAL.apps.map((a) => a.id));
+const cfg = await pg.evaluate(() => window.SPEZIAL.apps.filter((a) => !a.bald).map((a) => a.id));
+const bald = await pg.evaluate(() => window.SPEZIAL.apps.filter((a) => a.bald).map((a) => a.id));
 soll("Seite: eine Karte je Pro-App aus der Konfiguration", karten.join() === cfg.join() && karten.length >= 5, karten.join());
+soll("Seite: eine kommende Pro-App (bald) ohne Datei auf dem Server zeigt noch keine Karte", bald.length >= 2 && bald.every((id) => !karten.includes(id)), bald.join());
 await pg.waitForFunction(() => [...document.querySelectorAll(".sp-karte img.sp-sym")].every((i) => i.complete), null, { timeout: 15000 });
 const bilder = await pg.$$eval(".sp-karte", (k) => k.map((x) => { const i = x.querySelector("img.sp-sym"); return i && i.naturalWidth >= 64 ? "ok" : x.getAttribute("data-sp-app"); }));
 soll("Seite: jede Karte trägt das eigene Symbol der App (geladen, keine Lücke)", bilder.every((b) => b === "ok"), bilder.join());

@@ -55,7 +55,8 @@
 
   function zeichne() {
     var stand = {}; (KATALOG.apps || []).forEach(function (a) { stand[a.id] = a; });
-    el.liste.innerHTML = (C.apps || []).map(function (a) {
+    // „bald“: die nächsten Pro-Fassungen erscheinen erst, wenn der Server eine Datei für sie hat.
+    el.liste.innerHTML = (C.apps || []).filter(function (a) { var s = stand[a.id]; return !a.bald || (s && (s.android || s.windows)); }).map(function (a) {
       var s = stand[a.id] || {}, frei = FREI && FREI.indexOf(a.id) >= 0;
       var knoepfe = ["android", "windows"].map(function (art) {
         var d = s[art];
