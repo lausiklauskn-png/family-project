@@ -307,8 +307,8 @@ export function marktHtml(eintraege) {
         // „Familienprojekt" (Klaus' Bildschirmfoto 2026-09-14) — dasselbe
         // waere hier mit jedem App-Namen passiert.
         /* „Neu“ (Klaus 2026-11-25): die App ist neu gestaltet online gegangen. Ein kleiner Knopf neben dem Namen führt direkt in die neue
-         * App; ohne `neu` und `appUrl` steht er nicht da. Wortgleich in markt.html `card()`. */
-        `<h3 translate="no">${esc(e.label)}${e.neu && e.appUrl ? ` <a class="mk-neu" href="${esc(e.appUrl)}" target="_blank" rel="${relFuer(e.eigen)}" title="Die neue App öffnen">Neu</a>` : ""}</h3>` +
+         * App (appUrl, sonst url: seit 26.11. führt der Eintrag selbst in die App); ohne `neu` steht er nicht da. Wortgleich in markt.html `card()`. */
+        `<h3 translate="no">${esc(e.label)}${e.neu && (e.appUrl || e.url) ? ` <a class="mk-neu" href="${esc(e.appUrl || e.url)}" target="_blank" rel="${relFuer(e.eigen)}" title="Die neue App öffnen">Neu</a>` : ""}</h3>` +
         (e.by ? `<p class="by" translate="no">${esc(e.by)}</p>` : "") +
         `<p>${esc(e.text)}</p>` +
         /* Das Erklärvideo steht auf der Detailseite; die Karte trägt nur den

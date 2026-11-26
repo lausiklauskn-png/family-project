@@ -762,13 +762,9 @@
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
-        "grundlage": "313b990a3360d847",
-        "fgrundlage": "d03a998f4df78896",
-        "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "313b990a3360d847",
         "status": 200,
         "seit": "2026-08-10",
-        "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch-Page/"
+        "url": "https://lausiklauskn-png.github.io/Mein-Rezeptbuch/neu/"
       },
       "messung": {
         "leistung": 81,
@@ -889,13 +885,9 @@
         "fehlschlaege": 0,
         "safebrowsing": "nicht_geprueft",
         "ankuendigung": "ohne_spore",
-        "grundlage": "1324ecb530af6c8b",
-        "fgrundlage": "d03a998f4df78896",
-        "fingerabdruck": "d03a998f4df78896",
-        "pruefsumme": "1324ecb530af6c8b",
         "status": 200,
         "seit": "2026-08-10",
-        "url": "https://lausiklauskn-png.github.io/Mein-Mixarium-Page/"
+        "url": "https://lausiklauskn-png.github.io/Mein-Mixarium/neu/"
       },
       "messung": {
         "leistung": 85,

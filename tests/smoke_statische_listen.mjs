@@ -88,9 +88,9 @@ console.log("\nmarkt.html");
    * ihre eigene Zusicherung, und der Innen-Link wird ueberhaupt erst gemessen. */
   const alleLinks = links(b);
   /* Seit 2026-11-25 trägt eine neu gestaltete App neben dem Namen den Knopf „Neu“ (class mk-neu) in die neue App – eine eigene Sorte:
-   * genau einer je Eintrag mit `neu` und `appUrl`, und er führt auf DIESE appUrl. */
+   * genau einer je Eintrag mit `neu`, und er führt in die App (appUrl, sonst url). */
   const neuL = alleLinks.filter((l) => /\bmk-neu\b/.test(l.cls));
-  const sollNeu = markt.filter((e) => e.neu && e.appUrl).map((e) => e.appUrl);
+  const sollNeu = markt.filter((e) => e.neu && (e.appUrl || e.url)).map((e) => e.appUrl || e.url);   /* seit 26.11. führt der Eintrag selbst in die App (url), appUrl fällt dann weg */
   ok(neuL.length === sollNeu.length && neuL.every((l) => sollNeu.includes(l.href)) && sollNeu.length > 0,
     `jeder „Neu“-Knopf gehört zu einer neu gestalteten App und führt in sie (${neuL.length} von ${sollNeu.length})`);
   ok(neuL.every((l) => l.target === "_blank" && /noopener/.test(l.rel)), "„Neu“ öffnet die App in einem neuen Tab, mit noopener");
