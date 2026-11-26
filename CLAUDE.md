@@ -1529,3 +1529,16 @@ Seite, nicht diesen Markt.
   auch auf main** (Hintergrund-Schalter mit three.js; im Behälter nachgemessen, nicht angefasst). ⚠ Messung und Eigenschaften der
   Karte kommen mit der nächsten Nacht; der Pages-Host ist aus dem Behälter nicht erreichbar, die Karte ist am Tablet nicht gesehen
   (Sichttest ausstehend).
+
+## 🗂 Private Akte und Meine Familienakte im Regal (Klaus 2026-11-26)
+
+Klaus: *„Privatakte und Familienakte als PWA-App online stellen auf Family Project und PWA Toolpoint."* Beide standen bis
+dahin in **keinem** Markt; hier gab es für keine von beiden ein Messziel oder eine Reihe (`forschung/`, `tools/` per grep
+geprüft). PWA Toolpoint macht eine eigene Sitzung mit **denselben Kennungen** (Identität der Messreihe).
+- Einträge `eigen-private-akte` (`https://lausiklauskn-png.github.io/Private-Akte/`) und `eigen-familienakte`
+  (`https://lausiklauskn-png.github.io/Meine-Familienakte/`) in `assets/config/listings.js`, hinten vor der Marke, Kategorie
+  „Büro", Bild je `icons/icon-512.png`. Kein `sporeUrl`, keine Wartung, `own: true`. Texte ohne Gedankenstrich.
+- Gebaut mit `statische-listen` (markt.html 37 Karten), `detailseiten` (`apps/eigen-private-akte/`, `apps/eigen-familienakte/`),
+  `sitemap-bauen` (51 Adressen). Cache `v170 → v171`, `ASSET_V` und alle `?v=` nachgezogen.
+- ⚠ Messung und Vektor kommen mit der nächsten Nacht (`vektoren-taeglich.yml`); die Pages-Adressen sind aus dem Behälter nicht
+  abgerufen, die Karten am Tablet nicht gesehen.
