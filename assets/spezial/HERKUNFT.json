@@ -17,10 +17,11 @@
     },
     "privat-brain-pro": {
       "repo": "lausiklauskn-png/Privat-Brain-Pro",
-      "stand": "06a9965",
-      "pfad": "android/app/src/main/res/drawable-nodpi/private_brain_icon.png",
+      "stand": "0262c0d (PR #163)",
+      "pfad": "icon-pro-512.png",
       "datei": "privat-brain-pro.png",
-      "sha256": "3d8062d4f8644ab7f369cf1754f70a448b51264fd129e0f2ea6ad3dc5a66ff50"
+      "sha256": "a567c9ca834233ba6162c271d13d1add1562ae12544cec3e638ecc2aac5d132b",
+      "_": "Pro-Symbol dunkel mit Verlauf (Klaus 2026-11-26), Vorlage artwork/private-brain-pro-dark.png"
     },
     "datei-organizer": {
       "repo": "lausiklauskn-png/Datei-Organizer",
