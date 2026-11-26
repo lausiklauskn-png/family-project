@@ -1,0 +1,140 @@
+// Marktplatz Spezial im echten Browser: Seite + Studio gegen den echten Dienst (gestelltes GitHub).
+// node tests/smoke_spezial_seite.mjs
+import http from "node:http";
+import { mkdtemp, writeFile, readFile } from "node:fs/promises";
+import { readFileSync, existsSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, dirname, extname } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { createRequire } from "node:module";
+
+globalThis.self = globalThis;
+const WURZEL = join(dirname(fileURLToPath(import.meta.url)), "..");
+const require = createRequire(import.meta.url);
+const K = require(join(WURZEL, "assets/spezial-kern.js"));
+const noble = await import(pathToFileURL(join(WURZEL, "sbkim/noble-secp256k1.js")).href);
+let gruen = 0, rot = 0;
+function soll(name, wahr, mehr) { if (wahr) { gruen++; console.log("✓ " + name); } else { rot++; console.log("✗ " + name + (mehr ? "  → " + mehr : "")); } }
+async function ende(code) { console.log(`${gruen} grün · ${rot} ROT`); process.exitCode = code; }
+process.on("unhandledRejection", (e) => { rot++; console.log("✗ Probe gestolpert: " + (e && e.message || e)); ende(1); setTimeout(() => process.exit(1), 50); });
+
+// ── Daten: gestelltes GitHub → echter Spiegel ───────────────────────────
+const APK = Buffer.from("APK-" + "a".repeat(4000));
+const gh = http.createServer((q, a) => {
+  const b = "http://127.0.0.1:" + gh.address().port;
+  if (q.url.startsWith("/repos/lausiklauskn-png/Private-Akte/")) { a.writeHead(200, { "Content-Type": "application/json" }); return a.end(JSON.stringify([{ tag_name: "v0.9.11", published_at: "2026-11-26", assets: [{ name: "Private-Akte-Pro-0.9.11.apk", size: APK.length, browser_download_url: b + "/apk" }] }])); }
+  if (q.url.startsWith("/repos/")) { a.writeHead(200, { "Content-Type": "application/json" }); return a.end("[]"); }
+  if (q.url === "/apk") { a.writeHead(200); return a.end(APK); }
+  a.writeHead(404); a.end();
+});
+await new Promise((ok) => gh.listen(0, "127.0.0.1", ok));
+const DATEN = await mkdtemp(join(tmpdir(), "spezial-seite-"));
+const { spiegeln } = await import(pathToFileURL(join(WURZEL, "server/spezial/spiegeln.mjs")).href);
+await spiegeln({ daten: DATEN, api: "http://127.0.0.1:" + gh.address().port, log: () => {} });
+const SCHL = join(DATEN, "schluessel.json");
+await writeFile(SCHL, JSON.stringify({ fp: [], tp: [] }));
+process.env.SPEZIAL_DATEN = DATEN; process.env.SPEZIAL_SCHLUESSEL = SCHL;
+const { bauen } = await import(pathToFileURL(join(WURZEL, "server/spezial/dienst.mjs")).href);
+const dienst = bauen(); await new Promise((ok) => dienst.listen(0, "127.0.0.1", ok));
+const DIENST = "http://127.0.0.1:" + dienst.address().port;
+
+// ── Seite ausliefern ────────────────────────────────────────────────────
+const TYP = { ".html": "text/html; charset=utf-8", ".css": "text/css", ".js": "text/javascript", ".json": "application/json", ".png": "image/png", ".svg": "image/svg+xml" };
+const web = http.createServer((q, a) => {
+  let f = join(WURZEL, decodeURIComponent(q.url.split("?")[0]));
+  try { if (existsSync(f) && statSync(f).isDirectory()) f = join(f, "index.html"); } catch {}
+  if (!existsSync(f)) { a.writeHead(404); return a.end(); }
+  a.writeHead(200, { "Content-Type": TYP[extname(f)] || "application/octet-stream" }); a.end(readFileSync(f));
+});
+await new Promise((ok) => web.listen(0, "127.0.0.1", ok));
+const SEITE = "http://127.0.0.1:" + web.address().port;
+
+let pw; try { pw = require("playwright"); } catch { console.log("⊘ kein Playwright — NICHT LAUFFÄHIG, nicht grün"); await ende(2); process.exit(2); }
+const br = await pw.chromium.launch();
+const ctx = await br.newContext({ viewport: { width: 1280, height: 900 }, acceptDownloads: true });
+// spezial.family-projekt.de → echter Dienst; Origin wie auf der echten Seite
+await ctx.route("https://spezial.family-projekt.de/**", async (route) => {
+  const r = route.request(), u = new URL(r.url());
+  const antwort = await fetch(DIENST + u.pathname + u.search, { method: r.method(), body: r.method() === "POST" ? r.postData() : undefined,
+    headers: { "Content-Type": "application/json", Origin: "https://family-projekt.de", "X-Forwarded-Host": "spezial.family-projekt.de" } });
+  const kopf = Object.fromEntries(antwort.headers); kopf["access-control-allow-origin"] = SEITE;
+  await route.fulfill({ status: antwort.status, headers: kopf, body: Buffer.from(await antwort.arrayBuffer()) });
+});
+await ctx.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+const pg = await ctx.newPage();
+const fehler = []; pg.on("pageerror", (e) => fehler.push(e.message));
+
+// ── 1 · Studio: Schlüssel anlegen, Passkey erstellen ────────────────────
+await pg.goto(SEITE + "/spezial-studio.html");
+await pg.fill("#spsPw1", "studio-passwort-1"); await pg.fill("#spsPw2", "studio-passwort-1"); await pg.click("#spsAnlegen");
+await pg.waitForSelector(".sps-pub", { timeout: 30000 });
+const pub = (await pg.textContent(".sps-pub")).trim();
+soll("Studio: Schlüssel angelegt, öffentlicher Teil sichtbar", /^[0-9a-f]{64}$/.test(pub));
+const box = await pg.evaluate(() => localStorage.getItem("spezial_studio_fp"));
+soll("Studio: der geheime Schlüssel liegt nur verschlüsselt im Browser", box && !/"g"|geheim/i.test(box) && JSON.parse(box).ct && JSON.parse(box).pub === pub);
+soll("Studio: sagt, dass der Server den Schlüssel noch nicht kennt", /Noch nicht auf dem Server/.test(await pg.textContent("#spezialStudio")));
+await writeFile(SCHL, JSON.stringify({ fp: [pub], tp: [] })); // „Claude trägt ihn ein, git pull"
+await pg.reload(); await pg.waitForFunction(() => /steht auf dem Server/.test(document.body.textContent), null, { timeout: 15000 });
+soll("Studio: erkennt den Schlüssel auf dem Server", true);
+await pg.fill("#spsName", "Testkäufer"); await pg.check('.sps-apps input[value="private-akte"]');
+await pg.fill("#spsPw", "falsch-falsch"); await pg.click("#spsMachen");
+await pg.waitForFunction(() => /Falsches Studio-Passwort/.test(document.getElementById("spsM2").textContent), null, { timeout: 30000 });
+soll("Studio: falsches Passwort macht keinen Passkey", true);
+await pg.fill("#spsPw", "studio-passwort-1"); await pg.click("#spsMachen");
+await pg.waitForFunction(() => /^FPK1\./.test(document.getElementById("spsErgebnis").value), null, { timeout: 30000 });
+const passkey = await pg.inputValue("#spsErgebnis");
+const check = await K.pruefe(noble, passkey, "fp", [pub]);
+soll("Studio: Passkey trägt Pseudonym und genau die gewählte App", check.ok && check.daten.n === "Testkäufer" && check.daten.a.join() === "private-akte", JSON.stringify(check));
+soll("Studio: Passkey steht in der Liste", /Testkäufer/.test(await pg.textContent(".sps-tab")));
+
+// ── 2 · Seite ───────────────────────────────────────────────────────────
+await pg.goto(SEITE + "/markt.html");
+soll("Marktplatz: Knopf „Marktplatz Spezial“ führt zur Seite", (await pg.getAttribute("a.mk-spezial", "href")) === "markt-spezial.html");
+await pg.goto(SEITE + "/markt-spezial.html");
+await pg.waitForSelector(".sp-karte button[data-art=android]", { timeout: 15000 });
+const karten = await pg.$$eval(".sp-karte", (k) => k.map((x) => x.getAttribute("data-sp-app")));
+const cfg = await pg.evaluate(() => window.SPEZIAL.apps.map((a) => a.id));
+soll("Seite: eine Karte je Pro-App aus der Konfiguration", karten.join() === cfg.join() && karten.length >= 5, karten.join());
+await pg.waitForFunction(() => [...document.querySelectorAll(".sp-karte img.sp-sym")].every((i) => i.complete), null, { timeout: 15000 });
+const bilder = await pg.$$eval(".sp-karte", (k) => k.map((x) => { const i = x.querySelector("img.sp-sym"); return i && i.naturalWidth >= 64 ? "ok" : x.getAttribute("data-sp-app"); }));
+soll("Seite: jede Karte trägt das eigene Symbol der App (geladen, keine Lücke)", bilder.every((b) => b === "ok"), bilder.join());
+soll("Seite: keine Emoji-Ersatzsymbole in den Karten", !(await pg.$$eval(".sp-karte h3", (h) => h.some((x) => /\p{Extended_Pictographic}/u.test(x.textContent)))));
+soll("Seite: ohne Passkey ist kein Download-Knopf frei", (await pg.$$eval(".sp-karte button[data-art]", (b) => b.filter((x) => !x.disabled).length)) === 0);
+soll("Seite: zeigt die Fassung vom Server", /0\.9\.11/.test(await pg.textContent('[data-sp-app="private-akte"]')));
+const html = await pg.content() + readFileSync(join(WURZEL, "assets/spezial-seite.js"), "utf8") + readFileSync(join(WURZEL, "assets/config/spezial.js"), "utf8");
+soll("Seite: nennt keine Download-Adresse (kein github.com, kein releases/download)", !/github\.com|releases\/download|\.apk"/.test(html));
+await pg.fill("#spPasskey", passkey.slice(0, -4) + "AAAA"); await pg.click("#spForm button[type=submit]");
+await pg.waitForFunction(() => /passt nicht/.test(document.getElementById("spMeldung").textContent), null, { timeout: 15000 });
+soll("Seite: ein verbogener Passkey wird abgewiesen, mit Klartext", true);
+await pg.fill("#spPasskey", passkey); await pg.click("#spForm button[type=submit]");
+await pg.waitForFunction(() => /Freigeschaltet/.test(document.getElementById("spMeldung").textContent), null, { timeout: 15000 });
+soll("Seite: „Freigeschaltet“ steht als Erfolg da, nicht in der Warnfarbe", await pg.evaluate(() => document.getElementById("spMeldung").classList.contains("sp-gut")));
+const frei = await pg.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.map((x) => x.getAttribute("data-app") + "/" + x.getAttribute("data-art")));
+if (process.env.SPEZIAL_BILD) { await pg.setViewportSize({ width: 1100, height: 900 }); await pg.screenshot({ path: process.env.SPEZIAL_BILD + "/spezial-fp.png", fullPage: true }); await pg.setViewportSize({ width: 1280, height: 900 }); }
+soll("Seite: frei ist genau die App im Passkey", frei.join() === "private-akte/android", frei.join());
+soll("Seite: andere Apps tragen den Hinweis „nicht in deinem Passkey“", (await pg.$$(".sp-hin")).length === cfg.length - 1);
+const [dl] = await Promise.all([pg.waitForEvent("download", { timeout: 20000 }), pg.click('button[data-app="private-akte"][data-art=android]')]);
+const pfad = await dl.path();
+soll("Seite: Download liefert die APK vom Server", dl.suggestedFilename() === "Private-Akte-Pro-0.9.11.apk" && readFileSync(pfad).equals(APK), dl.suggestedFilename());
+await pg.reload(); await pg.waitForFunction(() => /Freigeschaltet/.test(document.getElementById("spMeldung").textContent), null, { timeout: 15000 });
+soll("Seite: der Passkey bleibt in diesem Browser gemerkt", true);
+const breit = await (async () => { const p2 = await ctx.newPage(); await p2.setViewportSize({ width: 360, height: 760 }); await p2.goto(SEITE + "/markt-spezial.html"); await p2.waitForSelector(".sp-karte"); const w = await p2.evaluate(() => document.documentElement.scrollWidth); await p2.close(); return w; })();
+soll("Seite: 360 px ohne seitliches Rollen", breit <= 360, breit + " px");
+
+if (process.env.SPEZIAL_BILD) { await pg.goto(SEITE + "/spezial-studio.html"); await pg.waitForSelector(".sps-tab"); await pg.screenshot({ path: process.env.SPEZIAL_BILD + "/spezial-studio-fp.png", fullPage: true }); }
+// ── 3 · Sperren aus dem Studio ──────────────────────────────────────────
+await pg.goto(SEITE + "/spezial-studio.html");
+await pg.waitForSelector("[data-sperr]");
+await pg.fill("#spsPw", "studio-passwort-1");
+pg.once("dialog", (d) => d.accept());
+await pg.click("[data-sperr]");
+await pg.waitForFunction(() => /Gesperrt/.test(document.getElementById("spsM3").textContent), null, { timeout: 30000 });
+const nach = await (await fetch(DIENST + "/pruefen", { method: "POST", body: JSON.stringify({ passkey }) })).json();
+soll("Studio: Sperren wirkt auf dem Server", nach.warum === "gesperrt", JSON.stringify(nach));
+await pg.goto(SEITE + "/markt-spezial.html");
+await pg.waitForFunction(() => /gesperrt/.test(document.getElementById("spMeldung").textContent), null, { timeout: 15000 });
+soll("Seite: ein gesperrter Passkey sagt es und wird vergessen", (await pg.evaluate(() => localStorage.getItem("spezial_passkey_fp"))) === null);
+soll("keine Skriptfehler", fehler.length === 0, fehler.join(" | "));
+
+await br.close(); web.close(); dienst.close(); gh.close();
+await ende(rot ? 1 : 0);

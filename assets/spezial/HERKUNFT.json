@@ -1,0 +1,54 @@
+{
+  "_": "Die eigenen App-Symbole der Pro-Apps (Klaus 2026-11-26: Original-Icons, keine Emojis). Aus dem Repo der App genommen und nur auf 128 x 128 px verkleinert. Ändert eine App ihr Symbol, hier neu holen — nie ein Ersatzbild malen.",
+  "symbole": {
+    "private-akte": {
+      "repo": "lausiklauskn-png/Private-Akte",
+      "stand": "accaade",
+      "pfad": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "datei": "private-akte.png",
+      "sha256": "a956289cdde64c3390914354e30a5b0e568d222daa0e7d1a91faee75189a4b5c"
+    },
+    "familienakte": {
+      "repo": "lausiklauskn-png/Meine-Familienakte",
+      "stand": "6682d68",
+      "pfad": "windows/src-tauri/icons/128x128@2x.png",
+      "datei": "familienakte.png",
+      "sha256": "f24fdb9360e0cd9ab8163e3144f8710198800309d3a0d9c0cb5c0931eb00c6d8"
+    },
+    "privat-brain-pro": {
+      "repo": "lausiklauskn-png/Privat-Brain-Pro",
+      "stand": "06a9965",
+      "pfad": "android/app/src/main/res/drawable-nodpi/private_brain_icon.png",
+      "datei": "privat-brain-pro.png",
+      "sha256": "3d8062d4f8644ab7f369cf1754f70a448b51264fd129e0f2ea6ad3dc5a66ff50"
+    },
+    "datei-organizer": {
+      "repo": "lausiklauskn-png/Datei-Organizer",
+      "stand": "1ef5352",
+      "pfad": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "datei": "datei-organizer.png",
+      "sha256": "94cb5105107d6cec19fcacab573977b5ad3b5b3cb05b3462658ad2190a7583a1"
+    },
+    "workflow-pdf-pro": {
+      "repo": "lausiklauskn-png/Workflow-PDF-Pro",
+      "stand": "27dfce3",
+      "pfad": "windows/src-tauri/icons/128x128@2x.png",
+      "datei": "workflow-pdf-pro.png",
+      "sha256": "c8b0c831043c70a0a59021bce6d19208250b3738c1da511b12074c860175898b"
+    },
+    "bookledger-pro": {
+      "repo": "lausiklauskn-png/BookLedgerPro",
+      "stand": "c597c11",
+      "pfad": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "datei": "bookledger-pro.png",
+      "sha256": "347369ba95476af9f8b511c0558c35ecd7415602f23bf532e0bac5bd141a0426"
+    },
+    "familienbuero-pro": {
+      "repo": "lausiklauskn-png/Familienbuero-Pro",
+      "stand": "145b7e6",
+      "pfad": "windows/src-tauri/icons/icon.png",
+      "datei": "familienbuero-pro.png",
+      "sha256": "27fea4e25c0923c89586d018adc38cc8f47c8e9ab186aa401dbdd56845223f38"
+    }
+  }
+}
