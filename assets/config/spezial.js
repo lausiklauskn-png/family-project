@@ -15,6 +15,7 @@ window.SPEZIAL = {
     // Klaus 2026-11-26: die nächsten Pro-Fassungen. „bald“: die Karte erscheint erst, wenn der Server eine Datei hat;
     // im Studio lassen sich schon Passkeys dafür ausgeben. Bild vorläufig das Symbol der Web-App, das Pro-Symbol folgt.
     { id: "rezeptbuch-pro", bald: true, name: "Mein Rezeptbuch Pro", bild: "assets/spezial/rezeptbuch-pro.png", text: "Rezepte sammeln, scannen und ordnen, mit Wochenplan und Einkaufsliste.", text_en: "Collect, scan and sort recipes, with weekly plan and shopping list." },
-    { id: "mixarium-pro", bald: true, name: "Mein Mixarium Pro", bild: "assets/spezial/mixarium-pro.png", text: "Dein Getränke-Labor: Cocktails, Mocktails, Smoothies und mehr.", text_en: "Your drinks lab: cocktails, mocktails, smoothies and more." }
+    { id: "mixarium-pro", bald: true, name: "Mein Mixarium Pro", bild: "assets/spezial/mixarium-pro.png", text: "Dein Getränke-Labor: Cocktails, Mocktails, Smoothies und mehr.", text_en: "Your drinks lab: cocktails, mocktails, smoothies and more." },
+    { id: "pseudodoc-pro", bald: true, name: "PseudoDoc Pro", bild: "assets/spezial/pseudodoc-pro.png", text: "Datei rein, pseudonymisiert zur KI, Antwort zurück. Namen und Nummern werden zu Platzhaltern, alles auf dem Gerät.", text_en: "File in, pseudonymised to the AI, answer back. Names and numbers become placeholders, all on your device." }
   ]
 };

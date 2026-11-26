@@ -1580,3 +1580,8 @@ geprüft). PWA Toolpoint macht eine eigene Sitzung mit **denselben Kennungen** (
   und alle `?v=` nachgezogen.
 - ⚠ Messung und Vektor kommen mit der nächsten Nacht (`vektoren-taeglich.yml`); die Pages-Adressen sind aus dem Behälter nicht
   abgerufen, die Karten am Tablet nicht gesehen.
+
+**Die nächsten Pro-Apps (Klaus 2026-11-26):** Mein Rezeptbuch Pro, Mein Mixarium Pro und PseudoDoc Pro stehen mit `bald: true`
+in `assets/config/spezial.js` und in `server/spezial/quellen.json`. Ihre Karte erscheint erst, wenn der Spiegel eine APK oder
+einen Windows-Installer gefunden hat; im Studio lassen sich schon Passkeys ausgeben. PseudoDoc trägt sein Android-Symbol
+(`HERKUNFT.json`), Rezeptbuch und Mixarium vorläufig das Symbol der Web-App. Cache v175.
