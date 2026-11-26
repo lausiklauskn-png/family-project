@@ -1558,3 +1558,17 @@ bash tests/gegenprobe_spezial_dienst.sh  # 9 Riegel, je einer ausgebaut, in eine
 Erster Gegenprobe-Lauf: 7 Fälle, **2 blind** (Markt unter der Unterschrift; SHA-Vergleich) — geschärft, jetzt 9 · 0 · 0.
 Cache v170 → v171 (markt.html), `ASSET_V` und alle `?v=` mitgezogen. `smoke_angleichen` (Private Akte / Familienakte
 fehlen hier als PWA) und `smoke_bewegungsknopf` sind auch auf `main` rot — nicht von dieser Arbeit.
+
+## 🗂 Private Akte und Meine Familienakte im Regal (Klaus 2026-11-26)
+
+Klaus: *„Privatakte und Familienakte als PWA-App online stellen auf Family Project und PWA Toolpoint."* Beide standen bis
+dahin in **keinem** Markt; hier gab es für keine von beiden ein Messziel oder eine Reihe (`forschung/`, `tools/` per grep
+geprüft). PWA Toolpoint macht eine eigene Sitzung mit **denselben Kennungen** (Identität der Messreihe).
+- Einträge `eigen-private-akte` (`https://lausiklauskn-png.github.io/Private-Akte/`) und `eigen-familienakte`
+  (`https://lausiklauskn-png.github.io/Meine-Familienakte/`) in `assets/config/listings.js`, hinten vor der Marke, Kategorie
+  „Büro", Bild je `icons/icon-512.png`. Kein `sporeUrl`, keine Wartung, `own: true`. Texte ohne Gedankenstrich.
+- Gebaut mit `statische-listen` (markt.html 37 Karten), `detailseiten` (`apps/eigen-private-akte/`, `apps/eigen-familienakte/`),
+  `sitemap-bauen` (51 Adressen). Cache `v171 → v172` (v171 hatte parallel Marktplatz Spezial #381 genommen), `ASSET_V`
+  und alle `?v=` nachgezogen.
+- ⚠ Messung und Vektor kommen mit der nächsten Nacht (`vektoren-taeglich.yml`); die Pages-Adressen sind aus dem Behälter nicht
+  abgerufen, die Karten am Tablet nicht gesehen.

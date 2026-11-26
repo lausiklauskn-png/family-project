@@ -812,6 +812,45 @@ window.FP_LISTINGS = [
     "category": "Büro",
     "own": true
   },
+  {
+    "label": "Private Akte",
+    "anchorId": "eigen-private-akte",
+    "text": "Eine App für alle eigenen Unterlagen. Ablegen, nach Bereichen und nach Akten je Person ordnen. Suche nach Wörtern und nach Bedeutung, auch im Text von PDFs und Fotos dank Texterkennung. Kalender und Notizen mit Erinnerung, Portemonnaie für Bargeld und Bank mit Monatsabschluss. Datei-Organizer und Workflow PDF zum Scannen eingebaut. Backup verschlüsselt mit Passwort. Alles bleibt auf dem Gerät, offline, ohne Konto. Ablage, Dokumente, Ordner, Scannen, Haushaltsbuch.",
+    "text_en": "One app for all your own documents. File them, sort them by area and by folder per person. Search by words and by meaning, including the text of PDFs and photos through text recognition. Calendar and notes with reminders, a wallet for cash and bank with month-end closing. File organizer and Workflow PDF for scanning built in. Backup encrypted with a password. Everything stays on the device, offline, with no account. Filing, documents, folders, scanning, household book.",
+    "vorstellung": [
+      "Für alle, die ihre Unterlagen an einer Stelle haben wollen",
+      "Ablegen, nach Bereichen und Akten je Person ordnen",
+      "Suche nach Wörtern und Bedeutung, auch in PDFs und Fotos",
+      "Kalender, Notizen mit Erinnerung und Portemonnaie",
+      "Datei-Organizer und Workflow PDF zum Scannen eingebaut",
+      "Offline auf dem Gerät, ohne Konto, Backup verschlüsselt"
+    ],
+    "besonders": "Findet eine Unterlage auch über ihren Inhalt, selbst in einem gescannten Brief oder Foto.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Private-Akte/",
+    "img": "https://lausiklauskn-png.github.io/Private-Akte/icons/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
+  {
+    "label": "Meine Familienakte",
+    "anchorId": "eigen-familienakte",
+    "text": "Der private Aktenschrank für die ganze Familie. Unterlagen, Personen mit Steckbrief, Fristen und Aufgaben je Person. Kalender je Person mit Erinnerungen, Notizen per Sprache. Suche nach Wörtern und nach Bedeutung. Workflow PDF eingebaut. Verschlüsselte Sicherung. Alles bleibt im Browser, offline, ohne Konto. Familie, Dokumente, Fristen, Termine, Ablage.",
+    "text_en": "The private filing cabinet for the whole family. Documents, people with a profile, deadlines and tasks per person. A calendar per person with reminders, notes by voice. Search by words and by meaning. Workflow PDF built in. Encrypted backup. Everything stays in the browser, offline, with no account. Family, documents, deadlines, appointments, filing.",
+    "vorstellung": [
+      "Für Familien, die Unterlagen und Fristen gemeinsam im Blick haben wollen",
+      "Personen mit Steckbrief, Fristen und Aufgaben je Person",
+      "Kalender je Person mit Erinnerungen, Notizen per Sprache",
+      "Suche nach Wörtern und Bedeutung, Workflow PDF eingebaut",
+      "Offline im Browser, ohne Konto, Sicherung verschlüsselt"
+    ],
+    "besonders": "Jede Person der Familie hat ihren eigenen Kalender, ihre Fristen und ihren Steckbrief.",
+    "by": "@klaus",
+    "url": "https://lausiklauskn-png.github.io/Meine-Familienakte/",
+    "img": "https://lausiklauskn-png.github.io/Meine-Familienakte/icons/icon-512.png",
+    "category": "Büro",
+    "own": true
+  },
   // FP_LISTINGS_INSERT_HERE — freigabe.php fügt freigegebene Einträge hier ein
   // (davor, mit abschließendem Komma). Die Marke NICHT entfernen.
 ];
