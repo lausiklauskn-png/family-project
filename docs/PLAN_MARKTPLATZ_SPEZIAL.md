@@ -22,7 +22,7 @@ Stand der Bausteine: ✅ gebaut · 🔨 in Arbeit · ⏳ geplant (Reihenfolge un
 | Kurzlink `spezial.<markt>/k/<id>`, **3 Tage**, nur für verschlossene Passkeys | `server/spezial/dienst.mjs` | ✅ |
 | Sperren (`FPS1.`/`TPS1.`) – wirkt sofort, löscht auch Kurzlinks | Studio + Dienst | ✅ |
 | Spiegel: holt APK/Installer aus GitHub-Releases oder vom eigenen Update-Server (Ed25519-geprüft) | `server/spezial/spiegeln.mjs`, `quellen.json` | ✅ |
-| **Gerätebindung: höchstens 2 Geräte je Passkey**, Zurücksetzen im Studio | Dienst + Seite + Studio | 🔨 |
+| **Gerätebindung: höchstens 2 Geräte je Passkey**, Zurücksetzen im Studio (Zufallskennung des Browsers, gezählt beim ersten Download) | Dienst + Seite + Studio | ✅ |
 | **Nachkaufen: „Erweitern“** – neuer Passkey mit alten + neuen Apps, alter wird gesperrt | Studio | ⏳ |
 | **Lizenzprüfung in den Pro-Apps** (Passkey in der App, Updates nur mit gültigem Passkey) | je Pro-Repo | ⏳ |
 | Verkauf automatisch über PayPal | Dienst | ⏳ erst nach Gewerbeanmeldung |
@@ -49,6 +49,8 @@ Stand der Bausteine: ✅ gebaut · 🔨 in Arbeit · ⏳ geplant (Reihenfolge un
 
 ## 3 · Einen Passkey ausgeben (Verkauf von Hand)
 
+0. Meldet sich ein Käufer mit „schon auf 2 Geräten in Gebrauch“ (neues Handy, Browserdaten gelöscht): im Studio am
+   Passkey **„Geräte zurücksetzen“**. Die Spalte „Geräte“ zeigt, wie viele es sind.
 1. Studio öffnen (`family-projekt.de/spezial-studio.html` bzw. `pwa-toolpoint.de/spezial-studio.html`).
 2. **Pseudonym** = z. B. die PayPal-Transaktionsnummer. Kein Name nötig.
 3. Apps anhaken · optional „gültig bis“ · **„Mit Code verschließen“ anhaken** · Studio-Passwort · „Passkey erstellen“.

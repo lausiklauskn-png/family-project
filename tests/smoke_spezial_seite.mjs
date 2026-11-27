@@ -188,6 +188,27 @@ await pg.click('#spezialStudio [data-kop]');
 await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb3 .sps-link"); return l && /(#z=FPZ1|\/k\/)/.test(l.value) && document.querySelector("#spsUeb3 .sps-code"); }, null, { timeout: 20000 });
 soll("Studio: „Übergabe“ in der Liste zeigt Link, Code und QR für einen älteren Passkey wieder", true);
 
+// ── 2c · Gerätebindung: höchstens 2 Geräte je Passkey (Klaus 2026-11-27) ──
+{
+  const zweit = await fetch(DIENST + "/link", { method: "POST", body: JSON.stringify({ passkey, app: "private-akte", art: "android", geraet: "zweites-geraet-00000000" }) });
+  soll("Geräte: ein zweites Gerät darf laden", (await zweit.json()).ok);
+  const c4 = await br.newContext({ viewport: { width: 412, height: 900 } }); await c4.route("https://spezial.family-projekt.de/**", (r) => weiter(r)); await c4.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+  const p4 = await c4.newPage(); await p4.goto(SEITE + "/markt-spezial.html#k=" + passkey);
+  const voll = await warte(p4, () => /auf 2 Ger/.test(document.getElementById("spMeldung").textContent), 15000);
+  soll("Geräte: ein drittes Gerät sieht den Grund und keine freien Knöpfe", voll && (await p4.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.length)) === 0);
+  await c4.close();
+  await pg.goto(SEITE + "/spezial-studio.html"); await pg.waitForSelector(`[data-geraete="${check.daten.id}"]`);
+  await pg.waitForFunction((id) => /von/.test((document.querySelector('[data-geraete="' + id + '"]') || {}).textContent || ""), check.daten.id, { timeout: 15000 }).catch(() => {});
+  const zahlTxt = await pg.evaluate((id) => (document.querySelector('[data-geraete="' + id + '"]') || {}).textContent, check.daten.id);
+  soll("Geräte: das Studio zeigt „2 von 2“ am Passkey", /2 von 2/.test(zahlTxt || ""), zahlTxt);
+  await pg.fill("#spsPw", "studio-passwort-1");
+  pg.once("dialog", (d) => d.accept());
+  await pg.click(`[data-frei="${check.daten.id}"]`);
+  const zurueck = await warte(pg, () => /Geräte zurückgesetzt/.test(document.getElementById("spsM3").textContent), 30000);
+  const nachher = await (await fetch(DIENST + "/pruefen", { method: "POST", body: JSON.stringify({ passkey }) })).json();
+  soll("Geräte: „Geräte zurücksetzen“ im Studio wirkt auf dem Server", zurueck && nachher.ok && nachher.geraete === 0, JSON.stringify(nachher));
+}
+
 // ── 3 · Sperren aus dem Studio ──────────────────────────────────────────
 await pg.goto(SEITE + "/spezial-studio.html");
 await pg.waitForSelector("[data-sperr]");

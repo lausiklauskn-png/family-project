@@ -109,7 +109,13 @@
   function sperrErklaerung(noble, geheim, markt, id) {
     var M = MAERKTE[markt]; if (!M) return Promise.reject(new Error("markt"));
     return unterschreibe(noble, geheim, M.sperre, { v: 1, m: markt, sperrt: String(id), d: heute() });
+  }  // Geräte eines Passkeys zurücksetzen (Klaus 2026-11-27): vom selben Schlüssel unterschrieben wie eine Sperre,
+  // mit Zeitstempel – der Dienst nimmt sie nur 15 Minuten lang an, damit eine alte Erklärung nicht wiederholt wirkt.
+  function freigabeErklaerung(noble, geheim, markt, id) {
+    var M = MAERKTE[markt];
+    return unterschreibe(noble, geheim, M.sperre, { v: 1, m: markt, frei: String(id), t: Date.now() });
   }
+
 
   // ── Studio-Schlüssel verschlüsselt ablegen (wie pb-studio-v1, eigene Kennung) ──
   function wickel(passwort, salz) {
@@ -164,7 +170,7 @@
   return {
     MAERKTE: MAERKTE, APP_RE: APP_RE,
     neuerCode: neuerCode, codeNorm: codeNorm, einwickeln: einwickeln, auswickeln: auswickeln,
-    pruefe: pruefe, erstelle: erstelle, sperrErklaerung: sperrErklaerung,
+    pruefe: pruefe, erstelle: erstelle, sperrErklaerung: sperrErklaerung, freigabeErklaerung: freigabeErklaerung,
     versiegle: versiegle, oeffne: oeffne, zerlege: zerlege,
     b64u: b64u, unb64u: unb64u, hex: hex, unhex: unhex, heute: heute
   };
