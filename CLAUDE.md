@@ -1625,3 +1625,5 @@ weitergibt). Der Server legt nur den verschlossenen Teil ab (`/srv/spezial/kurz.
 bleibt der lange Link. Nach dem Merge auf dem Cloud-Server einmal `docker restart spezial`. Probe `smoke_spezial_seite` 49; Sabotage
 „Klartext im Speicher“ fällt mit 2 roten Zeilen. Cache v183. Später (nach Gewerbe): PayPal-Automatik, Plan im Chat vom 27.11.
 
+
+**Gerätebindung (Klaus 2026-11-27):** je Passkey höchstens **2 Geräte** (Zufallskennung des Browsers `spezial_geraet_<markt>`, gemerkt beim ersten Download in `/srv/spezial/geraete.json`). Drittes Gerät: „schon auf 2 Geräten in Gebrauch“. Studio zeigt „n von 2“ und „Geräte zurücksetzen“ (unterschriebene Erklärung `{frei, t}` über `/sperren`, 15 Minuten gültig). Bremse zählt nur noch Fehlversuche. Proben `smoke_spezial_dienst` 61 · `smoke_spezial_seite` 53 · Gegenprobe 19/0/0. Cache v184. Nach dem Merge: `docker restart spezial`. Plan: `docs/PLAN_MARKTPLATZ_SPEZIAL.md`.
