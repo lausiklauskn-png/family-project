@@ -151,14 +151,14 @@ if (process.env.SPEZIAL_BILD) { await pg.goto(SEITE + "/spezial-studio.html"); a
 await pg.goto(SEITE + "/spezial-studio.html"); await pg.waitForSelector("#spsName");
 await pg.fill("#spsName", "Codekäufer"); await pg.check('.sps-apps input[value="private-akte"]'); await pg.check("#spsMitCode");
 await pg.fill("#spsPw", "studio-passwort-1"); await pg.click("#spsMachen");
-await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb .sps-link"), k = document.querySelector("#spsUeb [data-u-kurz]"); return l && k && /\/k\/[A-Za-z0-9_-]+$/.test(l.value) && /7 Tage/.test(k.textContent); }, null, { timeout: 60000 });
+await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb .sps-link"), k = document.querySelector("#spsUeb [data-u-kurz]"); return l && k && /\/k\/[A-Za-z0-9_-]+$/.test(l.value) && /3 Tage/.test(k.textContent); }, null, { timeout: 60000 });
 const kurzLink = await pg.inputValue("#spsUeb .sps-link");
-soll("Kurzlink: das Studio zeigt einen kurzen Link auf dem Dienst, 7 Tage gültig", /^https:\/\/spezial\.family-projekt\.de\/k\/[A-Za-z0-9_-]{6,20}$/.test(kurzLink) && kurzLink.length < 60, kurzLink);
+soll("Kurzlink: das Studio zeigt einen kurzen Link auf dem Dienst, 3 Tage gültig", /^https:\/\/spezial\.family-projekt\.de\/k\/[A-Za-z0-9_-]{6,20}$/.test(kurzLink) && kurzLink.length < 60, kurzLink);
 const kurzAntwort = await fetch(DIENST + new URL(kurzLink).pathname, { redirect: "manual" });
 const kurzZiel = kurzAntwort.headers.get("location") || "";
 soll("Kurzlink: der Dienst leitet auf die Seite mit dem verschlossenen Passkey weiter", kurzAntwort.status === 302 && /^https:\/\/family-projekt\.de\/markt-spezial\.html#z=FPZ1\./.test(kurzZiel), kurzAntwort.status + " " + kurzZiel.slice(0, 70));
 const kurzDaten = JSON.parse(await readFile(join(DATEN, "kurz.json"), "utf8"));
-soll("Kurzlink: auf dem Server liegt nur der verschlossene Teil, nie der Passkey selbst", !/FPK1/.test(JSON.stringify(kurzDaten)) && Object.values(kurzDaten).every((e) => /^FPZ1\./.test(e.z) && e.e > Date.now() + 6.9 * 864e5 && e.e < Date.now() + 7.1 * 864e5));
+soll("Kurzlink: auf dem Server liegt nur der verschlossene Teil, nie der Passkey selbst", !/FPK1/.test(JSON.stringify(kurzDaten)) && Object.values(kurzDaten).every((e) => /^FPZ1\./.test(e.z) && e.e > Date.now() + 2.9 * 864e5 && e.e < Date.now() + 3.1 * 864e5));
 const unbekannt = await fetch(DIENST + "/k/gibtesnicht", { redirect: "manual" });
 soll("Kurzlink: ein unbekannter oder abgelaufener Link sagt es, statt weiterzuleiten", unbekannt.status === 410 && /abgelaufen/.test(await unbekannt.text()));
 const zuLink = kurzZiel, code = await pg.evaluate(() => (document.querySelector("#spsUeb .sps-code strong") || { textContent: "" }).textContent.trim());

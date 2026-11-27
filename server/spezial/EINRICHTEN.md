@@ -78,3 +78,8 @@ eingebaut ist, und danach Größe und SHA-256. Nichts einzurichten: der Server z
 läuft stündlich. Sofort: `docker run --rm -v /srv/family-project:/app:ro -v /srv/spezial:/daten node:22-alpine node /app/server/spezial/spiegeln.mjs` (Cloud-Server).
 
 Wer wie oft geladen hat: `cat /srv/spezial/zaehler.json` (je Passkey-Kennung, kein Name).
+
+**Kurzlinks (2026-11-27):** Bei „Mit Code verschließen“ holt das Studio einen Kurzlink `spezial.family-projekt.de/k/<id>`
+(bzw. `spezial.pwa-toolpoint.de/k/<id>`), 3 Tage gültig. Gespeichert wird in `/srv/spezial/kurz.json` nur der verschlossene
+Teil (`FPZ1.`/`TPZ1.`), ohne den Code nutzlos; „Sperren“ löscht die Kurzlinks des Passkeys. Weil sich `dienst.mjs` dafür
+geändert hat, einmal auf dem **Cloud-Server**: `docker restart spezial` (das `git pull` macht der Server selbst).

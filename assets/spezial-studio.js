@@ -88,7 +88,7 @@
       }, function () { box.querySelector(".sps-qr").innerHTML = '<p class="sps-schlecht">Der QR-Schlüssel ließ sich nicht zeichnen. Der Link geht trotzdem.</p>'; });
     }
     // Kurzlink (Klaus 2026-11-27): nur für verschlossene Passkeys. Der Server legt NUR den verschlossenen Teil ab,
-    // 7 Tage. Kommt er nicht, bleibt der lange Link – er geht genauso, nur unhandlicher.
+    // 3 Tage. Kommt er nicht, bleibt der lange Link – er geht genauso, nur unhandlicher.
     var kz = box.querySelector("[data-u-kurz]");
     if (e.zu && e.text && C.dienst && window.fetch) {
       kz.textContent = "Kurzlink wird geholt …";
@@ -97,7 +97,7 @@
         .then(function (j) {
           if (!j || !j.ok || !/^https:\/\/[^\s"<>]+\/k\/[A-Za-z0-9_-]+$/.test(j.url || "")) throw new Error("kurz");
           link = j.url; box.querySelector(".sps-link").value = link;
-          kz.textContent = "Kurzlink, gilt 7 Tage (bis " + new Date(j.bis).toLocaleDateString("de-DE") + "). Danach hier neu holen.";
+          kz.textContent = "Kurzlink, gilt 3 Tage (bis " + new Date(j.bis).toLocaleDateString("de-DE") + "). Danach hier neu holen.";
           kz.className = "sps-klein sps-gut";
         }, function () { kz.textContent = "Kurzlink gerade nicht zu bekommen – der lange Link geht genauso."; kz.className = "sps-klein"; })
         .then(qrZeichnen);

@@ -13,7 +13,7 @@
 //   POST /link     {passkey,app,art} → {ok, url, bis}  (Link 10 Minuten gültig)
 //   GET  /datei/<marke>              → die Datei (mit Range)
 //   POST /sperren  {erklaerung}      → Sperre, vom Herausgeber-Schlüssel unterschrieben
-//   POST /kurz     {passkey, zu}     → {ok, url, bis}  Kurzlink 7 Tage, nur für verschlossene Passkeys
+//   POST /kurz     {passkey, zu}     → {ok, url, bis}  Kurzlink 3 Tage, nur für verschlossene Passkeys
 //   GET  /k/<id>                     → Weiterleitung auf markt-spezial.html#z=… (oder „abgelaufen“)
 //
 // Geheimnisse: keine im Depot. /daten/geheim (Zufall, beim ersten Start angelegt)
@@ -40,9 +40,9 @@ const SCHLUESSEL = process.env.SPEZIAL_SCHLUESSEL || join(HIER, "schluessel.json
 const QUELLEN = join(HIER, "quellen.json");
 const PORT = Number(process.env.SPEZIAL_PORT || 8080);
 const LINK_MS = 10 * 60 * 1000;
-// Kurzlinks (Klaus 2026-11-27): 7 Tage gültig. Gespeichert wird NUR der verschlossene Passkey (…Z1.…),
+// Kurzlinks (Klaus 2026-11-27): 3 Tage gültig. Gespeichert wird NUR der verschlossene Passkey (…Z1.…),
 // der ohne den getrennt übergebenen Code nutzlos ist. Nach Ablauf oder Sperre wird er gelöscht.
-const KURZ_MS = 7 * 24 * 60 * 60 * 1000;
+const KURZ_MS = 3 * 24 * 60 * 60 * 1000;
 const HERKUNFT = {
   fp: ["https://family-projekt.de", "https://www.family-projekt.de"],
   tp: ["https://pwa-toolpoint.de", "https://www.pwa-toolpoint.de"]
@@ -234,7 +234,7 @@ export function bauen() {
 
       if ((req.method === "GET" || req.method === "HEAD") && url.pathname.startsWith("/k/")) {
         const id = url.pathname.slice(3), e = /^[A-Za-z0-9_-]{6,20}$/.test(id) ? (await kurzLesen())[id] : null;
-        if (!e) return seite(res, 410, "Dieser Link ist abgelaufen", "Ein Kurzlink gilt 7 Tage. Bitte beim Anbieter einen neuen holen.");
+        if (!e) return seite(res, 410, "Dieser Link ist abgelaufen", "Ein Kurzlink gilt 3 Tage. Bitte beim Anbieter einen neuen holen.");
         res.writeHead(302, { Location: HERKUNFT[e.m][0] + "/markt-spezial.html#z=" + e.z, "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
         return res.end();
       }
