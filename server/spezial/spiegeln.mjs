@@ -18,11 +18,17 @@
 //   · Liest GitHub mit If-None-Match: eine unveränderte Liste kostet nichts.
 //   · Liegt /daten/github-token, wird er mitgeschickt (für spätere private Repos).
 //     Der Token liegt NUR auf dem Server, nie im Depot.
+//   · Zweiter Weg (Klaus 2026-11-27): BookLedgerPro und Datei-Organizer legen ihren
+//     Windows-Installer NUR auf den eigenen Update-Server (family-projekt.de/updates/<ordner>/),
+//     nicht an ein GitHub-Release. Steht in quellen.json bei einer App "server": {"windows":
+//     {"ordner", "schluessel"}}, wird diese Art von dort geholt: aktuell-windows.json samt .sig,
+//     Unterschrift (Ed25519) gegen den öffentlichen Schlüssel geprüft, der in der App selbst
+//     eingebaut ist; danach Größe und SHA-256 der Datei gegen den unterschriebenen Feed.
 //
 // Rückgabewerte: 0 alles da · 1 etwas fehlt oder stimmt nicht · 2 Aufbaufehler
 // ═══════════════════════════════════════════════════════════════════════
 
-import { createHash } from "node:crypto";
+import { createHash, createPublicKey, verify } from "node:crypto";
 import { createWriteStream, createReadStream } from "node:fs";
 import { mkdir, readFile, writeFile, rename, stat, readdir, unlink, open } from "node:fs/promises";
 import { join, dirname } from "node:path";
@@ -37,6 +43,8 @@ function arg(name, vorgabe) { const i = ARGS.indexOf(name); return i >= 0 && ARG
 const QUELLEN = arg("--quellen", join(HIER, "quellen.json"));
 const DATEN = arg("--daten", process.env.SPEZIAL_DATEN || "/daten");
 const API = process.env.SPEZIAL_GITHUB_API || "https://api.github.com";
+// Nur dieser Ort; ein Ordnername ist ein einfacher Name. Die Probe setzt einen gestellten Server.
+const UPDATES = process.env.SPEZIAL_UPDATES || "https://family-projekt.de/updates/";
 const MAX_BYTES = 1536 * 1024 * 1024; // 1,5 GB je Datei — ein Riegel, keine Messung
 const SPERRE_ALT_MS = 3 * 60 * 60 * 1000;
 
@@ -63,6 +71,34 @@ export function waehle(releases, art, cfg, app = {}) {
     }
   }
   return null;
+}
+
+/* Der unterschriebene Feed des eigenen Update-Servers. Rein, also einzeln prüfbar.
+ * feedText: Inhalt von aktuell-<art>.json · sigText: Base64 der Ed25519-Unterschrift
+ * schluessel: öffentlicher Schlüssel (SPKI, Base64), wie in der App eingebaut. */
+export function feedPruefen(feedText, sigText, schluessel, art, appName) {
+  let ok = false;
+  try {
+    const k = createPublicKey({ key: Buffer.from(String(schluessel), "base64"), format: "der", type: "spki" });
+    ok = k.asymmetricKeyType === "ed25519" && verify(null, Buffer.from(feedText, "utf8"), k, Buffer.from(String(sigText).trim(), "base64"));
+  } catch { ok = false; }
+  if (!ok) return { fehler: "Unterschrift des Feeds passt nicht" };
+  let f; try { f = JSON.parse(feedText); } catch { return { fehler: "Feed ist kein JSON" }; }
+  const d = f && f[art];
+  if (!f || f.format !== 1 || !/^\d+\.\d+\.\d+$/.test(String(f.version))) return { fehler: "Feed: Format oder Fassung ungültig" };
+  if (appName && f.app !== appName) return { fehler: "Feed gehört zu einer anderen App (" + f.app + ")" };
+  if (!d || !dateiNameOk(d.datei) || !/^[0-9a-f]{64}$/.test(String(d.sha256)) || !(d.groesse > 0)) return { fehler: "Feed: Datei-Angabe ungültig" };
+  return { tag: "server-v" + f.version, version: f.version, datei: d.datei, groesse: d.groesse, sha256Quelle: d.sha256, veroeffentlicht: f.datum || null };
+}
+
+async function holeServer(updates, srv, art, appName) {
+  if (!/^[a-z0-9][a-z0-9-]{0,39}$/.test(String(srv.ordner || ""))) throw new Error("Ordner ungültig");
+  const basis = updates.replace(/\/?$/, "/") + srv.ordner + "/";
+  const text = async (n) => { const r = await fetch(basis + n, { headers: { "User-Agent": "spezial-spiegel" }, cache: "no-store", signal: AbortSignal.timeout(60000) }); if (!r.ok) throw new Error("HTTP " + r.status + " für " + n); return r.text(); };
+  const feed = await text(`aktuell-${art}.json`), sig = await text(`aktuell-${art}.json.sig`);
+  const w = feedPruefen(feed, sig, srv.schluessel, art, srv.app);
+  if (w.fehler) throw new Error(w.fehler);
+  return { ...w, url: basis + w.datei };
 }
 
 async function sperre(pfad) {
@@ -101,7 +137,7 @@ async function lade(url, ziel, tok) {
   return { zw, groesse: n, sha256: h.digest("hex") };
 }
 
-export async function spiegeln({ quellen = QUELLEN, daten = DATEN, api = API, log = console.log } = {}) {
+export async function spiegeln({ quellen = QUELLEN, daten = DATEN, api = API, updates = UPDATES, log = console.log } = {}) {
   const cfg = JSON.parse(await readFile(quellen, "utf8"));
   if (!Array.isArray(cfg.apps) || cfg.apps.some((a) => !APP_ID.test(a.id) || !/^[A-Za-z0-9._-]+$/.test(a.repo))) { log("✗ quellen.json: Kennung oder Repo ungültig"); return 2; }
   await mkdir(join(daten, "dateien"), { recursive: true });
@@ -115,20 +151,29 @@ export async function spiegeln({ quellen = QUELLEN, daten = DATEN, api = API, lo
   try {
     for (const app of cfg.apps) {
       const url = `${api}/repos/${cfg.besitzer}/${app.repo}/releases?per_page=40`;
-      let releases;
+      let releases = null, ghUnveraendert = false;
+      const server = app.server && typeof app.server === "object" ? app.server : {};
       // Ein ETag gilt nur für die Einstellung, unter der die Liste ausgewertet wurde:
       // ändert sich die Zeile in quellen.json (z. B. „vorab"), wird neu gewählt, auch wenn GitHub „unverändert" sagt.
       const einstellung = JSON.stringify([app, cfg.muster, cfg.ohneTag, cfg.ohneDatei]);
       const etag = stand.etags[app.id] && stand.apps[app.id] && stand.einstellung[app.id] === einstellung ? stand.etags[app.id] : null;
       try {
         const r = await holeJson(url, etag, tok);
-        if (r.unveraendert) { log(`= ${app.id}: unverändert`); continue; }
-        releases = r.json; stand.etags[app.id] = r.etag || null; stand.einstellung[app.id] = einstellung;
-      } catch (e) { log(`✗ ${app.id}: Liste nicht erreichbar (${e.message})`); fehler++; continue; }
+        if (r.unveraendert) { log(`= ${app.id}: unverändert`); ghUnveraendert = true; }
+        else { releases = r.json; stand.etags[app.id] = r.etag || null; stand.einstellung[app.id] = einstellung; }
+      } catch (e) { log(`✗ ${app.id}: Liste nicht erreichbar (${e.message})`); fehler++; ghUnveraendert = null; }
       const eintrag = stand.apps[app.id] || {};
       eintrag.name = app.name;
       for (const art of ["android", "windows"]) {
-        const w = waehle(releases, art, cfg, app);
+        let w;
+        if (server[art]) {
+          // eigener Update-Server: immer nachsehen (der Feed ist klein), GitHub zählt für diese Art nicht
+          try { w = await holeServer(updates, server[art], art, server[art].app); }
+          catch (e) { log(`✗ ${app.id}/${art}: Update-Server (${e.message}) — die vorhandene Datei bleibt`); fehler++; continue; }
+        } else {
+          if (ghUnveraendert !== false) continue; // 304 oder Liste nicht erreichbar: nichts Neues zu wählen
+          w = waehle(releases, art, cfg, app);
+        }
         if (!w) { if (eintrag[art]) log(`! ${app.id}/${art}: an der Quelle nichts Passendes mehr — die vorhandene Datei bleibt`); else log(`· ${app.id}/${art}: keine Datei`); continue; }
         const ordner = join(daten, "dateien", app.id);
         await mkdir(ordner, { recursive: true });

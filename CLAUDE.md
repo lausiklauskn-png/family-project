@@ -1589,6 +1589,15 @@ einen Windows-Installer gefunden hat; im Studio lassen sich schon Passkeys ausge
 Service Worker liefert gleich-ursprüngliche Dateien cache-first; ein Bild unter demselben Namen erreicht den Browser nie. Deshalb trägt
 `bild` in `assets/config/spezial.js` ein `?v=N` – nach jedem Tausch eins hochzählen. Rezeptbuch Pro und Mixarium Pro: `?v=2`, Cache v181.
 
+**Windows vom eigenen Update-Server (Klaus 2026-11-27):** BookLedger Pro und Datei-Organizer Pro standen im Spezial mit
+„Windows (Installer) · noch keine Datei", obwohl die Installer veröffentlicht sind: `windows-release.yml` dort lädt nur nach
+`family-projekt.de/updates/<ordner>/`, der Spiegel las nur GitHub. Seitdem trägt `quellen.json` je App optional
+`server.<art>` (`ordner`, `app`, `schluessel` = `SCHLUESSEL` aus `windows/engine/src/DesktopUpdates.java` des Repos);
+`spiegeln.mjs` holt `aktuell-<art>.json` + `.sig`, prüft Ed25519 (`feedPruefen`, rein), danach Größe und SHA-256. GitHub
+zählt für diese Art nicht; der Feed wird auch bei GitHub-304 gefragt. Gilt für beide Märkte (ein Dienst, ein `stand.json`).
+Probe `smoke_spezial_dienst` 47 · Gegenprobe 14/0/0. ⚠ Der echte Update-Server ist aus dem Behälter nicht erreichbar (Proxy);
+gemessen ist die Mechanik an einem gestellten Server mit eigenem Wegwerf-Schlüssel. Die Pages-Seite wird nicht angefasst, kein Cache-Bump.
+
 ## 🕶 PseudoDoc im Regal (Klaus 2026-11-26)
 
 Klaus: *„Pseudodoc Basic kann in PWA Toolpoint und in Family Project mit rein.“* Eintrag `eigen-pseudodoc`
