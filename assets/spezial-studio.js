@@ -98,6 +98,7 @@
     var bekannt = box && SERVER_KEYS && SERVER_KEYS.indexOf(box.pub) >= 0;
     w.innerHTML =
       '<h2>🔑 Marktplatz Spezial · Passkeys für ' + esc(M.name) + "</h2>" +
+      (box ? '<p class="sps-schritte">So geht es: Namen des Kunden eintragen · Apps anhaken · Studio-Passwort · „Passkey erstellen“ · Link oder QR-Bild weitergeben.</p>' : "") +
       (!box
         ? '<section class="glass sps-teil"><h3>Herausgeber-Schlüssel anlegen</h3>' +
           '<p>Einmal je Seite. Der geheime Schlüssel bleibt verschlüsselt in diesem Browser. Danach den öffentlichen Schlüssel an Claude schicken.</p>' +
@@ -108,15 +109,7 @@
           '<textarea id="spsSich" rows="2" placeholder="' + esc(M.studio) + '.…"></textarea>' +
           '<input type="password" id="spsSichPw" placeholder="Studio-Passwort der Sicherung">' +
           '<button class="btn" id="spsHolen">Aus Sicherung holen</button><p id="spsM0" class="sps-meld"></p></section>'
-        : '<section class="glass sps-teil"><h3>Öffentlicher Schlüssel</h3>' +
-          '<p><code class="sps-pub">' + esc(box.pub) + "</code></p>" +
-          (bekannt ? '<p class="sps-gut">✓ Dieser Schlüssel steht auf dem Server. Passkeys gelten.</p>'
-                   : SERVER_KEYS === null ? '<p class="sps-klein">Der Server antwortet gerade nicht; ob er den Schlüssel kennt, ist offen.</p>'
-                   : '<p class="sps-schlecht">Noch nicht auf dem Server: diesen öffentlichen Schlüssel an Claude schicken. Bis dahin nimmt der Server keinen Passkey an.</p>') +
-          '<button class="btn" id="spsPubKop">Öffentlichen Schlüssel kopieren</button> ' +
-          '<button class="btn" id="spsSichKop">Schlüssel-Sicherung kopieren</button><p id="spsM1" class="sps-meld"></p>' +
-          '<p class="sps-klein">Die Sicherung ist mit dem Studio-Passwort verschlüsselt. Gut aufheben (z. B. im Tresor). Ohne sie und ohne diesen Browser lassen sich keine neuen Passkeys machen.</p></section>' +
-          '<section class="glass sps-teil"><h3>Passkey erstellen</h3>' +
+        : '<section class="glass sps-teil"><h3>Passkey erstellen</h3>' +
           '<input type="text" id="spsName" maxlength="60" placeholder="Pseudonym des Käufers (wie beim Kauf angegeben)">' +
           '<fieldset class="sps-apps"><legend>Welche Apps?</legend>' + (C.apps || []).map(function (a) {
             return '<label><input type="checkbox" value="' + esc(a.id) + '"> ' + (a.bild ? '<img class="sps-sym" src="' + esc(a.bild) + '" alt="" width="22" height="22"> ' : "") + esc(a.name) + "</label>";
@@ -132,7 +125,15 @@
               (e.gesperrt ? "🚫 gesperrt" : (e.code ? "🔒 " : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button>') + "</td></tr>";
           }).join("") + "</table>" : "<p>Noch keiner.</p>") +
           '<div id="spsUeb3" class="sps-ueb" hidden></div>' +
-          '<p class="sps-klein">Die Liste liegt nur in diesem Browser. Sperren braucht das Studio-Passwort (Feld oben) und Netz.</p><p id="spsM3" class="sps-meld"></p></section>');
+          '<p class="sps-klein">Die Liste liegt nur in diesem Browser. Sperren braucht das Studio-Passwort (Feld bei „Passkey erstellen“) und Netz.</p><p id="spsM3" class="sps-meld"></p></section>' +
+          '<section class="glass sps-teil"><h3>Öffentlicher Schlüssel</h3>' +
+          '<p><code class="sps-pub">' + esc(box.pub) + "</code></p>" +
+          (bekannt ? '<p class="sps-gut">✓ Dieser Schlüssel steht auf dem Server. Passkeys gelten.</p>'
+                   : SERVER_KEYS === null ? '<p class="sps-klein">Der Server antwortet gerade nicht; ob er den Schlüssel kennt, ist offen.</p>'
+                   : '<p class="sps-schlecht">Noch nicht auf dem Server: diesen öffentlichen Schlüssel an Claude schicken. Bis dahin nimmt der Server keinen Passkey an.</p>') +
+          '<button class="btn" id="spsPubKop">Öffentlichen Schlüssel kopieren</button> ' +
+          '<button class="btn" id="spsSichKop">Schlüssel-Sicherung kopieren</button><p id="spsM1" class="sps-meld"></p>' +
+          '<p class="sps-klein">Die Sicherung ist mit dem Studio-Passwort verschlüsselt. Gut aufheben (z. B. im Tresor). Ohne sie und ohne diesen Browser lassen sich keine neuen Passkeys machen.</p></section>');
     verdrahte();
   }
 

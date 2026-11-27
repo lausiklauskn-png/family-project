@@ -1595,3 +1595,10 @@ auf dem Update-Server (`family-projekt.de/updates/pseudodoc/`), nicht am GitHub-
 der Spiegel liest nur GitHub, also bietet Spezial vorerst nur die APK an.
 Dazu `tools/messung-nachziehen.mjs` gefahren: Private Akte und Familienakte trugen eine Reihe, aber keine Messung auf der Karte
 (`smoke_messung_nachziehen` war auf main rot). Cache v176.
+
+**Studio-Zugang und Käuferseite (Klaus 2026-11-27):** Im Marktplatz-Studio steht „🔑 Marktplatz Spezial: wer welche Pro-App bekommt“
+jetzt ganz oben (Knopf „Passkeys verwalten“); vorher trug der Abschnitt wegen doppelter Schlüssel `sp_h`/`sp_intro` die Überschrift
+der Sporen und war nicht zu finden (jetzt `msp_*`). Studio-Fenster breiter (`.fpst-box` 1120 px, Toolpoint `.studio-panel`
+min(1120px, 96vw)). `spezial-studio.html` 1240 px, ab 1000 px zweispaltig, „Passkey erstellen“ zuerst. Käuferseite: „Passkey hier
+vergessen“ → „Passkey von diesem Gerät entfernen“ mit Rückfrage, nur sichtbar mit Passkey (`hidden` verlor gegen `.btn`); ohne Passkey
+steht, woher man einen bekommt. Direkt: `https://family-projekt.de/spezial-studio.html`. Cache v180.

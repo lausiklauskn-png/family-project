@@ -112,6 +112,8 @@ await pg.waitForFunction(() => [...document.querySelectorAll(".sp-karte img.sp-s
 const bilder = await pg.$$eval(".sp-karte", (k) => k.map((x) => { const i = x.querySelector("img.sp-sym"); return i && i.naturalWidth >= 64 ? "ok" : x.getAttribute("data-sp-app"); }));
 soll("Seite: jede Karte trägt das eigene Symbol der App (geladen, keine Lücke)", bilder.every((b) => b === "ok"), bilder.join());
 soll("Seite: keine Emoji-Ersatzsymbole in den Karten", !(await pg.$$eval(".sp-karte h3", (h) => h.some((x) => /\p{Extended_Pictographic}/u.test(x.textContent)))));
+soll("Seite: ohne Passkey steht „Passkey von diesem Gerät entfernen“ NICHT da (Klaus 2026-11-27)", !(await pg.isVisible("#spVergessen")));
+soll("Seite: ohne Passkey sagt sie, woher man einen bekommt (Link oder QR-Code)", /Link oder QR-Code/.test(await pg.textContent("#spMeldung")));
 soll("Seite: ohne Passkey ist kein Download-Knopf frei", (await pg.$$eval(".sp-karte button[data-art]", (b) => b.filter((x) => !x.disabled).length)) === 0);
 soll("Seite: zeigt die Fassung vom Server", /0\.9\.11/.test(await pg.textContent('[data-sp-app="private-akte"]')));
 const html = await pg.content() + readFileSync(join(WURZEL, "assets/spezial-seite.js"), "utf8") + readFileSync(join(WURZEL, "assets/config/spezial.js"), "utf8");
@@ -121,6 +123,7 @@ await pg.waitForFunction(() => /passt nicht/.test(document.getElementById("spMel
 soll("Seite: ein verbogener Passkey wird abgewiesen, mit Klartext", true);
 await pg.fill("#spPasskey", passkey); await pg.click("#spForm button[type=submit]");
 await pg.waitForFunction(() => /Freigeschaltet/.test(document.getElementById("spMeldung").textContent), null, { timeout: 15000 });
+soll("Seite: nach dem Freischalten steht „Passkey von diesem Gerät entfernen“ da", await pg.isVisible("#spVergessen"));
 soll("Seite: „Freigeschaltet“ steht als Erfolg da, nicht in der Warnfarbe", await pg.evaluate(() => document.getElementById("spMeldung").classList.contains("sp-gut")));
 const frei = await pg.$$eval(".sp-karte button[data-art]:not([disabled])", (b) => b.map((x) => x.getAttribute("data-app") + "/" + x.getAttribute("data-art")));
 if (process.env.SPEZIAL_BILD) { await pg.setViewportSize({ width: 1100, height: 900 }); await pg.screenshot({ path: process.env.SPEZIAL_BILD + "/spezial-fp.png", fullPage: true }); await pg.setViewportSize({ width: 1280, height: 900 }); }
