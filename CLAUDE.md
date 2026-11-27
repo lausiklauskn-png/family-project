@@ -1673,5 +1673,13 @@ node tests/smoke_schlanke_karten.mjs          # 4 Lagen, mehr/Warnung, ohne und 
 bash tests/gegenprobe_schlanke_karten.sh      # 12 Fälle; NUR_ANKER=1, NUR_FALL="…" — in einer Kopie fahren
 ```
 
+Gemessen: `smoke_schlanke_karten` **43 grün · 0 rot**; danach alle **53** `tests/smoke_*.mjs` nacheinander mit Rückgabe 0.
 Nachgezogene Anker in `gegenprobe_kartenknoepfe` (Fall 6), `gegenprobe_angleichen` (C), `gegenprobe_uebersetzung`
 (Name im `mk-kopf-t`). Cache **v185 → v186**, `ASSET_V` und alle `?v=` mitgezogen.
+
+Gegenprobe-Lauf (2026-11-27, Wegwerf-Kopie): `gegenprobe_schlanke_karten` erst **11 schlagen an · 1 blind** (EINE-REIHE:
+die Sabotage nahm nur `position:absolute` heraus, `width:1px` blieb, die Wörter nahmen keinen Platz), geschärft →
+**12 · 0 · 0 · 0**. `gegenprobe_kartenknoepfe` **10 · 0 · 0 · 0**. ⚠ **Schon auf `main` so, nicht von dieser Arbeit:**
+`gegenprobe_angleichen` 2 blind („eine App von PWA Toolpoint fehlt hier", „ein .mp4 kommt in den Vorrat"; auf `main`
+nachgemessen, gleich) · `gegenprobe_uebersetzung` 1 toter Anker („der Knopf waehlt nicht mehr ausdruecklich", Anker in
+`assets/app.js`). Eingereiht, nicht nebenbei repariert.
