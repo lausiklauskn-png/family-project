@@ -1,10 +1,11 @@
 {
-  "_": "Öffentliche Herausgeber-Schlüssel (nicht geheim) je Markt. Klaus legt den Schlüssel im Studio an (spezial-studio.html) und schickt nur den ÖFFENTLICHEN Teil; der geheime verlässt seinen Browser nie. Solange eine Liste leer ist, nimmt der Server für diesen Markt keinen Passkey an. Eingetragen 2026-11-26. Zweiter fp-Schlüssel (Studio am Handy) eingetragen 2026-11-27.",
+  "_": "Öffentliche Herausgeber-Schlüssel (nicht geheim) je Markt. Klaus legt den Schlüssel im Studio an (spezial-studio.html) und schickt nur den ÖFFENTLICHEN Teil; der geheime verlässt seinen Browser nie. Solange eine Liste leer ist, nimmt der Server für diesen Markt keinen Passkey an. Eingetragen 2026-11-26. Zweiter fp- und tp-Schlüssel (Studio am Handy) eingetragen 2026-11-27.",
   "fp": [
     "57e66e21aa86b0fe9d07a77244254be44d52ada37d73ef2493d97865c9f9bb4f",
     "21ede92bb8d3dc69e4e921ae2fd10bc4406d3cdd220abf87b18f9fec86ad0df3"
   ],
   "tp": [
-    "764b7edc2e69f0d192a10d1005bf9278d043478af544029f664fa11e7c4cdffb"
+    "764b7edc2e69f0d192a10d1005bf9278d043478af544029f664fa11e7c4cdffb",
+    "75cbb0c53827fe4137ba0e86a085d3d3e5836012fc2240652cf9dee5a4414a81"
   ]
 }
