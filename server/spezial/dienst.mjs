@@ -13,6 +13,8 @@
 //   POST /link     {passkey,app,art} → {ok, url, bis}  (Link 10 Minuten gültig)
 //   GET  /datei/<marke>              → die Datei (mit Range)
 //   POST /sperren  {erklaerung}      → Sperre, vom Herausgeber-Schlüssel unterschrieben
+//   POST /kurz     {passkey, zu}     → {ok, url, bis}  Kurzlink 7 Tage, nur für verschlossene Passkeys
+//   GET  /k/<id>                     → Weiterleitung auf markt-spezial.html#z=… (oder „abgelaufen“)
 //
 // Geheimnisse: keine im Depot. /daten/geheim (Zufall, beim ersten Start angelegt)
 // unterschreibt nur die kurzlebigen Links. Öffentliche Schlüssel: schluessel.json.
@@ -38,6 +40,9 @@ const SCHLUESSEL = process.env.SPEZIAL_SCHLUESSEL || join(HIER, "schluessel.json
 const QUELLEN = join(HIER, "quellen.json");
 const PORT = Number(process.env.SPEZIAL_PORT || 8080);
 const LINK_MS = 10 * 60 * 1000;
+// Kurzlinks (Klaus 2026-11-27): 7 Tage gültig. Gespeichert wird NUR der verschlossene Passkey (…Z1.…),
+// der ohne den getrennt übergebenen Code nutzlos ist. Nach Ablauf oder Sperre wird er gelöscht.
+const KURZ_MS = 7 * 24 * 60 * 60 * 1000;
 const HERKUNFT = {
   fp: ["https://family-projekt.de", "https://www.family-projekt.de"],
   tp: ["https://pwa-toolpoint.de", "https://www.pwa-toolpoint.de"]
@@ -92,6 +97,39 @@ function markeLesen(text, key) {
   let ist; try { ist = Buffer.from(m[2], "base64url"); } catch { return null; }
   if (ist.length !== soll.length || !timingSafeEqual(ist, soll)) return null;
   try { const n = JSON.parse(Buffer.from(m[1], "base64url").toString("utf8")); return n && n.e > Date.now() ? n : null; } catch { return null; }
+}
+
+// ── Kurzlinks ──────────────────────────────────────────────────────────
+const KURZ_DATEI = () => join(DATEN, "kurz.json");
+async function kurzLesen() {
+  const k = await lies(KURZ_DATEI(), {}), jetzt = Date.now(), neu = {};
+  for (const [id, e] of Object.entries(k)) if (e && e.e > jetzt) neu[id] = e;
+  return neu;
+}
+export async function kurzAnlegen(passkey, zu) {
+  const p = await passkeyPruefen(passkey);
+  if (!p.ok) return { ok: false, warum: p.warum };
+  zu = String(zu || "").replace(/\s+/g, "");
+  const Z = K.MAERKTE[p.markt].zu;
+  if (zu.length > 4000 || zu.indexOf(Z + ".") !== 0 || !/^[A-Za-z0-9._-]+$/.test(zu)) return { ok: false, warum: "form" };
+  const k = await kurzLesen(), bis = Date.now() + KURZ_MS;
+  let id = Object.keys(k).find((i) => k[i].z === zu);
+  if (!id) { do id = randomBytes(8).toString("base64url"); while (k[id]); }
+  k[id] = { m: p.markt, z: zu, i: p.daten.id, e: bis };
+  await schreib(KURZ_DATEI(), k);
+  return { ok: true, id, markt: p.markt, bis };
+}
+async function kurzSperren(markt, pid) {
+  const k = await kurzLesen(); let weg = false;
+  for (const [id, e] of Object.entries(k)) if (e.m === markt && e.i === pid) { delete k[id]; weg = true; }
+  await schreib(KURZ_DATEI(), k);
+  return weg;
+}
+function seite(res, code, titel, text) {
+  const body = '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>' + titel +
+    '</title></head><body style="font:18px/1.5 system-ui,sans-serif;background:#0b0d14;color:#e8eef6;max-width:36em;margin:12vh auto;padding:0 16px"><h1 style="font-size:1.4em">' + titel + "</h1><p>" + text + "</p></body></html>";
+  res.writeHead(code, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer" });
+  res.end(body);
 }
 
 // ── Bremse je Adresse (in-memory) ───────────────────────────────────────
@@ -152,7 +190,7 @@ export function bauen() {
       if (req.method === "GET" && url.pathname === "/schluessel") return antwort(res, 200, await schluessel(), cors);
       if (req.method === "GET" && url.pathname === "/apps") return antwort(res, 200, await katalog(), cors);
 
-      if (req.method === "POST" && (url.pathname === "/pruefen" || url.pathname === "/link" || url.pathname === "/sperren")) {
+      if (req.method === "POST" && (url.pathname === "/pruefen" || url.pathname === "/link" || url.pathname === "/sperren" || url.pathname === "/kurz")) {
         if (gebremst(ipVon(req))) return antwort(res, 429, { ok: false, warum: "zu_oft" }, cors);
         let b; try { b = await koerper(req); } catch { return antwort(res, 400, { ok: false, warum: "anfrage" }, cors); }
 
@@ -164,7 +202,15 @@ export function bauen() {
           const id = String(r.daten.sperrt || "");
           if (!/^[A-Za-z0-9_-]{6,40}$/.test(id)) return antwort(res, 400, { ok: false, warum: "form" }, cors);
           const s = await sperrliste(); if (!s[markt].includes(id)) { s[markt].push(id); await schreib(join(DATEN, "sperrliste.json"), s); }
+          await kurzSperren(markt, id);
           return antwort(res, 200, { ok: true, gesperrt: id }, cors);
+        }
+
+        if (url.pathname === "/kurz") {
+          const r = await kurzAnlegen(b.passkey, b.zu);
+          if (!r.ok) return antwort(res, r.warum === "form" ? 400 : 403, r, cors);
+          if (herkunft && !HERKUNFT[r.markt].includes(herkunft)) return antwort(res, 403, { ok: false, warum: "anderer_markt" }, cors);
+          return antwort(res, 200, { ok: true, url: basisVon(req) + "/k/" + r.id, bis: new Date(r.bis).toISOString() }, cors);
         }
 
         const p = await passkeyPruefen(b.passkey);
@@ -184,6 +230,13 @@ export function bauen() {
         const m = marke({ a: app, r: art, f: d.datei, i: p.daten.id, m: p.markt, e: bis }, await geheim());
         await zaehle(p.markt, p.daten.id, app, art);
         return antwort(res, 200, { ok: true, url: basisVon(req) + "/datei/" + m, bis: new Date(bis).toISOString(), datei: d.datei, groesse: d.groesse, sha256: d.sha256 }, cors);
+      }
+
+      if ((req.method === "GET" || req.method === "HEAD") && url.pathname.startsWith("/k/")) {
+        const id = url.pathname.slice(3), e = /^[A-Za-z0-9_-]{6,20}$/.test(id) ? (await kurzLesen())[id] : null;
+        if (!e) return seite(res, 410, "Dieser Link ist abgelaufen", "Ein Kurzlink gilt 7 Tage. Bitte beim Anbieter einen neuen holen.");
+        res.writeHead(302, { Location: HERKUNFT[e.m][0] + "/markt-spezial.html#z=" + e.z, "Cache-Control": "no-store", "Referrer-Policy": "no-referrer" });
+        return res.end();
       }
 
       if ((req.method === "GET" || req.method === "HEAD") && url.pathname.startsWith("/datei/")) {

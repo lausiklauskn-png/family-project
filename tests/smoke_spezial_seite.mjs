@@ -151,10 +151,19 @@ if (process.env.SPEZIAL_BILD) { await pg.goto(SEITE + "/spezial-studio.html"); a
 await pg.goto(SEITE + "/spezial-studio.html"); await pg.waitForSelector("#spsName");
 await pg.fill("#spsName", "Codekäufer"); await pg.check('.sps-apps input[value="private-akte"]'); await pg.check("#spsMitCode");
 await pg.fill("#spsPw", "studio-passwort-1"); await pg.click("#spsMachen");
-await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb .sps-link"); return l && /#z=FPZ1\./.test(l.value); }, null, { timeout: 60000 });
-const zuLink = await pg.inputValue("#spsUeb .sps-link"), code = await pg.evaluate(() => (document.querySelector("#spsUeb .sps-code strong") || { textContent: "" }).textContent.trim());
+await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb .sps-link"), k = document.querySelector("#spsUeb [data-u-kurz]"); return l && k && /\/k\/[A-Za-z0-9_-]+$/.test(l.value) && /7 Tage/.test(k.textContent); }, null, { timeout: 60000 });
+const kurzLink = await pg.inputValue("#spsUeb .sps-link");
+soll("Kurzlink: das Studio zeigt einen kurzen Link auf dem Dienst, 7 Tage gültig", /^https:\/\/spezial\.family-projekt\.de\/k\/[A-Za-z0-9_-]{6,20}$/.test(kurzLink) && kurzLink.length < 60, kurzLink);
+const kurzAntwort = await fetch(DIENST + new URL(kurzLink).pathname, { redirect: "manual" });
+const kurzZiel = kurzAntwort.headers.get("location") || "";
+soll("Kurzlink: der Dienst leitet auf die Seite mit dem verschlossenen Passkey weiter", kurzAntwort.status === 302 && /^https:\/\/family-projekt\.de\/markt-spezial\.html#z=FPZ1\./.test(kurzZiel), kurzAntwort.status + " " + kurzZiel.slice(0, 70));
+const kurzDaten = JSON.parse(await readFile(join(DATEN, "kurz.json"), "utf8"));
+soll("Kurzlink: auf dem Server liegt nur der verschlossene Teil, nie der Passkey selbst", !/FPK1/.test(JSON.stringify(kurzDaten)) && Object.values(kurzDaten).every((e) => /^FPZ1\./.test(e.z) && e.e > Date.now() + 6.9 * 864e5 && e.e < Date.now() + 7.1 * 864e5));
+const unbekannt = await fetch(DIENST + "/k/gibtesnicht", { redirect: "manual" });
+soll("Kurzlink: ein unbekannter oder abgelaufener Link sagt es, statt weiterzuleiten", unbekannt.status === 410 && /abgelaufen/.test(await unbekannt.text()));
+const zuLink = kurzZiel, code = await pg.evaluate(() => (document.querySelector("#spsUeb .sps-code strong") || { textContent: "" }).textContent.trim());
 soll("Code: der Link trägt nur den verschlossenen Passkey, nicht den Klartext", !/FPK1/.test(zuLink) && /^[A-Z2-9]{4}-[A-Z2-9]{4}$/.test(code), zuLink.slice(0, 60) + " " + code);
-soll("Code: das Studio warnt, den Code getrennt zu schicken, und bietet keinen Klartext an", /NICHT in dieselbe Nachricht/.test(await pg.textContent("#spsUeb")) && !(await pg.$('#spsUeb [data-u="text"]')));
+soll("Code: das Studio warnt, den Code getrennt zu schicken, und bietet keinen Klartext an", /Am sichersten getrennt vom Link/.test(await pg.textContent("#spsUeb")) && !(await pg.$('#spsUeb [data-u="text"]')));
 soll("Code: der Code steht nicht im QR-Bild-Link und nicht im Link", !zuLink.includes(code.replace("-", "")) && !zuLink.includes(code));
 {
   const c3 = await br.newContext({ viewport: { width: 412, height: 900 } }); await c3.route("https://spezial.family-projekt.de/**", (r) => weiter(r)); await c3.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
@@ -176,7 +185,7 @@ soll("Code: der Code steht nicht im QR-Bild-Link und nicht im Link", !zuLink.inc
 }
 await pg.waitForSelector('#spezialStudio [data-kop]');
 await pg.click('#spezialStudio [data-kop]');
-await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb3 .sps-link"); return l && /#z=FPZ1/.test(l.value) && document.querySelector("#spsUeb3 .sps-code"); }, null, { timeout: 20000 });
+await pg.waitForFunction(() => { const l = document.querySelector("#spsUeb3 .sps-link"); return l && /(#z=FPZ1|\/k\/)/.test(l.value) && document.querySelector("#spsUeb3 .sps-code"); }, null, { timeout: 20000 });
 soll("Studio: „Übergabe“ in der Liste zeigt Link, Code und QR für einen älteren Passkey wieder", true);
 
 // ── 3 · Sperren aus dem Studio ──────────────────────────────────────────
