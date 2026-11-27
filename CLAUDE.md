@@ -1627,3 +1627,9 @@ bleibt der lange Link. Nach dem Merge auf dem Cloud-Server einmal `docker restar
 
 
 **Gerätebindung (Klaus 2026-11-27):** je Passkey höchstens **2 Geräte** (Zufallskennung des Browsers `spezial_geraet_<markt>`, gemerkt beim ersten Download in `/srv/spezial/geraete.json`). Drittes Gerät: „schon auf 2 Geräten in Gebrauch“. Studio zeigt „n von 2“ und „Geräte zurücksetzen“ (unterschriebene Erklärung `{frei, t}` über `/sperren`, 15 Minuten gültig). Bremse zählt nur noch Fehlversuche. Proben `smoke_spezial_dienst` 61 · `smoke_spezial_seite` 53 · Gegenprobe 19/0/0. Cache v184. Nach dem Merge: `docker restart spezial`. Plan: `docs/PLAN_MARKTPLATZ_SPEZIAL.md`.
+
+**Studio aufgeräumt (Klaus 2026-11-27):** Fenster eingeklappt (`<details class="sps-teil">`, nur für den Besuch gemerkt),
+Knöpfe je Passkey gleich breit untereinander, „▸ geladen (n)“ je Passkey aus `zaehler.json` (`/pruefen` liefert `geladen`),
+Gerätezahl wird bei `visibilitychange` neu gefragt. `dienst.mjs` geändert → nach dem Merge auf dem Cloud-Server
+`docker restart spezial` (ohne Neustart bleibt „geladen“ einfach verborgen). Probe `smoke_spezial_seite` 57 (vier neue, je
+von Hand sabotiert). Cache v185, tp v123.

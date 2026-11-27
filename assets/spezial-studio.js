@@ -13,6 +13,9 @@
   var C = window.SPEZIAL || {}, K = window.SpezialKern, M = K && K.MAERKTE[C.markt];
   var LS_KEY = "spezial_studio_" + C.markt, LS_LOG = "spezial_studio_log_" + C.markt;
   var noble = null, SERVER_KEYS = null;
+  // Welche Fenster offen sind (Klaus 2026-11-27: „alle großen Fenster eingeklappt, nach Bedarf öffnen“). Nur für diesen
+  // Besuch gemerkt, damit ein Neuzeichnen nach „Passkey erstellen“ nichts zuklappt.
+  var OFFEN = {};
   var SRC = document.currentScript ? document.currentScript.src : location.href;
   function nob() { return noble ? Promise.resolve(noble) : import(new URL("../sbkim/noble-secp256k1.js", SRC).href).then(function (m) { return (noble = m); }); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -117,9 +120,31 @@
         .then(function (j) {
           if (!j || !j.ok || typeof j.geraete !== "number") { sp.textContent = "–"; return; }
           sp.textContent = j.geraete + " von " + j.max;
-          var b = document.querySelector('[data-frei="' + id + '"]'); if (b && j.geraete > 0) b.style.display = "";
+          var b = document.querySelector('[data-frei="' + id + '"]'); if (b) b.style.display = j.geraete > 0 ? "" : "none";
+          geladenZeigen(id, j.geladen);
         }, function () { sp.textContent = "–"; });
     });
+  }
+
+  // Die Zahl veraltet, solange das Studio offen bleibt (Klaus 2026-11-27: die installierte App zeigte „0 von 2“, der
+  // frisch geladene Reiter „1 von 2“). Wer ins Fenster zurückkehrt, bekommt sie neu gefragt.
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") geraeteZeigen(); });
+
+  // Was je Passkey geladen wurde (Klaus 2026-11-27), eingeklappt unter der Gerätezahl. Gezählt wird jeder angeforderte
+  // Download-Link, nicht ob die Datei ganz ankam. Ein älterer Dienst schickt `geladen` nicht – dann bleibt es verborgen.
+  function geladenZeigen(id, g) {
+    var d = document.querySelector('[data-geladen="' + id + '"]'); if (!d) return;
+    var k = g && typeof g === "object" ? Object.keys(g) : [];
+    if (!k.length) { d.hidden = true; return; }
+    var summe = 0, namen = {};
+    (C.apps || []).forEach(function (a) { namen[a.id] = a.name; });
+    k.sort();
+    d.querySelector("ul").innerHTML = k.map(function (x) {
+      var t = x.split("/"), n = Number(g[x]) || 0; summe += n;
+      return "<li>" + esc(namen[t[0]] || t[0]) + " · " + (t[1] === "windows" ? "Windows" : "APK") + " " + n + "×</li>";
+    }).join("");
+    d.querySelector("summary").textContent = "geladen (" + summe + ")";
+    d.hidden = false;
   }
 
   function geheim(pw) {
@@ -157,8 +182,8 @@
           '<section class="glass sps-teil"><h3>Vergebene Passkeys (' + log.length + ")</h3>" +
           (log.length ? '<table class="sps-tab"><tr><th>Pseudonym</th><th>Apps</th><th>am</th><th>Geräte</th><th></th></tr>' + log.slice().reverse().map(function (e) {
             return "<tr><td>" + esc(e.n) + "</td><td>" + esc(e.a.join(", ")) + "</td><td>" + esc(e.d) + (e.x ? " bis " + esc(e.x) : "") + "</td><td>" +
-              (e.gesperrt ? "" : '<span data-geraete="' + esc(e.id) + '">…</span>') + "</td><td>" +
-              (e.gesperrt ? "🚫 gesperrt" : (e.code ? "🔒 " : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button> <button class="btn ghost" data-frei="' + esc(e.id) + '" style="display:none">Geräte zurücksetzen</button>') + "</td></tr>";
+              (e.gesperrt ? "" : '<span data-geraete="' + esc(e.id) + '">…</span><details class="sps-geladen" data-geladen="' + esc(e.id) + '" hidden><summary></summary><ul></ul></details>') + "</td><td>" +
+              (e.gesperrt ? "🚫 gesperrt" : '<div class="sps-knoepfe">' + (e.code ? '<span class="sps-zu">🔒 mit Code</span>' : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button><button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button><button class="btn ghost" data-frei="' + esc(e.id) + '" style="display:none">Geräte zurücksetzen</button></div>') + "</td></tr>";
           }).join("") + "</table>" : "<p>Noch keiner.</p>") +
           '<div id="spsUeb3" class="sps-ueb" hidden></div>' +
           '<p class="sps-klein">Die Liste liegt nur in diesem Browser. Sperren braucht das Studio-Passwort (Feld bei „Passkey erstellen“) und Netz.</p><p id="spsM3" class="sps-meld"></p></section>' +
@@ -170,7 +195,24 @@
           '<button class="btn" id="spsPubKop">Öffentlichen Schlüssel kopieren</button> ' +
           '<button class="btn" id="spsSichKop">Schlüssel-Sicherung kopieren</button><p id="spsM1" class="sps-meld"></p>' +
           '<p class="sps-klein">Die Sicherung ist mit dem Studio-Passwort verschlüsselt. Gut aufheben (z. B. im Tresor). Ohne sie und ohne diesen Browser lassen sich keine neuen Passkeys machen.</p></section>');
+    einklappen(w, !box);
     verdrahte();
+  }
+
+  // Jedes Fenster wird ein <details>: zu, bis man es antippt. Ohne Schlüssel gibt es nur das Anlegen, das steht offen.
+  function einklappen(w, allesOffen) {
+    [].slice.call(w.querySelectorAll("section.sps-teil")).forEach(function (sec) {
+      var h = sec.querySelector("h3"), key = h ? h.textContent.replace(/\s*\(\d+\)$/, "") : "";
+      var d = document.createElement("details"); d.className = sec.className; d.setAttribute("data-teil", key);
+      if (allesOffen || OFFEN[key]) d.open = true;
+      var sum = document.createElement("summary"), inh = document.createElement("div");
+      inh.className = "sps-inhalt";
+      if (h) sum.appendChild(h);
+      while (sec.firstChild) inh.appendChild(sec.firstChild);
+      d.appendChild(sum); d.appendChild(inh);
+      d.addEventListener("toggle", function () { OFFEN[key] = d.open; });
+      sec.parentNode.replaceChild(d, sec);
+    });
   }
 
   function verdrahte() {

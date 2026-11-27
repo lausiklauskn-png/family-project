@@ -57,6 +57,11 @@ Stand der Bausteine: ✅ gebaut · 🔨 in Arbeit · ⏳ geplant (Reihenfolge un
 4. **Kurzlink** an den Käufer (Signal, E-Mail). Der **Code** am sichersten getrennt (Telefon, SMS); über Signal in
    einer Nachricht geht auch.
 5. Kurzlink abgelaufen? Im Studio unter „Vergebene Passkeys“ → „Übergabe“ → neuer Kurzlink.
+6. Was ein Käufer geladen hat: im Studio unter der Gerätezahl **„▸ geladen (n)“** aufklappen (App · APK/Windows · Anzahl
+   angeforderter Links, nicht vollständig angekommener Dateien). Die Zahlen liegen in `/srv/spezial/zaehler.json`.
+   Downloads vor dem 2026-11-27, 19:51 (vor der Gerätebindung) zählen dort, aber nicht als Gerät.
+7. Alle Fenster des Studios stehen beim Öffnen **eingeklappt**; ein Tipp auf die Überschrift öffnet eines. Die
+   Gerätezahl wird beim Zurückkehren ins Fenster neu gefragt (eine offen gelassene App zeigte sonst den alten Stand).
 
 ---
 

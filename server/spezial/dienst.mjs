@@ -254,7 +254,10 @@ export function bauen() {
           const g = GERAET_RE.test(String(b.geraet || "")) ? String(b.geraet) : "";
           const st = await geraetStatus(p.markt, p.daten.id, g);
           if (g && !st.frei) return aw(res, 200, { ok: false, warum: "geraete_voll", geraete: st.n, max: GERAETE_MAX }, cors);
-          return aw(res, 200, { ok: true, markt: p.markt, n: p.daten.n, apps: p.daten.a, d: p.daten.d, x: p.daten.x || null, geraete: st.n, max: GERAETE_MAX }, cors);
+          // `geladen` (Klaus 2026-11-27): was mit diesem Passkey geladen wurde, je „app/art“ – fürs Studio. Nur wer den
+          // Passkey hat, bekommt es, und es steht nichts darin, was er nicht selbst getan hat.
+          const geladen = ((await lies(join(DATEN, "zaehler.json"), {}))[p.markt + ":" + p.daten.id] || {}).apps || {};
+          return aw(res, 200, { ok: true, markt: p.markt, n: p.daten.n, apps: p.daten.a, d: p.daten.d, x: p.daten.x || null, geraete: st.n, max: GERAETE_MAX, geladen }, cors);
         }
         // /link
         if (!p.ok) return aw(res, 403, { ok: false, warum: p.warum }, cors);
