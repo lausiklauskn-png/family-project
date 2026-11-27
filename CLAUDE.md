@@ -1585,6 +1585,9 @@ geprüft). PWA Toolpoint macht eine eigene Sitzung mit **denselben Kennungen** (
 in `assets/config/spezial.js` und in `server/spezial/quellen.json`. Ihre Karte erscheint erst, wenn der Spiegel eine APK oder
 einen Windows-Installer gefunden hat; im Studio lassen sich schon Passkeys ausgeben. PseudoDoc trägt sein Android-Symbol
 (`HERKUNFT.json`), Rezeptbuch und Mixarium vorläufig das Symbol der Web-App. Cache v175.
+⚠ **Ein getauschtes Symbol braucht eine neue Adresse** (Klaus 2026-11-27: im Studio standen nach dem Tausch weiter die alten Bilder). Der
+Service Worker liefert gleich-ursprüngliche Dateien cache-first; ein Bild unter demselben Namen erreicht den Browser nie. Deshalb trägt
+`bild` in `assets/config/spezial.js` ein `?v=N` – nach jedem Tausch eins hochzählen. Rezeptbuch Pro und Mixarium Pro: `?v=2`, Cache v181.
 
 ## 🕶 PseudoDoc im Regal (Klaus 2026-11-26)
 
