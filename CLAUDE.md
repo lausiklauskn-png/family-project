@@ -1706,7 +1706,7 @@ unteren Rand. Ein Zug über die Schiene ist die ganze Liste (gemessen: 38 Karten
 jetzt mit `offsetTop`. *Wer eine verdrehte Karte misst, misst die Drehung mit* — auch in der Probe.
 
 ```bash
-node tests/smoke_blaettern.mjs          # 21 grün · 0 rot
+node tests/smoke_blaettern.mjs          # 21 grün · 0 rot; danach alle 54 smoke_*.mjs mit Rückgabe 0
 bash tests/gegenprobe_blaettern.sh      # 13 Fälle; NUR_ANKER=1, NUR_FALL="…"; DATEI2/ALT2/NEU2 für doppelte Riegel
 ```
 
