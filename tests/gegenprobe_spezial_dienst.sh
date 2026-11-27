@@ -36,7 +36,7 @@ fall "Herkunft je Markt ungeprüft" $D 'if (p.ok && herkunft && !HERKUNFT[p.mark
 fall "Entwurf wird genommen" $S '.filter((r) => r && !r.draft && (' '.filter((r) => r && (' 'nicht Entwurf'
 fall "Vorabfassung wird nie genommen" $S '(!r.prerelease || (Array.isArray(app.vorab) && app.vorab.includes(art)))' '!r.prerelease' 'Vorabfassung zählt nur'
 fall "SHA-Vergleich fehlt" $S 'if (w.sha256Quelle && g.sha256 !== w.sha256Quelle)' 'if (false)' 'falsche SHA-256'
-fall "Sperre ohne Unterschrift angenommen" $D 'if (!r.ok) return antwort(res, 403, { ok: false, warum: r.warum }, cors);' '' 'fremdem Schlüssel'
+fall "Sperre ohne Unterschrift angenommen" $D 'if (!r.ok) return aw(res, 403, { ok: false, warum: r.warum }, cors);' '' 'fremdem Schlüssel'
 fall "Link ohne Prüfmarke" $D 'if (ist.length !== soll.length || !timingSafeEqual(ist, soll)) return null;' '' 'verbogener Link'
 fall "Unterschrift des Feeds ungeprüft" $S 'if (!ok) return { fehler: "Unterschrift des Feeds passt nicht" };' '' 'fremde Unterschrift wird abgewiesen'
 fall "Feed einer anderen App angenommen" $S 'if (appName && f.app !== appName)' 'if (false)' 'anderen App wird abgewiesen'
