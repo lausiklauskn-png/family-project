@@ -1532,6 +1532,9 @@ Seite, nicht diesen Markt.
 
 ## 🔑 Marktplatz Spezial: Pro-Apps nur gegen Passkey (Klaus 2026-11-26, Weg B)
 
+**⚠ VERBINDLICHER WEG: [`docs/PLAN_MARKTPLATZ_SPEZIAL.md`](docs/PLAN_MARKTPLATZ_SPEZIAL.md)** (Klaus 2026-11-27) – neue Pro-App aufnehmen,
+Passkey ausgeben, Nachkaufen, Gerätebindung, Lizenz in den Pro-Apps. Zuerst dort lesen, Änderungen zuerst dort eintragen.
+
 Klaus: *„Alle Pro-Apps, die jetzt Android und Windows sind … eine separate Seite … die erst aufgeht, wenn ich
 Marktplatz Spezial klicke … mit einem Passkey, den ich persönlich vergebe, in meinem Studio."* Entschieden: **Weg B**
 (der Server gibt die Dateien aus), Node-Dienst auf dem Cloud-Server, Passkey je App wählbar, **je Seite ein eigener
