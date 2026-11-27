@@ -65,6 +65,12 @@ const weiter = async (route) => {
 ctx._weiter = weiter;
 await ctx.route("https://spezial.family-projekt.de/**", weiter);
 await ctx.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+// Das Studio klappt seine Fenster ein (Klaus 2026-11-27). Die Abläufe unten tippen in die Fenster, also klappt dieser
+// Kontext sie auf; ob sie zu Anfang ZU sind, misst Abschnitt 2b in einem eigenen Kontext ohne dieses Skript.
+await ctx.addInitScript(() => {
+  const auf = () => document.querySelectorAll("details.sps-teil:not([open])").forEach((d) => { d.open = true; });
+  new MutationObserver(auf).observe(document, { childList: true, subtree: true });
+});
 const pg = await ctx.newPage();
 const fehler = []; pg.on("pageerror", (e) => fehler.push(e.message));
 
@@ -201,6 +207,26 @@ soll("Studio: „Übergabe“ in der Liste zeigt Link, Code und QR für einen ä
   await pg.waitForFunction((id) => /von/.test((document.querySelector('[data-geraete="' + id + '"]') || {}).textContent || ""), check.daten.id, { timeout: 15000 }).catch(() => {});
   const zahlTxt = await pg.evaluate((id) => (document.querySelector('[data-geraete="' + id + '"]') || {}).textContent, check.daten.id);
   soll("Geräte: das Studio zeigt „2 von 2“ am Passkey", /2 von 2/.test(zahlTxt || ""), zahlTxt);
+
+  // ── 2b · Eingeklappt und „geladen“ (Klaus 2026-11-27) ─────────────────
+  {
+    const cz = await br.newContext({ viewport: { width: 1280, height: 900 }, storageState: await ctx.storageState() });
+    await cz.route("https://spezial.family-projekt.de/**", weiter);
+    await cz.route("**/mycel-bg.js*", (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+    const pz = await cz.newPage(); await pz.goto(SEITE + "/spezial-studio.html");
+    await pz.waitForSelector("details.sps-teil");
+    const lage = await pz.evaluate(() => [...document.querySelectorAll("details.sps-teil")].map((d) => d.open));
+    soll("Studio: alle Fenster stehen zu Anfang eingeklappt", lage.length >= 3 && lage.every((o) => !o), JSON.stringify(lage));
+    const hoch = await pz.evaluate(() => document.documentElement.scrollHeight);
+    soll("Studio: eingeklappt passt das Studio auf einen Bildschirm", hoch <= 900 + 40, hoch + " px");
+    await pz.click('details.sps-teil[data-teil="Vergebene Passkeys"] > summary');
+    soll("Studio: ein Tipp auf die Überschrift öffnet das Fenster", await pz.evaluate(() => document.querySelector('details.sps-teil[data-teil="Vergebene Passkeys"]').open));
+    const gel = await pz.waitForFunction((id) => { const d = document.querySelector('[data-geladen="' + id + '"]'); return d && !d.hidden && /geladen \(\d+\)/.test(d.textContent); }, check.daten.id, { timeout: 15000 }).then(() => true, () => false);
+    const gelText = await pz.evaluate((id) => (document.querySelector('[data-geladen="' + id + '"]') || {}).textContent || "", check.daten.id);
+    const gelZu = await pz.evaluate((id) => { const d = document.querySelector('[data-geladen="' + id + '"]'); return d && !d.open; }, check.daten.id);
+    soll("Studio: am Passkey steht eingeklappt, was geladen wurde (App · APK/Windows · Zahl)", gel && gelZu && /×/.test(gelText) && /APK|Windows/.test(gelText), gelText);
+    await cz.close();
+  }
   await pg.fill("#spsPw", "studio-passwort-1");
   pg.once("dialog", (d) => d.accept());
   await pg.click(`[data-frei="${check.daten.id}"]`);
