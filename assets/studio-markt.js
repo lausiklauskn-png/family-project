@@ -70,9 +70,9 @@
       nv_h: "🕸 Netz-Verwaltung",
       nv_intro: "Empfehlen, Widerrufen und die Sperrliste stehen auf einer eigenen Seite.",
       nv_open: "🕸 Netz-Verwaltung öffnen",
-      sp_h: "Marktplatz Spezial",
-      sp_intro: "Passkeys für die Pro-Apps erstellen und sperren. Eigene Seite, der geheime Schlüssel bleibt in diesem Browser.",
-      sp_open: "🔑 Marktplatz Spezial: Passkeys",
+      msp_h: "🔑 Marktplatz Spezial: wer welche Pro-App bekommt",
+      msp_intro: "Hier legst du für jeden Kunden einen Passkey an: Name eintragen, Apps anhaken, Link oder QR-Code weitergeben. Beim ersten Mal richtest du einmal deinen Schlüssel ein. Er bleibt verschlüsselt in diesem Browser.",
+      msp_open: "Passkeys verwalten",
       nv_dirty: "Es gibt unveröffentlichte Änderungen im Studio. Sie gehen beim Wechseln verloren. Trotzdem öffnen?",
       sp_h: "🧬 Sporen der Anbieter",
       sp_intro: "Was die nächtliche Prüfung zuletzt gesehen hat. Ohne Haken am Eintrag wird eine geänderte Beschreibung nur gemeldet — übernommen wird sie erst hier.",
@@ -252,9 +252,9 @@
       nv_h: "🕸 Network administration",
       nv_intro: "Recommending, revoking and the block list are on a page of their own.",
       nv_open: "🕸 Open network administration",
-      sp_h: "Marketplace Special",
-      sp_intro: "Create and block passkeys for the Pro apps. Own page, the secret key stays in this browser.",
-      sp_open: "🔑 Marketplace Special: passkeys",
+      msp_h: "🔑 Marketplace Special: who gets which Pro app",
+      msp_intro: "Create a passkey for each customer here: enter the name, tick the apps, hand over the link or QR code. The first time you set up your key once. It stays encrypted in this browser.",
+      msp_open: "Manage passkeys",
       nv_dirty: "There are unpublished changes in the studio. They are lost when you switch. Open anyway?",
       sp_h: "🧬 Provider spores",
       sp_intro: "What the nightly check last saw. Without the checkbox a changed description is only reported — you accept it here.",
@@ -2058,6 +2058,11 @@
         '<div class="fpst-head"><b>' + esc(T("title")) + ' <span data-role="dirty" class="fpst-dirty"></span></b>' +
           '<button data-role="x" class="fpst-x" title="' + esc(T("publish_close")) + '">✕</button></div>' +
         '<p class="fpst-intro">' + esc(T("intro")) + '</p>' +
+        '<div class="fpst-queue fpst-spezial">' +
+          '<h4>' + esc(T("msp_h")) + '</h4>' +
+          '<p class="fpst-qintro">' + esc(T("msp_intro")) + '</p>' +
+          '<div class="fpst-qbtnrow"><a href="spezial-studio.html" data-role="spopen" class="fpst-btn fpst-btn--go">' + esc(T("msp_open")) + '</a></div>' +
+        '</div>' +
         '<div class="fpst-queue">' +
           '<h4>' + esc(T("q_h")) + '</h4>' +
           '<p class="fpst-qintro">' + esc(T("q_intro")) + '</p>' +
@@ -2140,11 +2145,6 @@
           '<p class="fpst-qintro">' + esc(T("nv_intro")) + '</p>' +
           '<div class="fpst-qbtnrow"><button type="button" data-role="nvopen" class="fpst-btn">' + esc(T("nv_open")) + '</button></div>' +
         '</div>' +
-        '<div class="fpst-vec">' +
-          '<h4>' + esc(T("sp_h")) + '</h4>' +
-          '<p class="fpst-qintro">' + esc(T("sp_intro")) + '</p>' +
-          '<div class="fpst-qbtnrow"><a href="spezial-studio.html" data-role="spopen" class="fpst-btn">' + esc(T("sp_open")) + '</a></div>' +
-        '</div>' +
         '<h4>' + esc(T("list_h")) + '</h4>' +
         '<div class="fpst-list" data-role="list"></div>' +
         '<div class="fpst-foot">' +
@@ -2160,6 +2160,7 @@
     panel.querySelector("[data-role=publish]").addEventListener("click", publish);
     var scb = panel.querySelector("[data-role=spcheckbtn]"); if (scb) scb.addEventListener("click", sporePruefen);
     var nvb = panel.querySelector("[data-role=nvopen]"); if (nvb) nvb.addEventListener("click", netzVerwaltungOeffnen);
+    var spb = panel.querySelector("[data-role=spopen]"); if (spb) spb.addEventListener("click", function (e) { if ((dirty || wacheDirty) && !window.confirm(T("nv_dirty"))) e.preventDefault(); });
     var vb = panel.querySelector("[data-role=vecbtn]"); if (vb) vb.addEventListener("click", buildVectors);
     var vr = panel.querySelector("[data-role=vecrecheck]"); if (vr) vr.addEventListener("click", function () { standLaden(); sporenLaden(); });
     var sb = panel.querySelector("[data-role=sporen]");
@@ -2268,7 +2269,7 @@
       ".fpst-toasts{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:100000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}" +
       ".fpst-toast{background:rgba(18,20,28,.96);color:#fff;padding:10px 16px;border-radius:12px;font:14px system-ui,sans-serif;box-shadow:0 8px 30px rgba(0,0,0,.4);max-width:90vw;transition:opacity .3s,transform .3s}" +
       ".fpst-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:flex-start;justify-content:center;background:rgba(6,8,14,.6);padding:16px;overflow:auto}" +
-      ".fpst-box{background:#141824;color:#eef1f7;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;max-width:560px;width:100%;margin:16px 0;box-shadow:0 20px 60px rgba(0,0,0,.5)}" +
+      ".fpst-box{background:#141824;color:#eef1f7;border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px;max-width:1120px;width:100%;margin:16px 0;box-shadow:0 20px 60px rgba(0,0,0,.5)}" +
       ".fpst-head{display:flex;align-items:center;justify-content:space-between;gap:8px}" +
       ".fpst-head b{font-size:1.1rem}.fpst-dirty{color:#ffb26b;font-size:.8rem;font-weight:400}" +
       ".fpst-x{background:transparent;border:0;color:#cfd6e6;font-size:1.2rem;cursor:pointer;padding:2px 8px}" +

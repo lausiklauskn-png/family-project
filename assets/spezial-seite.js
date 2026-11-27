@@ -10,8 +10,8 @@
   var LS = "spezial_passkey_" + C.markt;
   var W = {
     de: {
-      feld: "Passkey", pruefen: "Freischalten", vergessen: "Passkey hier vergessen", laeuft: "Wird geprüft …",
-      ok: "✓ Freigeschaltet für {n}", nichtfrei: "nicht in deinem Passkey", ohne: "Mit einem Passkey kannst du hier laden.",
+      feld: "Passkey", pruefen: "Freischalten", vergessen: "Passkey von diesem Gerät entfernen", vergessenFrage: "Den Passkey von diesem Gerät entfernen? Zum Laden brauchst du ihn danach wieder (Link oder QR-Code).", laeuft: "Wird geprüft …",
+      ok: "✓ Freigeschaltet für {n}", nichtfrei: "nicht in deinem Passkey", ohne: "Noch keinen Passkey? Du bekommst ihn vom Anbieter als Link oder QR-Code. Ein Tipp darauf öffnet diese Seite freigeschaltet, du musst nichts abtippen.",
       android: "Android (APK)", windows: "Windows (Installer)", keine: "noch keine Datei", holt: "Link wird geholt …",
       offline: "Der Server antwortet gerade nicht. Bitte später noch einmal.", fassung: "Fassung",
       zuTitel: "🔒 Dein Passkey ist mit einem Code verschlossen.", zuHin: "Gib den Code ein, den du getrennt bekommen hast (z. B. am Telefon).",
@@ -24,8 +24,8 @@
         app_nicht_frei: "Diese App ist nicht in deinem Passkey.", keine_datei: "Für diese App liegt gerade keine Datei bereit." }
     },
     en: {
-      feld: "Passkey", pruefen: "Unlock", vergessen: "Forget the passkey here", laeuft: "Checking …",
-      ok: "✓ Unlocked for {n}", nichtfrei: "not in your passkey", ohne: "With a passkey you can download here.",
+      feld: "Passkey", pruefen: "Unlock", vergessen: "Remove the passkey from this device", vergessenFrage: "Remove the passkey from this device? You will need it again to download (link or QR code).", laeuft: "Checking …",
+      ok: "✓ Unlocked for {n}", nichtfrei: "not in your passkey", ohne: "No passkey yet? You get it from the provider as a link or QR code. Tapping it opens this page unlocked, nothing to type.",
       android: "Android (APK)", windows: "Windows (installer)", keine: "no file yet", holt: "Fetching link …",
       offline: "The server is not answering right now. Please try again later.", fassung: "Version",
       zuTitel: "🔒 Your passkey is locked with a code.", zuHin: "Enter the code you received separately (e.g. by phone).",
@@ -116,7 +116,7 @@
     if (v.slice(0, 5) !== praefix() + ".") { FREI = null; melde(warum(/^[A-Z]{3}1\./.test(v) ? "markt" : "form")); zeichne(); return; }
     if (!leise) melde(t("laeuft"));
     holen("/pruefen", { passkey: v }).then(function (j) {
-      if (j && j.ok) { FREI = j.apps || []; merke(v); melde(t("ok").replace("{n}", j.n || ""), true); el.vergessen.hidden = false; }
+      if (j && j.ok) { FREI = j.apps || []; merke(v); melde(t("ok").replace("{n}", j.n || ""), true); zeige(el.vergessen, true); }
       else { FREI = null; melde(warum(j && j.warum)); if (j && (j.warum === "gesperrt" || j.warum === "abgelaufen")) merke(""); }
       zeichne();
     }).catch(function () { melde(t("offline")); });
@@ -132,6 +132,9 @@
     }).catch(function () { knopf.disabled = false; knopf.innerHTML = alt; melde(t("offline")); });
   }
 
+  // „hidden“ allein verliert gegen .btn{display:…} – der Knopf stand sonst auch ohne Passkey da (Klaus 2026-11-27).
+  function zeige(e, an) { if (e) e.style.display = an ? "" : "none"; }
+
   function start() {
     var wurzel = document.getElementById("spezial"); if (!wurzel) return;
     wurzel.innerHTML =
@@ -144,14 +147,14 @@
         '<button class="btn primary" type="submit">' + esc(t("zuOeffnen")) + "</button></form>" +
         '<p class="sp-meldung" id="spZuMeld" role="status" aria-live="polite"></p></div>' +
       '<p class="sp-meldung" id="spMeldung" role="status" aria-live="polite">' + esc(t("ohne")) + "</p>" +
-      '<p><button type="button" class="btn ghost sp-vergessen" id="spVergessen" hidden>' + esc(t("vergessen")) + "</button></p>" +
+      '<p><button type="button" class="btn ghost sp-vergessen" id="spVergessen" style="display:none">' + esc(t("vergessen")) + "</button></p>" +
       '<div class="grid listings sp-liste" id="spListe"></div>';
     el = { feld: document.getElementById("spPasskey"), meldung: document.getElementById("spMeldung"), liste: document.getElementById("spListe"), vergessen: document.getElementById("spVergessen"),
       form: document.getElementById("spForm"), zu: document.getElementById("spZu"), code: document.getElementById("spCode"), zuMeld: document.getElementById("spZuMeld") };
     document.getElementById("spZuForm").addEventListener("submit", function (e) { e.preventDefault(); entriegeln(); });
     window.addEventListener("hashchange", ausAdresse);
     document.getElementById("spForm").addEventListener("submit", function (e) { e.preventDefault(); pruefen(false); });
-    el.vergessen.addEventListener("click", function () { merke(""); el.feld.value = ""; FREI = null; el.vergessen.hidden = true; melde(t("ohne")); zeichne(); });
+    el.vergessen.addEventListener("click", function () { if (!window.confirm(t("vergessenFrage"))) return; merke(""); el.feld.value = ""; FREI = null; zeige(el.vergessen, false); melde(t("ohne")); zeichne(); });
     el.liste.addEventListener("click", function (e) { var b = e.target.closest("button[data-app]"); if (b && !b.disabled) laden(b.getAttribute("data-app"), b.getAttribute("data-art"), b); });
     zeichne();
     holen("/apps").then(function (j) { KATALOG = j || { apps: [] }; zeichne(); }).catch(function () { melde(t("offline")); });
