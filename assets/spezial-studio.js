@@ -117,10 +117,14 @@
         .then(function (j) {
           if (!j || !j.ok || typeof j.geraete !== "number") { sp.textContent = "–"; return; }
           sp.textContent = j.geraete + " von " + j.max;
-          var b = document.querySelector('[data-frei="' + id + '"]'); if (b && j.geraete > 0) b.style.display = "";
+          var b = document.querySelector('[data-frei="' + id + '"]'); if (b) b.style.display = j.geraete > 0 ? "" : "none";
         }, function () { sp.textContent = "–"; });
     });
   }
+
+  // Die Zahl veraltet, solange das Studio offen bleibt (Klaus 2026-11-27: die installierte App zeigte „0 von 2“, der
+  // frisch geladene Reiter „1 von 2“). Wer ins Fenster zurückkehrt, bekommt sie neu gefragt.
+  document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible") geraeteZeigen(); });
 
   function geheim(pw) {
     var box = lies(LS_KEY, null); if (!box) return Promise.reject(new Error("kein"));
