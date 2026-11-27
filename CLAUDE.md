@@ -1633,3 +1633,45 @@ Knöpfe je Passkey gleich breit untereinander, „▸ geladen (n)“ je Passkey 
 Gerätezahl wird bei `visibilitychange` neu gefragt. `dienst.mjs` geändert → nach dem Merge auf dem Cloud-Server
 `docker restart spezial` (ohne Neustart bleibt „geladen“ einfach verborgen). Probe `smoke_spezial_seite` 57 (vier neue, je
 von Hand sabotiert). Cache v185, tp v123.
+
+## 🗂 Schlanke Karten im Marktplatz (Klaus 2026-11-27)
+
+Klaus: *„Die App-Karten im Marktplatz sind zu groß. Bei rund 40 Apps dauert das Scrollen ewig … Ziel: in 3 bis 4
+Bildschirmen komplett durchgescrollt."* Gleiches Grund-Layout, nur verdichtet:
+
+| | vorher | jetzt |
+|---|---|---|
+| Bild | 16:9-Band über die ganze Karte | **Quadrat 52 px links neben dem Namen** (`.mk-kopf`) |
+| Text | 3 Zeilen | **2 Zeilen** (der volle Text bleibt im HTML: Such-Korpus) |
+| Messwerte | vier Pillen mit Wort, oft 2 Zeilen, dazu Satz und Hinweise | **eine Reihe, Symbol + Zahl**; das Wort steht für Vorleser und im `title` |
+| Rest | offen | **unter „mehr"** (`<details class="mk-mehr">`): Satz zur Messung, Hinweise, „von Hand geprüft", 🎬 Erklärvideo, „Bewertung nachlesen" |
+| Spalten | `auto-fill` | **1 / 2 / 3** (ab 600 · ab 900 px), nie 4 |
+| Kartenhöhe | 570–670 px | **215 px** |
+
+**Gemessen (38 Karten, echter Browser):** Handy 412×915 **25,9 → 9,4** Bildschirme · Tablet 820×1180 **10,3 → 3,7** ·
+Monitor 1280×800 **10,0 → 3,7** · 1920×1080 **7,4 → 2,7**.
+
+⚠ **BENANNTE GRENZE: am Handy sind 3–4 Bildschirme nicht zu schaffen.** In einer Spalte wären das unter 100 px je
+Karte, weniger als Knopfreihe plus Name. Der Wächter dort ist ein **Nagel** (≤ 10), ausdrücklich so benannt.
+
+⚠ **GELB UND ROT DES WÄCHTERS STEHEN WEITER OFFEN an der Karte**, nicht unter „mehr": eine Warnung, die man erst
+aufklappen muss, ist keine. Nur das grüne „von Hand geprüft" ist eingeklappt.
+
+⚠ **Die zugeklappten Zeilen tragen weiter ihre Klassen** (`.mk-mess` sitzt jetzt am `<details>`), also lesen
+`smoke_stufe5_messung` und `smoke_messung_hand` sie wie vorher. Wer **klickt**, tippt erst „mehr" an — vier Stellen in
+den Proben nachgezogen. `C2f–h` („die Knöpfe stehen auf einer Höhe") gilt jetzt der Fußzeile, die immer zu sehen ist.
+
+⚠ **Gebaute und gezeichnete Karte gleich hoch:** `tools/statische-listen.mjs` legt einen leeren Platzhalter
+`.mk-mehr-nur` dorthin, wo danach die Messwerte stehen, und `.listing-foot` reserviert 44 px für den Melde-Knopf (den
+die gebaute Seite nicht trägt). Ohne beides war die gebaute Karte 206 statt 215 px hoch.
+
+⚠ **Logos sind aus dem Behälter nicht abrufbar** (github.io gesperrt); gemessen ist das Feld, nicht das Bild.
+Breite og-Bilder (z. B. BookLedgerPro) werden im Quadrat mittig beschnitten (`cover`). Am Tablet nicht gesehen.
+
+```bash
+node tests/smoke_schlanke_karten.mjs          # 4 Lagen, mehr/Warnung, ohne und mit Skript
+bash tests/gegenprobe_schlanke_karten.sh      # 12 Fälle; NUR_ANKER=1, NUR_FALL="…" — in einer Kopie fahren
+```
+
+Nachgezogene Anker in `gegenprobe_kartenknoepfe` (Fall 6), `gegenprobe_angleichen` (C), `gegenprobe_uebersetzung`
+(Name im `mk-kopf-t`). Cache **v185 → v186**, `ASSET_V` und alle `?v=` mitgezogen.

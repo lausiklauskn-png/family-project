@@ -106,14 +106,16 @@ fall 'REIHE: die Woerter der Messwerte stehen wieder in der Pille' assets/style.
   'nicht abgeschnitten'
 
 # Die Reihe darf wieder umbrechen — mit sichtbaren Woertern zugleich, sonst
-# passt sie in eine Zeile und der Fall maesse nichts.
+# passt sie in eine Zeile und der Fall maesse nichts. ⚠ Der erste Lauf war
+# BLIND: die Sabotage nahm nur `position:absolute` heraus, `width:1px` blieb —
+# die Woerter nahmen weiter keinen Platz, und nichts brach um.
 fall 'EINE-REIHE: die Messwerte brechen in zwei Zeilen um' assets/style.css \
   '.listing .mk-ms-zeile{display:flex;flex-wrap:nowrap;gap:4px;min-width:0}
 .listing .mk-ms-zeile .mk-ms-w{padding:2px 6px;font-size:.74rem;gap:3px}
-.listing .mk-ms-k{position:absolute;' \
+.listing .mk-ms-k{position:absolute;width:1px;height:1px;' \
   '.listing .mk-ms-zeile{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
 .listing .mk-ms-zeile .mk-ms-w{padding:2px 6px;font-size:.74rem;gap:3px}
-.listing .mk-ms-k{position:static;' \
+.listing .mk-ms-k{position:static;width:auto;height:auto;' \
   'in EINER Reihe'
 
 # „mehr" steht von Anfang an offen.
