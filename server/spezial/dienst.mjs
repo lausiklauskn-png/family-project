@@ -13,6 +13,8 @@
 //   POST /link     {passkey,app,art} → {ok, url, bis}  (Link 10 Minuten gültig)
 //   GET  /datei/<marke>              → die Datei (mit Range)
 //   POST /sperren  {erklaerung}      → Sperre, vom Herausgeber-Schlüssel unterschrieben
+//   Gerätebindung: je Passkey höchstens GERAETE_MAX Geräte (Zufallskennung des Browsers), /link verlangt sie;
+//   zurückgesetzt wird mit einer unterschriebenen Erklärung {frei: id} über /sperren (15 Minuten gültig).
 //   POST /kurz     {passkey, zu}     → {ok, url, bis}  Kurzlink 3 Tage, nur für verschlossene Passkeys
 //   GET  /k/<id>                     → Weiterleitung auf markt-spezial.html#z=… (oder „abgelaufen“)
 //
@@ -42,6 +44,8 @@ const PORT = Number(process.env.SPEZIAL_PORT || 8080);
 const LINK_MS = 10 * 60 * 1000;
 // Kurzlinks (Klaus 2026-11-27): 3 Tage gültig. Gespeichert wird NUR der verschlossene Passkey (…Z1.…),
 // der ohne den getrennt übergebenen Code nutzlos ist. Nach Ablauf oder Sperre wird er gelöscht.
+const GERAETE_MAX = 2; // Klaus 2026-11-27: Handy und PC
+const GERAET_RE = /^[A-Za-z0-9_-]{16,40}$/;
 const KURZ_MS = 3 * 24 * 60 * 60 * 1000;
 const HERKUNFT = {
   fp: ["https://family-projekt.de", "https://www.family-projekt.de"],
@@ -132,13 +136,34 @@ function seite(res, code, titel, text) {
   res.end(body);
 }
 
+// ── Gerätebindung ─────────────────────────────────────────────────────
+const GERAETE_DATEI = () => join(DATEN, "geraete.json");
+async function geraetStatus(markt, id, g) {
+  const alle = await lies(GERAETE_DATEI(), {}), liste = alle[markt + ":" + id] || [];
+  const bekannt = !!g && liste.includes(g);
+  return { n: liste.length, bekannt, frei: bekannt || liste.length < GERAETE_MAX };
+}
+async function geraetMerken(markt, id, g) {
+  const alle = await lies(GERAETE_DATEI(), {}), k = markt + ":" + id, liste = alle[k] || [];
+  if (!liste.includes(g)) { liste.push(g); alle[k] = liste; await schreib(GERAETE_DATEI(), alle); }
+}
+async function geraeteFrei(markt, id) {
+  const alle = await lies(GERAETE_DATEI(), {}), k = markt + ":" + id;
+  if (alle[k]) { delete alle[k]; await schreib(GERAETE_DATEI(), alle); }
+}
+
 // ── Bremse je Adresse (in-memory) ───────────────────────────────────────
 const BREMSE = new Map();
+// Gezählt werden nur FEHLschläge (Klaus 2026-11-27): das Studio fragt je Passkey die Gerätezahl ab, und ein Käufer
+// lädt mehrere Apps – beides sind gültige Anfragen und darf die Bremse nicht auslösen. Raten bleibt gebremst.
 function gebremst(ip) {
-  const jetzt = Date.now(), f = BREMSE.get(ip) || [];
-  const neu = f.filter((t) => jetzt - t < 10 * 60 * 1000); neu.push(jetzt); BREMSE.set(ip, neu);
+  const jetzt = Date.now(), f = (BREMSE.get(ip) || []).filter((t) => jetzt - t < 10 * 60 * 1000);
+  BREMSE.set(ip, f);
+  return f.length >= 30;
+}
+function fehlversuch(ip) {
+  const f = BREMSE.get(ip) || []; f.push(Date.now()); BREMSE.set(ip, f);
   if (BREMSE.size > 5000) BREMSE.clear();
-  return neu.length > 30;
 }
 
 async function katalog() {
@@ -191,45 +216,62 @@ export function bauen() {
       if (req.method === "GET" && url.pathname === "/apps") return antwort(res, 200, await katalog(), cors);
 
       if (req.method === "POST" && (url.pathname === "/pruefen" || url.pathname === "/link" || url.pathname === "/sperren" || url.pathname === "/kurz")) {
-        if (gebremst(ipVon(req))) return antwort(res, 429, { ok: false, warum: "zu_oft" }, cors);
-        let b; try { b = await koerper(req); } catch { return antwort(res, 400, { ok: false, warum: "anfrage" }, cors); }
+        const ip = ipVon(req);
+        const aw = (r, code, obj, kopf) => { if (code >= 400 || (obj && obj.ok === false)) fehlversuch(ip); return antwort(r, code, obj, kopf); };
+        if (gebremst(ip)) return antwort(res, 429, { ok: false, warum: "zu_oft" }, cors);
+        let b; try { b = await koerper(req); } catch { return aw(res, 400, { ok: false, warum: "anfrage" }, cors); }
 
         if (url.pathname === "/sperren") {
           const text = String(b.erklaerung || "").replace(/\s+/g, ""), markt = marktVon(text);
-          if (!markt) return antwort(res, 400, { ok: false, warum: "form" }, cors);
+          if (!markt) return aw(res, 400, { ok: false, warum: "form" }, cors);
           const r = await K.pruefe(noble, text, markt, (await schluessel())[markt], "sperre");
-          if (!r.ok) return antwort(res, 403, { ok: false, warum: r.warum }, cors);
+          if (!r.ok) return aw(res, 403, { ok: false, warum: r.warum }, cors);
+          if (r.daten.frei !== undefined) {
+            const fid = String(r.daten.frei || ""), alter = Date.now() - Number(r.daten.t || 0);
+            if (!/^[A-Za-z0-9_-]{6,40}$/.test(fid)) return aw(res, 400, { ok: false, warum: "form" }, cors);
+            if (!(alter >= -5 * 60 * 1000 && alter <= 15 * 60 * 1000)) return aw(res, 403, { ok: false, warum: "alt" }, cors);
+            await geraeteFrei(markt, fid);
+            return aw(res, 200, { ok: true, frei: fid }, cors);
+          }
           const id = String(r.daten.sperrt || "");
-          if (!/^[A-Za-z0-9_-]{6,40}$/.test(id)) return antwort(res, 400, { ok: false, warum: "form" }, cors);
+          if (!/^[A-Za-z0-9_-]{6,40}$/.test(id)) return aw(res, 400, { ok: false, warum: "form" }, cors);
           const s = await sperrliste(); if (!s[markt].includes(id)) { s[markt].push(id); await schreib(join(DATEN, "sperrliste.json"), s); }
           await kurzSperren(markt, id);
-          return antwort(res, 200, { ok: true, gesperrt: id }, cors);
+          return aw(res, 200, { ok: true, gesperrt: id }, cors);
         }
 
         if (url.pathname === "/kurz") {
           const r = await kurzAnlegen(b.passkey, b.zu);
-          if (!r.ok) return antwort(res, r.warum === "form" ? 400 : 403, r, cors);
-          if (herkunft && !HERKUNFT[r.markt].includes(herkunft)) return antwort(res, 403, { ok: false, warum: "anderer_markt" }, cors);
-          return antwort(res, 200, { ok: true, url: basisVon(req) + "/k/" + r.id, bis: new Date(r.bis).toISOString() }, cors);
+          if (!r.ok) return aw(res, r.warum === "form" ? 400 : 403, r, cors);
+          if (herkunft && !HERKUNFT[r.markt].includes(herkunft)) return aw(res, 403, { ok: false, warum: "anderer_markt" }, cors);
+          return aw(res, 200, { ok: true, url: basisVon(req) + "/k/" + r.id, bis: new Date(r.bis).toISOString() }, cors);
         }
 
         const p = await passkeyPruefen(b.passkey);
-        if (p.ok && herkunft && !HERKUNFT[p.markt].includes(herkunft)) return antwort(res, 403, { ok: false, warum: "anderer_markt" }, cors);
+        if (p.ok && herkunft && !HERKUNFT[p.markt].includes(herkunft)) return aw(res, 403, { ok: false, warum: "anderer_markt" }, cors);
         if (url.pathname === "/pruefen") {
-          if (!p.ok) return antwort(res, 200, { ok: false, warum: p.warum }, cors);
-          return antwort(res, 200, { ok: true, markt: p.markt, n: p.daten.n, apps: p.daten.a, d: p.daten.d, x: p.daten.x || null }, cors);
+          if (!p.ok) return aw(res, 200, { ok: false, warum: p.warum }, cors);
+          const g = GERAET_RE.test(String(b.geraet || "")) ? String(b.geraet) : "";
+          const st = await geraetStatus(p.markt, p.daten.id, g);
+          if (g && !st.frei) return aw(res, 200, { ok: false, warum: "geraete_voll", geraete: st.n, max: GERAETE_MAX }, cors);
+          return aw(res, 200, { ok: true, markt: p.markt, n: p.daten.n, apps: p.daten.a, d: p.daten.d, x: p.daten.x || null, geraete: st.n, max: GERAETE_MAX }, cors);
         }
         // /link
-        if (!p.ok) return antwort(res, 403, { ok: false, warum: p.warum }, cors);
+        if (!p.ok) return aw(res, 403, { ok: false, warum: p.warum }, cors);
         const app = String(b.app || ""), art = String(b.art || "");
-        if (!p.daten.a.includes(app)) return antwort(res, 403, { ok: false, warum: "app_nicht_frei" }, cors);
-        if (art !== "android" && art !== "windows") return antwort(res, 400, { ok: false, warum: "art" }, cors);
+        if (!p.daten.a.includes(app)) return aw(res, 403, { ok: false, warum: "app_nicht_frei" }, cors);
+        if (art !== "android" && art !== "windows") return aw(res, 400, { ok: false, warum: "art" }, cors);
+        const geraet = String(b.geraet || "");
+        if (!GERAET_RE.test(geraet)) return aw(res, 400, { ok: false, warum: "geraet" }, cors);
+        const gst = await geraetStatus(p.markt, p.daten.id, geraet);
+        if (!gst.frei) return aw(res, 403, { ok: false, warum: "geraete_voll", geraete: gst.n, max: GERAETE_MAX }, cors);
         const stand = await lies(join(DATEN, "stand.json"), { apps: {} }), d = stand.apps[app] && stand.apps[app][art];
-        if (!d) return antwort(res, 404, { ok: false, warum: "keine_datei" }, cors);
+        if (!d) return aw(res, 404, { ok: false, warum: "keine_datei" }, cors);
+        if (!gst.bekannt) await geraetMerken(p.markt, p.daten.id, geraet);
         const bis = Date.now() + LINK_MS;
         const m = marke({ a: app, r: art, f: d.datei, i: p.daten.id, m: p.markt, e: bis }, await geheim());
         await zaehle(p.markt, p.daten.id, app, art);
-        return antwort(res, 200, { ok: true, url: basisVon(req) + "/datei/" + m, bis: new Date(bis).toISOString(), datei: d.datei, groesse: d.groesse, sha256: d.sha256 }, cors);
+        return aw(res, 200, { ok: true, url: basisVon(req) + "/datei/" + m, bis: new Date(bis).toISOString(), datei: d.datei, groesse: d.groesse, sha256: d.sha256 }, cors);
       }
 
       if ((req.method === "GET" || req.method === "HEAD") && url.pathname.startsWith("/k/")) {

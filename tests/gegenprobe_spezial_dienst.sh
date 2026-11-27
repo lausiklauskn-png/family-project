@@ -36,11 +36,16 @@ fall "Herkunft je Markt ungeprüft" $D 'if (p.ok && herkunft && !HERKUNFT[p.mark
 fall "Entwurf wird genommen" $S '.filter((r) => r && !r.draft && (' '.filter((r) => r && (' 'nicht Entwurf'
 fall "Vorabfassung wird nie genommen" $S '(!r.prerelease || (Array.isArray(app.vorab) && app.vorab.includes(art)))' '!r.prerelease' 'Vorabfassung zählt nur'
 fall "SHA-Vergleich fehlt" $S 'if (w.sha256Quelle && g.sha256 !== w.sha256Quelle)' 'if (false)' 'falsche SHA-256'
-fall "Sperre ohne Unterschrift angenommen" $D 'if (!r.ok) return antwort(res, 403, { ok: false, warum: r.warum }, cors);' '' 'fremdem Schlüssel'
+fall "Sperre ohne Unterschrift angenommen" $D 'if (!r.ok) return aw(res, 403, { ok: false, warum: r.warum }, cors);' '' 'fremdem Schlüssel'
 fall "Link ohne Prüfmarke" $D 'if (ist.length !== soll.length || !timingSafeEqual(ist, soll)) return null;' '' 'verbogener Link'
 fall "Unterschrift des Feeds ungeprüft" $S 'if (!ok) return { fehler: "Unterschrift des Feeds passt nicht" };' '' 'fremde Unterschrift wird abgewiesen'
 fall "Feed einer anderen App angenommen" $S 'if (appName && f.app !== appName)' 'if (false)' 'anderen App wird abgewiesen'
 fall "bei GitHub-304 wird der Update-Server übersprungen" $S '{ log(`= ${app.id}: unverändert`); ghUnveraendert = true; }' '{ log(`= ${app.id}: unverändert`); continue; }' 'auch wenn GitHub 304'
 fall "Server-Weg ausgebaut (Windows wieder aus GitHub)" $S 'if (server[art]) {' 'if (false) {' 'kommt vom Update-Server'
+fall "Gerätegrenze 3 statt 2" $D 'const GERAETE_MAX = 2;' 'const GERAETE_MAX = 3;' 'drittes Gerät bekommt keinen'
+fall "Link ohne Gerätekennung angenommen" $D 'if (!GERAET_RE.test(geraet)) return aw' 'if (false) return aw' 'ohne Gerätekennung wird abgewiesen'
+fall "Gerät wird nie gemerkt" $D 'if (!gst.bekannt) await geraetMerken' 'if (false) await geraetMerken' 'drittes Gerät bekommt keinen'
+fall "alte Zurücksetzen-Erklärung wirkt wieder" $D 'if (!(alter >= -5 * 60 * 1000 && alter <= 15 * 60 * 1000))' 'if (false)' 'alte Zur'
+fall "Bremse zählt auch Erfolge" $D 'if (code >= 400 || (obj && obj.ok === false)) fehlversuch(ip);' 'fehlversuch(ip);' 'gehen alle durch'
 echo "$gef schlagen an · $blind blind · $tot tote Anker"
 [ $blind -eq 0 ] && [ $tot -eq 0 ]

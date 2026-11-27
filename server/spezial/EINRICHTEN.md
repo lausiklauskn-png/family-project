@@ -83,3 +83,7 @@ Wer wie oft geladen hat: `cat /srv/spezial/zaehler.json` (je Passkey-Kennung, ke
 (bzw. `spezial.pwa-toolpoint.de/k/<id>`), 3 Tage gültig. Gespeichert wird in `/srv/spezial/kurz.json` nur der verschlossene
 Teil (`FPZ1.`/`TPZ1.`), ohne den Code nutzlos; „Sperren“ löscht die Kurzlinks des Passkeys. Weil sich `dienst.mjs` dafür
 geändert hat, einmal auf dem **Cloud-Server**: `docker restart spezial` (das `git pull` macht der Server selbst).
+
+**Gerätebindung (2026-11-27):** je Passkey höchstens 2 Geräte (`/srv/spezial/geraete.json`, nur Zufallskennungen).
+„Geräte zurücksetzen“ im Studio schickt eine unterschriebene Erklärung über `/sperren` (15 Minuten gültig). Die Bremse
+zählt seitdem nur Fehlversuche (30 in 10 Minuten). Neue `dienst.mjs` → einmal `docker restart spezial` (Cloud-Server).

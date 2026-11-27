@@ -104,6 +104,24 @@
     } else qrZeichnen();
   }
 
+  // Gerätebindung (Klaus 2026-11-27): je Passkey höchstens 2 Geräte. Die Zahl fragt der Dienst – ohne Gerätekennung,
+  // also zählt das Studio selbst nie als Gerät.
+  function geraeteZeigen() {
+    if (!C.dienst || !window.fetch) return;
+    var log = lies(LS_LOG, []);
+    [].slice.call(document.querySelectorAll("[data-geraete]")).forEach(function (sp) {
+      var id = sp.getAttribute("data-geraete"), e = log.find(function (x) { return x.id === id; });
+      if (!e || !e.text) { sp.textContent = "–"; return; }
+      fetch(C.dienst + "/pruefen", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passkey: e.text }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j || !j.ok || typeof j.geraete !== "number") { sp.textContent = "–"; return; }
+          sp.textContent = j.geraete + " von " + j.max;
+          var b = document.querySelector('[data-frei="' + id + '"]'); if (b && j.geraete > 0) b.style.display = "";
+        }, function () { sp.textContent = "–"; });
+    });
+  }
+
   function geheim(pw) {
     var box = lies(LS_KEY, null); if (!box) return Promise.reject(new Error("kein"));
     return K.oeffne(box, pw).catch(function () { throw new Error("pw"); });
@@ -137,9 +155,10 @@
           '<button class="btn primary" id="spsMachen">Passkey erstellen</button><p id="spsM2" class="sps-meld"></p>' +
           '<div id="spsUeb" class="sps-ueb" hidden></div></section>' +
           '<section class="glass sps-teil"><h3>Vergebene Passkeys (' + log.length + ")</h3>" +
-          (log.length ? '<table class="sps-tab"><tr><th>Pseudonym</th><th>Apps</th><th>am</th><th></th></tr>' + log.slice().reverse().map(function (e) {
+          (log.length ? '<table class="sps-tab"><tr><th>Pseudonym</th><th>Apps</th><th>am</th><th>Geräte</th><th></th></tr>' + log.slice().reverse().map(function (e) {
             return "<tr><td>" + esc(e.n) + "</td><td>" + esc(e.a.join(", ")) + "</td><td>" + esc(e.d) + (e.x ? " bis " + esc(e.x) : "") + "</td><td>" +
-              (e.gesperrt ? "🚫 gesperrt" : (e.code ? "🔒 " : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button>') + "</td></tr>";
+              (e.gesperrt ? "" : '<span data-geraete="' + esc(e.id) + '">…</span>') + "</td><td>" +
+              (e.gesperrt ? "🚫 gesperrt" : (e.code ? "🔒 " : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button> <button class="btn ghost" data-frei="' + esc(e.id) + '" style="display:none">Geräte zurücksetzen</button>') + "</td></tr>";
           }).join("") + "</table>" : "<p>Noch keiner.</p>") +
           '<div id="spsUeb3" class="sps-ueb" hidden></div>' +
           '<p class="sps-klein">Die Liste liegt nur in diesem Browser. Sperren braucht das Studio-Passwort (Feld bei „Passkey erstellen“) und Netz.</p><p id="spsM3" class="sps-meld"></p></section>' +
@@ -198,10 +217,26 @@
         sag("spsM2", "✓ Passkey für " + e.n + " erstellt.", true);
       }).catch(function (e) { sag("spsM2", e.message === "pw" ? "Falsches Studio-Passwort." : "Ging nicht: " + e.message, false); });
     };
+    geraeteZeigen();
     var w = $("spezialStudio");
     w.onclick = function (ev) {
       var kb = ev.target.closest("[data-kop]");
       if (kb) { var e1 = lies(LS_LOG, []).find(function (x) { return x.id === kb.getAttribute("data-kop"); }); if (e1) { uebergabe("spsUeb3", e1); $("spsUeb3").scrollIntoView({ block: "nearest" }); } return; }
+      var fb = ev.target.closest("[data-frei]");
+      if (fb) {
+        var fid = fb.getAttribute("data-frei");
+        if (!confirm("Die Geräte dieses Passkeys zurücksetzen? Danach darf er wieder auf 2 neuen Geräten laden.")) return;
+        sag("spsM3", "Wird zurückgesetzt …");
+        Promise.all([geheim(($("spsPw") || {}).value || ""), nob()]).then(function (r) {
+          return K.freigabeErklaerung(r[1], r[0], C.markt, fid);
+        }).then(function (erkl) {
+          return fetch(C.dienst + "/sperren", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ erklaerung: erkl }) }).then(function (r) { return r.json(); });
+        }).then(function (j) {
+          if (!j || !j.ok) throw new Error(j && j.warum || "server");
+          zeichne(); sag("spsM3", "✓ Geräte zurückgesetzt. Der Passkey darf wieder auf 2 neuen Geräten laden.", true);
+        }).catch(function (e) { sag("spsM3", e.message === "pw" ? "Falsches Studio-Passwort (Feld bei „Passkey erstellen“)." : "Ging nicht: " + e.message, false); });
+        return;
+      }
       var sb = ev.target.closest("[data-sperr]"); if (!sb) return;
       var id = sb.getAttribute("data-sperr");
       if (!confirm("Diesen Passkey wirklich sperren? Das lässt sich nicht zurücknehmen.")) return;

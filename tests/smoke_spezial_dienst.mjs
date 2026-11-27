@@ -163,9 +163,10 @@ soll("abgelaufener Passkey gilt nicht", (await post("/pruefen", { passkey: abgel
 soll("Herkunft pwa-toolpoint.de mit FPK1 → anderer Markt", (await post("/pruefen", { passkey: gut }, { Origin: "https://pwa-toolpoint.de" })).j.warum === "anderer_markt");
 soll("fremde Herkunft wird abgewiesen", (await post("/pruefen", { passkey: gut }, { Origin: "https://boese.example" })).s === 403);
 
-const l0 = await post("/link", { passkey: gut, app: "familienakte", art: "android" });
+const G1 = "geraet-eins-0000000001", G2 = "geraet-zwei-0000000002", G3 = "geraet-drei-0000000003";
+const l0 = await post("/link", { passkey: gut, app: "familienakte", art: "android", geraet: G1 });
 soll("Link für eine App, die der Passkey nicht trägt → 403", l0.s === 403 && l0.j.warum === "app_nicht_frei");
-const l1 = await post("/link", { passkey: gut, app: "private-akte", art: "android" }, { Origin: "https://family-projekt.de" });
+const l1 = await post("/link", { passkey: gut, app: "private-akte", art: "android", geraet: G1 }, { Origin: "https://family-projekt.de" });
 soll("Link für eine freie App", l1.j.ok && /\/datei\//.test(l1.j.url), JSON.stringify(l1.j));
 const d1 = await fetch(l1.j.url);
 const inhalt = Buffer.from(await d1.arrayBuffer());
@@ -177,6 +178,28 @@ soll("verbogener Link → 403", (await fetch(kaputt)).status === 403);
 soll("Dateien sind ohne Link nicht zu erreichen", (await fetch(B + "/dateien/private-akte/Private-Akte-Pro-0.9.11.apk")).status === 404);
 const z = JSON.parse(await readFile(join(DATEN, "zaehler.json"), "utf8"));
 soll("Zähler je Passkey", Object.values(z)[0]?.apps?.["private-akte/android"] === 1);
+const geraeteDatei = await readFile(join(DATEN, "geraete.json"), "utf8").then(JSON.parse, () => null);
+soll("Geräte: der Server merkt sich je Passkey nur Zufallskennungen, keinen Namen", !!geraeteDatei && Object.entries(geraeteDatei).every(([k, v]) => /^fp:[A-Za-z0-9_-]+$/.test(k) && v.every((g) => /^[A-Za-z0-9_-]{16,40}$/.test(g))) && !/Testk|Kunde/.test(JSON.stringify(geraeteDatei)), JSON.stringify(geraeteDatei));
+
+// Gerätebindung (Klaus 2026-11-27): höchstens 2 Geräte je Passkey
+const ohneG = await post("/link", { passkey: gut, app: "private-akte", art: "android" });
+soll("Geräte: ein Link ohne Gerätekennung wird abgewiesen", ohneG.s === 400 && ohneG.j.warum === "geraet");
+soll("Geräte: ein zweites Gerät bekommt einen Link", (await post("/link", { passkey: gut, app: "private-akte", art: "android", geraet: G2 })).j.ok);
+const drittes = await post("/link", { passkey: gut, app: "private-akte", art: "android", geraet: G3 });
+soll("Geräte: ein drittes Gerät bekommt keinen Link", drittes.s === 403 && drittes.j.warum === "geraete_voll" && drittes.j.max === 2, JSON.stringify(drittes.j));
+soll("Geräte: das dritte Gerät erfährt es schon beim Prüfen", (await post("/pruefen", { passkey: gut, geraet: G3 })).j.warum === "geraete_voll");
+soll("Geräte: ein bekanntes Gerät lädt weiter", (await post("/link", { passkey: gut, app: "private-akte", art: "android", geraet: G1 })).j.ok);
+const zahl = await post("/pruefen", { passkey: gut });
+soll("Geräte: ohne Gerätekennung (Studio) gibt es die Zahl, ohne mitzuzählen", zahl.j.ok && zahl.j.geraete === 2 && zahl.j.max === 2, JSON.stringify(zahl.j));
+const gid = JSON.parse(new TextDecoder().decode(K.unb64u(gut.split(".")[1]))).id;
+soll("Geräte: Zurücksetzen mit fremdem Schlüssel → abgewiesen", (await post("/sperren", { erklaerung: await K.freigabeErklaerung(noble, fremd, "fp", gid) })).s === 403);
+const altKoerper = K.b64u(new TextEncoder().encode(JSON.stringify({ v: 1, m: "fp", frei: gid, t: Date.now() - 20 * 60 * 1000 })));
+const altMsg = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("FPS1." + altKoerper)));
+const altErkl = "FPS1." + altKoerper + "." + K.b64u(await noble.schnorr.sign(altMsg, geheimFp));
+soll("Geräte: eine alte Zurücksetzen-Erklärung wirkt nicht noch einmal", (await post("/sperren", { erklaerung: altErkl })).j.warum === "alt");
+soll("Geräte: Zurücksetzen vom Herausgeber", (await post("/sperren", { erklaerung: await K.freigabeErklaerung(noble, geheimFp, "fp", gid) })).j.ok);
+soll("Geräte: danach darf das dritte Gerät", (await post("/link", { passkey: gut, app: "private-akte", art: "android", geraet: G3 })).j.ok);
+soll("Geräte: Zurücksetzen sperrt nichts", (await post("/pruefen", { passkey: gut })).j.ok);
 
 // Sperre
 const sperreFremd = await K.sperrErklaerung(noble, fremd, "fp", JSON.parse(new TextDecoder().decode(K.unb64u(gut.split(".")[1]))).id);
@@ -187,6 +210,14 @@ soll("Sperre vom Herausgeber", sp.j.ok && sp.j.gesperrt === id);
 soll("gesperrter Passkey gilt nicht mehr", (await post("/pruefen", { passkey: gut })).j.warum === "gesperrt");
 soll("ein schon ausgegebener Link des gesperrten Passkeys geht nicht mehr", (await fetch(l1.j.url)).status === 403);
 soll("ein anderer Passkey bleibt gültig", (await post("/pruefen", { passkey: (await K.erstelle(noble, geheimFp, "fp", "Y", ["private-akte"])).text })).j.ok);
+
+// Bremse: nur Fehlschläge zählen (ganz am Ende, sie sperrt diese Adresse danach für 10 Minuten)
+const gueltig = (await K.erstelle(noble, geheimFp, "fp", "Z", ["private-akte"])).text;
+let durch = 0; for (let i = 0; i < 40; i++) if ((await post("/pruefen", { passkey: gueltig })).j.ok) durch++;
+soll("Bremse: 40 gültige Abfragen hintereinander gehen alle durch (Studio, mehrere Apps)", durch === 40, durch + " von 40");
+for (let i = 0; i < 30; i++) await post("/pruefen", { passkey: "FPK1.falsch.falsch" });
+const gebremst = await post("/pruefen", { passkey: gueltig });
+soll("Bremse: nach 30 Fehlversuchen ist Schluss, auch für einen gültigen", gebremst.s === 429 && gebremst.j.warum === "zu_oft", gebremst.s + " " + JSON.stringify(gebremst.j));
 
 srv.close(); gh.close();
 console.log(`${gruen} grün · ${rot} ROT`);

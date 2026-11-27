@@ -21,7 +21,9 @@
         markt: "Dieser Passkey gehört zu einer anderen Seite. Hier gelten Passkeys, die mit „{p}.“ beginnen.", anderer_markt: "Dieser Passkey gehört zu einer anderen Seite.",
         keinschluessel: "Die Freischaltung ist hier noch nicht eingerichtet.", gesperrt: "Dieser Passkey ist gesperrt.",
         abgelaufen: "Dieser Passkey ist abgelaufen.", zu_oft: "Zu viele Versuche. Bitte in zehn Minuten noch einmal.",
-        app_nicht_frei: "Diese App ist nicht in deinem Passkey.", keine_datei: "Für diese App liegt gerade keine Datei bereit." }
+        app_nicht_frei: "Diese App ist nicht in deinem Passkey.", keine_datei: "Für diese App liegt gerade keine Datei bereit.",
+        geraete_voll: "Dieser Passkey ist schon auf {max} Geräten in Gebrauch. Bitte beim Anbieter melden, er kann die Geräte zurücksetzen.",
+        geraet: "Dieses Gerät ließ sich nicht erkennen. Bitte die Seite neu laden." }
     },
     en: {
       feld: "Passkey", pruefen: "Unlock", vergessen: "Remove the passkey from this device", vergessenFrage: "Remove the passkey from this device? You will need it again to download (link or QR code).", laeuft: "Checking …",
@@ -35,7 +37,9 @@
         markt: "This passkey belongs to another site. Passkeys here start with “{p}.”.", anderer_markt: "This passkey belongs to another site.",
         keinschluessel: "Unlocking is not set up here yet.", gesperrt: "This passkey has been blocked.",
         abgelaufen: "This passkey has expired.", zu_oft: "Too many attempts. Please try again in ten minutes.",
-        app_nicht_frei: "This app is not in your passkey.", keine_datei: "No file is ready for this app right now." }
+        app_nicht_frei: "This app is not in your passkey.", keine_datei: "No file is ready for this app right now.",
+        geraete_voll: "This passkey is already in use on {max} devices. Please contact the provider, who can reset the devices.",
+        geraet: "This device could not be recognised. Please reload the page." }
     }
   };
   function sp() { return String(document.documentElement.lang || "de").slice(0, 2) === "en" ? "en" : "de"; }
@@ -43,7 +47,7 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function mb(n) { return n ? (n / 1048576).toLocaleString(sp() === "en" ? "en" : "de", { maximumFractionDigits: 0 }) + " MB" : ""; }
   function praefix() { return C.markt === "tp" ? "TPK1" : "FPK1"; }
-  function warum(w) { return (W[sp()].warum[w] || W[sp()].warum.unterschrift).replace("{p}", praefix()); }
+  function warum(w, max) { return (W[sp()].warum[w] || W[sp()].warum.unterschrift).replace("{p}", praefix()).replace("{max}", max || 2); }
   function holen(pfad, body) {
     var o = body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {};
     return fetch(C.dienst + pfad, o).then(function (r) { return r.json(); });
@@ -51,6 +55,20 @@
 
   var KATALOG = { apps: [] }, FREI = null, el = {};
   function lies() { try { return localStorage.getItem(LS) || ""; } catch (e) { return ""; } }
+  // Gerätebindung (Klaus 2026-11-27): eine Zufallskennung dieses Browsers. Sie sagt nichts über das Gerät aus,
+  // sie zählt nur mit: ein Passkey gilt auf höchstens zwei Geräten. Ohne Speicher gilt jede Sitzung als neues Gerät.
+  var GERAET = "";
+  function geraet() {
+    if (GERAET) return GERAET;
+    var k = "spezial_geraet_" + C.markt;
+    try { GERAET = localStorage.getItem(k) || ""; } catch (e) {}
+    if (!/^[A-Za-z0-9_-]{16,40}$/.test(GERAET)) {
+      var b = new Uint8Array(16); crypto.getRandomValues(b);
+      GERAET = btoa(String.fromCharCode.apply(null, b)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      try { localStorage.setItem(k, GERAET); } catch (e) {}
+    }
+    return GERAET;
+  }
   function merke(v) { try { if (v) localStorage.setItem(LS, v); else localStorage.removeItem(LS); } catch (e) {} }
 
   function zeichne() {
@@ -115,9 +133,9 @@
     // Das Präfix verrät die Seite: ein Passkey der anderen Seite geht gar nicht erst hinaus.
     if (v.slice(0, 5) !== praefix() + ".") { FREI = null; melde(warum(/^[A-Z]{3}1\./.test(v) ? "markt" : "form")); zeichne(); return; }
     if (!leise) melde(t("laeuft"));
-    holen("/pruefen", { passkey: v }).then(function (j) {
+    holen("/pruefen", { passkey: v, geraet: geraet() }).then(function (j) {
       if (j && j.ok) { FREI = j.apps || []; merke(v); melde(t("ok").replace("{n}", j.n || ""), true); zeige(el.vergessen, true); }
-      else { FREI = null; melde(warum(j && j.warum)); if (j && (j.warum === "gesperrt" || j.warum === "abgelaufen")) merke(""); }
+      else { FREI = null; melde(warum(j && j.warum, j && j.max)); if (j && (j.warum === "gesperrt" || j.warum === "abgelaufen")) merke(""); }
       zeichne();
     }).catch(function () { melde(t("offline")); });
   }
@@ -125,10 +143,10 @@
   function laden(app, art, knopf) {
     var v = String(el.feld.value || "").replace(/\s+/g, ""), alt = knopf.innerHTML;
     knopf.disabled = true; knopf.textContent = t("holt");
-    holen("/link", { passkey: v, app: app, art: art }).then(function (j) {
+    holen("/link", { passkey: v, app: app, art: art, geraet: geraet() }).then(function (j) {
       knopf.disabled = false; knopf.innerHTML = alt;
       if (j && j.ok && /^https:\/\//.test(j.url)) { location.href = j.url; return; }
-      melde(warum(j && j.warum));
+      melde(warum(j && j.warum, j && j.max));
     }).catch(function () { knopf.disabled = false; knopf.innerHTML = alt; melde(t("offline")); });
   }
 
