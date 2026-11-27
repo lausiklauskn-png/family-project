@@ -158,7 +158,7 @@
           (log.length ? '<table class="sps-tab"><tr><th>Pseudonym</th><th>Apps</th><th>am</th><th>Geräte</th><th></th></tr>' + log.slice().reverse().map(function (e) {
             return "<tr><td>" + esc(e.n) + "</td><td>" + esc(e.a.join(", ")) + "</td><td>" + esc(e.d) + (e.x ? " bis " + esc(e.x) : "") + "</td><td>" +
               (e.gesperrt ? "" : '<span data-geraete="' + esc(e.id) + '">…</span>') + "</td><td>" +
-              (e.gesperrt ? "🚫 gesperrt" : (e.code ? "🔒 " : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button> <button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button> <button class="btn ghost" data-frei="' + esc(e.id) + '" style="display:none">Geräte zurücksetzen</button>') + "</td></tr>";
+              (e.gesperrt ? "🚫 gesperrt" : '<div class="sps-knoepfe">' + (e.code ? '<span class="sps-zu">🔒 mit Code</span>' : "") + '<button class="btn ghost" data-kop="' + esc(e.id) + '">Übergabe</button><button class="btn ghost" data-sperr="' + esc(e.id) + '">Sperren</button><button class="btn ghost" data-frei="' + esc(e.id) + '" style="display:none">Geräte zurücksetzen</button></div>') + "</td></tr>";
           }).join("") + "</table>" : "<p>Noch keiner.</p>") +
           '<div id="spsUeb3" class="sps-ueb" hidden></div>' +
           '<p class="sps-klein">Die Liste liegt nur in diesem Browser. Sperren braucht das Studio-Passwort (Feld bei „Passkey erstellen“) und Netz.</p><p id="spsM3" class="sps-meld"></p></section>' +
