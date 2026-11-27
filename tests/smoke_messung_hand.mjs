@@ -148,7 +148,7 @@ console.log("Marktplatz — von Hand eingetragene Messwerte");
     "markt-mixarium": Object.assign({ gemessen: "2026-08-02",
       schaufenster: { leistung: 94, bedienbarkeit: 87, gute_praxis: 100, auffindbarkeit: 100, gemessen: "2026-08-02" } }, VIER)
   });
-  await p.click('.listing:has([data-msid="markt-mixarium"]) .mk-mehr > summary');   // erst „mehr“ (seit 2026-11-27)
+  await p.click('.listing:has([data-msid="markt-mixarium"]) .mk-mehr-zu');   // erst „mehr“ (seit 2026-11-28 unten in der Fußzeile)
   await p.click('[data-msid="markt-mixarium"]');
   await p.waitForTimeout(600);
   const sf = await p.evaluate(() => {
@@ -257,7 +257,7 @@ console.log("Marktplatz — von Hand eingetragene Messwerte");
   ok(k.zahlen && k.zahlen[0] === 84,
     "11a der Hand-Wert der App gewinnt (" + JSON.stringify(k.zahlen && k.zahlen.slice(0, 4)) + ")");
   // Das Schaufenster steht im FENSTER, nicht auf der Karte (wie Fall 6).
-  await p.click('.listing:has([data-msid="markt-rezeptbuch"]) .mk-mehr > summary');   // erst „mehr“ (seit 2026-11-27)
+  await p.click('.listing:has([data-msid="markt-rezeptbuch"]) .mk-mehr-zu');   // erst „mehr“ (seit 2026-11-28 unten in der Fußzeile)
   await p.click('[data-msid="markt-rezeptbuch"]');
   await p.waitForTimeout(600);
   const sf = await p.evaluate(() => {

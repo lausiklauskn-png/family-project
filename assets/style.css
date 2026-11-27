@@ -614,26 +614,37 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .listing p{margin:0 0 8px;color:var(--muted);font-size:.88rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:calc(1.4em * 2)}
 .listing .by{display:block;-webkit-line-clamp:none;min-height:0;overflow:visible}
 
-/* „mehr“ (Klaus 2026-11-27): die vier Messwerte bilden die Zeile, auf die man
- * tippt; Satz, Hinweise, Erklärvideo und „Bewertung nachlesen“ liegen darunter.
- * Eine Höhe für beide Fassungen (gebaut und gezeichnet), damit die Liste beim
- * Neuzeichnen nicht springt. */
-.listing .mk-mehr,.listing p.mk-mehr-nur{margin:0 0 10px}
-.listing .mk-mehr>summary,.listing p.mk-mehr-nur{display:flex;align-items:center;gap:6px;min-height:28px;
+/* „mehr" (Klaus 2026-11-27, umgebaut 2026-11-28). Die Zeile der Messwerte
+ * gehört den vier Zahlen allein; der Knopf „mehr" steht unten in der Fußzeile
+ * neben „Melden" (Klaus mit Bild: bei größerer Schrift lag „mehr" über der
+ * vierten Zahl). Der aufgeklappte Teil öffnet sich über den Knöpfen.
+ * Eine Höhe für beide Fassungen (gebaut und gezeichnet). */
+/* ⚠ `.listing .mk-mehr.mk-mess` und `.listing .mk-mehr p.mk-mehr-reihe`:
+ * die älteren Regeln `.listing .mk-mess{margin…}` und `.listing .mk-mess p`
+ * stehen weiter unten und gewannen sonst — die gezeichnete Karte wurde 4 px
+ * höher als die gebaute (gemessen 217 ⟷ 213). */
+.listing .mk-mehr,.listing .mk-mehr.mk-mess{margin:0 0 10px}
+.listing .mk-mehr p.mk-mehr-reihe{display:flex;align-items:center;min-height:28px;margin:0;
   -webkit-line-clamp:none;overflow:visible;min-width:0}
-.listing .mk-mehr>summary{cursor:pointer;list-style:none;border-radius:8px}
-.listing .mk-mehr>summary::-webkit-details-marker{display:none}
-.listing .mk-mehr>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.listing .mk-mehr-zu{margin-left:auto;flex:0 0 auto;font-family:var(--mono);font-size:.74rem;color:var(--accent);white-space:nowrap}
-.listing .mk-mehr-zu::after{content:" ▾";display:inline-block;transition:transform .18s}
-.listing .mk-mehr[open] .mk-mehr-zu::after{transform:rotate(180deg)}
-.listing .mk-mehr-innen{padding-top:8px}
+.listing .mk-mehr-innen{padding-top:10px}
+.listing .mk-mehr-innen[hidden]{display:none}
 .listing .mk-mehr-innen p{display:block;-webkit-line-clamp:none;overflow:visible;min-height:0;margin:0 0 6px;font-size:.82rem}
-.listing .mk-mehr-innen .mk-ms-btn{margin-top:4px}
-/* Die vier Werte: nur Symbol und Zahl, in EINER Reihe. Das Wort bleibt für
- * Vorleser im Text (wie `.nur-vorlesen`) und steht im `title`. */
-.listing .mk-ms-zeile{display:flex;flex-wrap:nowrap;gap:4px;min-width:0}
-.listing .mk-ms-zeile .mk-ms-w{padding:2px 6px;font-size:.74rem;gap:3px}
+.listing .mk-mehr-innen p.mk-mehr-knoepfe{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+/* Der Knopf „mehr": klein und schlicht, aber mit 44 px Trefffläche (wie der
+ * Melde-Knopf daneben). Er rückt nach rechts, neben „Melden". */
+.listing .mk-mehr-zu{margin-left:auto;min-height:44px;min-width:44px;padding:0 3px;border:0;background:none;
+  font-family:var(--mono);font-size:.76rem;color:var(--accent);cursor:pointer;white-space:nowrap;border-radius:8px}
+.listing .mk-mehr-zu::after{content:" ▾";display:inline-block;transition:transform .18s}
+.listing .mk-mehr-zu[aria-expanded="true"]::after{transform:rotate(180deg)}
+.listing .mk-mehr-zu:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.listing-foot .mk-fuss-rechts{display:flex;align-items:flex-end;gap:4px;margin-left:auto}
+.listing-foot .mk-fuss-rechts .mk-mehr-zu,.listing-foot .mk-fuss-rechts .mk-report{margin-left:0}
+/* Die vier Werte: nur Symbol und Zahl, in EINER Reihe, und sie teilen sich
+ * die Breite gleichmäßig (flex:1). Das Wort bleibt für Vorleser im Text
+ * (wie `.nur-vorlesen`) und steht im `title`. Reicht die Breite bei sehr
+ * großer Schrift wirklich nicht, brechen sie um, statt sich zu überdecken. */
+.listing .mk-ms-zeile{display:flex;flex-wrap:wrap;gap:4px;min-width:0;width:100%}
+.listing .mk-ms-zeile .mk-ms-w{flex:1 1 0;justify-content:center;padding:2px 4px;font-size:.74rem;gap:3px}
 .listing .mk-ms-k{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .listing .mk-mess--leer{color:var(--muted);font-size:.78rem;opacity:.85}
 /* Wächter-Band auf der Marktplatz-Karte (Stufe 3).
@@ -815,16 +826,20 @@ h2{font-size:1.55rem;margin:0 0 6px}
  * Schrift unter 10 px, und die kann niemand lesen. */
 .listing .ext,
 .listing .mk-ms-btn,
+.listing .mk-kaffee,
 .listing .listing-foot .btn:not(.mk-report){
-  font-family:var(--mono);font-size:.78rem;font-weight:600;
-  padding:10px 12px;border-radius:10px;
+  font-family:var(--mono);font-size:.76rem;font-weight:600;
+  /* 8 px seitlich seit 2026-11-28: mit „mehr" in der Fußzeile passen die
+     vier sonst am Monitor (Karte 302 px innen) nicht mehr in eine Reihe —
+     gemessen 331 px gebraucht. */
+  padding:10px 8px;border-radius:10px;
   justify-content:center;   /* Klaus: „steht auch nicht in der Mitte vom Button" */
   white-space:nowrap}       /* der Text bricht NIE um — siehe oben */
 /* Fußzeile der Marktplatz-Karte: Öffnen links, Melde-Knopf rechtsbündig mit Abstand. */
 /* min-height 44 = der Melde-Knopf. Die gebaute Seite trägt ihn nicht (er
  * braucht das Skript); ohne die Reserve wäre ihre Karte 7 px niedriger, und
  * die Liste spränge beim Neuzeichnen (gemessen 2026-11-27, 206 ⟷ 215 px). */
-.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;min-height:44px}
+.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:6px;flex-wrap:wrap;min-height:44px}
 .listing-foot .mk-report{margin-left:auto}
 /* Aktions-Block (Stufe 5): „Bewertung nachlesen" + Fußzeile kleben GEMEINSAM
    am Boden der Karte. Befund von Klaus 2026-08-02: allein die Fußzeile klebte,

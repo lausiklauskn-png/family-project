@@ -37,7 +37,7 @@ const browser = await chromium.launch({ executablePath: exe, args: ["--no-sandbo
 
 // Seite laden; setEndpoint=false simuliert „Formular-Dienst noch nicht eingerichtet".
 async function open(setEndpoint) {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ reducedMotion: "reduce" });   // flache Karte, siehe smoke_kartenknoepfe
   await page.addInitScript((useEp) => {
     window.__sent = [];        // fetch-Mitschnitt
     window.__mailto = null;    // mailto-Mitschnitt (statt echter Navigation)
@@ -266,7 +266,7 @@ console.log("Marktplatz — Melde-Knopf (Stufe 4)");
 
 // Impressum: Haftung für fremde Links + Meldeweg
 {
-  const page = await browser.newPage();
+  const page = await browser.newPage({ reducedMotion: "reduce" });   // flache Karte, siehe smoke_kartenknoepfe
   await page.goto(base + "/impressum.html", { waitUntil: "load" });
   const t = await page.evaluate(() => document.body.innerText);
   ok(/unverzüglich entfernt/i.test(t), "Impressum: Link wird bei bekannter Rechtsverletzung unverzüglich entfernt");

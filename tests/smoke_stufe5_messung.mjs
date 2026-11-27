@@ -792,7 +792,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
      * oben steht. Genau so ist er am 2026-08-06 rot geworden, als ein neuer
      * Eintrag oben einsortiert wurde -- der Test prueft aber die Nachbesserungs-
      * Liste, und die hat nur BookLedgerPro. */
-    await page.click('.listing:has([data-msid="markt-bookledgerpro"]) .mk-mehr > summary');   // erst „mehr“ (seit 2026-11-27)
+    await page.click('.listing:has([data-msid="markt-bookledgerpro"]) .mk-mehr-zu');   // erst „mehr“ (seit 2026-11-28 unten in der Fußzeile)
     await page.click('.listing [data-msid="markt-bookledgerpro"]');
     await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const d = await page.evaluate(() => {
@@ -827,7 +827,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
      * gehalten wird, wie oft schon, und welchen Wert die neuere Messung hatte.
      * Wer nachliest, soll nicht suchen muessen. */
     await page.evaluate(() => document.getElementById("mkMessOv").close());
-    await page.click('.listing:has([data-msid="markt-rezeptbuch"]) .mk-mehr > summary');   // erst „mehr“ (seit 2026-11-27)
+    await page.click('.listing:has([data-msid="markt-rezeptbuch"]) .mk-mehr-zu');   // erst „mehr“ (seit 2026-11-28 unten in der Fußzeile)
     await page.click('.listing [data-msid="markt-rezeptbuch"]');
     await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const dh = await page.evaluate(() => {
@@ -900,7 +900,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
     }));
     await p5.goto(base + "/markt.html", { waitUntil: "load" });
     await p5.waitForSelector(".listing .mk-ms-btn", { state: "attached", timeout: 20000 });
-    await p5.click(".listing:has(.mk-ms-btn) .mk-mehr > summary");   // erst „mehr“ (seit 2026-11-27)
+    await p5.click(".listing:has(.mk-ms-btn) .mk-mehr-zu");   // erst „mehr“ (seit 2026-11-28 unten in der Fußzeile)
     await p5.click(".listing .mk-ms-btn");
     await p5.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const l = await p5.evaluate(() => ({

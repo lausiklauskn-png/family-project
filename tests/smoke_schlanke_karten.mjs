@@ -54,7 +54,12 @@ try {
 /* Fremde Adressen (Logos auf github.io) werden abgewiesen: das Bild hat feste
  * Maße, sein Fehlen ändert keine Höhe — und die Probe hängt nicht am Netz. */
 async function seite(w, h, { js = true, bericht = null } = {}) {
-  const ctx = await br.newContext({ viewport: { width: w, height: h }, javaScriptEnabled: js });
+/* reducedMotion: die Probe misst die GESTALT der Karte. Seit 2026-11-27
+ * kippen Karten am Bildrand weg (assets/markt-blaettern.js); eine gekippte
+ * Karte ist im Bild auf einen Strich gestaucht (gemessen 37 px statt 217),
+ * und jede Messung mit getBoundingClientRect misst die Drehung mit. Bei
+ * „weniger Bewegung" kippt nichts. Das Kippen selbst misst smoke_blaettern. */
+  const ctx = await br.newContext({ viewport: { width: w, height: h }, javaScriptEnabled: js, reducedMotion: "reduce" });
   const pg = await ctx.newPage();
   await pg.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
   if (bericht) await pg.route("**/assets/config/spore-stand.json*", (r) => r.fulfill({
@@ -86,11 +91,17 @@ if (br) {
       const lh = (el) => parseFloat(getComputedStyle(el).lineHeight);
       const karten = k.map((e) => {
         const img = e.querySelector(".img"), h3 = e.querySelector("h3");
-        const txt = e.querySelector(".body > p:not(.by):not(.mk-mehr-nur):not(.mk-wache):not(.mk-naehe)");
+        const txt = e.querySelector(".body > p:not(.by):not(.mk-wache):not(.mk-naehe)");
         const pills = [...e.querySelectorAll(".mk-ms-zeile .mk-ms-w")];
-        const zeile = e.querySelector(".mk-mehr > summary, .mk-mehr-nur");
+        const zeile = e.querySelector(".mk-mehr-reihe");
+        /* Seit 2026-11-28 steht „mehr“ unten neben „Melden“ (Klaus: bei
+         * großer Schrift lag es über der vierten Zahl). Gemessen wird, dass
+         * es NICHT in der Zeile der Messwerte steht und rechts neben dem
+         * Melde-Knopf in derselben Reihe. */
+        const mz = e.querySelector(".mk-mehr-zu"), mr = e.querySelector(".mk-report");
+        const mzr = mz && r(mz), mrr = mr && r(mr);
         const knopf = e.querySelector(".mk-ms-btn");
-        const det = e.querySelector("details.mk-mehr");
+        const panel = e.querySelector(".mk-mehr-innen");
         return {
           img: img ? { w: Math.round(r(img).width), h: Math.round(r(img).height), rechts: r(img).right, oben: r(img).top, unten: r(img).bottom } : null,
           h3: h3 ? { links: r(h3).left, mitte: (r(h3).top + r(h3).bottom) / 2 } : null,
@@ -103,7 +114,10 @@ if (br) {
           /* `checkVisibility()`, nicht die Höhe: der Inhalt eines
            * zugeklappten <details> behält in Chrome seine Maße. */
           knopfSichtbar: knopf ? knopf.checkVisibility() : false,
-          offen: det ? det.open : false,
+          offen: panel ? !panel.hidden : false,
+          mehrInZeile: !!(zeile && mz && zeile.contains(mz)),
+          mehrBeiMelden: mz && mr ? (Math.abs((mzr.top + mzr.bottom) / 2 - (mrr.top + mrr.bottom) / 2) < 30 && mzr.right <= mrr.left + 1) : null,
+          pillUeberlapp: pills.some((p, i) => i > 0 && r(p).left < r(pills[i - 1]).right - 0.5 && Math.round(r(p).top) === Math.round(r(pills[i - 1]).top)),
         };
       });
       return {
@@ -133,9 +147,36 @@ if (br) {
       `${L.w} px: die vier Messwerte stehen in EINER Reihe`);
     ok(m.karten.every((x) => !x.zeileKnapp),
       `${L.w} px: … und die Reihe ist nicht abgeschnitten`);
+    ok(m.karten.every((x) => !x.mehrInZeile), `${L.w} px: „mehr“ steht NICHT in der Zeile der Messwerte`);
+    ok(m.karten.filter((x) => x.mehrBeiMelden !== null).length > 0 && m.karten.every((x) => x.mehrBeiMelden !== false),
+      `${L.w} px: „mehr“ steht unten links neben „Melden“, auf derselben Höhe`);
+    ok(m.karten.every((x) => !x.pillUeberlapp), `${L.w} px: keine Messwert-Pille liegt über ihrer Nachbarin`);
     const mitKnopf = m.karten.filter((x) => x.knopfDa);
     ok(mitKnopf.length > 0 && mitKnopf.every((x) => !x.offen && !x.knopfSichtbar),
       `${L.w} px: „Bewertung nachlesen" liegt zugeklappt unter „mehr"`, `${mitKnopf.length} Karten mit Knopf`);
+    await ctx.close();
+  }
+
+  /* Klaus' Handy (2026-11-28, mit Bild) zeigt die Schrift deutlich größer
+   * als der Testbrowser: dort lag „mehr“ über der vierten Zahl. Gestellt mit
+   * 125 % Grundschrift bei 412 px. */
+  {
+    console.log("\nHandy mit großer Schrift (125 %)");
+    const { ctx, pg } = await seite(412, 915);
+    await pg.addStyleTag({ content: "html{font-size:125% !important}" });
+    await pg.waitForTimeout(300);
+    const g = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => {
+      const r = (el) => el.getBoundingClientRect();
+      const pills = [...e.querySelectorAll(".mk-ms-zeile .mk-ms-w")];
+      const mz = e.querySelector(".mk-mehr-zu"), mr = e.querySelector(".mk-report"), z = e.querySelector(".mk-mehr-reihe");
+      return {
+        ueber: pills.some((p, i) => i > 0 && r(p).left < r(pills[i - 1]).right - 0.5 && Math.round(r(p).top) === Math.round(r(pills[i - 1]).top)),
+        knapp: z ? z.scrollWidth > z.clientWidth + 1 : false,
+        paar: mz && mr ? Math.abs((r(mz).top + r(mz).bottom) / 2 - (r(mr).top + r(mr).bottom) / 2) < 30 && r(mz).right <= r(mr).left + 1 : null,
+      };
+    }));
+    ok(g.every((x) => !x.ueber && !x.knapp), "große Schrift: keine Pille liegt über einer anderen, nichts ist abgeschnitten");
+    ok(g.some((x) => x.paar !== null) && g.every((x) => x.paar !== false), "große Schrift: „mehr“ und „Melden“ stehen zusammen in einer Reihe");
     await ctx.close();
   }
 
@@ -151,7 +192,7 @@ if (br) {
     });
     ok(t.sicht.length > 120 && t.html, "der volle Text steht im HTML, sichtbar sind nur zwei Zeilen davon", `${t.sicht.length} Zeichen`);
 
-    await pg.click(".listing:has(.mk-ms-btn) .mk-mehr > summary");
+    await pg.click(".listing:has(.mk-ms-btn) .mk-mehr-zu");
     const auf = await pg.evaluate(() => {
       const k = document.querySelector(".listing:has(.mk-ms-btn)");
       const b = k.querySelector(".mk-ms-btn").getBoundingClientRect();
@@ -182,7 +223,7 @@ if (br) {
 
   /* Gebaute Seite (ohne Skript) und gezeichnete Seite (mit Skript) sind
    * gleich hoch — sonst spränge die Liste, sobald das Skript neu zeichnet.
-   * Der Platzhalter `.mk-mehr-nur` in der gebauten Fassung hält die Zeile frei,
+   * Die leere Zeile `.mk-mehr-reihe` in der gebauten Fassung hält die Zeile frei,
    * in der danach die Messwerte stehen. */
   {
     console.log("\nOhne und mit Skript gleich hoch");

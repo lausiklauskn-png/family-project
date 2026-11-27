@@ -74,7 +74,12 @@ const schmalste = [];
 
 if (br) {
   for (const w of BREITEN) {
-    const ctx = await br.newContext({ viewport: { width: w, height: 900 } });
+/* reducedMotion: die Probe misst die GESTALT der Karte. Seit 2026-11-27
+     * kippen Karten am Bildrand weg (assets/markt-blaettern.js); eine gekippte
+     * Karte ist im Bild auf einen Strich gestaucht (gemessen 37 px statt 217),
+     * und jede Messung mit getBoundingClientRect misst die Drehung mit. Bei
+     * „weniger Bewegung" kippt nichts. Das Kippen selbst misst smoke_blaettern. */
+    const ctx = await br.newContext({ viewport: { width: w, height: 900 }, reducedMotion: "reduce" });
     const pg = await ctx.newPage();
     await pg.goto(`${basis}/markt.html`, { waitUntil: "domcontentloaded" });
     await pg.waitForSelector(".listing .listing-foot .btn", { timeout: 20000 });
@@ -95,7 +100,7 @@ if (br) {
       const body = k.querySelector(".body") || k;
       /* Seit 2026-11-27 liegt der Referenz-Knopf unter „mehr“; zugeklappt
        * hätte er keine Maße, und jeder Vergleich mit ihm mäße nichts. */
-      const zu = k.querySelector("details.mk-mehr"); if (zu) zu.open = true;
+      const zu = k.querySelector(".mk-mehr-zu"); if (zu && zu.getAttribute("aria-expanded") !== "true") zu.click();
       const ref = k.querySelector(".mk-ms-btn");
       const text = [...k.querySelectorAll(".listing-foot .btn:not(.mk-report)")];
       const melde = k.querySelector(".listing-foot .mk-report");
@@ -228,7 +233,8 @@ ok(/mk_details: "Einzelheiten"/.test(statisch) && /mk_details: "Details"/.test(s
  * es an drei Stellen, liefen sie beim nächsten Handgriff auseinander — und
  * genau so ist dieser Befund entstanden. */
 const css = lies("assets/style.css");
-const block = /\.listing \.ext,\s*\n\.listing \.mk-ms-btn,\s*\n\.listing \.listing-foot \.btn:not\(\.mk-report\)\{([\s\S]*?)\}/.exec(css);
+// Seit 2026-11-28 gehört auch die Kaffeekasse (☕ unter „mehr“) zur Familie.
+const block = /\.listing \.ext,\s*\n\.listing \.mk-ms-btn,\s*\n(?:\.listing \.mk-kaffee,\s*\n)?\.listing \.listing-foot \.btn:not\(\.mk-report\)\{([\s\S]*?)\}/.exec(css);
 ok(!!block, "Schrift, Polster und Rundung der drei Knöpfe stehen in EINER Regel");
 ok(!!block && /white-space:nowrap/.test(block[1]), "… und sie trägt white-space:nowrap");
 ok(!!block && /justify-content:center/.test(block[1]), "… und justify-content:center");
