@@ -53,19 +53,19 @@
     },
     "rezeptbuch-pro": {
       "repo": "lausiklauskn-png/Mein-Rezeptbuch",
-      "stand": "28fe534",
-      "pfad": "icons/icon-book-1024.png",
+      "stand": "fc8f54e",
+      "pfad": "paket/zeichen/rezeptbuch/icon-only.png",
       "datei": "rezeptbuch-pro.png",
-      "sha256": "ab48cea51ee3bf700413d27d2bf24c29d08301b9e6e470d2539c8b0da0be7196",
-      "_": "vorläufig das Symbol der Web-App; das dunkle Pro-Symbol kommt mit der Pro-Fassung"
+      "sha256": "eaa67ceafe414d7992c3bf3d6e877d69f013e25c544a2e0249245855bb66cdc1",
+      "_": "Pro-Symbol aus dem Bau-Paket (Klaus 2026-11-27: Web-App-Symbol war falsch)"
     },
     "mixarium-pro": {
       "repo": "lausiklauskn-png/Mein-Mixarium",
-      "stand": "02ff25c",
-      "pfad": "icons/mixarium-192.png",
+      "stand": "0bda1c2",
+      "pfad": "paket/zeichen/mixarium-voll/icon-only.png",
       "datei": "mixarium-pro.png",
-      "sha256": "410136308ca611c7bbe7a85dac397730346f05f7e811e60f4106f7822d41eac5",
-      "_": "vorläufig das Symbol der Web-App; das dunkle Pro-Symbol kommt mit der Pro-Fassung"
+      "sha256": "158912ec206d539217ef91f1e0ef83c60c64ade46de6dcb492e7f20ea51a6e29",
+      "_": "Pro-Symbol aus dem Bau-Paket (Ausgabe mixarium-voll; Klaus 2026-11-27: Web-App-Symbol war falsch)"
     },
     "pseudodoc-pro": {
       "repo": "lausiklauskn-png/PseudoDoc",
