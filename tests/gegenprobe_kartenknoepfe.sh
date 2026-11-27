@@ -133,6 +133,7 @@ fall 'der Pfeil kommt in den Laufzeit-Zeichner zurueck' markt.html \
 fall 'aus einer Regel werden wieder drei' assets/style.css \
   '.listing .ext,
 .listing .mk-ms-btn,
+.listing .mk-kaffee,
 .listing .listing-foot .btn:not(.mk-report){' \
   '.listing .ext{font-family:var(--mono);font-size:.78rem}
 .listing .mk-ms-btn{font-family:var(--mono);font-size:.78rem}

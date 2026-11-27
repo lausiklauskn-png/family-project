@@ -117,7 +117,10 @@ if (br) {
           offen: panel ? !panel.hidden : false,
           mehrInZeile: !!(zeile && mz && zeile.contains(mz)),
           mehrBeiMelden: mz && mr ? (Math.abs((mzr.top + mzr.bottom) / 2 - (mrr.top + mrr.bottom) / 2) < 30 && mzr.right <= mrr.left + 1) : null,
-          pillUeberlapp: pills.some((p, i) => i > 0 && r(p).left < r(pills[i - 1]).right - 0.5 && Math.round(r(p).top) === Math.round(r(pills[i - 1]).top)),
+          /* Überdeckt wird mit dem TEXT, nicht mit dem Kasten: eine Pille, die
+           * unter ihre Zahl schrumpft, behält einen sauberen Kasten und lässt
+           * die Zahl hinausragen (die Gegenprobe war damit zuerst BLIND). */
+          pillUeberlapp: pills.some((p, i) => p.scrollWidth > p.clientWidth + 1 || (i > 0 && r(p).left < r(pills[i - 1]).right - 0.5 && Math.round(r(p).top) === Math.round(r(pills[i - 1]).top))),
         };
       });
       return {
@@ -170,7 +173,7 @@ if (br) {
       const pills = [...e.querySelectorAll(".mk-ms-zeile .mk-ms-w")];
       const mz = e.querySelector(".mk-mehr-zu"), mr = e.querySelector(".mk-report"), z = e.querySelector(".mk-mehr-reihe");
       return {
-        ueber: pills.some((p, i) => i > 0 && r(p).left < r(pills[i - 1]).right - 0.5 && Math.round(r(p).top) === Math.round(r(pills[i - 1]).top)),
+        ueber: pills.some((p, i) => p.scrollWidth > p.clientWidth + 1 || (i > 0 && r(p).left < r(pills[i - 1]).right - 0.5 && Math.round(r(p).top) === Math.round(r(pills[i - 1]).top))),
         knapp: z ? z.scrollWidth > z.clientWidth + 1 : false,
         paar: mz && mr ? Math.abs((r(mz).top + r(mz).bottom) / 2 - (r(mr).top + r(mr).bottom) / 2) < 30 && r(mz).right <= r(mr).left + 1 : null,
       };

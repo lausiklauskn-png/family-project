@@ -103,7 +103,7 @@ fall 'ZEILEN: der Text klemmt wieder auf drei Zeilen' assets/style.css \
 fall 'REIHE: die Woerter der Messwerte stehen wieder in der Pille' assets/style.css \
   '.listing .mk-ms-k{position:absolute;width:1px;height:1px;' \
   '.listing .mk-ms-k{position:static;width:auto;height:auto;' \
-  'nicht abgeschnitten'
+  'in EINER Reihe'
 
 # Die Pillen teilen sich die Breite nicht mehr und duerfen nicht umbrechen:
 # bei grosser Schrift liegen sie dann uebereinander (Klaus' Bild 2026-11-28).
