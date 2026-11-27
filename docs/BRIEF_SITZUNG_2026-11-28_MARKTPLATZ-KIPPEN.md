@@ -39,3 +39,28 @@ fast eine – du musst sehen, was am besten ist. Dass wir nicht mehr so weit scr
   `aria-valuenow`. Bei reduced-motion bleibt er (er ist keine Bewegung), das Kippen nicht.
 - Regeln: `seiten-bauregeln` (Layout: kein Springen, Bewegung abschaltbar), Proben im echten Browser bei mehreren
   Breiten, Gegenprobe je Riegel, Cache-Bump. Am Tablet misst nur Klaus.
+
+## ⚠ Nachtrag, Vorrang (Klaus 2026-11-27, 20:40): ZUERST die Karten verschlanken
+*„Sehr große Container … mit 40 Apps ist das ganz schön viel, auch für ein kleines Handy oder einen Monitor. Das
+Scrollen dauert ewig. … Logos kleiner. Im Groben dasselbe Layout. Gerne mehrere nebeneinander, 3 ist besser als 4
+(die Augen wandern sonst). Ziel: in 3–4 Bildschirmen komplett durch. Text direkt unter den Namen, kein großer
+Abstand. Vielleicht Logo, Text, Leistung sichtbar und den Rest eingeklappt. Lass dir was einfallen.“*
+
+**Gezählt an seinem Bild (1920 px breit, 27.11.):** 3 Karten je Reihe, eine Karte ≈ 760 px hoch: Bild ≈ 220 px,
+großer leerer Abstand zwischen „@klaus“ und Text (≈ 50 px), 3 Zeilen Text, 2 Reihen Messwerte, „Alle vier Werte sind
+gut (… am …)“, „Von uns persönlich geprüft …“, Knopf „Bewertung nachlesen“, Fußleiste (Einzelheiten · Zur Seite ·
+Melden). 39 Karten = 13 Reihen ≈ 10 000 px ≈ **11 Bildschirme**. Für 3–4 Bildschirme muss eine Reihe auf ≈ 250–300 px.
+
+**Vorschlag (vor dem Bau mit Klaus kurz abstimmen):**
+- Bild nicht mehr als Breitbild oben, sondern **Logo quadratisch 64–72 px links neben Name und @anbieter** (wie die
+  Karten in PWA Toolpoint); Text **direkt darunter, 2 Zeilen** geklemmt (voller Text bleibt im Markup, für Suche/SEO).
+- **Messwerte in EINER Reihe** kompakt (4 kleine Pillen, Farbe je Stufe bleibt).
+- „Alle vier Werte …“, „Von uns geprüft …“, „Bewertung nachlesen“ in ein **„▸ mehr“** (`<details>`), zu Anfang zu.
+- Fußleiste bleibt (Einzelheiten · Zur Seite · Melden, Knöpfe-Familie vom 2026-09-22, Melden ≥ 44×44).
+- **3 Spalten** am Monitor, 2 am Tablet, 1 am Handy; Raster mit `max-width`, damit 3 nicht über 1920 px gezogen werden.
+- Danach erst Wegkippen und Schieberegler (oben); mit kurzen Karten wirkt das Kippen besser, nicht schlechter.
+- ⚠ Fallen: die Karte gibt es **zweimal** (`tools/statische-listen.mjs` → `marktHtml()` und `card()` in `markt.html`),
+  beide ändern. Viele Proben zählen Karten/Knöpfe (`smoke_all`, `smoke_kartenknoepfe`, `smoke_stufe5_messung`,
+  `smoke_markt_vecpack`, `smoke_detail_gestalt`, `smoke_wartung`, `smoke_markt_melden`) – Zusicherungen nachziehen, nicht
+  schwächen. Skill `app-container-schaufenster` lesen. Messen bei 360 · 412 · 900 · 1280 · 1920 px: Höhe einer Reihe und
+  Bildschirme bis zum Ende, vorher/nachher. Kein CLS. Cache-Bump.
