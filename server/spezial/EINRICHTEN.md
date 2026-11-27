@@ -71,4 +71,10 @@ Erwartet: `ok`, eine Liste mit Fassungen, und **404** beim dritten (Dateien gibt
 | Dienst antwortet nicht | `docker logs --tail 50 spezial` (Cloud-Server, in `/opt/relay`) |
 | neue Fassung von `dienst.mjs` | `git -C /srv/family-project pull && docker restart spezial` |
 
+**Zweiter Weg (2026-11-27):** BookLedger Pro und Datei-Organizer Pro legen ihren Windows-Installer nur auf
+`family-projekt.de/updates/<ordner>/`, nicht an ein GitHub-Release. `quellen.json` nennt das je App unter `server.windows`;
+der Spiegel holt dann `aktuell-windows.json` samt `.sig`, prüft die Unterschrift gegen den Schlüssel, der in der App
+eingebaut ist, und danach Größe und SHA-256. Nichts einzurichten: der Server zieht `main` alle 2 Minuten, der Spiegel
+läuft stündlich. Sofort: `docker run --rm -v /srv/family-project:/app:ro -v /srv/spezial:/daten node:22-alpine node /app/server/spezial/spiegeln.mjs` (Cloud-Server).
+
 Wer wie oft geladen hat: `cat /srv/spezial/zaehler.json` (je Passkey-Kennung, kein Name).

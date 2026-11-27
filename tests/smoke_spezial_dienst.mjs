@@ -2,7 +2,7 @@
 // Ohne Browser, ohne Netz. node tests/smoke_spezial_dienst.mjs
 import http from "node:http";
 import { mkdtemp, writeFile, readFile, mkdir } from "node:fs/promises";
-import { createHash } from "node:crypto";
+import { createHash, generateKeyPairSync, sign as edSign } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -38,12 +38,26 @@ const gh = http.createServer((req, res) => {
       { tag_name: "v0.9.10", published_at: "2026-11-24", assets: [{ name: "Alt.apk", size: 1, browser_download_url: basis + "/x" }] }
     ]));
   }
+  // gestellter eigener Update-Server (family-projekt.de/updates/<ordner>/)
+  if (u.pathname === "/updates/testapp/aktuell-windows.json") { res.writeHead(200); return res.end(FEED.text); }
+  if (u.pathname === "/updates/testapp/aktuell-windows.json.sig") { res.writeHead(200); return res.end(FEED.sig); }
+  if (u.pathname === "/updates/testapp/Test-Pro-Windows-1.2.3-x64-setup.exe") { res.writeHead(200); return res.end(FEED.exe); }
   if (u.pathname.startsWith("/repos/")) { res.writeHead(200, { "Content-Type": "application/json" }); return res.end("[]"); }
   if (u.pathname === "/dl/apk") { res.writeHead(200); return res.end(APK); }
   if (u.pathname === "/dl/exe") { res.writeHead(200); return res.end(EXE); }
   res.writeHead(404); res.end();
 });
 await new Promise((ok) => gh.listen(0, "127.0.0.1", ok));
+
+// ── Feed des eigenen Update-Servers (Ed25519 wie windows-release.yml) ──
+const ED = generateKeyPairSync("ed25519"), ED2 = generateKeyPairSync("ed25519");
+const PUB = ED.publicKey.export({ type: "spki", format: "der" }).toString("base64");
+const SEXE = Buffer.from("SERVER-EXE-" + "z".repeat(9000));
+function feedBauen({ app = "testapp", exe = SEXE, schl = ED.privateKey, sha = shaHex(SEXE) } = {}) {
+  const text = JSON.stringify({ format: 1, app, version: "1.2.3", datum: "2026-11-27", windows: { datei: "Test-Pro-Windows-1.2.3-x64-setup.exe", groesse: SEXE.length, sha256: sha } }, null, 2) + "\n";
+  return { text, sig: edSign(null, Buffer.from(text), schl).toString("base64") + "\n", exe };
+}
+let FEED = feedBauen();
 
 // ── waehle() einzeln gefragt ────────────────────────────────────────────
 const { waehle, spiegeln } = await import(pathToFileURL(join(WURZEL, "server/spezial/spiegeln.mjs")).href);
@@ -57,22 +71,34 @@ soll("waehle: ohne passende Datei → null", waehle([{ tag_name: "v1", assets: [
 soll("waehle: ein Dateiname mit Pfad wird nicht genommen", waehle([{ tag_name: "v1", assets: [{ name: "../böse.apk" }] }], "android", cfg) === null);
 soll("quellen.json: jede Kennung passt zum Passkey-Muster", cfg.apps.every((a) => K.APP_RE.test(a.id)) && new Set(cfg.apps.map((a) => a.id)).size === cfg.apps.length);
 
+const { feedPruefen } = await import(pathToFileURL(join(WURZEL, "server/spezial/spiegeln.mjs")).href);
+soll("feedPruefen: richtig unterschriebener Feed → Datei", feedPruefen(FEED.text, FEED.sig, PUB, "windows", "testapp").datei === "Test-Pro-Windows-1.2.3-x64-setup.exe");
+soll("feedPruefen: fremde Unterschrift wird abgewiesen", /Unterschrift/.test(feedPruefen(FEED.text, feedBauen({ schl: ED2.privateKey }).sig, PUB, "windows", "testapp").fehler || ""));
+soll("feedPruefen: ein nachträglich geänderter Feed wird abgewiesen", /Unterschrift/.test(feedPruefen(FEED.text.replace("1.2.3", "9.9.9"), FEED.sig, PUB, "windows", "testapp").fehler || ""));
+soll("feedPruefen: Feed einer anderen App wird abgewiesen", /andere/.test(feedPruefen(feedBauen({ app: "fremd" }).text, feedBauen({ app: "fremd" }).sig, PUB, "windows", "testapp").fehler || ""));
+soll("quellen.json: BookLedger Pro und Datei-Organizer holen Windows vom eigenen Update-Server (Ed25519-Schlüssel)",
+  ["bookledger-pro", "datei-organizer"].every((id) => { const s = cfg.apps.find((a) => a.id === id)?.server?.windows; return s && /^[a-z0-9-]+$/.test(s.ordner) && /^MCowBQYDK2VwAyEA[A-Za-z0-9+/]{43}=$/.test(s.schluessel); }));
+
+// Die GitHub-Läufe unten fahren ohne Server-Weg (der echte Update-Server ist hier nicht erreichbar); er hat seinen eigenen Block.
+const QG = join(await mkdtemp(join(tmpdir(), "spezial-q-")), "quellen-ohne-server.json");
+await writeFile(QG, JSON.stringify({ ...cfg, apps: cfg.apps.map(({ server, ...a }) => a) }));
+
 // ── Spiegel ─────────────────────────────────────────────────────────────
 const DATEN = await mkdtemp(join(tmpdir(), "spezial-"));
 const logs = [];
 const api = "http://127.0.0.1:" + gh.address().port;
-const rc = await spiegeln({ daten: DATEN, api, log: (s) => logs.push(s) });
+const rc = await spiegeln({ quellen: QG, daten: DATEN, api, log: (s) => logs.push(s) });
 soll("Spiegel: erster Lauf ohne Fehler", rc === 0, logs.join(" | "));
 const stand = JSON.parse(await readFile(join(DATEN, "stand.json"), "utf8"));
 const pa = stand.apps["private-akte"];
 soll("Spiegel: nimmt die neueste Freigabe, nicht Entwurf/Test", pa?.android?.tag === "v0.9.11" && pa.android.datei === "Private-Akte-Pro-0.9.11.apk", JSON.stringify(pa));
 soll("Spiegel: SHA-256 der abgelegten APK stimmt", pa?.android?.sha256 === shaHex(APK) && (await readFile(join(DATEN, "dateien/private-akte", pa.android.datei))).equals(APK));
 soll("Spiegel: Windows-Installer liegt", pa?.windows?.datei === "Private-Akte-Pro_0.9.11_x64-setup.exe");
-const vorher = abrufe; await spiegeln({ daten: DATEN, api, log: (s) => logs.push(s) });
+const vorher = abrufe; await spiegeln({ quellen: QG, daten: DATEN, api, log: (s) => logs.push(s) });
 soll("Spiegel: zweiter Lauf fragt mit If-None-Match (304, nichts neu)", abrufe === vorher + 1 && logs.some((l) => /private-akte: unverändert/.test(l)));
 // eine geänderte Zeile in quellen.json gilt sofort, auch wenn GitHub 304 antworten würde
 const Q2 = join(DATEN, "quellen-geaendert.json");
-await writeFile(Q2, JSON.stringify({ ...cfg, apps: cfg.apps.map((a) => a.id === "private-akte" ? { ...a, vorab: ["windows"] } : a) }));
+await writeFile(Q2, JSON.stringify({ ...cfg, apps: JSON.parse(await readFile(QG, "utf8")).apps.map((a) => a.id === "private-akte" ? { ...a, vorab: ["windows"] } : a) }));
 const logs3 = []; await spiegeln({ quellen: Q2, daten: DATEN, api, log: (s) => logs3.push(s) });
 soll("Spiegel: nach geänderter Einstellung wird ohne If-None-Match neu gewählt", !logs3.some((l) => /private-akte: unverändert/.test(l)) && logs3.some((l) => /private-akte\/android: .* liegt schon/.test(l)), logs3.join(" | "));
 
@@ -80,10 +106,29 @@ soll("Spiegel: nach geänderter Einstellung wird ohne If-None-Match neu gewählt
 falschesDigest = true;
 const DATEN2 = await mkdtemp(join(tmpdir(), "spezial-"));
 const logs2 = [];
-const rc2 = await spiegeln({ daten: DATEN2, api, log: (s) => logs2.push(s) });
+const rc2 = await spiegeln({ quellen: QG, daten: DATEN2, api, log: (s) => logs2.push(s) });
 const st2 = JSON.parse(await readFile(join(DATEN2, "stand.json"), "utf8"));
 soll("Spiegel: falsche SHA-256 → nicht abgelegt, Fehler gemeldet", rc2 === 1 && !st2.apps["private-akte"].android && logs2.some((l) => /SHA-256 passt nicht/.test(l)), logs2.join(" | "));
 falschesDigest = false;
+
+// zweiter Weg: Windows vom eigenen Update-Server, Android weiter aus GitHub
+const QS = join(DATEN2, "quellen-server.json");
+await writeFile(QS, JSON.stringify({ ...cfg, apps: [{ id: "private-akte", name: "Private Akte Pro", repo: "Private-Akte", server: { windows: { ordner: "testapp", app: "testapp", schluessel: PUB } } }] }));
+const DATEN3 = await mkdtemp(join(tmpdir(), "spezial-")), updates = api + "/updates/";
+const logs4 = []; const rc4 = await spiegeln({ quellen: QS, daten: DATEN3, api, updates, log: (s) => logs4.push(s) });
+const st4 = JSON.parse(await readFile(join(DATEN3, "stand.json"), "utf8")).apps["private-akte"];
+soll("Spiegel: Windows kommt vom Update-Server, geprüft und abgelegt", rc4 === 0 && st4?.windows?.datei === "Test-Pro-Windows-1.2.3-x64-setup.exe" && st4.windows.version === "1.2.3" && (await readFile(join(DATEN3, "dateien/private-akte", st4.windows.datei))).equals(SEXE), logs4.join(" | "));
+soll("Spiegel: Android kommt dabei weiter aus GitHub", st4?.android?.datei === "Private-Akte-Pro-0.9.11.apk");
+FEED = feedBauen({ exe: Buffer.from("ANDERS-" + "q".repeat(SEXE.length - 7)) });
+const DATEN4 = await mkdtemp(join(tmpdir(), "spezial-")), logs5 = [];
+const rc5 = await spiegeln({ quellen: QS, daten: DATEN4, api, updates, log: (s) => logs5.push(s) });
+soll("Spiegel: Server-Datei mit falscher SHA-256 → nicht abgelegt", rc5 === 1 && !JSON.parse(await readFile(join(DATEN4, "stand.json"), "utf8")).apps["private-akte"].windows, logs5.join(" | "));
+FEED = feedBauen({ schl: ED2.privateKey });
+const logs6 = []; const rc6 = await spiegeln({ quellen: QS, daten: DATEN3, api, updates, log: (s) => logs6.push(s) });
+soll("Spiegel: falsche Unterschrift → Fehler, die vorhandene Datei bleibt", rc6 === 1 && logs6.some((l) => /Unterschrift/.test(l)) && JSON.parse(await readFile(join(DATEN3, "stand.json"), "utf8")).apps["private-akte"].windows?.datei === "Test-Pro-Windows-1.2.3-x64-setup.exe", logs6.join(" | "));
+FEED = feedBauen();
+const logs7 = []; await spiegeln({ quellen: QS, daten: DATEN3, api, updates, log: (s) => logs7.push(s) });
+soll("Spiegel: auch wenn GitHub 304 sagt, wird der Update-Server gefragt", logs7.some((l) => /private-akte: unverändert/.test(l)) && logs7.some((l) => /private-akte\/windows: .* liegt schon/.test(l)), logs7.join(" | "));
 
 // ── Dienst ──────────────────────────────────────────────────────────────
 const geheimFp = noble.utils.randomPrivateKey(), geheimTp = noble.utils.randomPrivateKey(), fremd = noble.utils.randomPrivateKey();

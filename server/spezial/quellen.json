@@ -36,7 +36,15 @@
     {
       "id": "datei-organizer",
       "name": "Datei-Organizer Pro",
-      "repo": "Datei-Organizer"
+      "repo": "Datei-Organizer",
+      "server": {
+        "windows": {
+          "ordner": "datei-organizer",
+          "app": "datei-organizer",
+          "schluessel": "MCowBQYDK2VwAyEAfdutRiXMBL+fOEgDuf4y7oaGaOFhP9NAjSa760JUQYw="
+        }
+      },
+      "_server": "Windows-Installer liegt nur auf family-projekt.de/updates/datei-organizer/ (windows-release.yml lädt nicht nach GitHub). Schlüssel = SCHLUESSEL in windows/engine/src/DesktopUpdates.java des Repos."
     },
     {
       "id": "workflow-pdf-pro",
@@ -46,7 +54,15 @@
     {
       "id": "bookledger-pro",
       "name": "BookLedger Pro",
-      "repo": "BookLedgerPro"
+      "repo": "BookLedgerPro",
+      "server": {
+        "windows": {
+          "ordner": "bookledgerpro",
+          "app": "bookledgerpro",
+          "schluessel": "MCowBQYDK2VwAyEAojPTWOhCLk0Cc+O6jKKf7yzdJglEaZ+ZBKF8PM7YLgs="
+        }
+      },
+      "_server": "Windows-Installer liegt nur auf family-projekt.de/updates/bookledgerpro/ (windows-release.yml lädt nicht nach GitHub). Schlüssel = SCHLUESSEL in windows/engine/src/DesktopUpdates.java des Repos."
     },
     {
       "id": "familienbuero-pro",

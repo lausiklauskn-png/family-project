@@ -38,5 +38,9 @@ fall "Vorabfassung wird nie genommen" $S '(!r.prerelease || (Array.isArray(app.v
 fall "SHA-Vergleich fehlt" $S 'if (w.sha256Quelle && g.sha256 !== w.sha256Quelle)' 'if (false)' 'falsche SHA-256'
 fall "Sperre ohne Unterschrift angenommen" $D 'if (!r.ok) return antwort(res, 403, { ok: false, warum: r.warum }, cors);' '' 'fremdem Schlüssel'
 fall "Link ohne Prüfmarke" $D 'if (ist.length !== soll.length || !timingSafeEqual(ist, soll)) return null;' '' 'verbogener Link'
+fall "Unterschrift des Feeds ungeprüft" $S 'if (!ok) return { fehler: "Unterschrift des Feeds passt nicht" };' '' 'fremde Unterschrift wird abgewiesen'
+fall "Feed einer anderen App angenommen" $S 'if (appName && f.app !== appName)' 'if (false)' 'anderen App wird abgewiesen'
+fall "bei GitHub-304 wird der Update-Server übersprungen" $S '{ log(`= ${app.id}: unverändert`); ghUnveraendert = true; }' '{ log(`= ${app.id}: unverändert`); continue; }' 'auch wenn GitHub 304'
+fall "Server-Weg ausgebaut (Windows wieder aus GitHub)" $S 'if (server[art]) {' 'if (false) {' 'kommt vom Update-Server'
 echo "$gef schlagen an · $blind blind · $tot tote Anker"
 [ $blind -eq 0 ] && [ $tot -eq 0 ]
