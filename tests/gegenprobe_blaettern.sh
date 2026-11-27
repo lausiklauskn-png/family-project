@@ -85,8 +85,10 @@ fall 'REGLER-TASTE: die Tastatur bewegt nichts' assets/markt-blaettern.js \
 fall 'KIPP-AUS: es kippt gar nichts mehr' assets/markt-blaettern.js \
   'k.el.classList.toggle("kipp-weg", raus);' 'k.el.classList.toggle("kipp-weg", false);' \
   'kippen Karten weg'
+# ⚠ Der erste Lauf war BLIND: `zuWenig` allein zu kippen reichte nicht, ob
+# eine Karte kippt, entscheidet erst „oben raus" / „unten rein".
 fall 'KIPP-ZU-FRUEH: auch ganz sichtbare Karten kippen' assets/markt-blaettern.js \
-  'var zuWenig = anteil < schwelle && !fuelltAlles;' 'var zuWenig = anteil < 1.01;' \
+  'var rein = zuWenig && !raus && unten > bild;' 'var rein = !raus;' \
   'ganz sichtbare Karte steht gerade'
 fall 'KIPP-FLACKERN: gemessen wird die gekippte Karte' assets/markt-blaettern.js \
   'karten.push({ el: g[i], oben: obenImDokument(g[i]), hoehe: g[i].offsetHeight });' \

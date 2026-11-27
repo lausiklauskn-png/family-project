@@ -1683,3 +1683,35 @@ die Sabotage nahm nur `position:absolute` heraus, `width:1px` blieb, die Wörter
 `gegenprobe_angleichen` 2 blind („eine App von PWA Toolpoint fehlt hier", „ein .mp4 kommt in den Vorrat"; auf `main`
 nachgemessen, gleich) · `gegenprobe_uebersetzung` 1 toter Anker („der Knopf waehlt nicht mehr ausdruecklich", Anker in
 `assets/app.js`). Eingereiht, nicht nebenbei repariert.
+
+## ↕ Karten kippen weg · Schieberegler fürs Handy (Klaus 2026-11-27)
+
+Klaus: *„die klappen nach hinten weg und kommen unten wieder hoch"* (wie PWA Toolpoint) · Schieberegler *„nur fürs
+Handy … nicht so riesig … schneller, als wenn du mit der Hand scrollst … ob dann die Apps gerollt werden sollen oder die
+Seite. Entscheide du."* Gebaut in **`assets/markt-blaettern.js`** (nur `markt.html`, im `CORE` des Service Workers).
+
+⚠ **ENTSCHIEDEN: DER REGLER BEWEGT DIE SEITE, NICHT EINEN KASTEN.** Ein Rollkasten in der Seite fängt am Handy den
+Finger (wer darin wischt, kommt nicht mehr an den Rest der Seite), und zwei Rollflächen übereinander verwirren. Der Regler
+rechnet aber nur über die **Liste**: ganz oben = erste App direkt unter der Kopfleiste, ganz unten = letzte App am
+unteren Rand. Ein Zug über die Schiene ist die ganze Liste (gemessen: 38 Karten, ein Zug).
+
+| | |
+|---|---|
+| **Regler** | `position:fixed` rechts, 32 px Anfassfläche, sichtbar 5 px Schiene + Griff 22×40; nur unter 600 px (Skript **und** CSS) und nur, solange die Liste im Bild ist; endet über der Pille „🌐 Mycel"; beim Ziehen „n / 38"; `role="slider"`, Tastatur (Pfeile, Bild, Pos1/Ende); Sprung `behavior:"instant"` (die Seite trägt `scroll-behavior:smooth`) |
+| **Kippen** | aus PWA Toolpoint übernommen: Schwelle .5 (kurzes Bild 2/3), Layout-Werte statt `getBoundingClientRect`, Kopfleiste als Deckel, `MutationObserver` + `toggle` in der Fangphase („mehr" schiebt). `--kipp` vor dem Maus-Neigen in der `transform`-Kette |
+| **weniger Bewegung** | kein Kippen (Skript), zweiter Riegel im CSS; der Regler bleibt |
+
+⚠ **Die Toolpoint-Falle hat MEINE PROBE erwischt:** der Wächter „jede ganz sichtbare Karte steht gerade" maß mit
+`getBoundingClientRect` und hielt 9 gekippte Karten (im Bild auf einen Strich geschrumpft) für „ganz sichtbar". Er misst
+jetzt mit `offsetTop`. *Wer eine verdrehte Karte misst, misst die Drehung mit* — auch in der Probe.
+
+```bash
+node tests/smoke_blaettern.mjs          # 21 grün · 0 rot
+bash tests/gegenprobe_blaettern.sh      # 13 Fälle; NUR_ANKER=1, NUR_FALL="…"; DATEI2/ALT2/NEU2 für doppelte Riegel
+```
+
+Gegenprobe erst **11 · 2 blind** (KIPP-ZU-FRUEH: die Sabotage traf `zuWenig`, entschieden wird aber erst bei „oben
+raus/unten rein" · KIPP-FLACKERN: zweimal direkt hintereinander gemessen, ohne die Bewegung abzuwarten), geschärft →
+**13 · 0 · 0 · 0**. ⚠ **BENANNTE GRENZE:** die CSS-Riegel **allein** (Regler ab 600 px, flache Karte bei „weniger
+Bewegung") sind nicht messbar, solange das Skript seinen Teil tut; gemessen sind sie zusammen mit ihm.
+⚠ Am Handy nicht gesehen (Wischen mit dem Finger, DeX). Cache **v186 → v187**.

@@ -143,7 +143,13 @@ if (br) {
     ok(m.voll.length > 0 && m.voll.every((x) => !x), `${w} px: jede ganz sichtbare Karte steht gerade`, `${m.voll.length} ganz sichtbar`);
     // Wer misst, was er selbst verdreht, flackert: zweimal ausmessen ändert nichts.
     const vor = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => e.className).join("|"));
-    await pg.evaluate(() => { window.FP_MARKT_BLAETTERN.sammeln(); window.FP_MARKT_BLAETTERN.sammeln(); });
+    /* Zwischen den Runden die Kipp-Bewegung (0,42 s) ganz abwarten: erst die
+     * fertig gekippte Karte zeigt, ob sie ihre eigene Messung verschiebt.
+     * ⚠ Der erste Lauf maß zweimal direkt hintereinander und war BLIND. */
+    for (let i = 0; i < 3; i++) {
+      await pg.evaluate(() => window.FP_MARKT_BLAETTERN.sammeln());
+      await pg.waitForTimeout(600);
+    }
     const nach = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => e.className).join("|"));
     ok(vor === nach, `${w} px: neu ausmessen ändert nichts (kein Flackern)`);
     await ctx.close();
