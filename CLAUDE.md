@@ -1614,3 +1614,11 @@ der Sporen und war nicht zu finden (jetzt `msp_*`). Studio-Fenster breiter (`.fp
 min(1120px, 96vw)). `spezial-studio.html` 1240 px, ab 1000 px zweispaltig, „Passkey erstellen“ zuerst. Käuferseite: „Passkey hier
 vergessen“ → „Passkey von diesem Gerät entfernen“ mit Rückfrage, nur sichtbar mit Passkey (`hidden` verlor gegen `.btn`); ohne Passkey
 steht, woher man einen bekommt. Direkt: `https://family-projekt.de/spezial-studio.html`. Cache v180.
+
+**Kurzlink und installierte App (Klaus 2026-11-27):** Ein geteilter Spezial-Link öffnete in der installierten App deren Startseite →
+`launch_handler` `navigate-existing` im Manifest (#398). Bei „Mit Code verschließen“ holt das Studio jetzt einen **Kurzlink**
+(`POST /kurz`, `GET /k/<id>` → 302 auf `markt-spezial.html#z=…`), **3 Tage** gültig (Klaus: 7 Tage sind zu viel, falls ihn jemand
+weitergibt). Der Server legt nur den verschlossenen Teil ab (`/srv/spezial/kurz.json`), „Sperren“ löscht ihn mit. Kommt der Kurzlink nicht,
+bleibt der lange Link. Nach dem Merge auf dem Cloud-Server einmal `docker restart spezial`. Probe `smoke_spezial_seite` 49; Sabotage
+„Klartext im Speicher“ fällt mit 2 roten Zeilen. Cache v183. Später (nach Gewerbe): PayPal-Automatik, Plan im Chat vom 27.11.
+

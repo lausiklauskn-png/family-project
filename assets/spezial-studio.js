@@ -58,9 +58,9 @@
     box.hidden = false;
     box.innerHTML =
       '<p class="sps-gut">Übergabe für ' + esc(e.n) + ":</p>" +
-      '<textarea rows="2" readonly class="sps-link">' + esc(link) + "</textarea>" +
+      '<textarea rows="2" readonly class="sps-link">' + esc(link) + "</textarea>" + '<p class="sps-klein" data-u-kurz></p>' +
       '<div class="sps-reihe"><button class="btn primary" data-u="link">Link kopieren</button>' + (teilen ? '<button class="btn" data-u="teilen">Link teilen</button>' : "") + "</div>" +
-      (e.code ? '<p class="sps-code">Code: <strong>' + esc(e.code) + '</strong></p><p class="sps-schlecht">⚠ Den Code NICHT in dieselbe Nachricht. Getrennt sagen, z. B. am Telefon oder per SMS.</p>' +
+      (e.code ? '<p class="sps-code">Code: <strong>' + esc(e.code) + '</strong></p><p class="sps-schlecht">⚠ Am sichersten getrennt vom Link, z. B. am Telefon oder per SMS. Über Signal in einer Nachricht geht auch, dann schützt der Code aber nicht mehr, falls die Nachricht später weitergeleitet wird.</p>' +
         '<div class="sps-reihe"><button class="btn" data-u="code">Code kopieren</button></div>' : "") +
       '<div class="sps-qr"><p class="sps-klein">QR-Schlüssel wird gezeichnet …</p></div>' +
       (e.code ? "" : '<p class="sps-klein">Oder nur den Passkey als Text: <button class="btn ghost" data-u="text">Passkey-Text kopieren</button></p>') +
@@ -79,12 +79,29 @@
         navigator.share({ files: [f], title: "Marktplatz Spezial" }).catch(function () {});
       }
     };
-    qrBild(link, e).then(function (b) {
-      bild = b;
-      var kannBild = teilen && navigator.canShare && navigator.canShare({ files: [new File([b.blob], "x.png", { type: "image/png" })] });
-      box.querySelector(".sps-qr").innerHTML = '<img src="' + b.url + '" alt="QR-Schlüssel für ' + esc(e.n) + '" width="240" height="313">' +
-        '<div class="sps-reihe"><a class="btn" download="' + esc(dateiname(e)) + '" href="' + b.url + '">Bild speichern</a>' + (kannBild ? '<button class="btn" data-u="bildteilen">Bild teilen</button>' : "") + "</div>";
-    }, function () { box.querySelector(".sps-qr").innerHTML = '<p class="sps-schlecht">Der QR-Schlüssel ließ sich nicht zeichnen. Der Link geht trotzdem.</p>'; });
+    function qrZeichnen() {
+      qrBild(link, e).then(function (b) {
+        bild = b;
+        var kannBild = teilen && navigator.canShare && navigator.canShare({ files: [new File([b.blob], "x.png", { type: "image/png" })] });
+        box.querySelector(".sps-qr").innerHTML = '<img src="' + b.url + '" alt="QR-Schlüssel für ' + esc(e.n) + '" width="240" height="313">' +
+          '<div class="sps-reihe"><a class="btn" download="' + esc(dateiname(e)) + '" href="' + b.url + '">Bild speichern</a>' + (kannBild ? '<button class="btn" data-u="bildteilen">Bild teilen</button>' : "") + "</div>";
+      }, function () { box.querySelector(".sps-qr").innerHTML = '<p class="sps-schlecht">Der QR-Schlüssel ließ sich nicht zeichnen. Der Link geht trotzdem.</p>'; });
+    }
+    // Kurzlink (Klaus 2026-11-27): nur für verschlossene Passkeys. Der Server legt NUR den verschlossenen Teil ab,
+    // 3 Tage. Kommt er nicht, bleibt der lange Link – er geht genauso, nur unhandlicher.
+    var kz = box.querySelector("[data-u-kurz]");
+    if (e.zu && e.text && C.dienst && window.fetch) {
+      kz.textContent = "Kurzlink wird geholt …";
+      fetch(C.dienst + "/kurz", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ passkey: e.text, zu: e.zu }) })
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j || !j.ok || !/^https:\/\/[^\s"<>]+\/k\/[A-Za-z0-9_-]+$/.test(j.url || "")) throw new Error("kurz");
+          link = j.url; box.querySelector(".sps-link").value = link;
+          kz.textContent = "Kurzlink, gilt 3 Tage (bis " + new Date(j.bis).toLocaleDateString("de-DE") + "). Danach hier neu holen.";
+          kz.className = "sps-klein sps-gut";
+        }, function () { kz.textContent = "Kurzlink gerade nicht zu bekommen – der lange Link geht genauso."; kz.className = "sps-klein"; })
+        .then(qrZeichnen);
+    } else qrZeichnen();
   }
 
   function geheim(pw) {
