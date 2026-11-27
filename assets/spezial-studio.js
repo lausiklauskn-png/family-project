@@ -73,7 +73,7 @@
       if (w === "link") kopier(link, meld.id);
       else if (w === "code") kopier(e.code, meld.id);
       else if (w === "text") kopier(e.text, meld.id);
-      else if (w === "teilen") navigator.share({ title: "Marktplatz Spezial", text: "Dein Schlüssel für den Marktplatz Spezial (" + M.name + "):", url: link }).catch(function () {});
+      else if (w === "teilen") navigator.share({ title: "Marktplatz Spezial", text: "Dein Schlüssel für den Marktplatz Spezial (" + M.name + "). Tipp auf den Link. Öffnet sich die App statt des Browsers: dort „Marktplatz Spezial“ öffnen und den Link ins Passkey-Feld einfügen.", url: link }).catch(function () {});
       else if (w === "bildteilen" && bild) {
         var f = new File([bild.blob], dateiname(e), { type: "image/png" });
         navigator.share({ files: [f], title: "Marktplatz Spezial" }).catch(function () {});
