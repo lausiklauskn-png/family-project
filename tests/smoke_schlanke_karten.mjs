@@ -162,11 +162,13 @@ if (br) {
 
   /* Klaus' Handy (2026-11-28, mit Bild) zeigt die Schrift deutlich größer
    * als der Testbrowser: dort lag „mehr“ über der vierten Zahl. Gestellt mit
-   * 125 % Grundschrift bei 412 px. */
+   * 140 % Grundschrift bei 360 px: erst so eng reicht die Breite für die vier
+   * Zahlen nicht mehr (bei 412 px und 125 % passten sie ohnehin, und die
+   * Gegenprobe war dort BLIND). */
   {
-    console.log("\nHandy mit großer Schrift (125 %)");
-    const { ctx, pg } = await seite(412, 915);
-    await pg.addStyleTag({ content: "html{font-size:125% !important}" });
+    console.log("\nHandy mit großer Schrift (360 px, 140 %)");
+    const { ctx, pg } = await seite(360, 780);
+    await pg.addStyleTag({ content: "html{font-size:140% !important}" });
     await pg.waitForTimeout(300);
     const g = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => {
       const r = (el) => el.getBoundingClientRect();

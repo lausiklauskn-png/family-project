@@ -105,14 +105,11 @@ fall 'REIHE: die Woerter der Messwerte stehen wieder in der Pille' assets/style.
   '.listing .mk-ms-k{position:static;width:auto;height:auto;' \
   'in EINER Reihe'
 
-# Die Pillen teilen sich die Breite nicht mehr und duerfen nicht umbrechen:
-# bei grosser Schrift liegen sie dann uebereinander (Klaus' Bild 2026-11-28).
-fall 'UEBERLAPP: die Pillen schrumpfen unter ihren Inhalt' assets/style.css \
-  '.listing .mk-ms-zeile{display:flex;flex-wrap:wrap;gap:4px;min-width:0;width:100%}
-.listing .mk-ms-zeile .mk-ms-w{flex:1 1 0;justify-content:center;' \
-  '.listing .mk-ms-zeile{display:flex;flex-wrap:nowrap;gap:4px;min-width:0;width:100%}
-.listing .mk-ms-zeile .mk-ms-w{flex:1 1 0;min-width:0;justify-content:center;' \
-  'keine Pille liegt'
+# ⚠ BENANNTE GRENZE: „die Pillen schrumpfen unter ihren Inhalt" ist hier
+# NICHT messbar und deshalb kein Fall. Selbst bei 360 px und 140 % Schrift
+# passen die vier Zahlen nebeneinander (gemessen 2026-11-28); die Sabotage
+# aenderte nichts, der Fall war BLIND. Die Ueberdeckung auf Klaus' Bild kam
+# von „mehr" in derselben Zeile — das misst MEHR-OBEN.
 
 # „mehr" steht wieder in der Zeile der Messwerte (der Stand vor Klaus' Bild).
 fall 'MEHR-OBEN: mehr steht wieder in der Zeile der Messwerte' markt.html \
