@@ -553,8 +553,45 @@ h2{font-size:1.55rem;margin:0 0 6px}
  * stoert deshalb auch dann nicht, wenn die Zeile leer bleibt (null Eintraege). */
 #mkCount{min-height:1.5em}
 .listing{padding:0;overflow:hidden;display:flex;flex-direction:column;
-  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
-  transition:transform .18s ease,box-shadow .18s}
+  /* --kipp steht VOR dem Maus-Neigen (wie in PWA Toolpoint): erst kippt die
+     Karte um ihre Kante, dann neigt sie sich zum Zeiger. */
+  transform:perspective(1000px) rotateX(var(--kipp,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
+  transition:transform .18s ease,box-shadow .18s,opacity .18s}
+/* Wegkippen an beiden Rändern (Klaus 2026-11-27: „wie bei PWA Toolpoint"),
+   gesetzt von assets/markt-blaettern.js. Oben hängt die Karte an der unteren
+   Kante, unten an der oberen: immer an der Kante, die noch zu sehen ist. */
+.listing.kipp-weg,.listing.kipp-rein{opacity:0;pointer-events:none;
+  transition:transform .42s cubic-bezier(.2,.7,.3,1),opacity .34s ease,box-shadow .18s}
+.listing.kipp-weg{--kipp:78deg;transform-origin:50% 100%}
+.listing.kipp-rein{--kipp:-78deg;transform-origin:50% 0}
+/* Zweiter Riegel bei „weniger Bewegung": eine Karte darf nie mit opacity:0
+   stehen bleiben, ohne dass jemand den Grund sieht. */
+@media (prefers-reduced-motion: reduce){
+  .listing.kipp-weg,.listing.kipp-rein{--kipp:0deg;opacity:1;pointer-events:auto;transition:none}
+}
+
+/* Der Schieberegler (Klaus 2026-11-27: „nur fürs Handy … nicht so riesig …
+   schneller, als wenn du mit der Hand scrollst"). Fest am rechten Rand, also
+   kein Sprung in der Seite. Sichtbar schmal (5 px Schiene, 22×40 Griff), die
+   Fläche zum Anfassen ist 32 px breit. Nur am Handy (eine Spalte) und nur,
+   solange die Liste im Bild ist — beides entscheidet das Skript. */
+.mk-regler{position:fixed;right:2px;bottom:18px;width:32px;z-index:25;touch-action:none;
+  cursor:grab;opacity:.6;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
+.mk-regler[hidden]{display:none}
+@media (min-width:600px){.mk-regler{display:none}}
+.mk-regler.zieht,.mk-regler:focus-visible,.mk-regler:hover{opacity:1}
+.mk-regler.zieht{cursor:grabbing}
+.mk-regler:focus-visible{outline:none}
+.mk-regler-schiene{position:absolute;top:0;bottom:0;left:50%;width:5px;margin-left:-2.5px;border-radius:3px;
+  background:color-mix(in srgb,var(--text) 18%,transparent)}
+.mk-regler-griff{position:absolute;top:0;left:50%;width:22px;height:40px;margin-left:-11px;border-radius:11px;
+  background:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+.mk-regler:focus-visible .mk-regler-griff{outline:2px solid var(--text);outline-offset:2px}
+.mk-regler-zahl{position:absolute;top:0;right:36px;margin-top:-13px;white-space:nowrap;pointer-events:none;
+  font-family:var(--mono);font-size:.8rem;font-weight:700;padding:4px 9px;border-radius:999px;
+  background:var(--bg2);color:var(--text);border:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.35);
+  opacity:0;transition:opacity .15s}
+.mk-regler.zeigt-zahl .mk-regler-zahl{opacity:1}
 .listing:hover{--lift:-3px;box-shadow:var(--shadow),var(--glow)}
 .listing::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(260px 200px at var(--mx,50%) var(--my,50%),rgba(255,255,255,.13),transparent 60%);
