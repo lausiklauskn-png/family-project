@@ -85,8 +85,8 @@ probe "das Bau-Werkzeug lässt Wartung wieder durch" \
 echo "═══ C · Erklärvideo ═══"
 probe "die gebaute Karte verliert den Hinweis" \
       "jede gebaute Karte mit Video" tools/statische-listen.mjs \
-      '(e.video && e.anchorId ? `<p class="mk-video">' \
-      '(false && e.anchorId ? `<p class="mk-video">'
+      '(e.video && e.anchorId ? `<details class="mk-mehr">' \
+      '(false && e.anchorId ? `<details class="mk-mehr">'
 probe "markt.html card() verliert den Hinweis" \
       "card() zeichnet den Hinweis" markt.html \
       "'<p class=\"mk-video\"><a href=\"apps/' + esc(x.anchorId) + '/#video\">' + esc(FP.t(\"mk_video\"))" \

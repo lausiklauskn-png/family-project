@@ -93,7 +93,9 @@ ok(ohneVideo.every((e) => !new RegExp(`apps/${e.anchorId}/#video`).test(html)) &
 ok(!/<video|\.mp4/.test(html), "die Karte bettet KEIN Video ein");
 ok(mitVideo.every((e) => markt.includes(`href="apps/${e.anchorId}/#video"`)),
    "… und markt.html trägt den Hinweis im ausgelieferten HTML");
-const karteJs = (markt.match(/function card\(x\) \{[\s\S]*?\n {6}\}/) || [""])[0];
+// Seit 2026-11-27 steht der Hinweis unter „mehr“: card() ruft mehrBlock(), und dort steht er.
+const karteJs = (markt.match(/function card\(x\) \{[\s\S]*?\n {6}\}/) || [""])[0] +
+  (/mehrBlock\(x, w\)/.test(markt) ? (markt.match(/function mehrBlock\(x, w\) \{[\s\S]*?\n {6}\}/) || [""])[0] : "");
 ok(/mk-video/.test(karteJs) && /FP\.t\("mk_video"\)/.test(karteJs),
    "markt.html card() zeichnet den Hinweis ebenso (zwei Fassungen, eine Regel)");
 ok(/mk_video: "🎬 Erklärvideo"/.test(markt) && /mk_video: "🎬 Explainer video"/.test(markt),

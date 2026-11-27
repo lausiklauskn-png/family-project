@@ -93,6 +93,9 @@ if (br) {
                  rechts: rund(r.right), oben: rund(r.top), mitte: c.justifyContent,
                  umbruch: c.whiteSpace }; };
       const body = k.querySelector(".body") || k;
+      /* Seit 2026-11-27 liegt der Referenz-Knopf unter „mehr“; zugeklappt
+       * hätte er keine Maße, und jeder Vergleich mit ihm mäße nichts. */
+      const zu = k.querySelector("details.mk-mehr"); if (zu) zu.open = true;
       const ref = k.querySelector(".mk-ms-btn");
       const text = [...k.querySelectorAll(".listing-foot .btn:not(.mk-report)")];
       const melde = k.querySelector(".listing-foot .mk-report");

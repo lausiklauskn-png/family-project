@@ -1633,3 +1633,85 @@ Knöpfe je Passkey gleich breit untereinander, „▸ geladen (n)“ je Passkey 
 Gerätezahl wird bei `visibilitychange` neu gefragt. `dienst.mjs` geändert → nach dem Merge auf dem Cloud-Server
 `docker restart spezial` (ohne Neustart bleibt „geladen“ einfach verborgen). Probe `smoke_spezial_seite` 57 (vier neue, je
 von Hand sabotiert). Cache v185, tp v123.
+
+## 🗂 Schlanke Karten im Marktplatz (Klaus 2026-11-27)
+
+Klaus: *„Die App-Karten im Marktplatz sind zu groß. Bei rund 40 Apps dauert das Scrollen ewig … Ziel: in 3 bis 4
+Bildschirmen komplett durchgescrollt."* Gleiches Grund-Layout, nur verdichtet:
+
+| | vorher | jetzt |
+|---|---|---|
+| Bild | 16:9-Band über die ganze Karte | **Quadrat 52 px links neben dem Namen** (`.mk-kopf`) |
+| Text | 3 Zeilen | **2 Zeilen** (der volle Text bleibt im HTML: Such-Korpus) |
+| Messwerte | vier Pillen mit Wort, oft 2 Zeilen, dazu Satz und Hinweise | **eine Reihe, Symbol + Zahl**; das Wort steht für Vorleser und im `title` |
+| Rest | offen | **unter „mehr"** (`<details class="mk-mehr">`): Satz zur Messung, Hinweise, „von Hand geprüft", 🎬 Erklärvideo, „Bewertung nachlesen" |
+| Spalten | `auto-fill` | **1 / 2 / 3** (ab 600 · ab 900 px), nie 4 |
+| Kartenhöhe | 570–670 px | **215 px** |
+
+**Gemessen (38 Karten, echter Browser):** Handy 412×915 **25,9 → 9,4** Bildschirme · Tablet 820×1180 **10,3 → 3,7** ·
+Monitor 1280×800 **10,0 → 3,7** · 1920×1080 **7,4 → 2,7**.
+
+⚠ **BENANNTE GRENZE: am Handy sind 3–4 Bildschirme nicht zu schaffen.** In einer Spalte wären das unter 100 px je
+Karte, weniger als Knopfreihe plus Name. Der Wächter dort ist ein **Nagel** (≤ 10), ausdrücklich so benannt.
+
+⚠ **GELB UND ROT DES WÄCHTERS STEHEN WEITER OFFEN an der Karte**, nicht unter „mehr": eine Warnung, die man erst
+aufklappen muss, ist keine. Nur das grüne „von Hand geprüft" ist eingeklappt.
+
+⚠ **Die zugeklappten Zeilen tragen weiter ihre Klassen** (`.mk-mess` sitzt jetzt am `<details>`), also lesen
+`smoke_stufe5_messung` und `smoke_messung_hand` sie wie vorher. Wer **klickt**, tippt erst „mehr" an — vier Stellen in
+den Proben nachgezogen. `C2f–h` („die Knöpfe stehen auf einer Höhe") gilt jetzt der Fußzeile, die immer zu sehen ist.
+
+⚠ **Gebaute und gezeichnete Karte gleich hoch:** `tools/statische-listen.mjs` legt einen leeren Platzhalter
+`.mk-mehr-nur` dorthin, wo danach die Messwerte stehen, und `.listing-foot` reserviert 44 px für den Melde-Knopf (den
+die gebaute Seite nicht trägt). Ohne beides war die gebaute Karte 206 statt 215 px hoch.
+
+⚠ **Logos sind aus dem Behälter nicht abrufbar** (github.io gesperrt); gemessen ist das Feld, nicht das Bild.
+Breite og-Bilder (z. B. BookLedgerPro) werden im Quadrat mittig beschnitten (`cover`). Am Tablet nicht gesehen.
+
+```bash
+node tests/smoke_schlanke_karten.mjs          # 4 Lagen, mehr/Warnung, ohne und mit Skript
+bash tests/gegenprobe_schlanke_karten.sh      # 12 Fälle; NUR_ANKER=1, NUR_FALL="…" — in einer Kopie fahren
+```
+
+Gemessen: `smoke_schlanke_karten` **43 grün · 0 rot**; danach alle **53** `tests/smoke_*.mjs` nacheinander mit Rückgabe 0.
+Nachgezogene Anker in `gegenprobe_kartenknoepfe` (Fall 6), `gegenprobe_angleichen` (C), `gegenprobe_uebersetzung`
+(Name im `mk-kopf-t`). Cache **v185 → v186**, `ASSET_V` und alle `?v=` mitgezogen.
+
+Gegenprobe-Lauf (2026-11-27, Wegwerf-Kopie): `gegenprobe_schlanke_karten` erst **11 schlagen an · 1 blind** (EINE-REIHE:
+die Sabotage nahm nur `position:absolute` heraus, `width:1px` blieb, die Wörter nahmen keinen Platz), geschärft →
+**12 · 0 · 0 · 0**. `gegenprobe_kartenknoepfe` **10 · 0 · 0 · 0**. ⚠ **Schon auf `main` so, nicht von dieser Arbeit:**
+`gegenprobe_angleichen` 2 blind („eine App von PWA Toolpoint fehlt hier", „ein .mp4 kommt in den Vorrat"; auf `main`
+nachgemessen, gleich) · `gegenprobe_uebersetzung` 1 toter Anker („der Knopf waehlt nicht mehr ausdruecklich", Anker in
+`assets/app.js`). Eingereiht, nicht nebenbei repariert.
+
+## ↕ Karten kippen weg · Schieberegler fürs Handy (Klaus 2026-11-27)
+
+Klaus: *„die klappen nach hinten weg und kommen unten wieder hoch"* (wie PWA Toolpoint) · Schieberegler *„nur fürs
+Handy … nicht so riesig … schneller, als wenn du mit der Hand scrollst … ob dann die Apps gerollt werden sollen oder die
+Seite. Entscheide du."* Gebaut in **`assets/markt-blaettern.js`** (nur `markt.html`, im `CORE` des Service Workers).
+
+⚠ **ENTSCHIEDEN: DER REGLER BEWEGT DIE SEITE, NICHT EINEN KASTEN.** Ein Rollkasten in der Seite fängt am Handy den
+Finger (wer darin wischt, kommt nicht mehr an den Rest der Seite), und zwei Rollflächen übereinander verwirren. Der Regler
+rechnet aber nur über die **Liste**: ganz oben = erste App direkt unter der Kopfleiste, ganz unten = letzte App am
+unteren Rand. Ein Zug über die Schiene ist die ganze Liste (gemessen: 38 Karten, ein Zug).
+
+| | |
+|---|---|
+| **Regler** | `position:fixed` rechts, 32 px Anfassfläche, sichtbar 5 px Schiene + Griff 22×40; nur unter 600 px (Skript **und** CSS) und nur, solange die Liste im Bild ist; endet über der Pille „🌐 Mycel"; beim Ziehen „n / 38"; `role="slider"`, Tastatur (Pfeile, Bild, Pos1/Ende); Sprung `behavior:"instant"` (die Seite trägt `scroll-behavior:smooth`) |
+| **Kippen** | aus PWA Toolpoint übernommen: Schwelle .5 (kurzes Bild 2/3), Layout-Werte statt `getBoundingClientRect`, Kopfleiste als Deckel, `MutationObserver` + `toggle` in der Fangphase („mehr" schiebt). `--kipp` vor dem Maus-Neigen in der `transform`-Kette |
+| **weniger Bewegung** | kein Kippen (Skript), zweiter Riegel im CSS; der Regler bleibt |
+
+⚠ **Die Toolpoint-Falle hat MEINE PROBE erwischt:** der Wächter „jede ganz sichtbare Karte steht gerade" maß mit
+`getBoundingClientRect` und hielt 9 gekippte Karten (im Bild auf einen Strich geschrumpft) für „ganz sichtbar". Er misst
+jetzt mit `offsetTop`. *Wer eine verdrehte Karte misst, misst die Drehung mit* — auch in der Probe.
+
+```bash
+node tests/smoke_blaettern.mjs          # 21 grün · 0 rot; danach alle 54 smoke_*.mjs mit Rückgabe 0
+bash tests/gegenprobe_blaettern.sh      # 13 Fälle; NUR_ANKER=1, NUR_FALL="…"; DATEI2/ALT2/NEU2 für doppelte Riegel
+```
+
+Gegenprobe erst **11 · 2 blind** (KIPP-ZU-FRUEH: die Sabotage traf `zuWenig`, entschieden wird aber erst bei „oben
+raus/unten rein" · KIPP-FLACKERN: zweimal direkt hintereinander gemessen, ohne die Bewegung abzuwarten), geschärft →
+**13 · 0 · 0 · 0**. ⚠ **BENANNTE GRENZE:** die CSS-Riegel **allein** (Regler ab 600 px, flache Karte bei „weniger
+Bewegung") sind nicht messbar, solange das Skript seinen Teil tut; gemessen sind sie zusammen mit ihm.
+⚠ Am Handy nicht gesehen (Wischen mit dem Finger, DeX). Cache **v186 → v187**.

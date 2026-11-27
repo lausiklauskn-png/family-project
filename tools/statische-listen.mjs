@@ -298,24 +298,31 @@ export function marktHtml(eintraege) {
       ? `<a class="btn ghost" href="apps/${esc(e.anchorId)}/">Einzelheiten</a>`
       : "";
     return '<div class="glass listing">' +
+      /* Schlanke Karte (Klaus 2026-11-27): „Die App-Karten sind zu groß.“
+       * Das Bild ist ein kleines Quadrat links neben dem Namen, der Text
+       * klemmt auf zwei Zeilen. Wortgleiche Gliederung in markt.html `card()`. */
+      '<div class="body"><div class="mk-kopf">' +
       '<div class="img">' +
         `<img src="${esc(e.img)}" alt="${esc(e.label)}" loading="lazy" referrerpolicy="no-referrer">` +
       "</div>" +
-      '<div class="body">' +
         // translate="no": App-Namen und Anbieter-Kuerzel sind EIGENNAMEN.
         // Googles Uebersetzer machte aus „Family Projekt" ein
         // „Familienprojekt" (Klaus' Bildschirmfoto 2026-09-14) — dasselbe
         // waere hier mit jedem App-Namen passiert.
         /* „Neu“ (Klaus 2026-11-25): die App ist neu gestaltet online gegangen. Ein kleiner Knopf neben dem Namen führt direkt in die neue
          * App (appUrl, sonst url: seit 26.11. führt der Eintrag selbst in die App); ohne `neu` steht er nicht da. Wortgleich in markt.html `card()`. */
-        `<h3 translate="no">${esc(e.label)}${e.neu && (e.appUrl || e.url) ? ` <a class="mk-neu" href="${esc(e.appUrl || e.url)}" target="_blank" rel="${relFuer(e.eigen)}" title="Die neue App öffnen">Neu</a>` : ""}</h3>` +
-        (e.by ? `<p class="by" translate="no">${esc(e.by)}</p>` : "") +
+        `<div class="mk-kopf-t"><h3 translate="no">${esc(e.label)}${e.neu && (e.appUrl || e.url) ? ` <a class="mk-neu" href="${esc(e.appUrl || e.url)}" target="_blank" rel="${relFuer(e.eigen)}" title="Die neue App öffnen">Neu</a>` : ""}</h3>` +
+        (e.by ? `<p class="by" translate="no">${esc(e.by)}</p>` : "") + "</div></div>" +
         `<p>${esc(e.text)}</p>` +
         /* Das Erklärvideo steht auf der Detailseite; die Karte trägt nur den
          * Weg dorthin, als Textzeile statt als vierter Knopf — die Knöpfe
-         * einer Karte sind eine Familie (Klaus 2026-09-22). Wortgleich in
-         * markt.html `card()`. */
-        (e.video && e.anchorId ? `<p class="mk-video"><a href="apps/${esc(e.anchorId)}/#video">🎬 Erklärvideo</a></p>` : "") +
+         * einer Karte sind eine Familie (Klaus 2026-09-22). Seit 2026-11-27
+         * unter „mehr“. Wortgleich in markt.html `card()` / `mehrBlock()`.
+         * Ohne Video steht ein leerer Platzhalter in derselben Höhe: die
+         * Karte, die das Skript danach zeichnet, trägt dort die Messwerte —
+         * ohne ihn spränge die Liste beim Neuzeichnen. */
+        (e.video && e.anchorId ? `<details class="mk-mehr"><summary><span class="mk-mehr-zu">mehr</span></summary><div class="mk-mehr-innen"><p class="mk-video"><a href="apps/${esc(e.anchorId)}/#video">🎬 Erklärvideo</a></p></div></details>`
+          : '<p class="mk-mehr-nur" aria-hidden="true"></p>') +
         '<div class="listing-actions"><div class="listing-foot">' + einzeln + link + "</div></div>" +
       "</div>" +
       "</div>";

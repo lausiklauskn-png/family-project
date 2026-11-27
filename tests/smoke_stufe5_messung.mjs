@@ -759,11 +759,15 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
       } })
     }));
     await p6.goto(base + "/markt.html", { waitUntil: "load" });
-    await p6.waitForSelector(".listing .mk-ms-btn", { timeout: 20000 });
+    /* Seit 2026-11-27 liegt „Bewertung nachlesen“ unter „mehr“ (Klaus: „die
+     * Karten sind zu groß“). Die Zusicherung „die Knöpfe stehen auf EINER
+     * Höhe“ gilt jetzt für die Fußzeile, die immer zu sehen ist. */
+    await p6.waitForSelector(".listing .mk-ms-btn", { state: "attached", timeout: 20000 });
     const reihe = await p6.evaluate(() => {
       const raus = [];
       for (const k of document.querySelectorAll(".listing")) {
-        const b = k.querySelector(".mk-ms-btn");
+        if (!k.querySelector(".mk-ms-btn")) continue;
+        const b = k.querySelector(".listing-foot .btn:not(.mk-report)");
         if (!b) continue;
         const r = k.getBoundingClientRect(), bb = b.getBoundingClientRect();
         raus.push({ zeile: Math.round(r.top), hoehe: Math.round(r.height),
@@ -788,6 +792,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
      * oben steht. Genau so ist er am 2026-08-06 rot geworden, als ein neuer
      * Eintrag oben einsortiert wurde -- der Test prueft aber die Nachbesserungs-
      * Liste, und die hat nur BookLedgerPro. */
+    await page.click('.listing:has([data-msid="markt-bookledgerpro"]) .mk-mehr > summary');   // erst „mehr“ (seit 2026-11-27)
     await page.click('.listing [data-msid="markt-bookledgerpro"]');
     await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const d = await page.evaluate(() => {
@@ -822,6 +827,7 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
      * gehalten wird, wie oft schon, und welchen Wert die neuere Messung hatte.
      * Wer nachliest, soll nicht suchen muessen. */
     await page.evaluate(() => document.getElementById("mkMessOv").close());
+    await page.click('.listing:has([data-msid="markt-rezeptbuch"]) .mk-mehr > summary');   // erst „mehr“ (seit 2026-11-27)
     await page.click('.listing [data-msid="markt-rezeptbuch"]');
     await page.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const dh = await page.evaluate(() => {
@@ -893,7 +899,8 @@ console.log("\nC — die Anzeige im Marktplatz (Browser)");
         gemessen: "2026-08-02", url: "http://unverschluesselt.example/" } } } })
     }));
     await p5.goto(base + "/markt.html", { waitUntil: "load" });
-    await p5.waitForSelector(".listing .mk-ms-btn", { timeout: 20000 });
+    await p5.waitForSelector(".listing .mk-ms-btn", { state: "attached", timeout: 20000 });
+    await p5.click(".listing:has(.mk-ms-btn) .mk-mehr > summary");   // erst „mehr“ (seit 2026-11-27)
     await p5.click(".listing .mk-ms-btn");
     await p5.waitForSelector("#mkMessOv[open]", { timeout: 10000 });
     const l = await p5.evaluate(() => ({

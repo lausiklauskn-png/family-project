@@ -507,7 +507,13 @@ h2{font-size:1.55rem;margin:0 0 6px}
 .prep{display:inline-block;font-family:var(--mono);font-size:.7rem;color:var(--gold);border:1px solid var(--gold);border-radius:5px;padding:1px 7px;margin-left:6px;text-transform:uppercase;letter-spacing:.04em}
 
 /* Marktplatz — Listing-Karten + Formular */
-.listings{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:8px}
+/* Schlanke Karten (Klaus 2026-11-27): „bei rund 40 Apps dauert das Scrollen
+ * ewig … 3 nebeneinander am Monitor (nicht 4, sonst wandern die Augen zu
+ * viel), 2 am Tablet, 1 am Handy." Feste Spaltenzahl statt auto-fill: auf
+ * einem breiten Bild hätte auto-fill sonst eine vierte Spalte aufgemacht. */
+.listings{display:grid;grid-template-columns:1fr;gap:12px;margin-top:8px}
+@media (min-width:600px){.listings{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (min-width:900px){.listings{grid-template-columns:repeat(3,minmax(0,1fr))}}
 /* Platz für die Einträge freihalten, SOLANGE sie noch nicht gezeichnet sind
  * (Befund 2026-08-02, mit Lighthouse 13.4.1 gemessen).
  *
@@ -547,19 +553,89 @@ h2{font-size:1.55rem;margin:0 0 6px}
  * stoert deshalb auch dann nicht, wenn die Zeile leer bleibt (null Eintraege). */
 #mkCount{min-height:1.5em}
 .listing{padding:0;overflow:hidden;display:flex;flex-direction:column;
-  transform:perspective(1000px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
-  transition:transform .18s ease,box-shadow .18s}
+  /* --kipp steht VOR dem Maus-Neigen (wie in PWA Toolpoint): erst kippt die
+     Karte um ihre Kante, dann neigt sie sich zum Zeiger. */
+  transform:perspective(1000px) rotateX(var(--kipp,0deg)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(var(--lift,0px));
+  transition:transform .18s ease,box-shadow .18s,opacity .18s}
+/* Wegkippen an beiden Rändern (Klaus 2026-11-27: „wie bei PWA Toolpoint"),
+   gesetzt von assets/markt-blaettern.js. Oben hängt die Karte an der unteren
+   Kante, unten an der oberen: immer an der Kante, die noch zu sehen ist. */
+.listing.kipp-weg,.listing.kipp-rein{opacity:0;pointer-events:none;
+  transition:transform .42s cubic-bezier(.2,.7,.3,1),opacity .34s ease,box-shadow .18s}
+.listing.kipp-weg{--kipp:78deg;transform-origin:50% 100%}
+.listing.kipp-rein{--kipp:-78deg;transform-origin:50% 0}
+/* Zweiter Riegel bei „weniger Bewegung": eine Karte darf nie mit opacity:0
+   stehen bleiben, ohne dass jemand den Grund sieht. */
+@media (prefers-reduced-motion: reduce){
+  .listing.kipp-weg,.listing.kipp-rein{--kipp:0deg;opacity:1;pointer-events:auto;transition:none}
+}
+
+/* Der Schieberegler (Klaus 2026-11-27: „nur fürs Handy … nicht so riesig …
+   schneller, als wenn du mit der Hand scrollst"). Fest am rechten Rand, also
+   kein Sprung in der Seite. Sichtbar schmal (5 px Schiene, 22×40 Griff), die
+   Fläche zum Anfassen ist 32 px breit. Nur am Handy (eine Spalte) und nur,
+   solange die Liste im Bild ist — beides entscheidet das Skript. */
+.mk-regler{position:fixed;right:2px;bottom:18px;width:32px;z-index:25;touch-action:none;
+  cursor:grab;opacity:.6;transition:opacity .2s;-webkit-tap-highlight-color:transparent}
+.mk-regler[hidden]{display:none}
+@media (min-width:600px){.mk-regler{display:none}}
+.mk-regler.zieht,.mk-regler:focus-visible,.mk-regler:hover{opacity:1}
+.mk-regler.zieht{cursor:grabbing}
+.mk-regler:focus-visible{outline:none}
+.mk-regler-schiene{position:absolute;top:0;bottom:0;left:50%;width:5px;margin-left:-2.5px;border-radius:3px;
+  background:color-mix(in srgb,var(--text) 18%,transparent)}
+.mk-regler-griff{position:absolute;top:0;left:50%;width:22px;height:40px;margin-left:-11px;border-radius:11px;
+  background:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+.mk-regler:focus-visible .mk-regler-griff{outline:2px solid var(--text);outline-offset:2px}
+.mk-regler-zahl{position:absolute;top:0;right:36px;margin-top:-13px;white-space:nowrap;pointer-events:none;
+  font-family:var(--mono);font-size:.8rem;font-weight:700;padding:4px 9px;border-radius:999px;
+  background:var(--bg2);color:var(--text);border:1px solid var(--line);box-shadow:0 4px 12px rgba(0,0,0,.35);
+  opacity:0;transition:opacity .15s}
+.mk-regler.zeigt-zahl .mk-regler-zahl{opacity:1}
 .listing:hover{--lift:-3px;box-shadow:var(--shadow),var(--glow)}
 .listing::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
   background:radial-gradient(260px 200px at var(--mx,50%) var(--my,50%),rgba(255,255,255,.13),transparent 60%);
   opacity:0;transition:opacity .25s;mix-blend-mode:screen;z-index:1}
 .listing:hover::after{opacity:1}
-.listing .img{aspect-ratio:16/9;background:linear-gradient(180deg,var(--bg2),var(--bg));display:flex;align-items:center;justify-content:center;overflow:hidden;border-bottom:1px solid var(--line)}
+/* Kopf der Karte: kleines quadratisches Logo links, Name und Anbieter rechts
+ * (Klaus 2026-11-27, vorher ein 16:9-Band über die ganze Breite — rund 180 px
+ * Höhe je Karte nur fürs Bild). Feste Maße, damit nichts springt, wenn das
+ * Bild erst später kommt. */
+.listing .mk-kopf{display:flex;align-items:center;gap:12px;margin:0 0 6px;min-width:0}
+.listing .img{flex:0 0 52px;width:52px;height:52px;border-radius:12px;background:linear-gradient(180deg,var(--bg2),var(--bg));display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid var(--line)}
 .listing .img img{width:100%;height:100%;object-fit:cover}
-.listing .body{padding:14px 16px 16px;display:flex;flex-direction:column;flex:1 1 auto;min-width:0}
-.listing h3{margin:0 0 4px;font-size:1.08rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.listing .by{font-family:var(--mono);font-size:.74rem;color:var(--accent);margin:0 0 8px}
-.listing p{margin:0 0 12px;color:var(--muted);font-size:.9rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:calc(1.4em * 3)}
+.listing .mk-kopf-t{min-width:0;flex:1 1 auto}
+.listing .body{padding:12px 14px 12px;display:flex;flex-direction:column;flex:1 1 auto;min-width:0}
+.listing h3{margin:0 0 2px;font-size:1.02rem;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.listing .by{font-family:var(--mono);font-size:.72rem;color:var(--accent);margin:0}
+/* Zwei Zeilen statt drei (Klaus 2026-11-27: „Text direkt unter den Namen,
+ * kurz, 2 Zeilen"). Der volle Text bleibt im HTML — er ist der Such-Korpus,
+ * gekürzt wird nur, was man sieht. */
+.listing p{margin:0 0 8px;color:var(--muted);font-size:.88rem;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:calc(1.4em * 2)}
+.listing .by{display:block;-webkit-line-clamp:none;min-height:0;overflow:visible}
+
+/* „mehr“ (Klaus 2026-11-27): die vier Messwerte bilden die Zeile, auf die man
+ * tippt; Satz, Hinweise, Erklärvideo und „Bewertung nachlesen“ liegen darunter.
+ * Eine Höhe für beide Fassungen (gebaut und gezeichnet), damit die Liste beim
+ * Neuzeichnen nicht springt. */
+.listing .mk-mehr,.listing p.mk-mehr-nur{margin:0 0 10px}
+.listing .mk-mehr>summary,.listing p.mk-mehr-nur{display:flex;align-items:center;gap:6px;min-height:28px;
+  -webkit-line-clamp:none;overflow:visible;min-width:0}
+.listing .mk-mehr>summary{cursor:pointer;list-style:none;border-radius:8px}
+.listing .mk-mehr>summary::-webkit-details-marker{display:none}
+.listing .mk-mehr>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.listing .mk-mehr-zu{margin-left:auto;flex:0 0 auto;font-family:var(--mono);font-size:.74rem;color:var(--accent);white-space:nowrap}
+.listing .mk-mehr-zu::after{content:" ▾";display:inline-block;transition:transform .18s}
+.listing .mk-mehr[open] .mk-mehr-zu::after{transform:rotate(180deg)}
+.listing .mk-mehr-innen{padding-top:8px}
+.listing .mk-mehr-innen p{display:block;-webkit-line-clamp:none;overflow:visible;min-height:0;margin:0 0 6px;font-size:.82rem}
+.listing .mk-mehr-innen .mk-ms-btn{margin-top:4px}
+/* Die vier Werte: nur Symbol und Zahl, in EINER Reihe. Das Wort bleibt für
+ * Vorleser im Text (wie `.nur-vorlesen`) und steht im `title`. */
+.listing .mk-ms-zeile{display:flex;flex-wrap:nowrap;gap:4px;min-width:0}
+.listing .mk-ms-zeile .mk-ms-w{padding:2px 6px;font-size:.74rem;gap:3px}
+.listing .mk-ms-k{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.listing .mk-mess--leer{color:var(--muted);font-size:.78rem;opacity:.85}
 /* Wächter-Band auf der Marktplatz-Karte (Stufe 3).
    Muss die Klemmung von `.listing p` ausdrücklich aufheben — ein Warnhinweis,
    von dem man nur drei Zeilen sieht, ist kein Warnhinweis. Rot legt den
@@ -745,7 +821,10 @@ h2{font-size:1.55rem;margin:0 0 6px}
   justify-content:center;   /* Klaus: „steht auch nicht in der Mitte vom Button" */
   white-space:nowrap}       /* der Text bricht NIE um — siehe oben */
 /* Fußzeile der Marktplatz-Karte: Öffnen links, Melde-Knopf rechtsbündig mit Abstand. */
-.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+/* min-height 44 = der Melde-Knopf. Die gebaute Seite trägt ihn nicht (er
+ * braucht das Skript); ohne die Reserve wäre ihre Karte 7 px niedriger, und
+ * die Liste spränge beim Neuzeichnen (gemessen 2026-11-27, 206 ⟷ 215 px). */
+.listing-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;min-height:44px}
 .listing-foot .mk-report{margin-left:auto}
 /* Aktions-Block (Stufe 5): „Bewertung nachlesen" + Fußzeile kleben GEMEINSAM
    am Boden der Karte. Befund von Klaus 2026-08-02: allein die Fußzeile klebte,
