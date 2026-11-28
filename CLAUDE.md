@@ -1771,4 +1771,11 @@ Wirkung. Die Probe wartet jetzt höchstens 3 s auf den Zustand, danach dreimal g
 node tests/smoke_kopfleiste.mjs       # Menü: zu beim Laden, alle Knöpfe drin, neben dem Siegel, im Fenster, schließt
 node tests/smoke_blaettern.mjs        # Regler ignoriert die angedockte Pille
 ```
+Gegenproben (Wegwerf-Kopie, 2026-11-28): `kopfleiste` **11 · 0 · 0 · 0** (sechs neue Fälle fürs Menü) ·
+`bewegungsknopf` 6/0/0/0 · `kartenknoepfe` 10/0/0/0 · `blaettern` erst **11 · 2 blind**, `schlanke_karten` erst
+**12 · 0 · 1 aus falschem Grund**. Die zwei Blinden: REGLER-PILLE (die Pille schwebt nicht mehr, der Wächter war bei
+`null` trivial grün; jetzt wird eine herausgezogene Pille gestellt) und KIPP-FLACKERN (bei Schwelle 0,35 lag keine
+Karte mehr an der Grenze; jetzt wird die Ursache gemessen: `FP_MARKT_BLAETTERN.lagen()` muss Layout-Werte tragen).
+PAAR fiel unter dem Nachbarnamen derselben Zusicherung („unten links neben Melden"). Danach **13 · 0 · 0 · 0**.
+
 Cache **v188 → v189**, `ASSET_V` und alle `?v=` mitgezogen. ⚠ Am Handy nicht gesehen.

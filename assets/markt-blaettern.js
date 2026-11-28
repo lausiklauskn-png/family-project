@@ -247,5 +247,8 @@
   /* „mehr" aufgeklappt schiebt alles darunter: `toggle` steigt nicht auf,
      deshalb in der Fangphase. */
   liste.addEventListener("toggle", sammeln, true);
-  window.FP_MARKT_BLAETTERN = { sammeln: sammeln };
+  /* `lagen()` gibt die gemerkten Lagen heraus — nur für die Probe, die prüft,
+     dass mit Layout-Werten gemessen wird und nicht mit der gekippten Karte. */
+  window.FP_MARKT_BLAETTERN = { sammeln: sammeln,
+    lagen: function () { return karten.map(function (k) { return [k.oben, k.hoehe]; }); } };
 })();
