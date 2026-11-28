@@ -1715,3 +1715,28 @@ raus/unten rein" · KIPP-FLACKERN: zweimal direkt hintereinander gemessen, ohne 
 **13 · 0 · 0 · 0**. ⚠ **BENANNTE GRENZE:** die CSS-Riegel **allein** (Regler ab 600 px, flache Karte bei „weniger
 Bewegung") sind nicht messbar, solange das Skript seinen Teil tut; gemessen sind sie zusammen mit ihm.
 ⚠ Am Handy nicht gesehen (Wischen mit dem Finger, DeX). Cache **v186 → v187**.
+
+### „mehr" unten neben „Melden" · Kaffeekasse an der Karte (Klaus 2026-11-28)
+
+Klaus mit Bild vom Handy (größere Schrift): *„das mehr … ist an der falschen Stelle. Es sollte unten mit sein bei
+melden … das mehr steht genau in einem der Anzeigen für die Messwerte"* · *„die Kaffeetasse sollte noch mit in
+Familienprojekt rein."* **Tafel-Evolution, benannt:** „mehr" ist kein `<details>`-Kopf in der Messwert-Zeile mehr.
+
+| | |
+|---|---|
+| Messwerte | `.mk-mehr-reihe` gehört den vier Zahlen allein, `flex:1` je Pille, bricht bei sehr großer Schrift um statt zu überdecken |
+| „mehr" | `<button class="mk-mehr-zu" aria-expanded aria-controls>` in der Fußzeile, mit „Melden" in `.mk-fuss-rechts` gepaart (sie brechen gemeinsam um); der Teil `.mk-mehr-innen[hidden]` öffnet sich über den Knöpfen, danach `FP_MARKT_BLAETTERN.sammeln()` |
+| ☕ Kaffeekasse | `kaffeeKnopf()` unter „mehr", nur an `own: true`, Adresse aus `assets/config/spenden.js` (`FP_SPENDEN`), in der Knopf-Familie |
+| Knöpfe | Polster 10/8 px, `.76rem`, Abstand 6 px: sonst passten die vier am Monitor nicht (gemessen 331 px gebraucht, 302 da) |
+| gebaute Seite | leere `.mk-mehr-reihe` als Platzhalter, Video-Link im versteckten Teil, **kein** „mehr"-Knopf (ohne Skript wäre er tot) |
+
+Gemessen: Karte 217 px bei 412 und 1280 px, alle Knöpfe einzeilig; bei 360 und 900 px rutschen „mehr" + „Melden"
+gemeinsam rechts in die zweite Reihe. ⚠ **Drei Gestalt-Proben** (`smoke_kartenknoepfe`, `smoke_schlanke_karten`,
+`smoke_markt_melden`) laufen jetzt mit `reducedMotion: "reduce"`: eine gekippte Karte ist im Bild auf 37 px gestaucht,
+und `getBoundingClientRect` misst die Drehung mit. Das Kippen misst `smoke_blaettern`. ⚠ Eine ältere Regel
+`.listing .mk-mess p` überstimmte die neue Zeile (gezeichnet 217 ⟷ gebaut 213 px); geschärft.
+
+Gegenprobe `schlanke_karten`: neu MEHR-OBEN · PAAR · MEHR · WARNUNG · SPRUNG; erster Lauf **12 · 1 blind · 1 falsch**
+(UEBERLAPP blind: selbst bei 360 px und 140 % Schrift passen die vier Zahlen — als benannte Grenze herausgenommen;
+REIHE: die Wörter lassen die Reihe jetzt umbrechen statt abschneiden, erwartet ist „in EINER Reihe"). `kartenknoepfe`
+10/0/0/0 nach nachgezogenem Anker. Alle **54** `smoke_*.mjs` mit Rückgabe 0. Cache **v187 → v188**.
