@@ -1205,6 +1205,54 @@
     renderPublicAppLinks();
     renderToolButtons();
     mountReloadButton();
+    kopfMenue();
+  }
+
+  /* ── DAS KOPF-MENÜ ☰ (Klaus 2026-11-28) ─────────────────────────────────
+   * Das Auf und Zu macht das <details> selbst. Hier nur, was es nicht kann:
+   * ein Tipp daneben und Esc schließen es, und der Name spricht die Sprache.
+   * ⚠ „Daneben" heißt nicht die Sprach-Auswahl, die Bewegungs-Blase und das
+   * Mycel-Fenster: die hängen am <body>, gehören aber zum Menü. */
+  function kopfMenue() {
+    var m = document.getElementById("kopfMenue");
+    if (!m || m.dataset.fpWired === "1") return;
+    m.dataset.fpWired = "1";
+    var knopf = m.querySelector("summary");
+    var name = function () {
+      var de = getLang() === "de";
+      if (knopf) knopf.setAttribute("aria-label", de ? "Menü: Einstellungen" : "Menu: settings");
+      if (knopf) knopf.title = de ? "Menü: Installieren, Aktualisieren, Sprache, Thema, Bewegung, Mycel"
+                                  : "Menu: install, reload, language, theme, motion, Mycel";
+    };
+    name();
+    global.addEventListener("fp:lang", name);
+    /* Der Teil hängt rechtsbündig unter ☰. Steht ☰ weit links (am Handy
+       mitten in der Zeile), ragte er links aus dem Fenster: dann rückt er
+       nach rechts, bis er ganz zu sehen ist (8 px Rand). */
+    var teil = m.querySelector(".kopf-menue-teil");
+    var einpassen = function () {
+      if (!teil || !m.open) return;
+      teil.style.right = "";
+      var r = teil.getBoundingClientRect(), W = global.innerWidth || 0, d = 0;
+      if (r.left < 8) d = 8 - r.left;
+      else if (r.right > W - 8) d = (W - 8) - r.right;
+      if (d) teil.style.right = (-d) + "px";
+    };
+    m.addEventListener("toggle", einpassen);
+    global.addEventListener("resize", einpassen, { passive: true });
+    var gehoert = function (t) {
+      if (!t || !t.closest) return false;
+      return !!(m.contains(t) || t.closest("#langMenu, #bgPauseHinweis, #sbkim-rdv-panel"));
+    };
+    document.addEventListener("pointerdown", function (e) {
+      if (m.open && !gehoert(e.target)) m.open = false;
+    }, true);
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && m.open && !document.getElementById("langMenu")) {
+        m.open = false;
+        try { knopf.focus(); } catch (_e) {}
+      }
+    });
   }
 
   global.FP = {

@@ -15,6 +15,13 @@
  *
  * ⚠ Die Reihen-Zahl ist an Klaus' Satz gehängt, nicht an einen Messwert von heute:
  * vier Reihen waren der Befund, drei die Obergrenze.
+ *
+ * ⚠ TAFEL-EVOLUTION (Klaus 2026-11-28): seit dem Menü ☰ liegen ↻, Sprache,
+ * Thema, Bewegung, ⬇ und die Mycel-Pille HINTER einem Knopf („dann rutscht das
+ * schon wieder eine Zeile nach oben"). Die Obergrenze ist deshalb ZWEI Reihen,
+ * die Knöpfe werden als Text gelesen (versteckt hat innerText keinen), und das
+ * Menü bekommt eigene Zusicherungen: zu beim Laden, enthält alle Knöpfe, liegt
+ * offen im Fenster, verschiebt nichts, ein Tipp daneben schließt es.
  */
 import http from "node:http";
 import fs from "node:fs";
@@ -67,7 +74,20 @@ const messe = () => {
   const rl = document.getElementById("fpReload"), lb = document.getElementById("langBtn");
   return { fehlt: false, reihen: tops.length, raus, quer: document.documentElement.scrollWidth > W,
     kopf: Math.round(h.getBoundingClientRect().height),
-    reloadText: rl ? rl.innerText.trim() : null, langText: lb ? lb.innerText.trim() : null };
+    reloadText: rl ? rl.textContent.trim() : null, langText: lb ? lb.textContent.trim() : null,
+    menue: (() => { const m = document.getElementById("kopfMenue"); if (!m) return null;
+      const t = m.querySelector(".kopf-menue-teil");
+      const drin = (id) => !!(document.getElementById(id) && t.contains(document.getElementById(id)));
+      /* ⚠ checkVisibility, nicht die Höhe: ein zugeklapptes <details> behält in
+         Chrome sein Layout (content-visibility), die Höhe ist dort NICHT null. */
+      return { zu: !m.open && !t.checkVisibility(),
+        knoepfe: ["fpReload", "langBtn", "themeBtn"].every(drin)
+          && (!document.getElementById("bgPauseBtn") || drin("bgPauseBtn"))
+          && (!document.getElementById("install-platz") || drin("install-platz")),
+        mycel: !!t.querySelector("[data-sbkim-mycel-platz]"),
+        neben: (() => { const d = document.getElementById("fp-dock"); if (!d) return true;
+          const a = d.getBoundingClientRect(), b = m.querySelector("summary").getBoundingClientRect();
+          return Math.abs((a.top + a.bottom) / 2 - (b.top + b.bottom) / 2) < 20 && b.left >= a.right - 1; })() }; })() };
 };
 
 const browser = await chromium.launch({ executablePath: exe, args: ["--no-sandbox"] });
@@ -82,7 +102,14 @@ try {
       await po.goto(`${base}/${s}`, { waitUntil: "load" });
       const a = await pm.evaluate(messe), b = await po.evaluate(messe);
       if (a.fehlt) { ok(false, `${s}: Kopfleiste da`); continue; }
-      ok(a.reihen <= 3, `${s}: höchstens drei Reihen in der Kopfleiste`, `${a.reihen} Reihen`);
+      ok(a.reihen <= 2, `${s}: höchstens ZWEI Reihen in der Kopfleiste (seit dem Menü)`, `${a.reihen} Reihen`);
+      ok(!!a.menue, `${s}: die Kopfleiste trägt das Menü ☰`);
+      if (a.menue) {
+        ok(a.menue.zu, `${s}: das Menü ist beim Laden zu`);
+        ok(a.menue.knoepfe, `${s}: ↻, Sprache, Thema, Bewegung und ⬇ liegen IM Menü`);
+        ok(a.menue.mycel, `${s}: die Mycel-Pille hat ihren Platz im Menü`);
+        ok(a.menue.neben, `${s}: das Menü steht neben dem Siegel (rechts der Lampen, gleiche Höhe)`);
+      }
       ok(!a.raus.length && !a.quer, `${s}: nichts ragt aus dem Fenster`, JSON.stringify(a.raus) + (a.quer ? " quer" : ""));
       ok(a.reloadText !== null && !/[A-Za-zÄÖÜäöü]/.test(a.reloadText), `${s}: der Aktualisieren-Knopf zeigt nur das Zeichen`, JSON.stringify(a.reloadText));
       ok(/^(DE|EN)$/.test(a.langText || ""), `${s}: der Sprachknopf zeigt nur die aktuelle Sprache`, JSON.stringify(a.langText));
@@ -93,6 +120,14 @@ try {
     await pm.evaluate(() => { try { localStorage.removeItem("fp_lang_wahl"); localStorage.removeItem("fp_lang"); } catch (e) {} });
     await pm.reload({ waitUntil: "load" }); await pm.waitForTimeout(400);
     const kopf0 = await pm.evaluate(() => Math.round(document.querySelector("header").getBoundingClientRect().height));
+    await pm.click("#kopfMenue > summary"); await pm.waitForTimeout(150);
+    const mo = await pm.evaluate(() => { const t = document.querySelector("#kopfMenue .kopf-menue-teil").getBoundingClientRect();
+      const sicht = ["fpReload", "langBtn", "themeBtn", "bgPauseBtn"].every((id) => { const e = document.getElementById(id); return e && e.checkVisibility(); });
+      return { drin: t.left >= 0 && t.right <= innerWidth && t.top >= 0 && t.bottom <= innerHeight, sicht,
+        kopf: Math.round(document.querySelector("header").getBoundingClientRect().height) }; });
+    ok(mo.sicht, "ein Tipp auf ☰ zeigt ↻, Sprache, Thema und Bewegung");
+    ok(mo.drin, "das offene Menü liegt ganz im Fenster");
+    ok(mo.kopf === kopf0, "das offene Menü verschiebt die Kopfleiste nicht", `${kopf0} → ${mo.kopf}`);
     await pm.click("#langBtn");
     const menu = await pm.waitForSelector("#langMenu", { timeout: 2000 }).catch(() => null);
     ok(!!menu, "ein Tipp auf den Sprachknopf öffnet die Auswahl");
@@ -116,6 +151,7 @@ try {
       await pm.mouse.click(5, 700); await pm.waitForTimeout(100);
       ok(await pm.evaluate(() => !document.getElementById("langMenu") && document.documentElement.lang === "en"),
         "ein Tipp daneben schließt die Auswahl und ändert nichts");
+      ok(await pm.evaluate(() => !document.getElementById("kopfMenue").open), "… und schließt auch das Menü");
     }
     await mit.close(); await ohne.close();
   }

@@ -104,6 +104,8 @@ async function seite(init, breite = 1280) {
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
   const p = await ctx.newPage();
   await p.goto(base + "/index.html", { waitUntil: "load" });
+  /* Seit 2026-11-28 liegt der Knopf im Menü ☰: erst aufklappen, dann tippen. */
+  await p.evaluate(() => { const m = document.getElementById("kopfMenue"); if (m) m.open = true; });
   return { ctx, p };
 }
 
@@ -137,10 +139,16 @@ try {
       ok(!k.steht && k.form === "striche" && !k.blass && k.gedrueckt === "false" && k.sicht === "", "läuft er, zeigt der Knopf zwei Striche und kein Wort", JSON.stringify(k));
       const b0 = k.breite;
       await p.click("#bgPauseBtn");
+      /* ⚠ Auf die Wirkung warten, nicht sofort messen: auch auf origin/main fiel
+         dieser Schritt in 3 von 3 Läufen um (2026-11-28), weil der Zustand ein
+         Bild später nachzieht. Gewartet wird höchstens 3 s — bleibt er aus,
+         wird die Zeile darunter rot wie bisher. */
+      await p.waitForFunction(() => document.getElementById("bgPauseBtn").classList.contains("bg-steht"), null, { timeout: 3000 }).catch(() => {});
       k = await knopf(p);
       ok(k.steht && k.form === "dreieck" && k.mbSteht && !k.laeuft && k.gedrueckt === "true", "ein Tipp: Dreieck, und die Schleife steht wirklich", JSON.stringify(k));
       ok(k.breite === b0, "Striche und Dreieck sind gleich breit — die Kopfleiste springt nicht", `${b0} → ${k.breite}`);
       await p.click("#bgPauseBtn");
+      await p.waitForFunction(() => !document.getElementById("bgPauseBtn").classList.contains("bg-steht"), null, { timeout: 3000 }).catch(() => {});
       k = await knopf(p);
       ok(!k.steht && k.form === "striche" && k.laeuft, "noch ein Tipp: Striche, und sie läuft wieder", JSON.stringify(k));
     }

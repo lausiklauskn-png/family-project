@@ -60,7 +60,9 @@ const lage = (pg) => pg.evaluate(() => {
   const g = r && r.querySelector(".mk-regler-griff").getBoundingClientRect();
   const k = [...document.querySelectorAll("#mkListings .listing")];
   const kopf = document.querySelector("header").getBoundingClientRect().bottom;
-  const pille = document.getElementById("sbkim-rdv-btn");
+  /* Nur eine SCHWEBENDE Pille zählt; im Menü ☰ angedockt liegt sie nicht über der Liste. */
+  let pille = document.getElementById("sbkim-rdv-btn");
+  if (pille && getComputedStyle(pille).position !== "fixed") pille = null;
   return {
     da: !!r, sichtbar: !!b && getComputedStyle(r).display !== "none",
     box: b && { l: b.left, r: b.right, t: b.top, b: b.bottom, w: b.width },
