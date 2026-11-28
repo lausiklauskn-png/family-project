@@ -81,7 +81,33 @@ fall 'SPRACHE: der Sprachknopf zeigt wieder das ganze Wort' assets/app.js \
 
 fall 'REIHEN: ohne die Verdichtung bricht die Kopfleiste in vier Reihen' assets/style.css \
   '@media (max-width:360px){nav.top{gap:5px}nav.top a{padding:7px 8px;font-size:.86rem}}' '' \
-  'drei Reihen'
+  'ZWEI Reihen'
+
+echo
+echo "═══ DAS MENUE ☰ (Klaus 2026-11-28) ═══"
+fall 'ZU: das Menue steht beim Laden offen' index.html \
+  '<details class="kopf-menue" id="kopfMenue">' '<details class="kopf-menue" id="kopfMenue" open>' \
+  'beim Laden zu'
+
+fall 'MYCEL: die Mycel-Pille hat keinen Platz mehr im Menue' index.html \
+  '<span class="kopf-mycel" data-sbkim-mycel-platz></span>' '' \
+  'ihren Platz im Menü'
+
+fall 'DANEBEN: ein Tipp daneben schliesst das Menue nicht' assets/app.js \
+  '      if (m.open && !gehoert(e.target)) m.open = false;' '      /* weg */' \
+  'schließt auch das Menü'
+
+fall 'EINPASSEN: der offene Teil ragt links aus dem Fenster' assets/app.js \
+  '      if (!teil || !m.open) return;' '      return;' \
+  'liegt ganz im Fenster'
+
+fall 'SCHIEBT: der offene Teil schiebt die Kopfleiste' assets/style.css \
+  '.kopf-menue-teil{position:absolute;' '.kopf-menue-teil{position:static;' \
+  'verschiebt die Kopfleiste nicht'
+
+fall 'NEBEN: das Menue steht nicht mehr neben dem Siegel' assets/style.css \
+  '.kopf-menue{position:relative;display:inline-flex}' '.kopf-menue{position:relative;display:inline-flex;margin-top:60px}' \
+  'neben dem Siegel'
 
 echo
 echo "═══ $gruen schlagen an · $blind blind · $falsch aus falschem Grund · $tot tote Anker ═══"

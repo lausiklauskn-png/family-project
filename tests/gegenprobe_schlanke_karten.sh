@@ -122,7 +122,9 @@ fall 'MEHR-OBEN: mehr steht wieder in der Zeile der Messwerte' markt.html \
 fall 'PAAR: mehr und Melden brechen getrennt um' assets/style.css \
   '.listing-foot .mk-fuss-rechts{display:flex;align-items:flex-end;gap:4px;margin-left:auto}' \
   '.listing-foot .mk-fuss-rechts{display:contents}' \
-  'zusammen in einer Reihe'
+  'neben\|zusammen in einer Reihe'
+# ⚠ Seit 2026-11-28 faellt dabei mal der Wachter bei grosser Schrift, mal der
+# bei 1280 px („unten links neben Melden") — beide sind DIESELBE Zusicherung.
 
 # „mehr" steht von Anfang an offen.
 fall 'MEHR: der aufgeklappte Teil steht von Anfang an offen' markt.html \

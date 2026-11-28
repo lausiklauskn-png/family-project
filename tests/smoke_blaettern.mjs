@@ -60,7 +60,9 @@ const lage = (pg) => pg.evaluate(() => {
   const g = r && r.querySelector(".mk-regler-griff").getBoundingClientRect();
   const k = [...document.querySelectorAll("#mkListings .listing")];
   const kopf = document.querySelector("header").getBoundingClientRect().bottom;
-  const pille = document.getElementById("sbkim-rdv-btn");
+  /* Nur eine SCHWEBENDE Pille zählt; im Menü ☰ angedockt liegt sie nicht über der Liste. */
+  let pille = document.getElementById("sbkim-rdv-btn");
+  if (pille && getComputedStyle(pille).position !== "fixed") pille = null;
   return {
     da: !!r, sichtbar: !!b && getComputedStyle(r).display !== "none",
     box: b && { l: b.left, r: b.right, t: b.top, b: b.bottom, w: b.width },
@@ -88,6 +90,11 @@ if (br) {
     await zu(pg, 0);
     const oben = await lage(pg);
     ok(oben.da && !oben.sichtbar, "ganz oben, vor der Liste, ist der Regler NICHT zu sehen");
+    /* Seit dem Menü ☰ (2026-11-28) sitzt die Mycel-Pille dort angedockt. Wer
+       sie einmal herausgezogen hat, hat sie aber unten rechts schweben — diese
+       Lage wird hier gestellt, sonst wäre der Wächter darunter trivial grün. */
+    await pg.evaluate(() => { const b = document.getElementById("sbkim-rdv-btn"); if (!b) return;
+      document.body.appendChild(b); b.style.position = "fixed"; b.style.right = "10px"; b.style.bottom = "20px"; b.style.left = "auto"; b.style.top = "auto"; });
     await zu(pg, (await listeOben(pg)) + 1200);
     const m = await lage(pg);
     ok(m.sichtbar, "in der Liste ist er zu sehen");
@@ -95,7 +102,7 @@ if (br) {
     ok(m.box && m.box.r >= m.breite - 4 && m.box.w <= 34 && m.griff.w <= 24,
       "er steht am rechten Rand und ist schmal (nicht riesig)", m.box ? `${Math.round(m.box.w)} px breit, Griff ${Math.round(m.griff.w)}×${Math.round(m.griff.h)}` : "");
     ok(m.box && m.box.t >= m.kopf, "er beginnt unter der Kopfleiste");
-    ok(m.pille === null || (m.box && m.box.b <= m.pille), "er endet über der Mycel-Pille, nicht unter ihr",
+    ok(m.pille !== null && m.box && m.box.b <= m.pille, "er endet über der (schwebenden) Mycel-Pille, nicht unter ihr",
       m.pille === null ? "keine Pille" : `${Math.round(m.box.b)} ≤ ${Math.round(m.pille)}`);
 
     // Ein Zug von oben nach unten: das Ende der Liste.
@@ -142,16 +149,35 @@ if (br) {
     ok(m.rein > 0, `${w} px: unten kommen Karten gekippt herein`, `${m.rein}`);
     ok(m.voll.length > 0 && m.voll.every((x) => !x), `${w} px: jede ganz sichtbare Karte steht gerade`, `${m.voll.length} ganz sichtbar`);
     // Wer misst, was er selbst verdreht, flackert: zweimal ausmessen ändert nichts.
-    const vor = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => e.className).join("|"));
     /* Zwischen den Runden die Kipp-Bewegung (0,42 s) ganz abwarten: erst die
      * fertig gekippte Karte zeigt, ob sie ihre eigene Messung verschiebt.
-     * ⚠ Der erste Lauf maß zweimal direkt hintereinander und war BLIND. */
-    for (let i = 0; i < 3; i++) {
-      await pg.evaluate(() => window.FP_MARKT_BLAETTERN.sammeln());
-      await pg.waitForTimeout(600);
+     * ⚠ Der erste Lauf maß zweimal direkt hintereinander und war BLIND.
+     * ⚠ Und seit der flacheren Schwelle (0,35, 2026-11-28) lag an EINER Stelle
+     * keine Karte mehr an der Grenze — wieder blind. Gemessen wird deshalb an
+     * mehreren Stellen der Liste. */
+    let flackert = [];
+    for (const d of [900, 960, 1020, 1080, 1140, 1200]) {
+      await zu(pg, (await listeOben(pg)) + d);
+      await pg.waitForTimeout(500);
+      const vor = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => e.className).join("|"));
+      for (let i = 0; i < 2; i++) {
+        await pg.evaluate(() => window.FP_MARKT_BLAETTERN.sammeln());
+        await pg.waitForTimeout(600);
+      }
+      const nach = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => e.className).join("|"));
+      if (vor !== nach) flackert.push(d);
     }
-    const nach = await pg.evaluate(() => [...document.querySelectorAll("#mkListings .listing")].map((e) => e.className).join("|"));
-    ok(vor === nach, `${w} px: neu ausmessen ändert nichts (kein Flackern)`);
+    ok(!flackert.length, `${w} px: neu ausmessen ändert nichts (kein Flackern)`, flackert.join(", "));
+    /* Die Ursache selbst: gemerkt werden Layout-Werte, auch für gekippte Karten. */
+    const abw = await pg.evaluate(() => {
+      window.FP_MARKT_BLAETTERN.sammeln();
+      const k = [...document.querySelectorAll("#mkListings .listing")], l = window.FP_MARKT_BLAETTERN.lagen();
+      let n = 0;
+      k.forEach((e, i) => { let t = 0, x = e; while (x) { t += x.offsetTop; x = x.offsetParent; if (x) t += x.clientTop || 0; }
+        if (Math.abs(l[i][0] - t) > 1 || Math.abs(l[i][1] - e.offsetHeight) > 1) n++; });
+      return { n, gekippt: k.filter((e) => e.classList.contains("kipp-weg") || e.classList.contains("kipp-rein")).length };
+    });
+    ok(abw.gekippt > 0 && abw.n === 0, `${w} px: gemerkt wird die Lage aus dem Layout, nicht die der gekippten Karte (kein Flackern)`, JSON.stringify(abw));
     await ctx.close();
   }
 

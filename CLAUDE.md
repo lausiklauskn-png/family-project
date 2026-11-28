@@ -1740,3 +1740,42 @@ Gegenprobe `schlanke_karten`: neu MEHR-OBEN · PAAR · MEHR · WARNUNG · SPRUNG
 (UEBERLAPP blind: selbst bei 360 px und 140 % Schrift passen die vier Zahlen — als benannte Grenze herausgenommen;
 REIHE: die Wörter lassen die Reihe jetzt umbrechen statt abschneiden, erwartet ist „in EINER Reihe"). `kartenknoepfe`
 10/0/0/0 nach nachgezogenem Anker. Alle **54** `smoke_*.mjs` mit Rückgabe 0. Cache **v187 → v188**.
+
+## ☰ Das Kopf-Menü · Karten bleiben länger stehen (Klaus 2026-11-28)
+
+Klaus: *„Da wo jetzt der Installationsbutton ist, bei Family Project im Handy kommt der Button hin für das Menü und dann
+sind darunter die anderen Button versteckt … Und auch das Myzel versteckst du mit in den Einstellungen."* · *„die zweite
+App, die auftaucht, soll etwas länger zu sehen sein."*
+
+⚠ **TAFEL-EVOLUTION, BENANNT:** die Kopfleiste trug ⬇ · ↻ · DE · ◐ · Bewegung offen, die Mycel-Pille schwebte unten
+rechts. Jetzt liegen alle hinter **☰** (`<details class="kopf-menue" id="kopfMenue">`), rechts neben den Lampen
+LEBT · VERKEHR · FREMD · SIEGEL. Die Lampen bleiben offen. Auf allen 13 Seiten mit Kopfleiste.
+
+| | |
+|---|---|
+| Menü | `<details>`: Auf/Zu und Tastatur ohne Skript; der Teil darunter `position:absolute`, er schiebt nichts. `kopfMenue()` in `assets/app.js`: Tipp daneben und Esc schließen, Name zweisprachig, der Teil rückt ins Fenster (`einpassen`) |
+| Mycel | dockt über `data-sbkim-mycel-platz` (Modul 23 kennt den Platz) **im Menü** ein. Wer die Pille früher einmal gezogen hat, behält seine gemerkte Lage; ⤺ im Mycel-Fenster holt sie zurück |
+| Knöpfe | unverändert (`#fpReload`, `#langBtn`, `#themeBtn`, `#bgPauseBtn`, `#install-platz` mit `data-vor`); Sprach-Auswahl, Bewegungs-Blase und Mycel-Fenster zählen als „im Menü" |
+| Kippen | `assets/markt-blaettern.js`: Schwelle 0,5 → **0,35**, am kurzen Bild 2/3 → **0,45** |
+| Regler | zählt nur eine **schwebende** Mycel-Pille (sonst schrumpfte er auf nichts, weil ein zugeklapptes `<details>` in Chrome sein Layout behält) |
+
+**Gemessen (Kopfhöhe, echter Browser):** 360 px **170 → 132** · 412 px **173 → 134** · 820 px **133 → 94** · 1280 px 61.
+
+⚠ **Ein zugeklapptes `<details>` hat in Chrome eine Höhe** (`content-visibility`), sein Inhalt ein Rechteck. Gemessen wird
+Sichtbarkeit mit `checkVisibility()`, nie mit der Höhe; der erste Lauf der Probe war daran 13× rot.
+
+⚠ `smoke_bewegungsknopf` war **auch auf `main`** in 3 von 3 Läufen rot („ein Tipp: Dreieck …"): gemessen wurde vor der
+Wirkung. Die Probe wartet jetzt höchstens 3 s auf den Zustand, danach dreimal grün.
+
+```bash
+node tests/smoke_kopfleiste.mjs       # Menü: zu beim Laden, alle Knöpfe drin, neben dem Siegel, im Fenster, schließt
+node tests/smoke_blaettern.mjs        # Regler ignoriert die angedockte Pille
+```
+Gegenproben (Wegwerf-Kopie, 2026-11-28): `kopfleiste` **11 · 0 · 0 · 0** (sechs neue Fälle fürs Menü) ·
+`bewegungsknopf` 6/0/0/0 · `kartenknoepfe` 10/0/0/0 · `blaettern` erst **11 · 2 blind**, `schlanke_karten` erst
+**12 · 0 · 1 aus falschem Grund**. Die zwei Blinden: REGLER-PILLE (die Pille schwebt nicht mehr, der Wächter war bei
+`null` trivial grün; jetzt wird eine herausgezogene Pille gestellt) und KIPP-FLACKERN (bei Schwelle 0,35 lag keine
+Karte mehr an der Grenze; jetzt wird die Ursache gemessen: `FP_MARKT_BLAETTERN.lagen()` muss Layout-Werte tragen).
+PAAR fiel unter dem Nachbarnamen derselben Zusicherung („unten links neben Melden"). Danach **13 · 0 · 0 · 0**.
+
+Cache **v188 → v189**, `ASSET_V` und alle `?v=` mitgezogen. ⚠ Am Handy nicht gesehen.

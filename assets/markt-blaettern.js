@@ -28,8 +28,12 @@
   var liste = document.getElementById("mkListings");
   if (!liste) return;
 
-  var KIPP_SCHWELLE = 0.5;
-  var KIPP_SCHWELLE_KURZ = 2 / 3;
+  /* Klaus 2026-11-28: „die zweite App, die auftaucht, soll etwas länger zu
+     sehen sein … nur ein wenig mehr". Eine Karte kippt erst, wenn weniger als
+     ein gutes Drittel von ihr im Bild ist (vorher die Hälfte, am kleinen Handy
+     zwei Drittel). */
+  var KIPP_SCHWELLE = 0.35;
+  var KIPP_SCHWELLE_KURZ = 0.45;
   var KIPP_KURZES_BILD = 720;
   var REGLER_AB = 8;              /* weniger Karten: kein Regler nötig */
   var REGLER_BREITE = "(max-width: 599px)";   /* nur am Handy (eine Spalte) */
@@ -161,6 +165,11 @@
       /* Unten rechts schwebt die Pille „🌐 Mycel" (Modul 23). Der Regler
          endet darüber, sonst läge der Griff ganz unten unter ihr. */
       var pille = document.getElementById("sbkim-rdv-btn"), unten = 18;
+      /* Nur die SCHWEBENDE Pille zählt. Seit dem Menü ☰ (2026-11-28) sitzt sie
+         dort angedockt; ein zugeklapptes <details> behält in Chrome sein
+         Layout, ihr Rechteck läge dann mitten im Kopf und der Regler schrumpfte
+         auf nichts. */
+      if (pille && getComputedStyle(pille).position !== "fixed") pille = null;
       if (pille) {
         var pr = pille.getBoundingClientRect();
         if (pr.height && pr.right > (window.innerWidth || 0) - 40) unten = Math.max(unten, bild - pr.top + 8);
@@ -238,5 +247,8 @@
   /* „mehr" aufgeklappt schiebt alles darunter: `toggle` steigt nicht auf,
      deshalb in der Fangphase. */
   liste.addEventListener("toggle", sammeln, true);
-  window.FP_MARKT_BLAETTERN = { sammeln: sammeln };
+  /* `lagen()` gibt die gemerkten Lagen heraus — nur für die Probe, die prüft,
+     dass mit Layout-Werten gemessen wird und nicht mit der gekippten Karte. */
+  window.FP_MARKT_BLAETTERN = { sammeln: sammeln,
+    lagen: function () { return karten.map(function (k) { return [k.oben, k.hoehe]; }); } };
 })();

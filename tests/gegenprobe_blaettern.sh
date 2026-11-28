@@ -78,7 +78,7 @@ fall 'REGLER-GROSS: der Griff wird riesig' assets/style.css \
   'ist schmal'
 fall 'REGLER-PILLE: der Regler endet unter der Mycel-Pille' assets/markt-blaettern.js \
   'unten = Math.max(unten, bild - pr.top + 8);' 'unten = unten;' \
-  'der Mycel-Pille, nicht unter'
+  'Mycel-Pille, nicht unter'
 fall 'REGLER-TASTE: die Tastatur bewegt nichts' assets/markt-blaettern.js \
   'else if (ev.key === "End") neu = 1;' 'else if (ev.key === "End") neu = null;' \
   'mit der Tastatur'

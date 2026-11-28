@@ -1036,3 +1036,22 @@ a.rf-step:hover{border-color:var(--accent);transform:translateY(-2px)}
 /* „Neu“ am Namen einer neu gestalteten App (Klaus 2026-11-25): klein, neben dem Namen, führt in die neue App */
 .listing h3 .mk-neu{display:inline-block;vertical-align:middle;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:.68rem;font-weight:700;letter-spacing:.03em;line-height:1.5;text-decoration:none;color:#06231a;background:var(--accent,#7fe0b4);border:1px solid rgba(0,0,0,.08)}
 .listing h3 .mk-neu:hover,.listing h3 .mk-neu:focus-visible{filter:brightness(1.08)}
+
+/* ── DAS KOPF-MENÜ ☰ (Klaus 2026-11-28) ────────────────────────────────────
+   „… du packst dann diese Button in ein Dreieck und das kannst du bitte neben
+   das Siegel packen … und auch das Myzel versteckst du mit in den
+   Einstellungen." Hinter ☰ liegen ⬇ Installieren, ↻, Sprache, Thema,
+   Bewegung und die Mycel-Pille (sie dockt über `data-sbkim-mycel-platz` ein).
+   Ein <details>: geht mit Tastatur und ohne eigenes Klick-Skript. Der Teil
+   darunter steht `position:absolute`, er schiebt die Leiste nicht. */
+.kopf-menue{position:relative;display:inline-flex}
+.kopf-menue>summary{list-style:none;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:34px;font-size:1rem;line-height:1;padding:6px 12px}
+.kopf-menue>summary::-webkit-details-marker{display:none}
+.kopf-menue>summary::marker{content:""}
+.kopf-menue[open]>summary{color:var(--text);border-color:var(--accent)}
+.kopf-menue-teil{position:absolute;right:0;top:calc(100% + 8px);z-index:45;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px;
+  width:max-content;max-width:min(300px,calc(100vw - 16px));padding:10px;border-radius:14px;background:color-mix(in srgb,var(--bg) 94%,transparent);border:1px solid var(--line);
+  backdrop-filter:blur(14px) saturate(1.2);-webkit-backdrop-filter:blur(14px) saturate(1.2);box-shadow:var(--shadow)}
+.kopf-menue-teil .pill{min-height:34px;display:inline-flex;align-items:center}
+.kopf-mycel:empty{display:none}
+.kopf-mycel #sbkim-rdv-btn{position:static !important}
