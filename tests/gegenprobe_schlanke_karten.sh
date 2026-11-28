@@ -103,39 +103,45 @@ fall 'ZEILEN: der Text klemmt wieder auf drei Zeilen' assets/style.css \
 fall 'REIHE: die Woerter der Messwerte stehen wieder in der Pille' assets/style.css \
   '.listing .mk-ms-k{position:absolute;width:1px;height:1px;' \
   '.listing .mk-ms-k{position:static;width:auto;height:auto;' \
-  'nicht abgeschnitten'
-
-# Die Reihe darf wieder umbrechen — mit sichtbaren Woertern zugleich, sonst
-# passt sie in eine Zeile und der Fall maesse nichts. ⚠ Der erste Lauf war
-# BLIND: die Sabotage nahm nur `position:absolute` heraus, `width:1px` blieb —
-# die Woerter nahmen weiter keinen Platz, und nichts brach um.
-fall 'EINE-REIHE: die Messwerte brechen in zwei Zeilen um' assets/style.css \
-  '.listing .mk-ms-zeile{display:flex;flex-wrap:nowrap;gap:4px;min-width:0}
-.listing .mk-ms-zeile .mk-ms-w{padding:2px 6px;font-size:.74rem;gap:3px}
-.listing .mk-ms-k{position:absolute;width:1px;height:1px;' \
-  '.listing .mk-ms-zeile{display:flex;flex-wrap:wrap;gap:4px;min-width:0}
-.listing .mk-ms-zeile .mk-ms-w{padding:2px 6px;font-size:.74rem;gap:3px}
-.listing .mk-ms-k{position:static;width:auto;height:auto;' \
   'in EINER Reihe'
 
+# ⚠ BENANNTE GRENZE: „die Pillen schrumpfen unter ihren Inhalt" ist hier
+# NICHT messbar und deshalb kein Fall. Selbst bei 360 px und 140 % Schrift
+# passen die vier Zahlen nebeneinander (gemessen 2026-11-28); die Sabotage
+# aenderte nichts, der Fall war BLIND. Die Ueberdeckung auf Klaus' Bild kam
+# von „mehr" in derselben Zeile — das misst MEHR-OBEN.
+
+# „mehr" steht wieder in der Zeile der Messwerte (der Stand vor Klaus' Bild).
+fall 'MEHR-OBEN: mehr steht wieder in der Zeile der Messwerte' markt.html \
+  "'<p class=\"mk-mehr-reihe\">' + teil.kurz + '</p>' +" \
+  "'<p class=\"mk-mehr-reihe\">' + teil.kurz + (id ? '<button type=\"button\" class=\"mk-mehr-zu\" aria-expanded=\"false\" aria-controls=\"' + id + '\">mehr</button>' : '') + '</p>' + (id = '', '') +" \
+  'NICHT in der Zeile der Messwerte'
+
+# „mehr" und „Melden" sind kein Paar mehr: bei grosser Schrift steht
+# „Melden" wieder allein links unten.
+fall 'PAAR: mehr und Melden brechen getrennt um' assets/style.css \
+  '.listing-foot .mk-fuss-rechts{display:flex;align-items:flex-end;gap:4px;margin-left:auto}' \
+  '.listing-foot .mk-fuss-rechts{display:contents}' \
+  'zusammen in einer Reihe'
+
 # „mehr" steht von Anfang an offen.
-fall 'MEHR: das Klappfeld steht von Anfang an offen' markt.html \
-  "return '<details class=\"mk-mehr' + (teil.mess ? ' mk-mess' : '') + '\"><summary>'" \
-  "return '<details open class=\"mk-mehr' + (teil.mess ? ' mk-mess' : '') + '\"><summary>'" \
+fall 'MEHR: der aufgeklappte Teil steht von Anfang an offen' markt.html \
+  "'<div class=\"mk-mehr-innen\" id=\"' + id + '\" hidden>'" \
+  "'<div class=\"mk-mehr-innen\" id=\"' + id + '\">'" \
   'liegt zugeklappt'
 
 # Die gelbe/rote Warnung wandert mit unter „mehr" — verschwindet aus dem Blick.
 ALT2='((w && w.ampel === "quittiert") ? "" : wacheBand(w)) +' NEU2='"" +' \
 fall 'WARNUNG: gelb und rot verschwinden unter mehr' markt.html \
-  'var innen = teil.lang + ((w && w.ampel === "quittiert") ? wacheBand(w) : "") + video + messungKnopf(x);' \
-  'var innen = teil.lang + wacheBand(w) + video + messungKnopf(x);' \
+  'var innen = teil.lang + ((w && w.ampel === "quittiert") ? wacheBand(w) : "") + video + knoepfe;' \
+  'var innen = teil.lang + wacheBand(w) + video + knoepfe;' \
   'stehen OFFEN an der Karte'
 
 # Der Platzhalter der gebauten Seite faellt weg: die Liste springt beim
 # Neuzeichnen, weil die Messwert-Zeile erst mit dem Skript kommt.
 fall 'SPRUNG: die gebaute Karte verliert den Platzhalter' tools/statische-listen.mjs \
-  ": '<p class=\"mk-mehr-nur\" aria-hidden=\"true\"></p>') +" \
-  ": '') +" \
+  "'<div class=\"mk-mehr\"><p class=\"mk-mehr-reihe\" aria-hidden=\"true\"></p>' +" \
+  "'<div class=\"mk-mehr\">' +" \
   'ohne und mit Skript gleich hoch' neubau
 
 # Die Reserve fuer den Melde-Knopf faellt weg (gebaut 7 px niedriger).

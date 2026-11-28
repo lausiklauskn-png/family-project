@@ -316,13 +316,18 @@ export function marktHtml(eintraege) {
         `<p>${esc(e.text)}</p>` +
         /* Das Erklärvideo steht auf der Detailseite; die Karte trägt nur den
          * Weg dorthin, als Textzeile statt als vierter Knopf — die Knöpfe
-         * einer Karte sind eine Familie (Klaus 2026-09-22). Seit 2026-11-27
-         * unter „mehr“. Wortgleich in markt.html `card()` / `mehrBlock()`.
-         * Ohne Video steht ein leerer Platzhalter in derselben Höhe: die
-         * Karte, die das Skript danach zeichnet, trägt dort die Messwerte —
-         * ohne ihn spränge die Liste beim Neuzeichnen. */
-        (e.video && e.anchorId ? `<details class="mk-mehr"><summary><span class="mk-mehr-zu">mehr</span></summary><div class="mk-mehr-innen"><p class="mk-video"><a href="apps/${esc(e.anchorId)}/#video">🎬 Erklärvideo</a></p></div></details>`
-          : '<p class="mk-mehr-nur" aria-hidden="true"></p>') +
+         * einer Karte sind eine Familie (Klaus 2026-09-22). Seit 2026-11-28
+         * im Teil „mehr", der sich über den Knöpfen öffnet; wortgleich in
+         * markt.html `mehrBlock()`.
+         * Die leere Zeile `.mk-mehr-reihe` hält die Höhe frei, in der danach
+         * die Messwerte stehen — ohne sie spränge die Liste beim Neuzeichnen.
+         * ⚠ KEIN „mehr"-Knopf in der gebauten Fassung: ohne Skript täte er
+         * nichts, und ein toter Knopf ist schlimmer als keiner. Der Link steht
+         * trotzdem im HTML (versteckt), für Suchmaschinen und als Weg, den
+         * das Skript danach aufklappbar macht. */
+        '<div class="mk-mehr"><p class="mk-mehr-reihe" aria-hidden="true"></p>' +
+        (e.video && e.anchorId ? `<div class="mk-mehr-innen" hidden><p class="mk-video"><a href="apps/${esc(e.anchorId)}/#video">🎬 Erklärvideo</a></p></div>` : "") +
+        "</div>" +
         '<div class="listing-actions"><div class="listing-foot">' + einzeln + link + "</div></div>" +
       "</div>" +
       "</div>";

@@ -99,7 +99,7 @@ fall 'der Melde-Knopf wird wieder 68 px breit' assets/style.css \
 #     meldete sich als ROT AUS FALSCHEM GRUND: mit `flex-wrap` ragt NIE etwas
 #     hinaus, es rutscht in eine zweite Reihe. Der Fall-Name log.
 fall 'das alte Polster kommt zurueck — die Knoepfe werden wieder fett' assets/style.css \
-  '  padding:10px 12px;border-radius:10px;' \
+  '  padding:10px 8px;border-radius:10px;' \
   '  padding:13px 22px;border-radius:14px;' \
   'Nagel'
 
@@ -110,8 +110,8 @@ fall 'das alte Polster kommt zurueck — die Knoepfe werden wieder fett' assets/
 #     schlimmere Sorte, weil man sie nicht sieht. Seitdem misst die Probe
 #     `scrollWidth > clientWidth`.
 fall 'die Fusszeile darf nicht mehr in eine zweite Reihe' assets/style.css \
-  'justify-content:space-between;gap:14px;flex-wrap:wrap;' \
-  'justify-content:space-between;gap:14px;flex-wrap:nowrap;' \
+  'justify-content:space-between;gap:6px;flex-wrap:wrap;' \
+  'justify-content:space-between;gap:6px;flex-wrap:nowrap;' \
   'ist nicht abgeschnitten'
 
 # 7 · der Pfeil kommt zurueck — im BAU-Zeichner, mit Neubau der Seite.
@@ -133,6 +133,7 @@ fall 'der Pfeil kommt in den Laufzeit-Zeichner zurueck' markt.html \
 fall 'aus einer Regel werden wieder drei' assets/style.css \
   '.listing .ext,
 .listing .mk-ms-btn,
+.listing .mk-kaffee,
 .listing .listing-foot .btn:not(.mk-report){' \
   '.listing .ext{font-family:var(--mono);font-size:.78rem}
 .listing .mk-ms-btn{font-family:var(--mono);font-size:.78rem}
